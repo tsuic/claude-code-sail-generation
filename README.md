@@ -41,4 +41,4 @@ You can also make a single request ask Claude to make a mockup and then make it 
 ### Pre-Requisite: Data Model Context
 In order to successfully inject record queries into the expression, Claude must know enough about the data model: record types, fields, UUIDs.
 
-Because this project isn't running in Appian and we don't yet have a tool call for fetching the data model, this context must be specified in a markdown file. Edit `/Dynamic Behaviors Guidelines/data_model_context.md`, making sure to preserve the structure of the example, to include details of your data model.
+Because this project isn't running in Appian and we don't yet have a tool call for fetching the data model, this context must be specified in a markdown file. Edit `/context/data-model-context.md`, making sure to preserve the structure of the example, to include details of your data model.
