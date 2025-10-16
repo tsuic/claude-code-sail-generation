@@ -22,8 +22,8 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 **BEFORE writing ANY SAIL code, you MUST:**
 
-1. **Read the component documentation** from `/UI Guidelines/` folder
-   - Find the relevant file: Use Glob to search for `*_<component_name>_instructions.md`
+1. **Read the component documentation** from `/ui-guidelines/` folder
+   - Find the relevant file: Use Glob to search for `*-<component-name>-instructions.md`
    - Read the ENTIRE file before using the component
    - DO NOT assume you know how a component works from memory
 
@@ -42,13 +42,14 @@ If you violate any of these rules, STOP and reconsider your approach.
    - When in doubt, re-read the documentation
 
 ### Example Files Available:
-- `0_sail_component_reference.md` - Overview of all components
-- `3_header_content_layout_instructions.md` - HeaderContentLayout
-- `3_columns_layout_instructions.md` - ColumnsLayout
-- `3_sidebyside_layout_instructions.md` - SideBySideLayout
-- `4_card_layout_instructions.md` - CardLayout
-- `4_grid_field_instructions.md` - GridField
-- `4_rich_text_instructions.md` - Rich Text components
+- `0-sail-component-reference.md` - Overview of all UI components and parameters
+- `1-expression-grammar-instructions.md` - Explains expression grammar for calculation, logic, etc. functions
+- `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
+- `3-columns-layout-instructions.md` - ColumnsLayout guidelines
+- `3-sidebyside-layout-instructions.md` - SideBySideLayout guidelines
+- `4-card-layout-instructions.md` - CardLayout guidelines
+- `4-grid-field-instructions.md` - GridField guidelines
+- `4-rich-text-instructions.md` - Rich Text component guidelines
 - And many more...
 
 ### ❌ NEVER:
@@ -186,6 +187,3 @@ Use a columnsLayout instead
 ‼️DO NOT put columnsLayouts inside sideBySideLayouts
 ‼️DO NOT put cardLayouts inside sideBySideLayouts
 ‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-
-

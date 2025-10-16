@@ -56,8 +56,8 @@ Your validation process must be systematic and exhaustive:
    - Confirm brace/parenthesis matching
 
 3. **Parameter Verification:**
-   - Use *.md files in /UI Guidelines as documentation
-   - Pay particular attention to /UI Guidelines/0_sail_component_reference.md as it lists valid functions and parameters
+   - Use *.md files in /ui-guidelines as documentation
+   - Pay particular attention to /ui-guidelines/0-sail-component-reference.md as it lists valid functions and parameters
    - Cross-reference every parameter against documentation
    - Validate all enum values are from allowed lists
    - Check color format compliance
