@@ -7,6 +7,13 @@
 4. Launch Claude Code by typing: `claude`
 5. Grant any permissions that Claude Code asks for
 
+## Additional Steps to Setup an IDE
+If you want to use an IDE instead of a terminal. Follow these steps:
+1. Install Visual Studio Code: https://code.visualstudio.com/docs/setup/mac
+2. Run Visual Studio Code.app
+3. Install Claude Code extension for VS Code: https://docs.claude.com/en/docs/claude-code/vs-code#installation
+4. Setup Github in VS Code: https://code.visualstudio.com/docs/sourcecontrol/github
+
 ## Generating a SAIL Mockup
 This project's primary goal is to generate a SAIL expression representing a UI mockup with hard-coded sample data.
 
