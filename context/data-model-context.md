@@ -1,7 +1,7 @@
 # DATA MODEL (RECORDS) CONTEXT
 
 <available_record_types>
-## Available Record Types - Updated description
+## Available Record Types
 
 <sssa_case>
 ### SSSA Case
