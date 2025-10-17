@@ -2,7 +2,7 @@
 
 ## PURPOSE AND GOALS
 - Given a request, generate an Appian SAIL UI
-- Write generated output to a .sail files in the /Output folder
+- Write generated output to a .sail files in the /output folder
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling. Use the provided color scheme.
 - Don't worry about making it functional, just hard-code sample content

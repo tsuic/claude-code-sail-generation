@@ -25,6 +25,9 @@ a!localVariables(
 )
 ```
 
+## ✅ MANDATORY RULE: All local! variables used in an expression must have been declared in the parent a!localVariables() function
+Double check that referenced variables have been declared
+
 ## Core LocalVariables Structure
 
 ### Basic Syntax
