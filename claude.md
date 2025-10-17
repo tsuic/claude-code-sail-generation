@@ -66,7 +66,19 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
-## UI DESIGN PLANNING STEPS
+## INITIAL REQUEST CATEGORIZATION
+Is the user request...
+1. For a full page
+   - Example: "Create a dashboard that..."
+   - Example: "Generate a form for..."
+-OR-
+2. For a single component
+   - Example: "Make a grid that..."
+   - Example: "Create a card group that..."
+
+## PAGE UI DESIGN PLANNING STEPS
+When designing a full page, follow these planning steps (not necessary if user requests a single component):
+
 1. Decide which top-level layout to use:
   [ ] Pane layout - if the page features full-height (100vh) panes that might scroll independently, or,
   [ ] Form layout - for single-step forms, or,
@@ -77,8 +89,8 @@ If you violate any of these rules, STOP and reconsider your approach.
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
 4. If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
-Break components up into separate sideBySideItems, OR,
-Use a columnsLayout instead
+  - Break components up into separate sideBySideItems, OR,
+  - Use a columnsLayout instead
 
 ## COMPONENT SELECTION GUIDE
 
