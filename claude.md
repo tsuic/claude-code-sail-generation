@@ -2,12 +2,12 @@
 
 ## PURPOSE AND GOALS
 - Given a request, generate an Appian SAIL UI
-- Write generated output to a .sail files in the /output folder
+- Write generated output to a .sail file in the /output folder
 - Use only valid SAIL components and the allowed parameter values for each
-- Use modern, but business-appropriate styling. Use the provided color scheme.
+- Use modern, but business-appropriate styling
 - Don't worry about making it functional, just hard-code sample content
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation (in the /UI Guidelines folder)!
+- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation (in the /ui-guidelines folder)!
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
