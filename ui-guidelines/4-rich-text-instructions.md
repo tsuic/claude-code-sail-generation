@@ -315,7 +315,7 @@ a!sideBySideLayout(
 ## Rich Text Icons
 
 ### a!richTextIcon Parameters
-- `icon`: Font Awesome 4.7 icon name (brand icons like "google" are not supported)
+- `icon`: must be a valid alias string (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - `color`: Icon color (STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY, or hex)
 - `size`: Icon size (SMALL through EXTRA_LARGE)
 - `altText`: Accessibility text

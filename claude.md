@@ -18,32 +18,17 @@
 
 If you violate any of these rules, STOP and reconsider your approach.
 
-## 📚 DOCUMENTATION-FIRST WORKFLOW (MANDATORY)
-
-**BEFORE writing ANY SAIL code, you MUST:**
-
-1. **Read the component documentation** from `/ui-guidelines/` folder
-   - Find the relevant file: Use Glob to search for `*-<component-name>-instructions.md`
-   - Read the ENTIRE file before using the component
-   - DO NOT assume you know how a component works from memory
-
-2. **Follow the templates exactly** as shown in the documentation
-   - Use the "Standard Template" or "Common Patterns" sections
-   - Do NOT improvise or "improve" the structure
-   - Parameters and their values are explicitly documented - use only those
-
-3. **Check the validation checklist** at the end of each documentation file
-   - Every component documentation file has a validation checklist
-   - Verify your code against ALL checklist items before finalizing
-
-4. **Reference while writing**
-   - Keep the documentation open while writing code
-   - Cross-reference parameter names and allowed values
-   - When in doubt, re-read the documentation
+## 📚 DOCUMENTATION REQUIREMENT
+**ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.**
+1. Find: Glob for `*-<component-name>-instructions.md`
+2. Read: Full file, especially templates and validation sections
+3. Follow: Use exact templates, check validation lists
+4. Never assume - only use documented parameters/values
+5. When in doubt, re-read the documentation
 
 ### Key Files Available:
 - `0-sail-component-reference.md` - Overview of all UI components and parameters
-- `1-expression-grammar-instructions.md` - Explains expression grammar for calculation, logic, etc. functions
+- `1-expression-grammar-instructions.md` - Explains expression grammar for calculation, logic, conversion etc. functions (✅ ALWAYS check this for existence and signatures of functions)
 - `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
 - `3-columns-layout-instructions.md` - ColumnsLayout guidelines
 - `3-sidebyside-layout-instructions.md` - SideBySideLayout guidelines
@@ -165,7 +150,7 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
   - Allowed color enumeration values vary across components. Only use values specified in the documentation for that component.
   - HTML color names like "RED" are invalid
 - ButtonWidgets only take "ACCENT" or hex codes as color values
-- Icons must reference valid Font Awesome v4.7 icon aliases (but brand name or trademarked icons like "google" and "windows" are not supported)
+- Icons must reference valid aliases (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - RichTextItem align parameter allowed values are "LEFT", "CENTER", or "RIGHT", do not use "START" or "END"!
 - Checkbox and radio button labels can only accept plain text, not rich text
 - choiceValues CANNOT be null or empty strings (“”)
@@ -192,33 +177,3 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - [ ] Only richTextItems or richTextIcons in richTextDisplayField
 - [ ] At least one AUTO width column in columnsLayout
 - [ ] ❌ DON'T USE `less` or `more` for `spacing`!
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField
-
-‼️DO NOT nest sideBySideLayouts inside sideBySideLayouts
-‼️DO NOT put columnsLayouts inside sideBySideLayouts
-‼️DO NOT put cardLayouts inside sideBySideLayouts
-‼️ONLY richTextItems and richTextIcons can go inside richTextDisplayField

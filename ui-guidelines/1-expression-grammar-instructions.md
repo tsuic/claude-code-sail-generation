@@ -124,6 +124,11 @@ today()                             /* Current date */
 now()                               /* Current datetime */
 ```
 
+⚠️ ALWAYS use casting functions to make sure that different values have the same type, e.g.:
+- `todate(today())`
+- `todate(today()+1)`
+- `todatetime(now())`
+
 #### Date Extraction
 ```sail
 year(date)                          /* Extract year */
