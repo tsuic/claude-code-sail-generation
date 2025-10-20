@@ -1,5 +1,7 @@
 # Claude Code SAIL Generation
 
+This tool generates Appian SAIL UI expressions from natural language requests.
+
 ## Getting Started
 1. Clone this repo
 2. [Install and set up Claude Code](https://docs.claude.com/en/docs/claude-code/setup)
