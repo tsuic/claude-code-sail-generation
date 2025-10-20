@@ -50,7 +50,7 @@ Your validation process must be systematic and exhaustive:
    - Confirm no forbidden nesting patterns
 
 2. **Syntax Scanning:**
-   - Verify all operators use function syntax
+   - Verify valid operator functions used, not JS-/Python-style infix operators
    - Check quote escaping throughout
    - Validate comment syntax
    - Confirm brace/parenthesis matching
@@ -59,7 +59,7 @@ Your validation process must be systematic and exhaustive:
    - Use *.md files in /ui-guidelines as documentation
    - Pay particular attention to /ui-guidelines/0-sail-component-reference.md as it lists valid UI functions and parameters
    - Check /ui-guidelines/1-expression-grammar-instructions.md for expression function signatures
-   - Cross-reference EVERY parameter against documentation to make sure invalid parameters aren't used!
+   - Cross-reference EVERY **function name**, EVERY **parameter name**, and EVERY **parameter value** against documentation to make sure invalid syntax isn't used!
    - Validate all enum values are from allowed lists
    - Check color format compliance
    - Verify icon references
