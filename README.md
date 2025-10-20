@@ -13,6 +13,8 @@ If you want to use an IDE instead of the command line:
 2. Launch VS Code
 3. [Install Claude Code extension for VS Code](https://docs.claude.com/en/docs/claude-code/vs-code#installation)
 4. [Install GitHub extension for VS Code](https://code.visualstudio.com/docs/sourcecontrol/github)
+5. Open the root folder for this repo in VS Code Explorer
+6. Click the Claude icon on the top bar to open a Claude Code tab
 
 ## Generating a SAIL Mockup
 This project's primary goal is to generate a SAIL expression representing a UI mockup with hard-coded sample data.
