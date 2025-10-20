@@ -48,6 +48,8 @@ Container for multiple cards with automatic flow and height matching.
 - Automatic card wrapping and responsive behavior
 - When you want automatic height matching across all cards
 - Quick implementation of card collections
+- When the number of cards is known or unknown
+- *DEFAULT* to using cardGroupLayout (not columnsLayout) to arrange sets of cards
 
 **Example:**
 ```sail

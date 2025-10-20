@@ -41,7 +41,7 @@ If you violate any of these rules, STOP and reconsider your approach.
    - Cross-reference parameter names and allowed values
    - When in doubt, re-read the documentation
 
-### Example Files Available:
+### Key Files Available:
 - `0-sail-component-reference.md` - Overview of all UI components and parameters
 - `1-expression-grammar-instructions.md` - Explains expression grammar for calculation, logic, etc. functions
 - `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
@@ -50,6 +50,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - `4-card-layout-instructions.md` - CardLayout guidelines
 - `4-grid-field-instructions.md` - GridField guidelines
 - `4-rich-text-instructions.md` - Rich Text component guidelines
+- `4-stamp-field-instructions.md` - Stamp Field guidelines
 - And many more...
 
 ### ❌ NEVER:
@@ -92,7 +93,7 @@ When designing a full page, follow these planning steps (not necessary if user r
   - Break components up into separate sideBySideItems, OR,
   - Use a columnsLayout instead
 
-## COMPONENT SELECTION GUIDE
+## LAYOUT SELECTION GUIDE
 
 ### Layout Hierarchy (Top to Bottom):
 1. **Page Structure**: HeaderContentLayout/FormLayout/PaneLayout
@@ -104,8 +105,30 @@ When designing a full page, follow these planning steps (not necessary if user r
 - **ColumnsLayout**: Page structure, content sections, different widths
 - **SideBySideLayout**: Icon + text, label + value, small UI elements
 
+## COMPONENT SELECTION GUIDE
+
+### Form Inputs
+- Use `radioButtonField` or `checkboxField` for short lists of options
+- Alternatively, use `cardChoiceField` to show short lists of options in a more visually interesting way
+- Use `dropdownField` for longer lists of options
+
+### List Display
+- `gridField` is the simplest way to show tabular data, especially from records
+- A custom tabular display pattern (`4-tabular-data-display-pattern.md`) can be used if the capabilities of `gridField` are too limiting (such as when each cell needs to show multiple components)
+- Use `cardGroupLayout` to show a responsive grid of cards with each card representing a list item. This creates a more visually interesting list than a basic `gridField`.
+
+### Decorative Data Display
+- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc.
+- Use `tagField` to show UI elements styled like tags or chips
+
+### Common Patterns
+Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements:
+- `list_items.md` for list items (users, tasks, messages, etc.) as cards
+- `kpis.md` for key performance indicator cards
+- `messages.md` for message banners (info, warning, etc.)
+- `tabs.md` for tab bars
+
 ### Special Rules
-- Use tagField to show UI elements styled like tags or chips
 - Avoid using the KPIField unless data can be sourced dynamically from a record. The KPIField doesn't work well for static mockup KPI values.
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
 - When not setting a label on a component, explicitly set labelPosition to “COLLAPSED” so that space is not reserved for the label (for more reliable alignment)
