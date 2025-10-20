@@ -33,7 +33,8 @@ If you violate any of these rules, STOP and reconsider your approach.
 - `3-columns-layout-instructions.md` - ColumnsLayout guidelines
 - `3-sidebyside-layout-instructions.md` - SideBySideLayout guidelines
 - `4-card-layout-instructions.md` - CardLayout guidelines
-- `4-grid-field-instructions.md` - GridField guidelines
+- `4-grid-field-instructions.md` - GridField (read-only grid) guidelines
+- `4-grid-layout-instructions.md` - GridLayout (editable grid) guidelines
 - `4-rich-text-instructions.md` - Rich Text component guidelines
 - `4-stamp-field-instructions.md` - Stamp Field guidelines
 - And many more...
@@ -53,14 +54,30 @@ If you violate any of these rules, STOP and reconsider your approach.
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
 ## INITIAL REQUEST CATEGORIZATION
-Is the user request...
-1. For a full page
-   - Example: "Create a dashboard that..."
-   - Example: "Generate a form for..."
--OR-
-2. For a single component
-   - Example: "Make a grid that..."
-   - Example: "Create a card group that..."
+
+Determine if the user wants a full page or just a component.
+
+### Decision Criteria:
+
+**Generate a SINGLE COMPONENT if the request:**
+- Asks for "a grid", "a card", "a form", "a chart", etc. (note: "a" = one thing)
+- Names a single component (grid, KPI, etc.) that's not a top-level layout
+- Specifies columns, fields, or content WITHOUT mentioning "page" or "interface"
+- Examples:
+  - ✅ "Make a grid that shows..." → Generate ONLY a!gridLayout
+  - ✅ "Create a card group with..." → Generate ONLY a!cardGroupLayout
+  - ✅ "Build a form with these fields..." → Generate ONLY a!formLayout
+  - ✅ "Show me a chart of..." → Generate ONLY a chart component
+
+**Generate a FULL PAGE if the request:**
+- Asks for "a page", "a dashboard", "an interface", "a screen"
+- Mentions multiple distinct sections or areas (e.g., "header with KPIs and a grid below")
+- Describes a complete user experience or workflow
+- Names a top-level layout (header-content, form, wizard, panes)
+- Examples:
+  - ✅ "Create a dashboard that..." → Generate headerContentLayout with multiple sections
+  - ✅ "Build a project management page..." → Generate full page structure
+  - ✅ "Design an interface for..." → Generate full page structure
 
 ## PAGE UI DESIGN PLANNING STEPS
 When designing a full page, follow these planning steps (not necessary if user requests a single component):
@@ -156,9 +173,9 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - choiceValues CANNOT be null or empty strings (“”)
 
 ## 🛑 MANDATORY VALIDATION CHECKLIST
+👉 Always call the sail-syntax-validator sub-agent to code review new expressions!
 
 ### Syntax Validation:
-- [ ] Call the sail-syntax-validator sub-agent as needed
 - [ ] Starts with a!localVariables()
 - [ ] All braces/parentheses matched
 - [ ] All strings in double quotes
