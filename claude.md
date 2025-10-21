@@ -152,6 +152,47 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
      - Common scenarios: selection states, conditional visibility, dynamic styling
      - Any local variable that starts as null and gets populated later needs null checking
 
+## TYPE HANDLING FOR DATE/TIME CALCULATIONS
+
+### Always Cast Date Arithmetic with todate()
+When using date arithmetic in sample data, cast results to ensure consistent types:
+
+**WRONG:**
+```sail
+local!data: {
+  a!map(dueDate: today()),        /* Type: Date */
+  a!map(dueDate: today() + 1)     /* Type: DateTime - causes grid sort errors! */
+}
+```
+
+**RIGHT:**
+```sail
+local!data: {
+  a!map(dueDate: todate(today())),      /* Type: Date */
+  a!map(dueDate: todate(today() + 1)),  /* Type: Date */
+  a!map(dueDate: todate(today() + 7))   /* Type: Date */
+}
+```
+
+### Date/DateTime Arithmetic Returns Intervals
+Subtracting dates or datetimes returns an **Interval** type, not a Number:
+- `now() - timestamp` → Interval (Day to Second)
+- `today() - dateValue` → Interval (Day to Day)
+
+**Cannot compare Intervals directly to Numbers:**
+```sail
+/* WRONG */
+if(now() - fv!row.timestamp < 1, ...)  /* Error: Cannot compare Interval to Number */
+
+/* RIGHT */
+if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer first */
+```
+
+### Key Functions
+- `todate()` - Cast to Date type (use for all date arithmetic in sample data)
+- `tointeger()` - Convert interval to whole days as integer
+- `text(value, format)` - Format numbers/dates/intervals as text
+
 ## EXPRESSION STRUCTURE RULES
 - All expressions must begin with a!localVariables() as the parent element
 - Place the main interface as the last argument of a!localVariables()
@@ -182,7 +223,9 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons - use `and(not(isnull(variable)), variable = value)` ‼️ 
+- [ ] Null checks before comparisons - use `and(not(isnull(variable)), variable = value)` ‼️
+- [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
+- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️ 
 
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
