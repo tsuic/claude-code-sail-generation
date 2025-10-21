@@ -54,7 +54,7 @@ This document lists the available icon aliases for use with `a!richTextIcon()` c
 `battery-empty`, `battery-full`, `battery-half`, `battery-quarter`, `battery-three-quarters`, `bluetooth`, `bug`, `charging-station`, `code`, `code-fork`, `database`, `desktop`, `digital-tachograph`, `ethernet`, `hdd`, `hdd-o`, `keyboard`, `keyboard-o`, `laptop`, `laptop-code`, `laptop-house`, `memory`, `microchip`, `mobile`, `mobile-alt`, `mobile-alt-solid`, `mouse`, `network-wired`, `pager`, `plug`, `power-off`, `print`, `sd-card`, `server`, `sim-card`, `tablet`, `tablet-alt`, `tablet-alt-solid`, `terminal`, `tv`, `wifi`
 
 ### Chart & Data Icons
-`area-chart`, `bar-chart`, `chart-line`, `line-chart`, `pie-chart`, `poll`, `poll-h`, `stream`, `tachometer`
+`area-chart`, `bar-chart`, `line-chart`, `pie-chart`, `poll`, `poll-h`, `stream`, `tachometer`
 
 ### Currency Icons
 `dollar`, `eur`, `gbp`, `hryvnia`, `ils`, `inr`, `jpy`, `krw`, `rub`, `tenge`, `try`, `usd`

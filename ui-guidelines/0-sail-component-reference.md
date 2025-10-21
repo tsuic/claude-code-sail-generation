@@ -987,6 +987,7 @@
 | `size` | Text | `SMALL`\|`STANDARD`\|`MEDIUM`\|`MEDIUM_PLUS`\|`LARGE`\|`LARGE_PLUS`\|`EXTRA_LARGE` |
 | `color` | Text | `STANDARD`\|`ACCENT`\|`POSITIVE`\|`NEGATIVE`\|`SECONDARY` or hex |
 | `link` | Link | Text link |
+| `linkStyle` | Text | `INLINE`|`STANDALONE` |
 
 ---
 
