@@ -152,6 +152,69 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
      - Common scenarios: selection states, conditional visibility, dynamic styling
      - Any local variable that starts as null and gets populated later needs null checking
 
+## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
+
+Function variables (fv!) are context-specific and ONLY available in certain SAIL functions.
+
+### Available Function Variables by Context
+
+**In a!forEach():**
+- ✅ `fv!index` - Current iteration index (1-based)
+- ✅ `fv!item` - Current item value
+- ✅ `fv!isFirst` - Boolean, true on first iteration
+- ✅ `fv!isLast` - Boolean, true on last iteration
+
+**In a!gridField() columns:**
+- ✅ `fv!row` - Current row data (ONLY variable available!)
+- ❌ `fv!index` - NOT AVAILABLE in grid columns
+- ❌ `fv!item` - NOT AVAILABLE in grid columns
+
+**In a!wizardLayout():**
+- ✅ `fv!activeStepIndex` - Current step number
+- ✅ `fv!isFirstStep` - Boolean for first step
+- ✅ `fv!isLastStep` - Boolean for last step
+
+### ⚠️ MOST COMMON MISTAKE: Using fv!index in Grid Columns
+
+**❌ WRONG - This will cause an error:**
+```sail
+a!gridColumn(
+  label: "Name",
+  value: a!richTextItem(
+    text: fv!row.name,
+    link: a!dynamicLink(
+      value: fv!index,  /* ERROR: fv!index doesn't exist in grid columns! */
+      saveInto: local!selectedIndex
+    )
+  )
+)
+```
+
+**✅ RIGHT - Use grid's built-in selection:**
+```sail
+a!gridField(
+  data: local!items,
+  columns: {
+    a!gridColumn(
+      label: "Name",
+      value: fv!row.name  /* Only fv!row is available */
+    )
+  },
+  selectable: true,
+  selectionValue: local!selectedRows,  /* This is a LIST of selected row data */
+  selectionSaveInto: local!selectedRows,
+  maxSelections: 1
+)
+
+/* Access selected data (selectionValue is always a LIST): */
+local!firstSelected: index(local!selectedRows, 1, null)
+```
+
+### Key Points
+- Grid `selectionValue` is ALWAYS a list, even with `maxSelections: 1`
+- Use `index(local!selectedRows, 1, null)` to get the first selected item
+- Check length before accessing: `if(length(local!selectedRows) > 0, ...)`
+
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
 ### Always Cast Date Arithmetic with todate()
@@ -225,7 +288,14 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] `or(a,b)` NOT `a or b` ‼️
 - [ ] Null checks before comparisons - use `and(not(isnull(variable)), variable = value)` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
-- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️ 
+- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
+
+### Function Variable Validation:
+- [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
+- [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
+- [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
+- [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
+- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️ 
 
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
