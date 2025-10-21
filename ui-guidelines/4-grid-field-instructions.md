@@ -3,6 +3,44 @@
 ## Overview
 GridField displays tabular data with built-in sorting, paging, selection, and search capabilities. It's optimized for read-only data presentation with rich formatting options for each column, including text, links, tags, buttons, and progress bars.
 
+## ⚠️ CRITICAL: Function Variables in Grid Columns
+
+**ONLY `fv!row` is available in grid columns!**
+
+- ✅ `fv!row` - Access current row data
+- ❌ `fv!index` - NOT AVAILABLE (causes runtime error)
+- ❌ `fv!item` - NOT AVAILABLE (causes runtime error)
+
+### ❌ COMMON MISTAKE: Using fv!index for Selection
+
+**WRONG - This will fail:**
+```sail
+a!gridColumn(
+  value: a!richTextItem(
+    text: fv!row.name,
+    link: a!dynamicLink(
+      value: fv!index,  /* ERROR: fv!index doesn't exist in grid columns! */
+      saveInto: local!selectedIndex
+    )
+  )
+)
+```
+
+**RIGHT - Use grid's built-in selection:**
+```sail
+a!gridField(
+  data: local!items,
+  columns: { /* ... */ },
+  selectable: true,
+  selectionValue: local!selectedRows,  /* List of selected row data */
+  selectionSaveInto: local!selectedRows,
+  maxSelections: 1
+)
+
+/* Access selected item (selectionValue is always a LIST): */
+local!firstSelected: index(local!selectedRows, 1, null)
+```
+
 ## ⚠️ CRITICAL GRID COLUMN RESTRICTIONS
 
 ### ❌ NEVER Use These in GridColumns:
