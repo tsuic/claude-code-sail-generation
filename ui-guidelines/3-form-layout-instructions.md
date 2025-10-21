@@ -247,7 +247,8 @@ a!formLayout(
                   color: "#FFFFFF",
                   size: "SMALL"
                 )
-              }
+              },
+              marginBelow: "NONE"
             ),
             width: "MINIMIZE"
           )

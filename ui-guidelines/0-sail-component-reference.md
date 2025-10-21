@@ -959,6 +959,7 @@
 | `align` | Text | `START` | `START`\|`CENTER`\|`END` |
 | `marginBelow` | Text | `STANDARD` | `NONE`\|`EVEN_LESS`\|`LESS`\|`STANDARD`\|`MORE`\|`EVEN_MORE` |
 
+**⚠️ Critical Recommendation**: set `marginBelow` to `NONE` explicitly to improve vertical alignment of buttons by removing extra space below
 ---
 
 ### a!buttonLayout
