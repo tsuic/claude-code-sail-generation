@@ -523,6 +523,7 @@ a!cardLayout(
                 color: "#3B82F6"
               )
             },
+            marginBelow: "NONE",
             align: "END"
           ),
           width: "MINIMIZE"

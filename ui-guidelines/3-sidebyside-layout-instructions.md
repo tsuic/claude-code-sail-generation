@@ -352,7 +352,8 @@ items: {
             style: "LINK",
             color: "SECONDARY"
         )
-        }
+        },
+        marginBelow: "NONE"
     ),
     width: "MINIMIZE"
     )

@@ -292,7 +292,8 @@ a!sideBySideLayout(
           label: "Review",
           style: "OUTLINE",
           size: "SMALL"
-        )
+        ),
+        marginBelow: "NONE"
       ),
       width: "MINIMIZE"
     )

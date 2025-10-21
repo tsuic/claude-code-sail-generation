@@ -279,11 +279,12 @@ a!localVariables(
                         ),
                         a!buttonWidget(
                           icon: "trash",
-                          style: "OUTLINE", 
+                          style: "OUTLINE",
                           color: "SECONDARY",
                           size: "SMALL"
                         )
                       },
+                      marginBelow: "NONE",
                       align: "CENTER"
                     ),
                     width: "NARROW"
@@ -512,10 +513,11 @@ a!columnLayout(
       a!buttonWidget(
         icon: "trash",
         style: "OUTLINE",
-        color: "SECONDARY", 
+        color: "SECONDARY",
         size: "SMALL"
       )
     },
+    marginBelow: "NONE",
     align: "CENTER"
   ),
   width: "NARROW"

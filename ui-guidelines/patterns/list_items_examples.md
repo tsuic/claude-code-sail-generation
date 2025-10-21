@@ -589,6 +589,7 @@ a!cardLayout(
                 style: "LINK"
               )
             },
+            marginBelow: "NONE",
             align: "END"
           ),
           width: "MINIMIZE"
