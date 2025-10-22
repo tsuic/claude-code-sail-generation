@@ -69,6 +69,9 @@ a!localVariables(
                     width: "NARROW"
                   )
                 }
+              ),
+              a!columnLayout( /* Empty filler column to comply with best practice of always having an AUTO column */
+                width: "AUTO"
               )
             },
             marginBelow: "NONE",
@@ -209,6 +212,9 @@ a!localVariables(
                     width: "NARROW"
                   )
                 }
+              ),
+              a!columnLayout( /* Empty filler column to comply with best practice of always having an AUTO column */
+                width: "AUTO"
               )
             },
             marginBelow: "NONE",
@@ -343,6 +349,10 @@ a!localVariables(
                     width: "NARROW"
                   )
                 }
+              ),
+              a!columnLayout(
+                /* Empty filler column to comply with best practice of always having an AUTO column */
+                width: "AUTO"
               )
             },
             marginBelow: "NONE",
