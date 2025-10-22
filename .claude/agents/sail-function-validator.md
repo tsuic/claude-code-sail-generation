@@ -110,10 +110,12 @@ Code uses: style: "PRIMARY"
 ### STEP 5: Special Validations
 
 #### Icons
-- **Use Grep/Read** on `/ui-guidelines/5-rich-text-icon-aliases.md`
-- Verify EXACT icon name exists in the aliases list
-- Quote the section where icon was found
-- If not found, suggest similar valid icons
+- **MANDATORY: Use Grep** on `/ui-guidelines/5-rich-text-icon-aliases.md` with exact icon name
+- Search for the exact string used in the code (e.g., if code has `icon: "file-alt"`, grep for `file-alt`)
+- **Only valid if found as EXACT MATCH** in the aliases file
+- Quote the line from the file showing the exact match
+- **If grep returns no results → ERROR** (the icon is invalid)
+- If not found, use Grep to suggest similar valid icons (e.g., grep for "file-" to find file-related icons)
 
 #### Colors
 - Hex format: Must be 6 characters `#RRGGBB` (not 3-char or 8-char)
@@ -210,20 +212,23 @@ spacing: "STANDARD"
 ## ERROR 2: Invalid Icon Alias
 
 **Location:** Line 78, `a!richTextIcon()`
-**Issue:** Icon name not found in aliases
+**Issue:** Icon name not found in aliases file (exact match required)
 
 **Code:**
 icon: "chart-line"
 
 **Documentation Check:**
 - Source: /ui-guidelines/5-rich-text-icon-aliases.md
-- Tool used: Grep for "chart-line"
-- Result: No matches found
+- Tool used: Grep with pattern "chart-line"
+- Result: 0 matches (icon does not exist)
 
-**Similar Valid Icons:**
-- "line-chart" (found in Chart & Data Icons section)
-- "chart-area"
-- "chart-bar"
+**Verification Method:**
+Grep search for exact string "chart-line" in 5-rich-text-icon-aliases.md returned no results, confirming this alias is invalid.
+
+**Similar Valid Icons (found via Grep for "chart"):**
+- "line-chart" (found at line X)
+- "chart-area" (found at line Y)
+- "chart-bar" (found at line Z)
 
 **Fix:**
 icon: "line-chart"

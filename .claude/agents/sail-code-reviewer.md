@@ -161,6 +161,13 @@ a!buttonArrayLayout(
 ```
 
 #### Rule 3.3: ColumnsLayout must have at least one AUTO width
+
+Check this carefully by listing out:
+- Every a!columnsLayout
+- Every a!columnLayout in each a!columnsLayout
+- The value of the `width` parameter for each a!columnLayout
+- At least one of these must be `AUTO` for each set of columns!
+
 ```
 ❌ BAD:
 a!columnsLayout(
@@ -586,7 +593,7 @@ Before completing, verify:
 - [ ] All sideBySideLayout nesting checked (no nested sideBySide, columns, or cards)
 - [ ] All richTextDisplayField contents validated
 - [ ] All ButtonWidgets are in ButtonArrayLayout
-- [ ] All columnsLayout have AUTO width column
+- [ ] All columnsLayout have at least one column with AUTO width
 - [ ] String escaping uses "" not \"
 - [ ] Comments use /* */ not //
 - [ ] Boolean operators use or(), and() functions
