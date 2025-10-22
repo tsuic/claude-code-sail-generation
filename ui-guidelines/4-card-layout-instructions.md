@@ -173,10 +173,30 @@ a!cardGroupLayout(
   }
 )
 ```
-
-**✅ Prefer: Neutral with Decorative Elements**
+**✅ Preferred: Plain White Card with Simple Title**
 ```sail
-/* DO: Neutral background with decorative bar for visual interest */
+  a!cardLayout(
+    contents: {
+      a!headingField(
+        text: "Section Title",
+        size: "MEDIUM_PLUS",
+        headingTag: "H2",
+        fontWeight: "SEMI_BOLD",
+        marginBelow: "MORE"
+      ),
+      /* Rest of card contents here */
+    },
+    height: "AUTO",
+    style: "NONE",
+    shape: "ROUNDED",
+    padding: "STANDARD",
+    marginBelow: "STANDARD"
+  )
+```
+
+**✅ Optional: White Card with Decorative Elements**
+```sail
+/* DO: To draw attention to certain cards, add decorativeBar and/or stamp */
 a!cardLayout(
   contents: {
     a!sideBySideLayout(
@@ -203,51 +223,10 @@ a!cardLayout(
       alignVertical: "MIDDLE",
       marginBelow: "MORE"
     ),
-    a!columnsLayout(
-      columns: {
-        a!columnLayout(
-          contents: {
-            a!textField(
-              label: "Full Name",
-              value: "Sarah Johnson",
-              readOnly: true
-            ),
-            a!textField(
-              label: "Major",
-              value: "Computer Science",
-              readOnly: true
-            ),
-            a!textField(
-              label: "Email",
-              value: "sarah.johnson@university.edu",
-              readOnly: true
-            )
-          }
-        ),
-        a!columnLayout(
-          contents: {
-            a!textField(
-              label: "Student ID",
-              value: "S20248761",
-              readOnly: true
-            ),
-            a!textField(
-              label: "GPA",
-              value: "3.85",
-              readOnly: true
-            ),
-            a!textField(
-              label: "Expected Graduation",
-              value: "May 2026",
-              readOnly: true
-            )
-          }
-        )
-      }
-    )
+    /* Rest of card contents here */
   },
   style: "NONE",                    /* Clean white background */
-  decorativeBarPosition: "START",   /* Colored accent bar on left */
+  decorativeBarPosition: "TOP",   /* Colored accent bar on top */
   decorativeBarColor: "#0D4FD6",    /* Blue accent */
   shape: "ROUNDED",
   padding: "STANDARD"
