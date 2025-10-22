@@ -157,6 +157,51 @@ a!paneLayout(
 )
 ```
 
+### 3. Panes Below Header: headerContentLayout + paneLayout
+```sail
+a!headerContentLayout(
+  header: { /* Page title header bar */
+    a!cardLayout(
+      contents: {
+        a!richTextDisplayField(
+          labelPosition: "COLLAPSED",
+          value: {
+            a!richTextItem(
+              text: "Prerequisite Verification Review",
+              size: "LARGE",
+              style: "STRONG",
+              color: "#FFFFFF"
+            )
+          }
+        )
+      },
+      height: "AUTO",
+      style: "#1E40AF",
+      padding: "MORE",
+      marginBelow: "NONE",
+      showBorder: false
+    )
+  },
+  contents: a!paneLayout( /* Pane layout in headerContentLayout contents */
+    panes: {
+      a!pane(
+        contents: {
+          /* Side Pane Contents */
+        },
+        width: "NARROW_PLUS"
+      ),
+      a!pane(
+        contents: {
+          /* Main Pane Contents */
+        },
+        width: "AUTO"
+      )
+    }
+  ),
+  contentsPadding: "NONE"
+)
+```
+
 ## Common Anti-Patterns to Avoid
 
 ### ❌ No AUTO Width Pane
