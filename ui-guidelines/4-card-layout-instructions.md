@@ -144,6 +144,123 @@ a!columnsLayout(
     - WIDE: 800px
     - WIDE_PLUS: 1120px
 
+### Background Color Best Practices
+
+**Modern Approach: Favor White Backgrounds with Decorative Accents**
+
+Using different colored backgrounds for each card section creates a dated, visually cluttered appearance. Instead, prefer neutral card backgrounds with selective use of decorative elements for visual interest.
+
+**❌ Avoid: Rainbow Dashboard**
+```sail
+/* DON'T: Different colored cards throughout the page */
+a!cardGroupLayout(
+  cards: {
+    a!cardLayout(
+      contents: {/* KPI content */},
+      style: "INFO",      /* Blue card */
+      shape: "ROUNDED"
+    ),
+    a!cardLayout(
+      contents: {/* Chart content */},
+      style: "SUCCESS",   /* Green card */
+      shape: "ROUNDED"
+    ),
+    a!cardLayout(
+      contents: {/* Grid content */},
+      style: "#FFE5E5",   /* Pink card */
+      shape: "ROUNDED"
+    )
+  }
+)
+```
+
+**✅ Prefer: Neutral with Decorative Elements**
+```sail
+/* DO: Neutral background with decorative bar for visual interest */
+a!cardLayout(
+  contents: {
+    a!sideBySideLayout(
+      items: {
+        a!sideBySideItem(
+          item: a!stampField( /* colored stamp ahead of card title for pop of color */
+            icon: "graduation-cap",
+            backgroundColor: "#0D4FD6",
+            size: "TINY"
+          ),
+          width: "MINIMIZE"
+        ),
+        a!sideBySideItem(
+          item: a!richTextDisplayField(
+            labelPosition: "COLLAPSED",
+            value: a!richTextItem(
+              text: "Student Information",
+              size: "LARGE",
+              style: "STRONG"
+            )
+          )
+        )
+      },
+      alignVertical: "MIDDLE",
+      marginBelow: "MORE"
+    ),
+    a!columnsLayout(
+      columns: {
+        a!columnLayout(
+          contents: {
+            a!textField(
+              label: "Full Name",
+              value: "Sarah Johnson",
+              readOnly: true
+            ),
+            a!textField(
+              label: "Major",
+              value: "Computer Science",
+              readOnly: true
+            ),
+            a!textField(
+              label: "Email",
+              value: "sarah.johnson@university.edu",
+              readOnly: true
+            )
+          }
+        ),
+        a!columnLayout(
+          contents: {
+            a!textField(
+              label: "Student ID",
+              value: "S20248761",
+              readOnly: true
+            ),
+            a!textField(
+              label: "GPA",
+              value: "3.85",
+              readOnly: true
+            ),
+            a!textField(
+              label: "Expected Graduation",
+              value: "May 2026",
+              readOnly: true
+            )
+          }
+        )
+      }
+    )
+  },
+  style: "NONE",                    /* Clean white background */
+  decorativeBarPosition: "START",   /* Colored accent bar on left */
+  decorativeBarColor: "#0D4FD6",    /* Blue accent */
+  shape: "ROUNDED",
+  padding: "STANDARD"
+)
+```
+
+**Key Guidelines:**
+- ✅ Default to `style: "NONE"` (white) or `style: "STANDARD"` (light gray)
+- ✅ AS NEEDED, add visual interest with `decorativeBarPosition` and `decorativeBarColor`
+- ✅ AS NEEDED, use `stampField` components to add colorful accents
+- ✅ Reserve colored backgrounds (INFO, SUCCESS, WARN, ERROR) for functional purposes like message banners
+- ❌ Avoid using different colored backgrounds for each content section
+
 ## Layout Patterns
 
 ### Dashboard Cards (Using cardGroupLayout)
@@ -282,50 +399,6 @@ a!cardLayout(
   padding: "MORE"
 )
 ```
-
-### Success/Status Card
-
-**Tailwind CSS:**
-```html
-<div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
-  <!-- content -->
-</div>
-```
-
-**SAIL Equivalent:**
-```sail
-a!cardLayout(
-  contents: { /* content */ },
-  style: "SUCCESS",           /* Green theme */
-  decorativeBarPosition: "START", /* Left accent bar */
-  decorativeBarColor: "POSITIVE",
-  shape: "SEMI_ROUNDED",
-  padding: "STANDARD"
-)
-```
-
-### Elevated Card with Strong Shadow
-
-**Tailwind CSS:**
-```html
-<div class="bg-white rounded-lg shadow-2xl p-8 border border-gray-100">
-  <!-- content -->
-</div>
-```
-
-**SAIL Equivalent:**
-```sail
-a!cardLayout(
-  contents: { /* content */ },
-  style: "NONE",           /* White background */
-  shape: "ROUNDED",
-  showBorder: true,
-  borderColor: "#F3F4F6",  /* Light gray border */
-  showShadow: true,        /* Strong shadow */
-  padding: "EVEN_MORE"     /* Extra padding for premium feel */
-)
-```
-
 ### Dark Card
 
 **Tailwind CSS:**
@@ -374,10 +447,12 @@ a!cardLayout(
 ## Common Mistakes to Avoid
 ❌ **Wrong:**
 - Inconsistent padding/spacing across related cards
-- Using bright colors (SUCCESS, ERROR) without semantic meaning
+- Using different colored backgrounds for each card section (creates dated appearance)
+- Using bright colors (SUCCESS, ERROR, INFO) without semantic meaning
 - Using cardGroupLayout when cards need different widths
 
 ✅ **Correct:**
 - Consistent styling across similar card types
+- Neutral backgrounds with decorative bars and stamps for visual interest
 - Meaningful use of color styles and decorative elements
 - Choosing the right layout method for the specific use case
