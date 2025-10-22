@@ -39,6 +39,7 @@ Validate SAIL code structure and patterns:
 **Check:**
 - [ ] First function call is `a!localVariables()`
 - [ ] Local variables defined within a!localVariables()
+- [ ] Unique local variable names within each a!localVariables() block (no re-use!)
 - [ ] Main interface is last argument of a!localVariables()
 - [ ] All form inputs save to local variables
 
