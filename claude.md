@@ -277,7 +277,9 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - choiceValues CANNOT be null or empty strings (“”)
 
 ## 🛑 MANDATORY VALIDATION CHECKLIST
-👉 Always call the sail-syntax-validator sub-agent to code review new expressions!
+👉 Always call BOTH validation sub-agents to code review new expressions:
+1. **sail-function-validator** - Validates functions, parameters, and values against documentation
+2. **sail-code-reviewer** - Validates structure, syntax, and architectural patterns
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()

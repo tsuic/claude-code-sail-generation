@@ -605,6 +605,7 @@
 |-----------|------|---------|-------------|
 | `tags` | List of Variant | - | Use `a!tagItem()` |
 | `size` | Text | `STANDARD` | `SMALL`\|`STANDARD` |
+| `align` | Text | `START` | `START`\|`CENTER`\|`END` |
 
 ---
 
