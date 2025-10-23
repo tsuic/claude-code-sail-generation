@@ -332,6 +332,101 @@ showWhen: and(
 
 ---
 
+### 6.2 NULL SAFETY FOR FUNCTION PARAMETERS
+
+**Rule:** Many SAIL functions cannot accept null parameters and require null checking
+
+**Critical Functions That Cannot Accept Null:**
+- `text()` - Cannot format null values
+- `fixed()` - Cannot format null numbers
+- `upper()`, `lower()`, `proper()` - Cannot transform null text
+- `len()` - Cannot get length of null
+- Mathematical operators (`+`, `-`, `*`, `/`) with null operands
+
+**High-Risk Contexts:**
+1. **Record field access in grids/forEach** - Fields can be null
+2. **Related record fields** - Relationships can be null/unpopulated
+3. **User form inputs** - Initially null until populated
+4. **Date/DateTime fields** - Often nullable in databases
+
+**Common Patterns:**
+
+```
+✅ PATTERN 1: if() with null check
+value: if(
+  isnull(fv!row.dateField),
+  "No date",
+  text(fv!row.dateField, "MMM d, yyyy")
+)
+
+✅ PATTERN 2: a!defaultValue() wrapper
+value: text(
+  a!defaultValue(fv!row.dateField, today()),
+  "MMM d, yyyy"
+)
+
+✅ PATTERN 3: Direct a!defaultValue() for display
+value: a!defaultValue(fv!row.assignee, "Unassigned")
+
+❌ WRONG: No null handling
+value: text(fv!row.dateField, "MMM d, yyyy")
+```
+
+**Validation Process:**
+1. Find all `text()`, `fixed()`, `upper()`, `lower()`, mathematical operations
+2. Trace the source of each parameter
+3. If parameter is from:
+   - Record field → Check if null handling exists
+   - Related field → Check if null handling exists
+   - Local variable that starts null → Check if null handling exists
+4. Verify one of these patterns is used:
+   - `if(isnull(value), default, operation(value))`
+   - `operation(a!defaultValue(value, default))`
+
+**Example Error Report:**
+
+```
+## ERROR: Null Safety - text() Function with Nullable Field
+
+**Location:** Line 625
+**Rule Violated:** Rule 6.2 - Check for null before text() function
+
+**Problematic Code:**
+```
+a!richTextItem(
+  text: text(
+    fv!row['recordType!{...}SCMA Case.fields.{...}createdOn'],
+    "MMM d, yyyy"
+  )
+)
+```
+
+**Problem:**
+The `createdOn` field from the database can be null, causing text() to fail.
+
+**Impact:**
+Runtime error: "A null parameter has been passed as parameter 1"
+
+**Fix:**
+```
+a!richTextItem(
+  text: if(
+    isnull(fv!row['recordType!{...}SCMA Case.fields.{...}createdOn']),
+    "N/A",
+    text(
+      fv!row['recordType!{...}SCMA Case.fields.{...}createdOn'],
+      "MMM d, yyyy"
+    )
+  )
+)
+```
+
+**Explanation:**
+Check if the date field is null first. If null, display "N/A". Otherwise, format the date.
+```
+
+---
+
 ### 7. TYPE HANDLING
 
 #### Rule 7.1: Date arithmetic must be wrapped in todate()
@@ -407,7 +502,10 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)
 
 **Null Safety:** Valid ✅
 - All comparisons null-checked ✅
-- Checked [n] comparison operations ✅
+- All text() calls have null checks ✅
+- All record field access has null handling ✅
+- All related record fields have null handling ✅
+- Checked [n] comparison operations and [n] function calls ✅
 
 **Type Handling:** Valid ✅
 - Date arithmetic wrapped in todate() ✅
@@ -601,6 +699,10 @@ Before completing, verify:
 - [ ] All delimiters matched
 - [ ] All fv! usage checked against context
 - [ ] All comparisons have null checks where needed
+- [ ] All text() calls have null checks for parameters from nullable sources
+- [ ] All record field access wrapped in null handling (a!defaultValue or if/isnull)
+- [ ] All related record fields have null handling
+- [ ] All mathematical operations with nullable operands checked
 - [ ] All date arithmetic wrapped in todate()
 - [ ] All interval comparisons use tointeger()
 - [ ] For errors: provided line, rule, problem, impact, fix, and explanation

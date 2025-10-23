@@ -152,6 +152,48 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
      - Common scenarios: selection states, conditional visibility, dynamic styling
      - Any local variable that starts as null and gets populated later needs null checking
 
+### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
+
+Many SAIL functions cannot accept null parameters and will cause runtime errors. Always check for null before passing values to these functions:
+
+#### Functions That Cannot Accept Null:
+
+**text() function:**
+```sail
+❌ WRONG:
+text(fv!row.createdDate, "MMM d, yyyy")  /* Fails if createdDate is null */
+
+✅ RIGHT - Option 1 (if statement):
+if(
+  isnull(fv!row.createdDate),
+  "N/A",
+  text(fv!row.createdDate, "MMM d, yyyy")
+)
+
+✅ RIGHT - Option 2 (a!defaultValue):
+text(
+  a!defaultValue(fv!row.createdDate, today()),
+  "MMM d, yyyy"
+)
+```
+
+**Concatenation with null:**
+```sail
+❌ WRONG:
+text: "CASE-" & fv!row.caseId  /* Fails if caseId is null */
+
+✅ RIGHT:
+text: "CASE-" & a!defaultValue(fv!row.caseId, "")
+```
+
+**Common scenarios requiring null checks:**
+- ✅ **Record fields from database** - Can be null if not required or not populated
+- ✅ **Related record fields** - Can be null if relationship is not populated
+- ✅ **User-typed fields** - Text/Number/Date inputs can be null initially
+- ✅ **Calculated fields** - Results of operations can be null
+- ✅ **Date/Time formatting** - Always check before text(), datetext(), datetimetext()
+- ✅ **Mathematical operations** - Division, multiplication with null values
+
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
 Function variables (fv!) are context-specific and ONLY available in certain SAIL functions.
@@ -289,6 +331,9 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
 - [ ] Null checks before comparisons - use `and(not(isnull(variable)), variable = value)` ‼️
+- [ ] Null checks before text() formatting - use `if(isnull(value), "N/A", text(value, format))` ‼️
+- [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `isnull()` ‼️
+- [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 
