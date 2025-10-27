@@ -733,29 +733,46 @@
 | **Core Grid Parameters** | | | |
 | `data` | RecordType/List/DataSubset | - | Use record type or `a!recordData()` |
 | `columns` | List of a!gridColumn | - | Column definitions |
-| `emptyGridMessage` | Text | - | Message shown when no data |
-| **Paging Parameters** | | | |
+| `emptyGridMessage` | Text | "No items available" | Message shown when no data |
 | `pageSize` | Integer | `10` | Rows per page |
-| `pagingSaveInto` | Save Array | - | Variables updated when paging |
-| **Sorting Parameters** | | | |    
+| **Paging** | | | |
+| `pagingSaveInto` | Save Array | - | Variables updated when paging (use `fv!pagingInfo`) |
+| **Sorting** | | | |
 | `initialSorts` | List of SortInfo | - | Default sort configuration |
 | `secondarySorts` | List of SortInfo | - | Secondary sort when initial sorts are equal |
-| **Selection Parameters** | | | |
+| **Selection** | | | |
 | `selectable` | Boolean | `false` | Enable row selection |
 | `selectionStyle` | Text | `CHECKBOX` | `CHECKBOX`\|`ROW_HIGHLIGHT` |
 | `selectionValue` | List of Variant | - | Currently selected rows |
-| `selectionSaveInto` | Save Array | - | Variables updated on selection |
+| `selectionSaveInto` | Save Array | - | Variables updated on selection (use `fv!selectedRows`, `fv!deselectedRows`) |
 | `selectionRequired` | Boolean | `false` | Require at least one selection |
 | `selectionRequiredMessage` | Text | - | Custom required selection message |
 | `maxSelections` | Integer | - | Maximum allowed selections |
-| `showSelectionCount` | Boolean | `false` | Display selection count |
-| `disableRowSelectionWhen` | Boolean | - | Per-row selection disabling |
-| **Visual Styling Parameters** | | | |
+| `showSelectionCount` | Text | `AUTO` | `AUTO`\|`ON`\|`OFF` - Display selection counter |
+| `disableRowSelectionWhen` | Boolean | `false` | Per-row selection disabling (use `fv!row`, `fv!identifier`) |
+| **Record-Specific Features** (only when data is a record type) | | | |
+| `recordActions` | List of Variant | - | Record action items via `a!recordActionItem()` |
+| `actionsStyle` | Text | `TOOLBAR` | `TOOLBAR`\|`TOOLBAR_PRIMARY` - Action toolbar style |
+| `actionsDisplay` | Text | `LABEL_AND_ICON` | `LABEL_AND_ICON`\|`LABEL`\|`ICON` - Action button content |
+| `openActionsIn` | Text | `DIALOG` | `DIALOG`\|`NEW_TAB`\|`SAME_TAB` - Where actions open |
+| `userFilters` | List of Variant | - | User filter references (e.g., `recordType!Case.filters.status`) |
+| `showSearchBox` | Boolean | `true` | Display record search box |
+| `showRefreshButton` | Boolean | `true` | Display manual refresh button |
+| `showExportButton` | Boolean | `false` | Display export to Excel button |
+| `similarityScoreThreshold` | Decimal | `1` | Smart search relevance threshold (0.0-1.0) |
+| `loadDataAsync` | Boolean | `false` | Load grid data in background |
+| **Refresh Behavior** | | | |
+| `refreshAlways` | Boolean | `false` | Refresh after each user interaction |
+| `refreshAfter` | List of Text | - | Refresh after events (e.g., `"RECORD_ACTION"`) |
+| `refreshInterval` | Decimal | - | Auto-refresh interval in minutes (0.5, 1, 2, 3, 4, 5, 10, 30, 60) |
+| `refreshOnReferencedVarChange` | Boolean | `true` | Refresh when referenced variables change |
+| `refreshOnVarChange` | Any Type | - | Refresh when specific variables change |
+| **Visual Styling** | | | |
 | `height` | Text | `AUTO` | `SHORT`\|`SHORT_PLUS`\|`MEDIUM`\|`MEDIUM_PLUS`\|`TALL`\|`TALL_PLUS`\|`EXTRA_TALL`\|`AUTO` |
 | `spacing` | Text | `STANDARD` | `STANDARD`\|`DENSE` |
-| `borderStyle` | Text | `STANDARD` | `STANDARD`\|`LIGHT` |
-| `shadeAlternateRows` | Boolean | `true` | Alternate row coloring |
-| `rowHeader` | Integer | - | Fixed left columns count |
+| `borderStyle` | Text | `LIGHT` | `STANDARD`\|`LIGHT` |
+| `shadeAlternateRows` | Boolean | `false` | Alternate row coloring |
+| `rowHeader` | Integer | - | Column index for row headers (accessibility) |
 
 ---
 
