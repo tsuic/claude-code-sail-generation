@@ -1,4 +1,4 @@
-# List Items (for Card Groups)
+# Card Group List Items
 
 Examples of how to lay out different types of list item as cards
 
@@ -383,6 +383,156 @@ a!localVariables(
     ),
     cardWidth: "WIDE_PLUS",
     spacing: "DENSE"
+  )
+)
+```
+
+## Photo Gallery List Cards
+
+For displaying items with prominent images (real estate, products, media, etc.):
+
+```sail
+a!localVariables(
+  /* Sample property data for mockup */
+  local!properties: {
+    a!map(
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c75?w=800",
+      price: "$1,695,000",
+      beds: 3,
+      baths: 2.5,
+      sqft: "2,403",
+      address: "12345 Maple Ave, Palm Springs, CA 92262",
+      daysListed: 2,
+      status: "NEW LISTING",
+      statusColor: "#FF9900"
+    ),
+    a!map(
+      image: "https://images.unsplash.com/photo-1575517171740-99871f6c4c75?w=800",
+      price: "$2,150,000",
+      beds: 4,
+      baths: 3.5,
+      sqft: "2,942",
+      address: "2345 Mesa Blvd, Palm Springs, CA 92264",
+      daysListed: 15,
+      status: "OPEN HOUSE SCHEDULED",
+      statusColor: "#38761D"
+    ),
+    a!map(
+      image: "https://images.unsplash.com/photo-1582268611958-ebfd16ef9cdb?w=800",
+      price: "$1,945,000",
+      beds: 3,
+      baths: 2.5,
+      sqft: "2,178",
+      address: "345 Main St, Cathedral City, CA 92234",
+      daysListed: 26,
+      status: "OPEN HOUSE SCHEDULED",
+      statusColor: "#38761D"
+    )
+  },
+
+  a!cardGroupLayout(
+    cards: a!forEach(
+      items: local!properties,
+      expression: a!cardLayout(
+        contents: {
+          a!billboardLayout( /* Use a billboard layout for each item photo because it guarantees the same height for all images even if the source photos have different aspect ratios */
+            backgroundMedia: a!webImage(source: fv!item.image),
+            backgroundColor: "#F0F0F0",
+            height: "SHORT_PLUS",
+            marginBelow: "NONE",
+            overlay: a!fullOverlay( /* Using a billboard overlay allows information, such as a tag or rich text, to be superimposed upon the photo */
+              alignVertical: "TOP",
+              contents: {
+                a!tagField(
+                  labelPosition: "COLLAPSED",
+                  tags: a!tagItem(
+                    text: fv!item.status,
+                    backgroundColor: fv!item.statusColor
+                  )
+                )
+              },
+              style: "NONE"
+            )
+          ),
+          a!cardLayout(
+            contents: {
+              a!sideBySideLayout(
+                items: {
+                  a!sideBySideItem(
+                    item: a!richTextDisplayField(
+                      labelPosition: "COLLAPSED",
+                      value: {
+                        a!richTextItem(
+                          text: fv!item.price,
+                          size: "MEDIUM_PLUS",
+                          style: "STRONG"
+                        )
+                      }
+                    )
+                  ),
+                  a!sideBySideItem(
+                    item: a!richTextDisplayField(
+                      labelPosition: "COLLAPSED",
+                      value: {
+                        a!richTextItem(
+                          text: {
+                            a!richTextIcon(icon: "calendar"),
+                            " " & fv!item.daysListed & "d"
+                          },
+                          color: "SECONDARY",
+                          size: "MEDIUM"
+                        )
+                      }
+                    ),
+                    width: "MINIMIZE"
+                  )
+                },
+                alignVertical: "MIDDLE",
+                marginBelow: "STANDARD"
+              ),
+              a!richTextDisplayField(
+                labelPosition: "COLLAPSED",
+                value: {
+                  a!richTextItem(
+                    text: fv!item.beds & " Beds  ",
+                    size: "STANDARD"
+                  ),
+                  " • ",
+                  fv!item.baths & " Baths",
+                  " • ",
+                  fv!item.sqft & " Sq. Ft.",
+                  char(10),
+                  a!richTextItem(
+                    text: fv!item.address,
+                    size: "SMALL",
+                    color: "#6B7280"
+                  )
+                },
+                preventWrapping: false
+              )
+            },
+            height: "AUTO",
+            style: "NONE",
+            padding: "STANDARD",
+            marginBelow: "NONE",
+            showBorder: false
+          )
+        },
+        link: a!dynamicLink(
+          value: fv!item,
+          saveInto: {
+            /* Navigate to property details */
+          }
+        ),
+        height: "AUTO",
+        style: "NONE",
+        shape: "SEMI_ROUNDED",
+        padding: "NONE",
+        showBorder: true
+      )
+    ),
+    cardWidth: "MEDIUM",
+    spacing: "STANDARD"
   )
 )
 ```

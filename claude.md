@@ -124,8 +124,10 @@ When designing a full page, follow these planning steps (not necessary if user r
 - Use `tagField` to show UI elements styled like tags or chips
 
 ### Common Patterns
-Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements:
-- `list_items.md` for list items (users, tasks, messages, etc.) as cards
+Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements.
+
+*ALWAYS* study the relevant patterns if the UI requires any of these elements:
+- `card_lists.md` for list items (users, tasks, products, messages, etc.) shown as cards
 - `kpis.md` for key performance indicator cards
 - `messages.md` for message banners (info, warning, etc.)
 - `tabs.md` for tab bars
