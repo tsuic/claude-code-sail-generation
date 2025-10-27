@@ -961,6 +961,115 @@ a!gridField(
 ```
 </grid_field_essentials>
 
+<record_links_and_identifiers>
+## 🚨 CRITICAL: Record Links and Identifiers
+
+<fv_identifier_availability>
+**fv!identifier Availability Rules**
+
+`fv!identifier` is ONLY automatically available in specific contexts where Appian provides it:
+
+**✅ Available Contexts:**
+1. **Grid columns with `a!recordData()`** - Identifier provided automatically
+2. **Grid recordActions parameter** - For row-specific actions
+
+**❌ NOT Available Contexts:**
+1. **`a!forEach()` over query results** - Must use primary key field instead
+2. **`a!forEach()` over `.data` property** - Must use primary key field instead
+3. **Manual array iterations** - Must use primary key field instead
+
+```sail
+/* ✅ CORRECT - fv!identifier works in grids with a!recordData() */
+a!gridField(
+  data: a!recordData(recordType: recordType!Case),
+  columns: {
+    a!gridColumn(
+      label: "Title",
+      value: a!richTextDisplayField(
+        value: a!richTextItem(
+          text: fv!row[recordType!Case.fields.title],
+          link: a!recordLink(
+            recordType: recordType!Case,
+            identifier: fv!identifier  /* ✅ Works - provided by a!recordData() */
+          )
+        )
+      )
+    )
+  },
+  recordActions: {
+    a!recordActionItem(
+      action: recordType!Case.actions.updateCase,
+      identifier: fv!identifier  /* ✅ Works - provided by grid context */
+    )
+  }
+)
+
+/* ❌ WRONG - fv!identifier doesn't exist in a!forEach over query results */
+local!cases: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    recordType!Case.fields.caseId,
+    recordType!Case.fields.title
+  }
+).data,
+
+a!forEach(
+  items: local!cases,
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: a!richTextItem(
+          text: fv!item[recordType!Case.fields.title],
+          link: a!recordLink(
+            recordType: recordType!Case,
+            identifier: fv!identifier  /* ❌ ERROR - Not available in a!forEach */
+          )
+        )
+      )
+    }
+  )
+)
+
+/* ✅ CORRECT - Use primary key field in a!forEach */
+local!cases: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    recordType!Case.fields.caseId,  /* Must query the primary key field */
+    recordType!Case.fields.title
+  }
+).data,
+
+a!forEach(
+  items: local!cases,
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: a!richTextItem(
+          text: fv!item[recordType!Case.fields.title],
+          link: a!recordLink(
+            recordType: recordType!Case,
+            identifier: fv!item[recordType!Case.fields.caseId]  /* ✅ Use primary key */
+          )
+        )
+      )
+    }
+  )
+)
+```
+</fv_identifier_availability>
+
+<record_link_identifier_rules>
+**Record Link Identifier Rules:**
+
+1. **When using `a!recordData()` in grids/charts**: Use `fv!identifier`
+2. **When using `a!queryRecordType().data` with `a!forEach()`**: Use the primary key field
+3. **Always query the primary key field** when you need to create record links in `a!forEach()`
+4. **Primary key fields are typically**: `id`, `caseId`, `orderId`, `employeeId`, etc.
+
+**Rule of Thumb**: If you're iterating with `a!forEach()` over query results and need record links, you MUST include the primary key field in your query and use it as the identifier.
+</record_link_identifier_rules>
+</record_links_and_identifiers>
+
 <user_filters_vs_custom_filters>
 User Filters vs Custom Filters
 **MANDATORY**: If record type has user filters AND interface has custom filters, ASK user to choose:
@@ -1638,6 +1747,9 @@ Critical Syntax:
 - [ ] **KPIs use a!aggregationFields() with a!measure(), NOT .totalCount**
 - [ ] **Single checkbox fields use direct assignment without null handling or conversion logic**
 - [ ] **No `a!encryptedTextField()` used with synced record types - use `a!textField()` with warning banner instead**
+- [ ] **`fv!identifier` ONLY used in grids with `a!recordData()` or grid recordActions - use primary key field in `a!forEach()`**
+- [ ] **Record links in `a!forEach()` use primary key field as identifier, NOT `fv!identifier`**
+- [ ] **Primary key field included in query when creating record links in `a!forEach()`**
 </critical_syntax_checks>
 
 <relationship_navigation_validation>
