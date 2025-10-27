@@ -1126,6 +1126,94 @@ fv!item['recordType!Comment.fields.description']
 ```
 </related_record_field_references>
 
+<user_field_vs_relationship>
+## 🚨 CRITICAL: User/Group Fields vs Relationships
+
+**When the data model shows BOTH a field AND a relationship for users, ALWAYS use the FIELD reference, NEVER the relationship.**
+
+<critical_distinction>
+Many record types have both:
+- **Field** (e.g., `assignedTo`, `createdBy`, `modifiedBy`): User type field
+- **Relationship** (e.g., `assignedToUser`, `createdByUser`, `modifiedByUser`): many-to-one relationship to User record type
+
+**ALWAYS query and display using the FIELD, NOT the relationship:**
+</critical_distinction>
+
+<correct_user_field_usage>
+```sail
+/* ✅ CORRECT - Use the User field directly in queries */
+a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    'recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo',
+    'recordType!Case.fields.{782fab03-6e79-464d-862d-9766558ead34}createdBy',
+    'recordType!Case.fields.{24dc24a9-c3a8-4c5b-b0f2-227247049eb6}modifiedBy'
+  }
+)
+
+/* ✅ CORRECT - Use the User field in grid columns */
+a!gridColumn(
+  label: "Assigned To",
+  value: if(
+    a!isNotNullOrEmpty(fv!row['recordType!Case.fields.{41905c99...}assignedTo']),
+    user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "displayName"),
+    "Unassigned"
+  ),
+  sortField: 'recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo'
+)
+
+/* ✅ CORRECT - Use the User field in forms */
+a!pickerFieldUsers(
+  label: "Assigned To",
+  value: a!defaultValue(
+    ri!case['recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo'],
+    null
+  ),
+  saveInto: ri!case['recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo']
+)
+
+/* ❌ WRONG - Don't use the User relationship */
+a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    'recordType!Case.relationships.{b2f0c709...}assignedToUser',  /* WRONG */
+    'recordType!Case.relationships.{e102da15...}createdByUser',   /* WRONG */
+    'recordType!Case.relationships.{8a2834b3...}modifiedByUser'   /* WRONG */
+  }
+)
+
+/* ❌ WRONG - Don't use relationship in grid columns */
+a!gridColumn(
+  label: "Assigned To",
+  value: fv!row['recordType!Case.relationships.assignedToUser']  /* CAUSES ERRORS */
+)
+```
+</correct_user_field_usage>
+
+<rule_of_thumb>
+**Rule of Thumb for Fields vs Relationships:**
+
+| Data Type | When to Use | Example |
+|-----------|-------------|---------|
+| **User field** | Always use the FIELD | `assignedTo`, `createdBy`, `modifiedBy` |
+| **Group field** | Always use the FIELD | `teamGroup`, `departmentGroup` |
+| **Date/DateTime field** | Always use the FIELD | `createdOn`, `modifiedOn`, `dueDate` |
+| **Text/Number/Boolean field** | Always use the FIELD | `title`, `caseId`, `isActive` |
+| **Related record data** | Use the RELATIONSHIP to navigate | `refCaseStatus.fields.value`, `teamRelationship.fields.teamname` |
+
+**Key Principle:**
+- **Fields** store scalar values (User, Date, Text, Number, Boolean) → Access directly
+- **Relationships** navigate to related records via foreign keys → Use for accessing fields on the related record
+</rule_of_thumb>
+
+<why_both_exist>
+**Why Both Field and Relationship Exist:**
+- The **field** (e.g., `assignedTo`) stores the actual User value and is what you use for queries, displays, and forms
+- The **relationship** (e.g., `assignedToUser`) exists primarily for advanced relationship modeling and is rarely used in interfaces
+- The relationship may provide access to additional User record properties, but for standard use cases (displaying names, filtering by user, etc.), always use the field
+</why_both_exist>
+</user_field_vs_relationship>
+
 <date_time_critical_rules>
 ## Date/Time Critical Rules
 
@@ -1478,7 +1566,7 @@ Query Functions:
 2. **Verify all local variables are declared at top** - No undeclared variable usage
 3. **Confirm a!recordData() only used in grids/charts** - Never in local variables
 4. **Validate function parameter counts** - Use function validation checkpoint
-5. **Check field vs relationship usage** - Fields for values, relationships for navigation
+5. **Check field vs relationship usage** - User/Group/Date/Text/Number fields use FIELD references, NOT relationships; relationships only for navigating to related record data
 6. **Verify record type references are exact** - No truncated UUIDs
 7. **Confirm all saveInto targets are valid** - Local variables or rule inputs only
 8. **Check null handling** - Use a!isNotNullOrEmpty() for validation
@@ -1547,6 +1635,9 @@ Critical Syntax:
 - [ ] **No double bracket syntax: `record.relation.field` NOT `[record.relation][otherRecord.field]`**
 - [ ] **Grid sorting references fields only, never relationships**
 - [ ] **Related record values accessed through relationships with proper field paths**
+- [ ] **User/Group fields use FIELD references (assignedTo, createdBy) NOT relationship references (assignedToUser, createdByUser)**
+- [ ] **Date/DateTime fields use FIELD references (createdOn, modifiedOn) NOT relationship references**
+- [ ] **Scalar fields (Text, Number, Boolean) use FIELD references, NOT relationships**
 </relationship_navigation_validation>
 
 <dropdown_record_data_validation>
