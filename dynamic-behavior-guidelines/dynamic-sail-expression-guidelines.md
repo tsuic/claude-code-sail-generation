@@ -213,10 +213,18 @@ These errors cause immediate interface failures and violate core SAIL patterns:
    ```sail
    if(
      a!isNotNullOrEmpty(a!defaultValue(userIdField, null)),
-     user(userIdField, "displayName"),
-     "Unknown User"
+     trim(
+       user(userIdField, "firstName") & " " & user(userIdField, "lastName")
+     ),
+     "–"
    )
    ```
+
+   **Note on User Display Names:**
+   - Use `user(userId, "firstName") & " " & user(userId, "lastName")` instead of `displayName`
+   - The `displayName` field is actually a nickname and is not always populated
+   - Wrap in `trim()` to clean up any extra whitespace
+   - Use "–" (en dash) as fallback for null/empty users instead of text like "Unknown User" or "Unassigned"
 
 3. **Array Operations**: Protect all array references
    ```sail
@@ -1156,8 +1164,11 @@ a!gridColumn(
   label: "Assigned To",
   value: if(
     a!isNotNullOrEmpty(fv!row['recordType!Case.fields.{41905c99...}assignedTo']),
-    user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "displayName"),
-    "Unassigned"
+    trim(
+      user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "firstName") & " " &
+      user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "lastName")
+    ),
+    "–"
   ),
   sortField: 'recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo'
 )
