@@ -103,7 +103,10 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 </record_type_usage>
 
 <checkpoint>
-🚨 MANDATORY CHECKPOINT: Before implementing any interface with record data, check if the record type has user filters. If it does AND the interface includes custom filters, STOP and ask the user to choose between built-in user filters vs custom filtering experience.
+🚨 MANDATORY CHECKPOINT: For grids with record data, ALWAYS check for and prefer:
+1. User filters (userFilters parameter) over custom dropdowns
+2. Built-in search (showSearchBox: true) over custom search fields
+Only use custom filtering if built-in features are unavailable.
 </checkpoint>
 </critical_rules>
 
@@ -961,6 +964,33 @@ a!gridField(
 ```
 </grid_field_essentials>
 
+<builtin_grid_features>
+Built-in Grid Features (Always Prefer)
+
+```sail
+/* ✅ CORRECT - Use built-in user filters when available */
+a!gridField(
+  data: a!recordData(recordType: recordType!Case),
+  userFilters: {
+    recordType!Case.filters.Status,
+    recordType!Case.filters.Priority
+  },
+  showSearchBox: true(),  /* Built-in text search */
+  columns: { /* ... */ }
+)
+
+/* ❌ WRONG - Custom dropdowns when user filters exist */
+local!filterStatus,  /* Unnecessary when user filters exist */
+a!dropdownField(...),  /* Don't create custom filters */
+a!gridField(
+  data: a!recordData(
+    recordType: recordType!Case,
+    filters: { /* custom filters */ }
+  )
+)
+```
+</builtin_grid_features>
+
 <record_links_and_identifiers>
 ## 🚨 CRITICAL: Record Links and Identifiers
 
@@ -1779,6 +1809,13 @@ Layout Validation:
 - [ ] `emptyGridMessage` used instead of conditional grid rendering
 - [ ] Grid selection parameters configured when using record actions
 </layout_validation>
+
+<grid_features_validation>
+Grid Features:
+- [ ] Used userFilters parameter when record type has user filters
+- [ ] Used showSearchBox: true for text search (not custom search fields)
+- [ ] No custom filter dropdowns when built-in features available
+</grid_features_validation>
 </syntax_validation_checklist>
 
 
