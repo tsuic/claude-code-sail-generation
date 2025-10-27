@@ -59,7 +59,7 @@ a!cardGroupLayout(
     a!cardLayout(contents: {/* content */}, shape: "ROUNDED"),
     a!cardLayout(contents: {/* content */}, shape: "ROUNDED")
   },
-  cardWidth: "MEDIUM",
+  cardWidth: "NARROW_PLUS",
   spacing: "SPARSE"
 )
 ```
@@ -259,7 +259,7 @@ a!cardGroupLayout(
       padding: "STANDARD"
     )
   },
-  cardWidth: "MEDIUM",
+  cardWidth: "NARROW_PLUS",
   spacing: "STANDARD"
 )
 ```

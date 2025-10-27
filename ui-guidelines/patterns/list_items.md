@@ -107,7 +107,7 @@ a!localVariables(
         showShadow: false
       )
     ),
-    cardWidth: "MEDIUM",
+    cardWidth: "NARROW_PLUS",
     spacing: "DENSE"
   )
 )

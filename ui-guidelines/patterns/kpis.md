@@ -326,7 +326,7 @@ a!localVariables(
         shape: "ROUNDED"
       )
     },
-    cardWidth: "MEDIUM",
+    cardWidth: "NARROW_PLUS",
     spacing: "STANDARD"
   )
 )
