@@ -116,6 +116,7 @@ Code uses: style: "PRIMARY"
 - Quote the line from the file showing the exact match
 - **If grep returns no results → ERROR** (the icon is invalid)
 - If not found, use Grep to suggest similar valid icons (e.g., grep for "file-" to find file-related icons)
+- Icon names are only valid if found in `/ui-guidelines/5-rich-text-icon-aliases.md`, NOT if found in any other file!
 
 #### Colors
 - Hex format: Must be 6 characters `#RRGGBB` (not 3-char or 8-char)

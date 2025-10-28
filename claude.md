@@ -83,17 +83,22 @@ Determine if the user wants a full page or just a component.
 When designing a full page, follow these planning steps (not necessary if user requests a single component):
 
 1. Decide which top-level layout to use:
-  [ ] Pane layout - if the page features full-height (100vh) panes that might scroll independently, or,
-  [ ] Form layout - for single-step forms, or,
-  [ ] Wizard layout - for multi-step forms, or,
-  [ ] Header-content layout - for everything else
-2. Plan the main page content layout using columnsLayout
-3. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button
+  - [ ] Pane layout - if the page features full-height (100vh) panes that might scroll independently, or,
+  - [ ] Form layout - for single-step forms, or,
+  - [ ] Wizard layout - for multi-step forms, or,
+  - [ ] Header-content layout - for everything else
+2. Read primary layout docs
+  - [ ] If using FormLayout → Read `3-form-layout-instructions.md`
+  - [ ] If using HeaderContentLayout → Read `3-header-content-layout-instructions.md`
+  - [ ] If using PaneLayout → Read `3-pane-layout-instructions.md`
+  - [ ] If using WizardLayout → Read `3-wizard-layout-instructions.md`
+3. Plan the main page content layout using columnsLayout
+4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
-4. If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
-  - Break components up into separate sideBySideItems, OR,
-  - Use a columnsLayout instead
+  - If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
+     - Break components up into separate sideBySideItems, OR,
+     - Use a columnsLayout instead
 
 ## LAYOUT SELECTION GUIDE
 
