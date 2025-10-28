@@ -325,6 +325,57 @@
 
 ---
 
+### a!fullOverlay
+**Purpose**: Full overlay completely covering entire billboard
+
+**Inherits**: Visibility
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `alignVertical` | Text | `TOP` | `TOP`\|`MIDDLE`\|`BOTTOM` |
+| `contents` | Any Type | - |  |
+| `style` | Text | `DARK` | `DARK`\|`SEMI_DARK`\|`NONE`\|`SEMI_LIGHT`\|`LIGHT` |
+| `padding` | Text | `STANDARD` | `NONE`\|`EVEN_LESS`\|`LESS`\|`STANDARD`\|`MORE`\|`EVEN_MORE` |
+
+**Overlay style**
+- `DARK` and `SEMI_DARK` produce a semi-transparent black background
+- `LIGHT` and `SEMI_LIGHT` produce a semi-transparent white background
+
+---
+
+### a!barOverlay
+**Purpose**: Horizontal bar overlay positioned at top, middle, or bottom of billboard
+
+**Inherits**: Visibility
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `position` | Text | `BOTTOM` | `TOP`\|`MIDDLE`\|`BOTTOM` |
+| `contents` | Any Type | - |  |
+| `style` | Text | `DARK` | `DARK`\|`SEMI_DARK`\|`NONE`\|`SEMI_LIGHT`\|`LIGHT` |
+| `padding` | Text | `STANDARD` | `NONE`\|`EVEN_LESS`\|`LESS`\|`STANDARD`\|`MORE`\|`EVEN_MORE` |
+
+---
+
+### a!columnOverlay
+**Purpose**: Vertical column overlay positioned at left, middle, or right of billboard
+
+**Inherits**: Visibility
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `alignVertical` | Text | `TOP` | `TOP`\|`MIDDLE`\|`BOTTOM` |
+| `position` | Text | `START` | `START`\|`CENTER`\|`END` |
+| `width` | Text | `MEDIUM` | `NARROW`\|`MEDIUM`\|`WIDE` |
+| `contents` | Any Type | - |  |
+| `style` | Text | `DARK` | `DARK`\|`SEMI_DARK`\|`NONE`\|`SEMI_LIGHT`\|`LIGHT` |
+| `padding` | Text | `STANDARD` | `NONE`\|`EVEN_LESS`\|`LESS`\|`STANDARD`\|`MORE`\|`EVEN_MORE` |
+
+---
+
 ## Input Components
 
 ### a!textField
