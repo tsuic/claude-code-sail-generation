@@ -190,6 +190,30 @@ These errors cause immediate interface failures and violate core SAIL patterns:
 - **Problem**: `condition ? trueValue : falseValue`
 - **Solution**: `if(condition, trueValue, falseValue)`
 </error_7>
+
+<error_8>
+**Error 8: Passing Null to Functions That Reject It**
+- **Problem**: `text(a!defaultValue(dateField, null), "format")` or `user(a!defaultValue(userId, null), "firstName")`
+- **Solution**: Check for null with if() BEFORE calling these functions
+```sail
+if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–")
+```
+</error_8>
+
+<error_9>
+**Error 9: Using .totalCount for KPI Metrics**
+- **Problem**: `local!caseCount: a!queryRecordType(..., fetchTotalCount: true).totalCount`
+- **Solution**: Use aggregations for ALL KPIs
+```sail
+local!caseCountQuery: a!queryRecordType(
+  fields: a!aggregationFields(
+    groupings: {},
+    measures: {a!measure(function: "COUNT", field: recordType!Case.fields.id, alias: "count")}
+  )
+),
+local!caseCount: index(local!caseCountQuery.data, 1, {}).count
+```
+</error_9>
 </common_critical_errors>
 
 <mandatory_null_safety>
@@ -212,8 +236,9 @@ These errors cause immediate interface failures and violate core SAIL patterns:
    value: a!defaultValue(ri!record[recordType!X.fields.title], ""),
    ```
 
-2. **User Function Calls**: Always check for null user IDs first
+2. **User Function Calls**: Always check for null user IDs BEFORE calling user() function
    ```sail
+   /* ✅ CORRECT - Check for null BEFORE calling user() */
    if(
      a!isNotNullOrEmpty(a!defaultValue(userIdField, null)),
      trim(
@@ -221,7 +246,15 @@ These errors cause immediate interface failures and violate core SAIL patterns:
      ),
      "–"
    )
+
+   /* ❌ WRONG - Checking null INSIDE user() call - user() will fail if passed null */
+   trim(
+     user(a!defaultValue(userIdField, null), "firstName") & " " &
+     user(a!defaultValue(userIdField, null), "lastName")
+   )
    ```
+
+   **Critical Note**: The user() function CANNOT accept null as the first parameter. If the field value is null, user() will cause an error. You MUST check for null with an if() statement BEFORE calling user(), not inside the user() function call.
 
    **Note on User Display Names:**
    - Use `user(userId, "firstName") & " " & user(userId, "lastName")` instead of `displayName`
@@ -248,6 +281,34 @@ These errors cause immediate interface failures and violate core SAIL patterns:
 **🚨 CRITICAL REMINDER**: The `a!defaultValue()` function prevents interface failures by handling null field references gracefully. This is MANDATORY for all direct field access, not optional. Missing this causes immediate runtime errors.
 </implementation_reminder>
 </mandatory_null_safety>
+
+<functions_that_reject_null>
+## 🚨 CRITICAL: Functions That Cannot Accept Null Values
+
+**Some Appian functions will fail immediately if passed null values, even with a!defaultValue(). These require if() checks BEFORE calling the function:**
+
+<null_rejecting_functions>
+**Functions That Reject Null:**
+- `user(userId, property)` - Cannot accept null userId
+- `group(groupId, property)` - Cannot accept null groupId
+- `text(value, format)` - Cannot accept null value when formatting dates/numbers
+- String manipulation functions on null: `upper()`, `lower()`, `left()`, `right()`, `find()`
+
+```sail
+/* ✅ CORRECT Pattern for null-rejecting functions */
+if(
+  a!isNotNullOrEmpty(a!defaultValue(fieldValue, null)),
+  functionThatRejectsNull(fieldValue, otherParams),
+  fallbackValue
+)
+
+/* ❌ WRONG - a!defaultValue() inside the function doesn't prevent the error */
+functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
+```
+
+**Rule**: When a function operates ON a value (not just passing it through), check for null BEFORE calling the function. The a!defaultValue() wrapper alone is not sufficient for these functions.
+</null_rejecting_functions>
+</functions_that_reject_null>
 
 <complex_scenario_handling>
 ## 🔥 Complex Scenario Handling
@@ -506,18 +567,24 @@ local!caseQuery: a!queryRecordType(
 ),
 local!totalCases: local!caseQuery.totalCount  /* AVOID - Use aggregation instead */
 ```
-When to Use Each Approach:
 
-Use .totalCount: ONLY for pagination in grids showing lists of records
-Use a!measure() COUNT: For ALL KPI counts, metrics, and dashboard statistics
-Use a!measure() SUM/AVG/MIN/MAX: For ALL calculated KPI values
+**When to Use Each Approach:**
 
-Key Benefits of Aggregations:
+| Use Case | Correct Approach | Why |
+|----------|-----------------|-----|
+| **KPI counts (dashboard metrics)** | `a!aggregationFields()` with `a!measure()` | Better performance, database-level calculation |
+| **KPI calculations (SUM, AVG, MIN, MAX)** | `a!aggregationFields()` with `a!measure()` | ONLY way to calculate these metrics |
+| **Pagination info in grids** | `.totalCount` property | Appropriate for showing "Showing X of Y results" |
+| **Simple count for conditional logic** | `.totalCount` property | OK for one-off checks like "if(query.totalCount > 0)" |
 
-Better performance (database-level calculation)
-Consistent pattern for all metrics (COUNT, SUM, AVG, etc.)
-More maintainable and scalable
-Leverages record type's query optimization
+**Key Benefits of Aggregations for KPIs:**
+- Better performance (database-level calculation)
+- Consistent pattern for all metrics (COUNT, SUM, AVG, MIN, MAX, etc.)
+- More maintainable and scalable
+- Leverages record type's query optimization
+- Allows grouping and multiple measures in one query
+
+**MANDATORY: ALWAYS use `a!aggregationFields()` for dashboard KPIs, metrics, and statistics. Only use `.totalCount` for pagination display or simple conditional checks.**
 </kpi_aggregation_pattern>
 
 <direct_record_usage>
@@ -1292,9 +1359,9 @@ Many record types have both:
 a!queryRecordType(
   recordType: recordType!Case,
   fields: {
-    'recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo',
-    'recordType!Case.fields.{782fab03-6e79-464d-862d-9766558ead34}createdBy',
-    'recordType!Case.fields.{24dc24a9-c3a8-4c5b-b0f2-227247049eb6}modifiedBy'
+    recordType!Case.fields.assignedTo,
+    recordType!Case.fields.createdBy,
+    recordType!Case.fields.modifiedBy
   }
 )
 
@@ -1302,40 +1369,40 @@ a!queryRecordType(
 a!gridColumn(
   label: "Assigned To",
   value: if(
-    a!isNotNullOrEmpty(fv!row['recordType!Case.fields.{41905c99...}assignedTo']),
+    a!isNotNullOrEmpty(fv!row[recordType!Case.fields.assignedTo]),
     trim(
-      user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "firstName") & " " &
-      user(fv!row['recordType!Case.fields.{41905c99...}assignedTo'], "lastName")
+      user(fv!row[recordType!Case.fields.assignedTo], "firstName") & " " &
+      user(fv!row[recordType!Case.fields.assignedTo], "lastName")
     ),
     "–"
   ),
-  sortField: 'recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo'
+  sortField: recordType!Case.fields.assignedTo
 )
 
 /* ✅ CORRECT - Use the User field in forms */
 a!pickerFieldUsers(
   label: "Assigned To",
   value: a!defaultValue(
-    ri!case['recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo'],
+    ri!case[recordType!Case.fields.assignedTo],
     null
   ),
-  saveInto: ri!case['recordType!Case.fields.{41905c99-3332-4704-bf2e-c0ea6b8b2207}assignedTo']
+  saveInto: ri!case[recordType!Case.fields.assignedTo]
 )
 
 /* ❌ WRONG - Don't use the User relationship */
 a!queryRecordType(
   recordType: recordType!Case,
   fields: {
-    'recordType!Case.relationships.{b2f0c709...}assignedToUser',  /* WRONG */
-    'recordType!Case.relationships.{e102da15...}createdByUser',   /* WRONG */
-    'recordType!Case.relationships.{8a2834b3...}modifiedByUser'   /* WRONG */
+    recordType!Case.relationships.assignedToUser,  /* WRONG */
+    recordType!Case.relationships.createdByUser,   /* WRONG */
+    recordType!Case.relationships.modifiedByUser   /* WRONG */
   }
 )
 
 /* ❌ WRONG - Don't use relationship in grid columns */
 a!gridColumn(
   label: "Assigned To",
-  value: fv!row['recordType!Case.relationships.assignedToUser']  /* CAUSES ERRORS */
+  value: fv!row[recordType!Case.relationships.assignedToUser]  /* CAUSES ERRORS */
 )
 ```
 </correct_user_field_usage>
@@ -1445,6 +1512,33 @@ value: a!addDateTime(startDateTime: today(), days: -30)
 value: a!subtractDateTime(startDateTime: now(), days: 30)
 ```
 </date_function_corrections>
+
+<text_function_with_dates>
+🚨 CRITICAL: text() Function with Date/DateTime Values
+
+**The text() function CANNOT accept null values. Always check for null before calling text():**
+
+```sail
+/* ❌ WRONG - Passing null to text() causes errors */
+text(a!defaultValue(fv!row['recordType!Case.fields.createdOn'], null), "MMM d, yyyy")
+
+/* ✅ CORRECT - Check for null BEFORE calling text() */
+if(
+  a!isNullOrEmpty(a!defaultValue(fv!row['recordType!Case.fields.createdOn'], null)),
+  "–",
+  text(fv!row['recordType!Case.fields.createdOn'], "MMM d, yyyy")
+)
+
+/* ✅ CORRECT - Alternative pattern with defaultValue as fallback string */
+if(
+  a!isNullOrEmpty(a!defaultValue(fv!row['recordType!Case.fields.dueDate'], null)),
+  "No due date",
+  text(fv!row['recordType!Case.fields.dueDate'], "MM/DD/YYYY")
+)
+```
+
+**Rule**: When formatting dates with text(), ALWAYS wrap in a null check that returns a fallback string (like "–" or "N/A"), NOT null.
+</text_function_with_dates>
 </date_time_critical_rules>
 
 <chart_data_configuration>
@@ -1780,6 +1874,10 @@ Critical Syntax:
 - [ ] **`fv!identifier` ONLY used in grids with `a!recordData()` or grid recordActions - use primary key field in `a!forEach()`**
 - [ ] **Record links in `a!forEach()` use primary key field as identifier, NOT `fv!identifier`**
 - [ ] **Primary key field included in query when creating record links in `a!forEach()`**
+- [ ] **text() function with dates wrapped in null check that returns string fallback (NOT null)**
+- [ ] **user() and group() functions called ONLY after null checking with if() statement**
+- [ ] **No null values passed to functions that operate on values (user, group, text, upper, lower, etc.)**
+- [ ] **All date/time formatting with text() has fallback string like "–" or "N/A"**
 </critical_syntax_checks>
 
 <relationship_navigation_validation>
