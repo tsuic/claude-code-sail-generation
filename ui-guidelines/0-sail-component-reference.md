@@ -18,7 +18,7 @@
 
 ### Display Components
 - **Text**: `a!richTextDisplayField`, `a!headingField`, `a!timeDisplay`
-- **Media**: `a!imageField`, `a!documentViewer`, `a!webContentField`
+- **Media**: `a!imageField`, `a!documentViewerField`, `a!webContentField`
 - **Visual Indicators**: `a!progressBarField`, `a!gaugeField`, `a!milestoneField`, `a!stampField`
 - **Lists & Links**: `a!tagField`, `a!linkField`
 - **Separators**: `a!horizontalLine`
@@ -749,16 +749,22 @@
 | `style` | Text | `SOLID` | `SOLID`\|`DOT`\|`DASH` |
 
 ---
-### a!documentViewer
-**Purpose**: Displays a document from document management
+### a!documentViewerField
+**Purpose**: Displays a document using the web browser's built-in document viewer (PDF support is most common)
 
-**Inherits**: Visibility, Vertical Margins
+**Inherits**: Labeling, Visibility, Vertical Margins, Accessibility
 
+**Parameters**:
 | Parameter | Type | Default | Description |
-|:---|:---|:---|:---|
-| `document` | Document | - | The document to display |
-| `showName` | Boolean | `true` | Display document file name |
-| `showDescription` | Boolean | `false` | Display document description |
+|-----------|------|---------|-------------|
+| `document` | Document | - | Document to display |
+| `showName` | Boolean | `true` | Display document file name above viewer |
+| `showDescription` | Boolean | `false` | Display document description below file name |
+| `height` | Text | `MEDIUM` | `SHORT`\|`MEDIUM`\|`TALL` |
+
+**Notes**:
+- Rendering depends on browser capabilities; PDFs are commonly supported
+- Other file types may prompt download instead of inline display
 
 ### a!timeDisplay
 **Purpose**: Displays a single time (hour, minute, second) in read-only format
