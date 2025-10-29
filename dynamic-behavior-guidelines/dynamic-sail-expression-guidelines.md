@@ -99,7 +99,7 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 - **For one-to-many relationships** - Use main record type's relationships rather than new variables
 - **NEVER confuse relationships with fields** - Relationships navigate, fields display values
 - **Use aggregation queries for KPIs** - Leverage native `a!queryRecordType()` with `a!aggregationFields()` for better performance than manual filtering/calculations. Avoid manual calculations whenever possible, leverage aggregations instead.
-- **Use a!recordData() directly in the grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components.
+- **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When using record data in charts, always use the `data` + `config` approach, never `categories` + `series`.
 </record_type_usage>
 
 <checkpoint>
@@ -168,9 +168,13 @@ These errors cause immediate interface failures and violate core SAIL patterns:
 </error_3>
 
 <error_4>
-**Error 4: Mock Chart Patterns with Record Data**
-- **Problem**: `categories: {...}, series: {...}`
-- **Solution**: `data: a!recordData(...), config: a!columnChartConfig(...)`
+**Error 4: Invalid Chart Patterns**
+- **Problem 1**: `categories: {...}, series: {...}` with record data
+- **Solution 1**: `data: a!recordData(...), config: a!columnChartConfig(...)`
+- **Problem 2**: `interval: "MONTH"` or `interval: "WEEK"` in a!grouping()
+- **Solution 2**: Use valid intervals: "MONTH_SHORT_TEXT", "DATE_SHORT_TEXT", etc.
+- **Problem 3**: `stacking: "NORMAL"` in chart config
+- **Solution 3**: Place `stacking` on chart field, not in config
 </error_4>
 
 <error_5>
@@ -1593,6 +1597,190 @@ Chart Data Extraction Rules
 </chart_data_extraction_rules>
 </chart_data_configuration>
 
+<chart_components_usage>
+## Chart Components Usage
+
+<available_chart_types>
+**Available Chart Functions:**
+1. `a!areaChartField()` - Filled areas under lines for trends and cumulative values
+2. `a!barChartField()` - Horizontal bars for comparing categories
+3. `a!columnChartField()` - Vertical bars for comparing values across categories
+4. `a!lineChartField()` - Connected points for trends over time
+5. `a!pieChartField()` - Pie slices for part-to-whole relationships
+6. `a!scatterChartField()` - Points on X/Y axes for correlations (record data only)
+</available_chart_types>
+
+<chart_shared_parameters>
+**Parameters Shared by All Chart Types:**
+- `label`, `labelPosition` (usually "COLLAPSED"), `instructions`
+- `height` - Values vary by type:
+  - Column/Line/Area/Bar: "MICRO", "SHORT", "MEDIUM", "TALL" (Bar also has "AUTO")
+  - Pie/Scatter: "SHORT", "MEDIUM", "TALL"
+- `showWhen`, `accessibilityText`
+- `xAxisTitle`, `yAxisTitle` (not available for pie charts)
+- `showLegend` (column, line, bar, area only - NOT pie)
+- `showDataLabels`, `colorScheme`
+</chart_shared_parameters>
+
+<chart_stacking_property>
+🚨 CRITICAL: Stacking Property
+
+**ONLY these chart types have a `stacking` property:**
+- `a!areaChartField()`
+- `a!barChartField()`
+- `a!columnChartField()`
+
+**The `stacking` property is on the CHART FIELD, NOT in the config:**
+```sail
+/* ✅ CORRECT - stacking on chart field */
+a!columnChartField(
+  data: a!recordData(...),
+  config: a!columnChartConfig(...),
+  stacking: "NORMAL"  /* On chart field level */
+)
+
+/* ❌ WRONG - stacking in config (parameter doesn't exist there) */
+a!columnChartField(
+  data: a!recordData(...),
+  config: a!columnChartConfig(
+    stacking: "NORMAL"  /* INVALID - not a config parameter */
+  )
+)
+```
+
+**Valid stacking values:** "NONE" (default), "NORMAL", "PERCENT_TO_TOTAL"
+</chart_stacking_property>
+
+<chart_data_approaches>
+**Two Data Approaches for Charts:**
+
+**Approach 1: Static Mockup Data** (categories + series)
+- Use for: Column, Line, Bar, Area, Pie charts with hardcoded sample data
+- Structure:
+```sail
+a!columnChartField(
+  categories: {"Q1", "Q2", "Q3", "Q4"},
+  series: {
+    a!chartSeries(label: "Sales", data: {100, 120, 115, 140}, color: "#3B82F6")
+  }
+)
+```
+
+**Approach 2: Record Data** (data + config)
+- Use for: ALL charts when connecting to live record data
+- ⚠️ Scatter charts ONLY work with this approach
+- Structure:
+```sail
+a!columnChartField(
+  data: a!recordData(...),
+  config: a!columnChartConfig(
+    primaryGrouping: a!grouping(...),
+    measures: {a!measure(...)}
+  )
+)
+```
+
+❌ **NEVER mix approaches:** Don't use `categories` + `series` with record data
+❌ **NEVER use scatter charts with static mockup data** - they require record data
+</chart_data_approaches>
+
+<chart_config_parameters>
+**Valid Parameters for Chart Config Functions:**
+- `primaryGrouping` - a!grouping() for main data grouping
+- `secondaryGrouping` - a!grouping() for multi-series charts
+- `measures` - Array of a!measure() for aggregations
+- `sort` - a!sortInfo() for ordering results
+- `dataLimit` - Maximum number of data points
+- `link` - Dynamic link for click actions
+- `showIntervalsWithNoData` - Boolean for showing empty intervals
+
+❌ **INVALID Parameters (Don't Use):**
+- `stacking` - This is on the chart field, NOT in config
+- `aggregations` - Use `measures` instead
+- `aggregationFields` - Use `measures` instead
+</chart_config_parameters>
+
+<chart_interval_values>
+🚨 CRITICAL: Valid Interval Values for a!grouping()
+
+**The `interval` parameter in a!grouping() can ONLY be used with Date/DateTime/Time fields.**
+
+**Valid interval values:**
+- "AUTO" (default), "YEAR"
+- "MONTH_OF_YEAR", "MONTH_OF_YEAR_SHORT_TEXT", "MONTH_OF_YEAR_TEXT"
+- "MONTH_TEXT", "MONTH_SHORT_TEXT", "MONTH_DATE"
+- "DATE", "DATE_SHORT_TEXT", "DATE_TEXT"
+- "DAY_OF_MONTH"
+- "HOUR_OF_DAY", "HOUR"
+- "MINUTE_OF_HOUR", "MINUTE"
+
+```sail
+/* ✅ CORRECT - Valid interval values */
+a!grouping(
+  field: recordType!Case.fields.createdOn,
+  alias: "month_grouping",
+  interval: "MONTH_SHORT_TEXT"  /* Valid - shows "Jan", "Feb", etc. */
+)
+
+a!grouping(
+  field: recordType!Case.fields.modifiedOn,
+  alias: "date_grouping",
+  interval: "DATE_SHORT_TEXT"  /* Valid - shows short date format */
+)
+
+/* ❌ WRONG - Invalid interval values */
+a!grouping(
+  field: recordType!Case.fields.createdOn,
+  alias: "month_grouping",
+  interval: "MONTH"  /* INVALID - not in allowed list */
+)
+
+a!grouping(
+  field: recordType!Case.fields.modifiedOn,
+  alias: "week_grouping",
+  interval: "WEEK"  /* INVALID - not in allowed list */
+)
+```
+
+**Rule**: Only use interval values from the documented list above. For weekly groupings, use "DATE_SHORT_TEXT" or "DATE" instead.
+</chart_interval_values>
+
+<chart_record_data_example>
+**Complete Record Data Chart Example:**
+```sail
+a!columnChartField(
+  labelPosition: "COLLAPSED",
+  data: a!recordData(
+    recordType: recordType!Case,
+    filters: a!queryFilter(
+      field: recordType!Case.fields.isActive,
+      operator: "=",
+      value: true
+    )
+  ),
+  config: a!columnChartConfig(
+    primaryGrouping: a!grouping(
+      field: recordType!Case.relationships.status.fields.value,
+      alias: "status_grouping"
+    ),
+    measures: {
+      a!measure(
+        function: "COUNT",
+        field: recordType!Case.fields.id,
+        alias: "case_count"
+      )
+    },
+    dataLimit: 20
+  ),
+  xAxisTitle: "Status",
+  yAxisTitle: "Number of Cases",
+  showDataLabels: true,
+  height: "MEDIUM"
+)
+```
+</chart_record_data_example>
+</chart_components_usage>
+
 <kpi_performance_calculations>
 ## KPI and Performance Calculations
 **Best Practice**: Use aggregation queries for KPIs - Leverage native `a!queryRecordType()` with `a!aggregationFields()` for better performance than manual filtering/calculations.
@@ -1878,6 +2066,11 @@ Critical Syntax:
 - [ ] **user() and group() functions called ONLY after null checking with if() statement**
 - [ ] **No null values passed to functions that operate on values (user, group, text, upper, lower, etc.)**
 - [ ] **All date/time formatting with text() has fallback string like "–" or "N/A"**
+- [ ] **Charts use a!recordData() with config parameter when using record data**
+- [ ] **Chart interval values are from valid list (MONTH_SHORT_TEXT, DATE_SHORT_TEXT, etc.) - NOT "MONTH" or "WEEK"**
+- [ ] **Stacking property (if used) is on chart field level, NOT in config**
+- [ ] **Chart config uses only valid parameters: primaryGrouping, secondaryGrouping, measures, sort, dataLimit, link, showIntervalsWithNoData**
+- [ ] **Scatter charts ONLY use record data approach (data + config), never categories + series**
 </critical_syntax_checks>
 
 <relationship_navigation_validation>
