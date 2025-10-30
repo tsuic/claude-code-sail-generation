@@ -182,7 +182,7 @@ a!cardGroupLayout(
         size: "MEDIUM_PLUS",
         headingTag: "H2",
         fontWeight: "SEMI_BOLD",
-        marginBelow: "MORE"
+        marginBelow: "STANDARD"
       ),
       /* Rest of card contents here */
     },
