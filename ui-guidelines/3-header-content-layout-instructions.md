@@ -54,16 +54,50 @@ a!headerContentLayout(
 - `"MORE"`: Increased padding
 - `"EVEN_MORE"`: Maximum padding
 
-## ⚠️ CRITICAL DECISION POINT: Header Contents
+## ⚠️ CRITICAL RULES: Header Parameter
+
+### Valid Header Components
+The `header` parameter **ONLY accepts these components:**
+- `a!cardLayout()` - Most common for standard headers
+- `a!billboardLayout()` - For headers with background images/videos
+- Empty `{}` or omit parameter - No header
+
+### ❌ INVALID Header Components
+**NEVER use these directly in header:**
+- `a!sideBySideLayout()` - Must be wrapped in a!cardLayout()
+- `a!richTextDisplayField()` - Must be wrapped in a!cardLayout()
+- `a!buttonArrayLayout()` - Must be wrapped in a!cardLayout()
+- Any other component - Must be wrapped in a!cardLayout()
+
+```sail
+/* ❌ WRONG - sideBySideLayout directly in header */
+header: {
+  a!sideBySideLayout(...)
+}
+
+/* ✅ RIGHT - Wrapped in cardLayout */
+header: {
+  a!cardLayout(
+    contents: {
+      a!sideBySideLayout(...)
+    },
+    style: "NONE",
+    height: "AUTO",
+    marginBelow: "STANDARD"
+  )
+}
+```
+
+### When to Use Each Option
 
 **Header is not needed for design:**
-- Just exclude the `header` parameter
+- Just exclude the `header` parameter or use `header: {}`
 
 **Header must show an image or video as its background:**
-- Use `billboardLayout` in `header`
+- Use `a!billboardLayout()` in `header`
 
-**Default:**
-- Use `cardLayout` in `header`
+**Default (standard page header with title, buttons, etc.):**
+- Use `a!cardLayout()` in `header` containing your header components
 
 ## Standard Template
 
