@@ -7,13 +7,17 @@
 1. **All SAIL expressions must begin with `a!localVariables()`** - even if no variables are defined
 2. **ALL local variables must be declared before use** - No undeclared variables allowed
 3. **Use only available Appian functions** - No JavaScript equivalents exist
-4. **Appian data is immutable** - Use functional approaches like `append()` instead of mutation
+4. **Appian data is immutable** - Use functional approaches for data manipulation:
+   - `append(array, value)` - Add to end of array (both params must be arrays or compatible types)
+   - `a!update(data: array, index: position, value: newValue)` - Insert/replace at position
+   - `insert(array, value, index)` - Insert value at specific position
+   - `remove(array, index)` - Remove value at position
 5. **Always validate for null values** - Use `a!isNullOrEmpty()` and `a!isNotNullOrEmpty()`
 6. **Set audit fields on create/update** - createdBy, createdOn, modifiedBy, modifiedOn
 7. **Never use `append()` with record data in dropdown choices - use placeholders**
 8. **For dropdowns with record data**: Use record IDs as choiceValues and record text fields as choiceLabels - NO value-to-ID translation needed
-9. **wherecontains() returns arrays, not single values** - Don't use with index() for single value lookups
-10. **Always try to use record types for populating read-only grids (`a!griField()`) and charts** - instead of using mock data.
+9. **wherecontains() signature**: `wherecontains(valuesToFind, arrayToSearchIn)` - Returns array of indices, always use with index() for extraction
+10. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
 </expression_structure>
 
 <syntax_pattern_validation>
@@ -108,6 +112,94 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 2. Built-in search (showSearchBox: true) over custom search fields
 Only use custom filtering if built-in features are unavailable.
 </checkpoint>
+
+<array_manipulation_patterns>
+## Array and Data Manipulation Patterns
+
+<combining_data>
+### Combining Different Data Types
+
+```sail
+/* ❌ WRONG - append() expects compatible types */
+local!kpiMap: a!map(name: "Total", count: 100),
+local!kpiArray: {a!map(...), a!map(...)},
+local!combined: append(local!kpiMap, local!kpiArray)  /* ERROR: Can't append map to array */
+
+/* ✅ RIGHT - Use a!update() to insert at position */
+local!kpiMap: a!map(name: "Total", count: 100),
+local!kpiArray: {a!map(...), a!map(...)},
+local!combined: a!update(data: local!kpiArray, index: 1, value: local!kpiMap)
+
+/* ✅ ALTERNATIVE - Use insert() */
+local!combined: insert(local!kpiArray, local!kpiMap, 1)
+
+/* ✅ CORRECT - append() with arrays */
+local!array1: {1, 2, 3},
+local!array2: {4, 5, 6},
+local!combined: append(local!array1, local!array2)  /* Returns {1, 2, 3, 4, 5, 6} */
+```
+
+**Key Rules:**
+- `append(array, value)` - Both parameters must be arrays or compatible scalar/array combinations
+- `a!update(data: array, index: position, value: newValue)` - Insert or replace at any position
+- `insert(array, value, index)` - Insert value at specific position (pushes existing items down)
+</combining_data>
+
+<wherecontains_usage>
+### Using wherecontains() Correctly
+
+**Function Signature:** `wherecontains(valuesToFind, arrayToSearchIn)`
+- **Returns:** Array of indices (1-based) where values are found
+- **Always returns an array**, even if only one match
+
+```sail
+/* ❌ WRONG - wherecontains() only takes 2 parameters */
+icon: wherecontains(value, statusArray, iconArray)  /* INVALID - 3 params */
+
+/* ✅ RIGHT - Use nested index() for lookups */
+local!statusConfig: a!forEach(
+  items: {"Open", "Closed", "Pending"},
+  expression: a!map(
+    status: fv!item,
+    icon: index({"folder-open", "check-circle", "clock"}, fv!index, "file"),
+    color: index({"#059669", "#6B7280", "#F59E0B"}, fv!index, "#000000")
+  )
+),
+
+/* Extract matching config */
+icon: index(
+  index(
+    local!statusConfig,
+    wherecontains("Open", local!statusConfig.status),
+    {}
+  ).icon,
+  1,
+  "file"
+)
+
+/* How it works:
+1. wherecontains("Open", local!statusConfig.status) → {1}
+2. index(local!statusConfig, {1}, {}) → {a!map(status: "Open", icon: "folder-open", ...)}
+3. .icon → {"folder-open"}
+4. index(..., 1, "file") → "folder-open"
+*/
+```
+
+**Common Pattern for Lookups:**
+```sail
+/* Find value from parallel arrays */
+local!statuses: {"Open", "Closed", "Pending"},
+local!colors: {"#059669", "#6B7280", "#F59E0B"},
+
+local!color: index(
+  local!colors,
+  wherecontains("Open", local!statuses),
+  "#000000"  /* Default color */
+)
+/* Returns: "#059669" (first element of colors array) */
+```
+</wherecontains_usage>
+</array_manipulation_patterns>
 </critical_rules>
 
 <button_widget_parameters>
@@ -218,6 +310,33 @@ local!caseCountQuery: a!queryRecordType(
 local!caseCount: index(local!caseCountQuery.data, 1, {}).count
 ```
 </error_9>
+
+<error_10>
+**Error 10: Incorrect Array and Data Manipulation Functions**
+- **Problem 1**: Using `append(map, array)` - append only works with arrays of compatible types
+- **Solution 1**: Use `a!update(data: array, index: 1, value: map)` to insert at beginning
+- **Problem 2**: Using `wherecontains()` with 3 parameters
+- **Solution 2**: `wherecontains(value, array)` only takes 2 params - use nested index() for lookups
+- **Problem 3**: Using `append()` to add single item to beginning of array
+- **Solution 3**: Use `a!update()` or `insert()` for positional insertion
+```sail
+/* ❌ WRONG - append() expects compatible types */
+local!combined: append(local!singleMap, local!arrayOfMaps)  /* ERROR */
+
+/* ✅ RIGHT - Use a!update() to insert at position */
+local!combined: a!update(data: local!arrayOfMaps, index: 1, value: local!singleMap)
+
+/* ❌ WRONG - wherecontains() only takes 2 parameters */
+icon: wherecontains(value, array, arrayToExtractFrom)
+
+/* ✅ RIGHT - Use nested index() for lookups */
+icon: index(
+  index(configArray, wherecontains(value, configArray.field), {}).propertyName,
+  1,
+  "default"
+)
+```
+</error_10>
 </common_critical_errors>
 
 <mandatory_null_safety>
@@ -2023,6 +2142,15 @@ Critical Syntax:
 - [ ] **ALL direct field references wrapped in `a!defaultValue()`**
 - [ ] **User function calls protected with null checking via `if()` statements**
 - [ ] **Array operations use `a!defaultValue()` with empty array fallbacks**
+
+<array_function_validation>
+Array Function Validation:
+- [ ] **append() used only with array + array or array + compatible scalar**
+- [ ] **wherecontains() called with exactly 2 parameters: `wherecontains(value, array)`**
+- [ ] **a!update() used for inserting/replacing at specific index positions**
+- [ ] **Single items prepended to arrays use `a!update()` or `insert()`, NOT `append()`**
+- [ ] **No mixing of incompatible types in `append()` (e.g., map + array)**
+</array_function_validation>
 - [ ] **Form validations use `a!defaultValue()` for field references**
 - [ ] **No naked field references (ri!record[field] without a!defaultValue)**
 - [ ] **Dropdown variables with record data are uninitialized (declared without values)**
