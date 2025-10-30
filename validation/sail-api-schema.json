@@ -1,0 +1,1900 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL API Validation Schema - Complete reference for all components, functions, parameters, and valid values",
+  "version": "2.3.0",
+
+  "components": {
+    "a!formLayout": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "titleBar": { "type": "Text|CardLayout|HeaderTemplate", "required": false },
+        "contentsWidth": { "type": "Text", "required": false, "validValues": ["FULL", "WIDE", "MEDIUM", "NARROW", "EXTRA_NARROW"] },
+        "contents": { "type": "Any Type Array", "required": false },
+        "buttons": { "type": "Button Layout", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["WHITE", "TRANSPARENT"], "acceptsHexColors": true },
+        "validations": { "type": "Text/Validation Message", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!headerContentLayout": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "header": { "type": "Any Type", "required": false },
+        "contents": { "type": "Any Type Array", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["WHITE", "TRANSPARENT"], "acceptsHexColors": true },
+        "contentsPadding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "isHeaderFixed": { "type": "Boolean", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!paneLayout": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "panes": { "type": "List of a!pane", "required": true },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!pane": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "contents": { "type": "Any Type", "required": false },
+        "width": { "type": "Text", "required": false, "validValues": ["AUTO", "EXTRA_NARROW", "NARROW", "NARROW_PLUS", "MEDIUM", "MEDIUM_PLUS", "WIDE", "WIDE_PLUS"] },
+        "backgroundColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!wizardLayout": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "titleBar": { "type": "Text|CardLayout|HeaderTemplate", "required": false },
+        "steps": { "type": "List of a!wizardStep", "required": true },
+        "style": { "type": "Text", "required": false, "validValues": ["DOT_VERTICAL", "DOT_HORIZONTAL", "CHEVRON_VERTICAL", "CHEVRON_HORIZONTAL", "LINE_VERTICAL", "LINE_HORIZONTAL", "MINIMAL"] },
+        "contentsWidth": { "type": "Text", "required": false, "validValues": ["FULL", "WIDE", "MEDIUM", "NARROW", "EXTRA_NARROW"] },
+        "primaryButtons": { "type": "List of ButtonWidget", "required": false },
+        "secondaryButtons": { "type": "List of ButtonWidget", "required": false },
+        "showStepHeadings": { "type": "Boolean", "required": false },
+        "focusOnFirstInput": { "type": "Boolean", "required": false },
+        "isTitleBarFixed": { "type": "Boolean", "required": false },
+        "showButtonDivider": { "type": "Boolean", "required": false },
+        "showTitleBarDivider": { "type": "Boolean", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!wizardStep": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": true },
+        "instructions": { "type": "Text", "required": false },
+        "contents": { "type": "Any Type", "required": true },
+        "showWhen": { "type": "Boolean", "required": false },
+        "disableNextButton": { "type": "Boolean", "required": false },
+        "validations": { "type": "List of Text", "required": false }
+      }
+    },
+    "a!boxLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "contents": { "type": "Any Type Array", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["STANDARD", "ACCENT", "SUCCESS", "INFO", "WARN", "ERROR"], "acceptsHexColors": true },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showBorder": { "type": "Boolean", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!columnsLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "columns": { "type": "List of columnLayout", "required": true },
+        "alignVertical": { "type": "Text", "required": false, "validValues": ["TOP", "MIDDLE", "BOTTOM"] },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "NONE", "DENSE", "SPARSE"] },
+        "showDividers": { "type": "Boolean", "required": false },
+        "stackWhen": { "type": "List of Text", "required": false, "validValues": ["PHONE", "TABLET_PORTRAIT", "TABLET_LANDSCAPE", "DESKTOP", "DESKTOP_WIDE"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!columnLayout": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "contents": { "type": "Any Type", "required": false },
+        "width": { "type": "Text", "required": false, "validValues": ["AUTO", "EXTRA_NARROW", "NARROW", "NARROW_PLUS", "MEDIUM", "MEDIUM_PLUS", "WIDE", "WIDE_PLUS", "1X", "2X", "3X", "4X", "5X", "6X", "7X", "8X", "9X", "10X"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!sideBySideLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "items": { "type": "List of sideBySideItem", "required": true },
+        "alignVertical": { "type": "Text", "required": false, "validValues": ["TOP", "MIDDLE", "BOTTOM"] },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "NONE", "DENSE", "SPARSE"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!sideBySideItem": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "item": { "type": "Single component", "required": true },
+        "width": { "type": "Text", "required": false, "validValues": ["AUTO", "MINIMIZE", "1X", "2X", "3X", "4X", "5X", "6X", "7X", "8X", "9X", "10X"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!cardLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins", "accessibility"],
+      "parameters": {
+        "contents": { "type": "Any Type", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["NONE", "TRANSPARENT", "STANDARD", "ACCENT", "SUCCESS", "INFO", "WARN", "ERROR", "CHARCOAL_SCHEME", "NAVY_SCHEME", "PLUM_SCHEME"], "acceptsHexColors": true },
+        "shape": { "type": "Text", "required": false, "validValues": ["SQUARED", "SEMI_ROUNDED", "ROUNDED"] },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showBorder": { "type": "Boolean", "required": false },
+        "showShadow": { "type": "Boolean", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["EXTRA_SHORT", "SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL", "AUTO"] },
+        "link": { "type": "a!dynamicLink", "required": false },
+        "decorativeBarPosition": { "type": "Text", "required": false, "validValues": ["NONE", "TOP", "BOTTOM", "START", "END"] },
+        "decorativeBarColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "borderColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!cardGroupLayout": {
+      "category": "layout",
+      "inherits": ["labeling", "visibility", "margins"],
+      "parameters": {
+        "cards": { "type": "Any Type", "required": false },
+        "cardWidth": { "type": "Text", "required": false, "validValues": ["EXTRA_NARROW", "NARROW", "NARROW_PLUS", "MEDIUM", "MEDIUM_PLUS", "WIDE", "WIDE_PLUS", "EXTRA_WIDE"] },
+        "cardHeight": { "type": "Text", "required": false, "validValues": ["AUTO", "EXTRA_SHORT", "SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL"] },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "NONE", "DENSE", "SPARSE"] },
+        "fillContainer": { "type": "Boolean", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!sectionLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins", "accessibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "contents": { "type": "Any Type", "required": false },
+        "isCollapsible": { "type": "Boolean", "required": false },
+        "labelColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "STANDARD", "POSITIVE", "NEGATIVE", "SECONDARY"], "acceptsHexColors": true },
+        "labelSize": { "type": "Text", "required": false, "validValues": ["LARGE_PLUS", "LARGE", "MEDIUM_PLUS", "MEDIUM", "SMALL", "EXTRA_SMALL"] },
+        "divider": { "type": "Text", "required": false, "validValues": ["NONE", "ABOVE", "BELOW"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!billboardLayout": {
+      "category": "layout",
+      "inherits": ["visibility", "margins", "accessibility"],
+      "parameters": {
+        "backgroundMedia": { "type": "Any Type", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "height": { "type": "Text", "required": false, "validValues": ["EXTRA_SHORT", "SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL", "AUTO"] },
+        "overlay": { "type": "Any Type", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!fullOverlay": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "alignVertical": { "type": "Text", "required": false, "validValues": ["TOP", "MIDDLE", "BOTTOM"] },
+        "contents": { "type": "Any Type", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["DARK", "SEMI_DARK", "NONE", "SEMI_LIGHT", "LIGHT"] },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!barOverlay": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "position": { "type": "Text", "required": false, "validValues": ["TOP", "MIDDLE", "BOTTOM"] },
+        "contents": { "type": "Any Type", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["DARK", "SEMI_DARK", "NONE", "SEMI_LIGHT", "LIGHT"] },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!columnOverlay": {
+      "category": "layout",
+      "inherits": ["visibility"],
+      "parameters": {
+        "alignVertical": { "type": "Text", "required": false, "validValues": ["TOP", "MIDDLE", "BOTTOM"] },
+        "position": { "type": "Text", "required": false, "validValues": ["START", "CENTER", "END"] },
+        "width": { "type": "Text", "required": false, "validValues": ["NARROW", "MEDIUM", "WIDE"] },
+        "contents": { "type": "Any Type", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["DARK", "SEMI_DARK", "NONE", "SEMI_LIGHT", "LIGHT"] },
+        "padding": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!textField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Text", "required": false },
+        "placeholder": { "type": "Text", "required": false },
+        "refreshAfter": { "type": "Text", "required": false, "validValues": ["KEYPRESS", "UNFOCUS"] },
+        "align": { "type": "Text", "required": false, "validValues": ["LEFT", "CENTER", "RIGHT"] },
+        "masked": { "type": "Boolean", "required": false },
+        "inputPurpose": { "type": "Text", "required": false, "validValues": ["NAME", "EMAIL", "PHONE_NUMBER", "STREET_ADDRESS", "POSTAL_CODE", "CREDIT_CARD_NUMBER", "OFF"] },
+        "characterLimit": { "type": "Integer", "required": false },
+        "showCharacterCount": { "type": "Boolean", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!paragraphField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Text", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["SHORT", "MEDIUM", "TALL"] },
+        "characterLimit": { "type": "Integer", "required": false },
+        "showCharacterCount": { "type": "Boolean", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!integerField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Integer", "required": false },
+        "masked": { "type": "Boolean", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!floatingPointField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Decimal", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!dateField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Date", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!dropdownField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "choiceLabels": { "type": "List of Text", "required": false },
+        "choiceValues": { "type": "List of Variant", "required": false, "validation": "cannot be null or empty strings" },
+        "value": { "type": "Any Type", "required": false },
+        "placeholder": { "type": "Text", "required": false },
+        "searchDisplay": { "type": "Text", "required": false, "validValues": ["AUTO", "ON", "OFF"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!radioButtonField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "choiceLabels": { "type": "List of Text", "required": false },
+        "choiceValues": { "type": "List of Variant", "required": false, "validation": "cannot be null or empty strings" },
+        "value": { "type": "Any Type", "required": false },
+        "choiceLayout": { "type": "Text", "required": false, "validValues": ["STACKED", "COMPACT"] },
+        "choiceStyle": { "type": "Text", "required": false, "validValues": ["STANDARD", "CARDS"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!checkboxField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "choiceLabels": { "type": "List of Text", "required": false },
+        "choiceValues": { "type": "List of Variant", "required": false, "validation": "cannot be null or empty strings" },
+        "value": { "type": "List of Variant", "required": false },
+        "choiceLayout": { "type": "Text", "required": false, "validValues": ["STACKED", "COMPACT"] },
+        "choiceStyle": { "type": "Text", "required": false, "validValues": ["STANDARD", "CARDS"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!dateTimeField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Date and Time", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!timeField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Time", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!checkboxFieldBoolean": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "value": { "type": "Boolean", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!barcodeField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Text", "required": false },
+        "placeholder": { "type": "Text", "required": false },
+        "refreshAfter": { "type": "Text", "required": false, "validValues": ["KEYPRESS", "UNFOCUS"] },
+        "align": { "type": "Text", "required": false, "validValues": ["LEFT", "CENTER", "RIGHT"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!pickerFieldUsers": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "maxSelections": { "type": "Integer", "required": false },
+        "groupFilter": { "type": "Group", "required": false },
+        "value": { "type": "List of Username", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!pickerFieldGroups": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "maxSelections": { "type": "Integer", "required": false },
+        "groupFilter": { "type": "Group", "required": false },
+        "value": { "type": "List of Group", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!pickerFieldUsersAndGroups": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "maxSelections": { "type": "Integer", "required": false },
+        "groupFilter": { "type": "Group", "required": false },
+        "value": { "type": "List of User or Group", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!cardChoiceField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "data": { "type": "List of Variant", "required": false },
+        "cardTemplate": { "type": "Any Type", "required": false },
+        "value": { "type": "List of Variant", "required": false },
+        "maxSelections": { "type": "Integer", "required": false },
+        "showShadow": { "type": "Boolean", "required": false },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "NONE", "DENSE", "SPARSE"] },
+        "align": { "type": "Text", "required": false, "validValues": ["START", "CENTER", "END"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!fileUploadField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "target": { "type": "Document/Folder", "required": false },
+        "value": { "type": "List of Document", "required": false },
+        "maxSelections": { "type": "Integer", "required": false },
+        "buttonStyle": { "type": "Text", "required": false, "validValues": ["NORMAL", "PRIMARY", "SECONDARY", "LINK"] },
+        "buttonDisplay": { "type": "Text", "required": false, "validValues": ["LABEL", "ICON", "LABEL_AND_ICON"] },
+        "buttonSize": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD", "LARGE"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!richTextDisplayField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Any Type", "required": false, "validation": "Can only contain a!richTextItem, a!richTextIcon, a!richTextBulletedList, a!richTextNumberedList, or plain text" },
+        "align": { "type": "Text", "required": false, "validValues": ["LEFT", "CENTER", "RIGHT"] },
+        "preventWrapping": { "type": "Boolean", "required": false },
+        "tooltip": { "type": "Text", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!stampField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "icon": { "type": "Text", "required": false },
+        "text": { "type": "Text", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY", "TRANSPARENT"], "acceptsHexColors": true },
+        "contentColor": { "type": "Text", "required": false, "validValues": ["STANDARD", "ACCENT", "POSITIVE", "NEGATIVE"], "acceptsHexColors": true },
+        "size": { "type": "Text", "required": false, "validValues": ["TINY", "SMALL", "MEDIUM", "LARGE"] },
+        "shape": { "type": "Text", "required": false, "validValues": ["ROUNDED", "SEMI_ROUNDED", "SQUARED"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!headingField": {
+      "category": "display",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "text": { "type": "Text", "required": false },
+        "size": { "type": "Text", "required": false, "validValues": ["LARGE_PLUS", "LARGE", "MEDIUM_PLUS", "MEDIUM", "SMALL", "EXTRA_SMALL"] },
+        "headingTag": { "type": "Text", "required": false, "validValues": ["H1", "H2", "H3", "H4", "H5", "H6"] },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "STANDARD", "SECONDARY"], "acceptsHexColors": true },
+        "fontWeight": { "type": "Text", "required": false, "validValues": ["LIGHT", "NORMAL", "SEMI_BOLD", "BOLD", "EXTRA_BOLD"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!progressBarField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "percentage": { "type": "Integer", "required": false },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"], "acceptsHexColors": true },
+        "style": { "type": "Text", "required": false, "validValues": ["THIN", "THICK"] },
+        "showPercentage": { "type": "Boolean", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!tagField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "tags": { "type": "List of Variant", "required": false },
+        "size": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD"] },
+        "align": { "type": "Text", "required": false, "validValues": ["START", "CENTER", "END"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!linkField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "links": { "type": "Any Type", "required": false },
+        "align": { "type": "Text", "required": false, "validValues": ["LEFT", "CENTER", "RIGHT"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!recordActionField": {
+      "category": "display",
+      "inherits": ["visibility", "accessibility"],
+      "parameters": {
+        "actions": { "type": "Any Type", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["TOOLBAR", "LINKS", "CARDS", "SIDEBAR", "CALL_TO_ACTION", "MENU", "MENU_ICON", "TOOLBAR_PRIMARY", "SIDEBAR_PRIMARY"] },
+        "display": { "type": "Text", "required": false },
+        "openActionsIn": { "type": "Text", "required": false },
+        "align": { "type": "Text", "required": false },
+        "securityOnDemand": { "type": "Boolean", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!imageField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "images": { "type": "Any Type", "required": false },
+        "size": { "type": "Text", "required": false, "validValues": ["ICON", "ICON_PLUS", "TINY", "EXTRA_SMALL", "SMALL", "SMALL_PLUS", "MEDIUM", "MEDIUM_PLUS", "LARGE", "LARGE_PLUS", "EXTRA_LARGE", "FIT", "GALLERY"] },
+        "style": { "type": "Text", "required": false, "validValues": ["STANDARD", "AVATAR"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!gaugeField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "percentage": { "type": "Decimal", "required": false },
+        "primaryText": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"], "acceptsHexColors": true },
+        "size": { "type": "Text", "required": false, "validValues": ["SMALL", "MEDIUM", "LARGE"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!milestoneField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "steps": { "type": "List of Text", "required": false },
+        "active": { "type": "Integer", "required": false },
+        "orientation": { "type": "Text", "required": false, "validValues": ["HORIZONTAL", "VERTICAL"] },
+        "stepStyle": { "type": "Text", "required": false, "validValues": ["LINE", "CHEVRON", "DOT"] },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"], "acceptsHexColors": true },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!horizontalLine": {
+      "category": "display",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "color": { "type": "Text", "required": false, "validValues": ["SECONDARY", "STANDARD", "ACCENT"], "acceptsHexColors": true },
+        "weight": { "type": "Text", "required": false, "validValues": ["THIN", "MEDIUM", "THICK"] },
+        "style": { "type": "Text", "required": false, "validValues": ["SOLID", "DOT", "DASH"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!documentViewerField": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "document": { "type": "Document", "required": false },
+        "showName": { "type": "Boolean", "required": false },
+        "showDescription": { "type": "Boolean", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["SHORT", "MEDIUM", "TALL"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!timeDisplay": {
+      "category": "display",
+      "inherits": ["labeling", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Time", "required": false },
+        "format": { "type": "Text", "required": false, "validValues": ["SHORT", "MEDIUM", "LONG"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!buttonWidget": {
+      "category": "interactive",
+      "inherits": ["visibility", "accessibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "icon": { "type": "Text", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["OUTLINE", "GHOST", "LINK", "SOLID"] },
+        "size": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD", "LARGE"] },
+        "submit": { "type": "Boolean", "required": false },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "NEGATIVE", "SECONDARY"], "acceptsHexColors": true },
+        "disabled": { "type": "Boolean", "required": false },
+        "confirmMessage": { "type": "Text", "required": false },
+        "confirmHeader": { "type": "Text", "required": false },
+        "width": { "type": "Text", "required": false, "validValues": ["MINIMIZE", "FILL"] },
+        "loadingIndicator": { "type": "Boolean", "required": false },
+        "validate": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "value": { "type": "Any Type", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!buttonArrayLayout": {
+      "category": "interactive",
+      "inherits": ["visibility", "accessibility"],
+      "parameters": {
+        "buttons": { "type": "List of ButtonWidget", "required": false },
+        "align": { "type": "Text", "required": false, "validValues": ["START", "CENTER", "END"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!buttonLayout": {
+      "category": "interactive",
+      "inherits": ["visibility", "accessibility"],
+      "parameters": {
+        "primaryButtons": { "type": "List of ButtonWidget", "required": false },
+        "secondaryButtons": { "type": "List of ButtonWidget", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!gridField": {
+      "category": "data",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "RecordType/List/DataSubset", "required": false },
+        "columns": { "type": "List of a!gridColumn", "required": false },
+        "emptyGridMessage": { "type": "Text", "required": false },
+        "pageSize": { "type": "Integer", "required": false },
+        "pagingSaveInto": { "type": "Save Array", "required": false },
+        "initialSorts": { "type": "List of SortInfo", "required": false },
+        "secondarySorts": { "type": "List of SortInfo", "required": false },
+        "selectable": { "type": "Boolean", "required": false },
+        "selectionStyle": { "type": "Text", "required": false, "validValues": ["CHECKBOX", "ROW_HIGHLIGHT"] },
+        "selectionValue": { "type": "List of Variant", "required": false },
+        "selectionSaveInto": { "type": "Save Array", "required": false },
+        "selectionRequired": { "type": "Boolean", "required": false },
+        "selectionRequiredMessage": { "type": "Text", "required": false },
+        "maxSelections": { "type": "Integer", "required": false },
+        "showSelectionCount": { "type": "Text", "required": false, "validValues": ["AUTO", "ON", "OFF"] },
+        "disableRowSelectionWhen": { "type": "Boolean", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL", "AUTO"] },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "DENSE"] },
+        "borderStyle": { "type": "Text", "required": false, "validValues": ["STANDARD", "LIGHT"] },
+        "shadeAlternateRows": { "type": "Boolean", "required": false },
+        "rowHeader": { "type": "Integer", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!gridColumn": {
+      "category": "data",
+      "inherits": ["visibility", "accessibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "value": { "type": "Any Type", "required": false },
+        "helpTooltip": { "type": "Text", "required": false },
+        "sortField": { "type": "Any Type", "required": false },
+        "width": { "type": "Text", "required": false, "validValues": ["AUTO", "ICON", "ICON_PLUS", "NARROW", "NARROW_PLUS", "MEDIUM", "MEDIUM_PLUS", "WIDE", "1X", "2X", "3X", "4X", "5X", "6X", "7X", "8X", "9X", "10X"] },
+        "align": { "type": "Text", "required": false, "validValues": ["START", "CENTER", "END"] },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["NONE", "ACCENT", "SUCCESS", "INFO", "WARN", "ERROR"], "acceptsHexColors": true },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!columnChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "Any Type", "required": false },
+        "categories": { "type": "List of Variant", "required": false },
+        "series": { "type": "List of ChartSeries", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["MICRO", "SHORT", "MEDIUM", "TALL"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "stacking": { "type": "Text", "required": false, "validValues": ["NONE", "NORMAL", "PERCENT_TO_TOTAL"] },
+        "showLegend": { "type": "Boolean", "required": false },
+        "showDataLabels": { "type": "Boolean", "required": false },
+        "xAxisTitle": { "type": "Text", "required": false },
+        "yAxisTitle": { "type": "Text", "required": false },
+        "referenceLines": { "type": "List of ReferenceLine", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!pieChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "series": { "type": "List of PieChartSeries", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["SHORT", "MEDIUM", "TALL"] },
+        "showAsPercentage": { "type": "Boolean", "required": false },
+        "style": { "type": "Text", "required": false, "validValues": ["PIE", "DONUT"] },
+        "seriesLabelStyle": { "type": "Text", "required": false, "validValues": ["ON_CHART", "LEGEND", "NONE"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!lineChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "Any Type", "required": false },
+        "categories": { "type": "List of Variant", "required": false },
+        "series": { "type": "List of ChartSeries", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["MICRO", "SHORT", "MEDIUM", "TALL"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "connectNulls": { "type": "Boolean", "required": false },
+        "xAxisTitle": { "type": "Text", "required": false },
+        "yAxisTitle": { "type": "Text", "required": false },
+        "referenceLines": { "type": "List of ReferenceLine", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!barChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "Any Type", "required": false },
+        "categories": { "type": "List of Variant", "required": false },
+        "series": { "type": "List of ChartSeries", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["MICRO", "SHORT", "MEDIUM", "TALL", "AUTO"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "stacking": { "type": "Text", "required": false, "validValues": ["NONE", "NORMAL", "PERCENT_TO_TOTAL"] },
+        "showLegend": { "type": "Boolean", "required": false },
+        "showDataLabels": { "type": "Boolean", "required": false },
+        "xAxisTitle": { "type": "Text", "required": false },
+        "yAxisTitle": { "type": "Text", "required": false },
+        "referenceLines": { "type": "List of ReferenceLine", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!areaChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "Any Type", "required": false },
+        "categories": { "type": "List of Variant", "required": false },
+        "series": { "type": "List of ChartSeries", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["MICRO", "SHORT", "MEDIUM", "TALL"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "stacking": { "type": "Text", "required": false, "validValues": ["NORMAL", "PERCENT_TO_TOTAL", "NONE"] },
+        "connectNulls": { "type": "Boolean", "required": false },
+        "showLegend": { "type": "Boolean", "required": false },
+        "showDataLabels": { "type": "Boolean", "required": false },
+        "xAxisTitle": { "type": "Text", "required": false },
+        "yAxisTitle": { "type": "Text", "required": false },
+        "referenceLines": { "type": "List of ReferenceLine", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!scatterChartField": {
+      "category": "chart",
+      "inherits": ["labeling", "visibility", "accessibility"],
+      "parameters": {
+        "data": { "type": "Any Type", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["MICRO", "SHORT", "MEDIUM", "TALL"] },
+        "colorScheme": { "type": "Text", "required": false, "validValues": ["CLASSIC", "MIDNIGHT", "OCEAN", "MOSS", "BERRY", "PARACHUTE", "RAINFOREST", "SUNSET"] },
+        "xAxisTitle": { "type": "Text", "required": false },
+        "yAxisTitle": { "type": "Text", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      }
+    },
+    "a!richTextItem": {
+      "category": "helper",
+      "parameters": {
+        "text": { "type": "Text", "required": false },
+        "style": { "type": "Text Array", "required": false, "validValues": ["PLAIN", "EMPHASIS", "STRONG", "UNDERLINE", "STRIKETHROUGH"] },
+        "size": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD", "MEDIUM", "MEDIUM_PLUS", "LARGE", "LARGE_PLUS", "EXTRA_LARGE"] },
+        "color": { "type": "Text", "required": false, "validValues": ["STANDARD", "ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY"], "acceptsHexColors": true },
+        "link": { "type": "Link", "required": false },
+        "linkStyle": { "type": "Text", "required": false, "validValues": ["INLINE", "STANDALONE"] }
+      }
+    },
+    "a!richTextIcon": {
+      "category": "helper",
+      "parameters": {
+        "icon": { "type": "Text", "required": false },
+        "color": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "size": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD", "MEDIUM", "MEDIUM_PLUS", "LARGE", "LARGE_PLUS", "EXTRA_LARGE"] },
+        "altText": { "type": "Text", "required": false }
+      }
+    },
+    "a!chartSeries": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "data": { "type": "Decimal Array", "required": false },
+        "color": { "type": "Text", "required": false, "validValues": ["ACCENT", "BLUEGRAY", "GREEN", "GOLD", "ORANGE", "PURPLE", "RED", "SKYBLUE", "LIMEGREEN", "YELLOW", "AMBER", "PINK", "VIOLETRED"], "acceptsHexColors": true },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!dynamicLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "value": { "type": "Any Type", "required": false },
+        "saveInto": { "type": "Save Array", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!safeLink": {
+      "category": "helper",
+      "parameters": {
+        "uri": { "type": "Text", "required": true },
+        "label": { "type": "Text", "required": false }
+      }
+    },
+    "a!recordLink": {
+      "category": "helper",
+      "parameters": {
+        "record": { "type": "Record", "required": true },
+        "label": { "type": "Text", "required": false }
+      }
+    },
+    "a!tagItem": {
+      "category": "helper",
+      "parameters": {
+        "text": { "type": "Text", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY"], "acceptsHexColors": true },
+        "textColor": { "type": "Text", "required": false, "validValues": ["STANDARD"], "acceptsHexColors": true },
+        "link": { "type": "Any Type", "required": false }
+      }
+    },
+    "a!richTextBulletedList": {
+      "category": "helper",
+      "parameters": {
+        "items": { "type": "List of Text/RichTextItem", "required": false }
+      }
+    },
+    "a!richTextNumberedList": {
+      "category": "helper",
+      "parameters": {
+        "items": { "type": "List of Text/RichTextItem", "required": false }
+      }
+    },
+    "a!headerTemplateFull": {
+      "category": "helper",
+      "parameters": {
+        "title": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "titleColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "secondaryTextColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "stampIcon": { "type": "Text", "required": false },
+        "stampColor": { "type": "Text", "required": false, "acceptsHexColors": true }
+      }
+    },
+    "a!headerTemplateSimple": {
+      "category": "helper",
+      "parameters": {
+        "title": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "titleColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "secondaryTextColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "stampIcon": { "type": "Text", "required": false },
+        "stampColor": { "type": "Text", "required": false, "acceptsHexColors": true }
+      }
+    },
+    "a!sidebarTemplate": {
+      "category": "helper",
+      "parameters": {
+        "title": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "image": { "type": "Any Type", "required": false },
+        "additionalContents": { "type": "Any Type", "required": false }
+      }
+    },
+    "a!validationMessage": {
+      "category": "utility",
+      "inherits": ["visibility"],
+      "parameters": {
+        "message": { "type": "Text", "required": false },
+        "color": { "type": "Text", "required": false, "validValues": ["ERROR", "WARN", "INFO", "SUCCESS"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!webImage": {
+      "category": "helper",
+      "parameters": {
+        "source": { "type": "Text", "required": true },
+        "altText": { "type": "Text", "required": false }
+      }
+    },
+    "a!documentImage": {
+      "category": "helper",
+      "parameters": {
+        "document": { "type": "Document", "required": true },
+        "altText": { "type": "Text", "required": false }
+      }
+    },
+    "a!userImage": {
+      "category": "helper",
+      "parameters": {
+        "user": { "type": "User", "required": true },
+        "altText": { "type": "Text", "required": false }
+      }
+    },
+    "a!save": {
+      "category": "helper",
+      "parameters": {
+        "target": { "type": "Variable", "required": true },
+        "value": { "type": "Any Type", "required": true }
+      }
+    },
+    "a!sortInfo": {
+      "category": "helper",
+      "parameters": {
+        "field": { "type": "Text", "required": true },
+        "ascending": { "type": "Boolean", "required": true }
+      }
+    },
+    "a!map": {
+      "category": "helper",
+      "parameters": {}
+    },
+    "a!forEach": {
+      "category": "looping",
+      "parameters": {
+        "items": { "type": "Any Type", "required": true },
+        "expression": { "type": "Any Type", "required": true }
+      },
+      "functionVariables": ["fv!item", "fv!index", "fv!isFirst", "fv!isLast", "fv!itemCount"]
+    },
+    "a!localVariables": {
+      "category": "core",
+      "parameters": {}
+    },
+    "a!pagingInfo": {
+      "category": "data",
+      "parameters": {
+        "startIndex": { "type": "Integer", "required": true },
+        "batchSize": { "type": "Integer", "required": true },
+        "sort": { "type": "List of a!sortInfo", "required": false }
+      }
+    },
+    "a!queryRecordType": {
+      "category": "data",
+      "parameters": {
+        "recordType": { "type": "RecordType", "required": true },
+        "fields": { "type": "List of Field References or a!aggregationFields", "required": false },
+        "filters": { "type": "List of a!queryFilter or a!queryLogicalExpression", "required": false },
+        "pagingInfo": { "type": "a!pagingInfo", "required": false },
+        "fetchTotalCount": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!recordData": {
+      "category": "data",
+      "parameters": {
+        "recordType": { "type": "RecordType", "required": true },
+        "filters": { "type": "List of a!queryFilter or a!queryLogicalExpression", "required": false },
+        "relatedRecordData": { "type": "List of a!relatedRecordData", "required": false }
+      },
+      "specialNote": "ONLY use directly in a!gridField data parameter or chart data parameter - NEVER in local variables"
+    },
+    "a!aggregationFields": {
+      "category": "data",
+      "parameters": {
+        "groupings": { "type": "List of a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false }
+      }
+    },
+    "a!measure": {
+      "category": "data",
+      "parameters": {
+        "function": { "type": "Text", "required": true, "validValues": ["COUNT", "SUM", "AVG", "MIN", "MAX", "MEDIAN", "MODE", "STDEV", "STDEVP", "VAR", "VARP"] },
+        "field": { "type": "Field Reference", "required": true },
+        "alias": { "type": "Text", "required": true },
+        "filters": { "type": "List of a!queryFilter", "required": false }
+      }
+    },
+    "a!grouping": {
+      "category": "data",
+      "parameters": {
+        "field": { "type": "Field Reference", "required": true },
+        "alias": { "type": "Text", "required": true },
+        "interval": { "type": "Text", "required": false, "validValues": ["AUTO", "YEAR", "MONTH_OF_YEAR", "MONTH_OF_YEAR_SHORT_TEXT", "MONTH_OF_YEAR_TEXT", "MONTH_TEXT", "MONTH_SHORT_TEXT", "MONTH_DATE", "DATE", "DATE_SHORT_TEXT", "DATE_TEXT", "DAY_OF_MONTH", "HOUR_OF_DAY", "HOUR", "MINUTE_OF_HOUR", "MINUTE"] }
+      }
+    },
+    "a!queryFilter": {
+      "category": "data",
+      "parameters": {
+        "field": { "type": "Field Reference", "required": true },
+        "operator": { "type": "Text", "required": true, "validValues": ["=", "<>", ">", "<", ">=", "<=", "in", "not in", "is null", "not null", "between", "starts with", "not starts with", "ends with", "not ends with", "includes", "not includes", "like"] },
+        "value": { "type": "Any Type", "required": false },
+        "applyWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!queryLogicalExpression": {
+      "category": "data",
+      "parameters": {
+        "operator": { "type": "Text", "required": true, "validValues": ["AND", "OR"] },
+        "filters": { "type": "List of a!queryFilter or a!queryLogicalExpression", "required": true }
+      }
+    },
+    "a!encryptedTextField": {
+      "category": "input",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
+      "parameters": {
+        "value": { "type": "Encrypted Text", "required": false },
+        "placeholder": { "type": "Text", "required": false },
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "required": { "type": "Boolean", "required": false },
+        "requiredMessage": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "accessibilityText": { "type": "Text", "required": false }
+      },
+      "specialNote": "NOT compatible with synced record types - use a!textField with warning banner instead"
+    },
+    "a!recordActionItem": {
+      "category": "helper",
+      "parameters": {
+        "action": { "type": "Record Action", "required": true },
+        "identifier": { "type": "Any Type", "required": false }
+      }
+    },
+    "a!messageBanner": {
+      "category": "display",
+      "inherits": ["visibility", "margins"],
+      "parameters": {
+        "primaryText": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "backgroundColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "SUCCESS", "INFO", "WARN", "ERROR"], "acceptsHexColors": true },
+        "showWhen": { "type": "Boolean", "required": false },
+        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
+        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] }
+      }
+    },
+    "a!columnChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": { "type": "a!grouping", "required": false },
+        "secondaryGrouping": { "type": "a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false },
+        "sort": { "type": "a!sortInfo", "required": false },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false },
+        "showIntervalsWithNoData": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!barChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": { "type": "a!grouping", "required": false },
+        "secondaryGrouping": { "type": "a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false },
+        "sort": { "type": "a!sortInfo", "required": false },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false },
+        "showIntervalsWithNoData": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!lineChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": { "type": "a!grouping", "required": false },
+        "secondaryGrouping": { "type": "a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false },
+        "sort": { "type": "a!sortInfo", "required": false },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false },
+        "showIntervalsWithNoData": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!areaChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": { "type": "a!grouping", "required": false },
+        "secondaryGrouping": { "type": "a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false },
+        "sort": { "type": "a!sortInfo", "required": false },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false },
+        "showIntervalsWithNoData": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!pieChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": { "type": "a!grouping", "required": false },
+        "measures": { "type": "List of a!measure", "required": false },
+        "sort": { "type": "a!sortInfo", "required": false },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false }
+      }
+    },
+    "a!scatterChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "xAxisField": { "type": "Field Reference", "required": true },
+        "yAxisField": { "type": "Field Reference", "required": true },
+        "dataLimit": { "type": "Integer", "required": false },
+        "link": { "type": "Any Type", "required": false }
+      },
+      "specialNote": "Scatter charts ONLY work with a!recordData - cannot use categories + series"
+    },
+    "a!gridLayout": {
+      "category": "data",
+      "inherits": ["labeling", "validation", "interaction", "visibility", "accessibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "instructions": { "type": "Text", "required": false },
+        "headerCells": { "type": "List of a!gridLayoutHeaderCell", "required": false },
+        "columnConfigs": { "type": "List of a!gridLayoutColumnConfig", "required": false },
+        "rows": { "type": "List of a!gridRowLayout", "required": false },
+        "emptyGridMessage": { "type": "Text", "required": false },
+        "height": { "type": "Text", "required": false, "validValues": ["SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL", "AUTO"] },
+        "spacing": { "type": "Text", "required": false, "validValues": ["STANDARD", "DENSE"] },
+        "borderStyle": { "type": "Text", "required": false, "validValues": ["STANDARD", "LIGHT"] },
+        "shadeAlternateRows": { "type": "Boolean", "required": false },
+        "selectable": { "type": "Boolean", "required": false },
+        "selectionValue": { "type": "List of Variant", "required": false },
+        "selectionSaveInto": { "type": "List of Save", "required": false },
+        "selectionStyle": { "type": "Text", "required": false, "validValues": ["CHECKBOX", "ROW_HIGHLIGHT"] },
+        "selectionDisabled": { "type": "Boolean", "required": false },
+        "selectionRequired": { "type": "Boolean", "required": false },
+        "addRowLink": { "type": "Link", "required": false },
+        "rowDeletions": { "type": "List of a!gridRowDeletion", "required": false },
+        "totalCount": { "type": "Integer", "required": false },
+        "rowHeader": { "type": "Integer", "required": false },
+        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
+        "helpTooltip": { "type": "Text", "required": false },
+        "validations": { "type": "List of Text", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "disabled": { "type": "Boolean", "required": false },
+        "readOnly": { "type": "Boolean", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "showWhen": { "type": "Boolean", "required": false },
+        "accessibilityText": { "type": "Text", "required": false }
+      },
+      "specialNote": "For inline editing - use a!gridField for read-only display"
+    },
+    "a!gridLayoutHeaderCell": {
+      "category": "helper",
+      "inherits": ["visibility"],
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "helpTooltip": { "type": "Text", "required": false },
+        "align": { "type": "Text", "required": false, "validValues": ["LEFT", "CENTER", "RIGHT"] },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!gridLayoutColumnConfig": {
+      "category": "helper",
+      "parameters": {
+        "width": { "type": "Text", "required": false, "validValues": ["DISTRIBUTE", "AUTO", "ICON", "ICON_PLUS", "NARROW", "NARROW_PLUS", "MEDIUM", "MEDIUM_PLUS", "WIDE", "1X", "2X", "3X", "4X", "5X", "6X", "7X", "8X", "9X", "10X"] },
+        "weight": { "type": "Integer", "required": false }
+      }
+    },
+    "a!gridRowLayout": {
+      "category": "helper",
+      "inherits": ["visibility"],
+      "parameters": {
+        "contents": { "type": "List of Any Type", "required": true },
+        "id": { "type": "Any Type", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!gridRowDeletion": {
+      "category": "helper",
+      "parameters": {
+        "icon": { "type": "Text", "required": false },
+        "isDisabled": { "type": "Boolean", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!webVideo": {
+      "category": "helper",
+      "parameters": {
+        "source": { "type": "Text", "required": true },
+        "altText": { "type": "Text", "required": false }
+      }
+    },
+    "a!isPageWidth": {
+      "category": "utility",
+      "parameters": {
+        "widths": { "type": "List of Text", "required": true, "validValues": ["PHONE", "TABLET_PORTRAIT", "TABLET_LANDSCAPE", "DESKTOP", "DESKTOP_WIDE"] }
+      },
+      "specialNote": "Returns true if current viewport matches any of the specified widths - use for responsive design"
+    },
+    "a!authorizationLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "task": { "type": "Task", "required": true }
+      }
+    },
+    "a!documentDownloadLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "document": { "type": "Document", "required": true }
+      }
+    },
+    "a!processTaskLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "task": { "type": "Task", "required": true }
+      }
+    },
+    "a!startProcessLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "processModel": { "type": "Process Model", "required": true },
+        "processParameters": { "type": "Any Type", "required": false }
+      }
+    },
+    "a!submitLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "value": { "type": "Any Type", "required": false },
+        "saveInto": { "type": "List of Save", "required": false },
+        "confirm": { "type": "Boolean", "required": false },
+        "confirmHeader": { "type": "Text", "required": false },
+        "confirmMessage": { "type": "Text", "required": false },
+        "validate": { "type": "Boolean", "required": false },
+        "validationGroup": { "type": "Text", "required": false },
+        "showWhen": { "type": "Boolean", "required": false }
+      }
+    },
+    "a!userRecordLink": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "user": { "type": "User", "required": true }
+      }
+    },
+    "a!cardTemplateBarTextStacked": {
+      "category": "helper",
+      "parameters": {
+        "id": { "type": "Any Type", "required": false },
+        "primaryText": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "tertiaryText": { "type": "Text", "required": false },
+        "emphasize": { "type": "Text", "required": false, "validValues": ["PRIMARY", "SECONDARY", "TERTIARY"] }
+      }
+    },
+    "a!cardTemplateBarTextJustified": {
+      "category": "helper",
+      "parameters": {
+        "id": { "type": "Any Type", "required": false },
+        "primaryText": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false },
+        "tertiaryText": { "type": "Text", "required": false }
+      }
+    },
+    "a!cardTemplateTile": {
+      "category": "helper",
+      "parameters": {
+        "id": { "type": "Any Type", "required": false },
+        "primaryText": { "type": "Text", "required": false },
+        "secondaryText": { "type": "Text", "required": false }
+      }
+    },
+    "a!chartCustomColorScheme": {
+      "category": "helper",
+      "parameters": {
+        "colors": { "type": "List of Text", "required": true }
+      },
+      "specialNote": "Use hex color codes in the colors array"
+    },
+    "a!chartReferenceLine": {
+      "category": "helper",
+      "parameters": {
+        "label": { "type": "Text", "required": false },
+        "value": { "type": "Decimal", "required": true },
+        "color": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "style": { "type": "Text", "required": false, "validValues": ["SOLID", "DASHED"] }
+      }
+    }
+  },
+
+  "expressionFunctions": {
+    "if": {
+      "syntax": "if(condition, valueIfTrue, valueIfFalse)",
+      "parameterCount": 3,
+      "description": "Conditional logic with short-circuit evaluation"
+    },
+    "and": {
+      "syntax": "and(value1, value2, ...)",
+      "parameterCount": "variadic",
+      "description": "Logical AND operation"
+    },
+    "or": {
+      "syntax": "or(value1, value2, ...)",
+      "parameterCount": "variadic",
+      "description": "Logical OR operation"
+    },
+    "not": {
+      "syntax": "not(booleanValue)",
+      "parameterCount": 1,
+      "description": "Logical NOT operation"
+    },
+    "isnull": {
+      "syntax": "isnull(value)",
+      "parameterCount": 1,
+      "description": "Check if value is null"
+    },
+    "index": {
+      "syntax": "index(array, index, default)",
+      "parameterCount": 3,
+      "description": "Get array element at index or default"
+    },
+    "length": {
+      "syntax": "length(array)",
+      "parameterCount": 1,
+      "description": "Get array length"
+    },
+    "append": {
+      "syntax": "append(array, value)",
+      "parameterCount": 2,
+      "description": "Append value to array"
+    },
+    "concat": {
+      "syntax": "concat(text1, text2, ...)",
+      "parameterCount": "variadic",
+      "description": "Concatenate text strings"
+    },
+    "text": {
+      "syntax": "text(value, format)",
+      "parameterCount": 2,
+      "description": "Format value as text with pattern",
+      "specialNote": "Cannot accept null values - use if() or a!defaultValue() to check first"
+    },
+    "today": {
+      "syntax": "today()",
+      "parameterCount": 0,
+      "description": "Current date"
+    },
+    "now": {
+      "syntax": "now()",
+      "parameterCount": 0,
+      "description": "Current date and time"
+    },
+    "todate": {
+      "syntax": "todate(value)",
+      "parameterCount": 1,
+      "description": "Convert to date type"
+    },
+    "todatetime": {
+      "syntax": "todatetime(value)",
+      "parameterCount": 1,
+      "description": "Convert to datetime type"
+    },
+    "tointeger": {
+      "syntax": "tointeger(value)",
+      "parameterCount": 1,
+      "description": "Convert to integer"
+    },
+    "todecimal": {
+      "syntax": "todecimal(value)",
+      "parameterCount": 1,
+      "description": "Convert to decimal"
+    },
+    "tostring": {
+      "syntax": "tostring(value)",
+      "parameterCount": 1,
+      "description": "Convert to text"
+    },
+    "upper": {
+      "syntax": "upper(text)",
+      "parameterCount": 1,
+      "description": "Convert to uppercase"
+    },
+    "lower": {
+      "syntax": "lower(text)",
+      "parameterCount": 1,
+      "description": "Convert to lowercase"
+    },
+    "trim": {
+      "syntax": "trim(text)",
+      "parameterCount": 1,
+      "description": "Remove extra whitespace"
+    },
+    "a!defaultValue": {
+      "syntax": "a!defaultValue(value, default)",
+      "parameterCount": 2,
+      "description": "Return first non-null/empty value"
+    },
+    "a!isNullOrEmpty": {
+      "syntax": "a!isNullOrEmpty(value)",
+      "parameterCount": 1,
+      "description": "Check if null or empty"
+    },
+    "a!isNotNullOrEmpty": {
+      "syntax": "a!isNotNullOrEmpty(value)",
+      "parameterCount": 1,
+      "description": "Check if not null and not empty"
+    },
+    "contains": {
+      "syntax": "contains(arrayToFindWithin, valueToFind)",
+      "parameterCount": 2,
+      "description": "Check if array contains value"
+    },
+    "where": {
+      "syntax": "where(booleanArray)",
+      "parameterCount": 1,
+      "description": "Return indices where true"
+    },
+    "union": {
+      "syntax": "union(array1, array2)",
+      "parameterCount": 2,
+      "description": "All unique items from both arrays"
+    },
+    "difference": {
+      "syntax": "difference(array1, array2)",
+      "parameterCount": 2,
+      "description": "Items in array1 not in array2"
+    },
+    "intersection": {
+      "syntax": "intersection(array1, array2)",
+      "parameterCount": 2,
+      "description": "Items in both arrays"
+    },
+    "sum": {
+      "syntax": "sum(numberArray)",
+      "parameterCount": 1,
+      "description": "Sum of array"
+    },
+    "average": {
+      "syntax": "average(numberArray)",
+      "parameterCount": 1,
+      "description": "Average of array"
+    },
+    "min": {
+      "syntax": "min(numberArray)",
+      "parameterCount": 1,
+      "description": "Minimum value"
+    },
+    "max": {
+      "syntax": "max(numberArray)",
+      "parameterCount": 1,
+      "description": "Maximum value"
+    },
+    "round": {
+      "syntax": "round(number, digits)",
+      "parameterCount": 2,
+      "description": "Round to digits"
+    },
+    "mod": {
+      "syntax": "mod(dividend, divisor)",
+      "parameterCount": 2,
+      "description": "Modulo/remainder operation"
+    },
+    "todatasubset": {
+      "syntax": "todatasubset(array, pagingInfo)",
+      "parameterCount": 2,
+      "description": "Sort and paginate data using a!pagingInfo",
+      "specialNote": "Returns DataSubset with data, startIndex, batchSize, sort, totalCount, and identifiers"
+    },
+    "wherecontains": {
+      "syntax": "wherecontains(valueToFind, arrayToSearch)",
+      "parameterCount": 2,
+      "description": "Find indices where array contains value"
+    },
+    "filter": {
+      "syntax": "filter(predicate, array)",
+      "parameterCount": 2,
+      "description": "Filter array by boolean predicate"
+    },
+    "reduce": {
+      "syntax": "reduce(rule, initialValue, array)",
+      "parameterCount": 3,
+      "description": "Reduce array to single value"
+    },
+    "merge": {
+      "syntax": "merge(array1, array2, ...)",
+      "parameterCount": "variadic",
+      "description": "Merge multiple arrays preserving duplicates"
+    },
+    "a!flatten": {
+      "syntax": "a!flatten(array)",
+      "parameterCount": 1,
+      "description": "Flatten nested arrays into single array"
+    },
+    "a!update": {
+      "syntax": "a!update(array, index, value)",
+      "parameterCount": 3,
+      "description": "Immutably update array element at index"
+    },
+    "a!match": {
+      "syntax": "a!match(value, equals, then, default)",
+      "parameterCount": 4,
+      "description": "Pattern matching for cleaner conditional logic"
+    },
+    "datetime": {
+      "syntax": "datetime(year, month, day, hour, minute, second)",
+      "parameterCount": 6,
+      "description": "Create datetime value from components"
+    },
+    "date": {
+      "syntax": "date(year, month, day)",
+      "parameterCount": 3,
+      "description": "Create date value from components"
+    },
+    "a!addDateTime": {
+      "syntax": "a!addDateTime(dateTime, years, months, days, hours, minutes, seconds)",
+      "parameterCount": 7,
+      "description": "Add time intervals to datetime"
+    },
+    "a!subtractDateTime": {
+      "syntax": "a!subtractDateTime(dateTime, years, months, days, hours, minutes, seconds)",
+      "parameterCount": 7,
+      "description": "Subtract time intervals from datetime"
+    },
+    "user": {
+      "syntax": "user(username, property)",
+      "parameterCount": 2,
+      "description": "Get user information by username",
+      "specialNote": "Common properties: firstName, lastName, email, displayName"
+    },
+    "loggedInUser": {
+      "syntax": "loggedInUser()",
+      "parameterCount": 0,
+      "description": "Get current logged-in user"
+    },
+    "group": {
+      "syntax": "group(groupId, property)",
+      "parameterCount": 2,
+      "description": "Get group information",
+      "specialNote": "Common properties: name, description, members"
+    },
+    "a!toJson": {
+      "syntax": "a!toJson(value)",
+      "parameterCount": 1,
+      "description": "Convert SAIL value to JSON text"
+    },
+    "a!fromJson": {
+      "syntax": "a!fromJson(jsonText)",
+      "parameterCount": 1,
+      "description": "Parse JSON text to SAIL value"
+    },
+    "a!jsonPath": {
+      "syntax": "a!jsonPath(jsonText, path, default)",
+      "parameterCount": 3,
+      "description": "Extract value from JSON using JSONPath expression"
+    },
+    "find": {
+      "syntax": "find(searchText, withinText, startPosition)",
+      "parameterCount": 3,
+      "description": "Find position of substring"
+    },
+    "left": {
+      "syntax": "left(text, numChars)",
+      "parameterCount": 2,
+      "description": "Extract leftmost characters"
+    },
+    "substitute": {
+      "syntax": "substitute(text, oldText, newText)",
+      "parameterCount": 3,
+      "description": "Replace substring occurrences"
+    },
+    "len": {
+      "syntax": "len(text)",
+      "parameterCount": 1,
+      "description": "Get text length"
+    },
+    "fixed": {
+      "syntax": "fixed(number, decimals, noCommas)",
+      "parameterCount": 3,
+      "description": "Format number with fixed decimal places"
+    },
+    "dollar": {
+      "syntax": "dollar(number, decimals)",
+      "parameterCount": 2,
+      "description": "Format number as currency"
+    }
+  }
+}

@@ -21,11 +21,10 @@ Validate that the SAIL code uses only documented APIs:
 1. ✅ Functions exist in documentation
 2. ✅ Parameters exist for those functions
 3. ✅ Parameter values are allowed (especially enumerations)
-4. ✅ Icons are valid aliases
-5. ✅ Colors use correct format and are allowed for that parameter
-6. ✅ Choice values aren't null/empty
+4. ✅ Colors use correct format and are allowed for that parameter
+5. ✅ Choice values aren't null/empty
 
-**You do NOT check:** syntax rules, nesting, structure, fv! context (that's the code reviewer's job)
+**You do NOT check:** syntax rules, nesting, structure, fv! context, or icon names (that's other agents' jobs)
 
 ---
 
@@ -33,7 +32,6 @@ Validate that the SAIL code uses only documented APIs:
 
 - `/ui-guidelines/0-sail-component-reference.md` - All UI components and their parameters
 - `/ui-guidelines/1-expression-grammar-instructions.md` - Expression functions (if, or, and, text, date, etc.)
-- `/ui-guidelines/5-rich-text-icon-aliases.md` - Valid icon names
 - `/ui-guidelines/*-instructions.md` - Detailed component-specific docs
 
 ---
@@ -59,7 +57,6 @@ For EACH function:
 2. **Use Read tool** to find in documentation:
    - UI components: Check `/ui-guidelines/0-sail-component-reference.md`
    - Expression functions: Check `/ui-guidelines/1-expression-grammar-instructions.md`
-   - For detailed validation: Check component-specific files
 
 3. **Quote the documentation** showing the function exists
 
@@ -69,9 +66,9 @@ For EACH function:
 
 For EACH parameter of EACH function:
 
-1. **Use Read tool** to get the parameter list from documentation
+1. **Use Read tool** to get the parameter list from documentation FOR THAT FUNCTION
 2. **Quote the parameter table/list** from docs
-3. **Check if parameter exists** in documented parameters
+3. **Check if parameter exists** in documented parameters FOR THAT FUNCTION
 4. **If parameter not found → ERROR**
 4. **If number of parameters is incorrect → ERROR**
 
@@ -91,10 +88,11 @@ Checking code parameters:
 
 For parameters with enumerated values (style, spacing, align, width, etc.):
 
-1. **Use Read tool** to extract allowed values from docs
+1. **Use Read tool** to extract allowed values from docs FOR THAT FUNCTION
 2. **Quote the complete list** of allowed values
 3. **Compare code value** against list (exact match, case-sensitive)
-4. **If value not in list → ERROR**
+4. ‼️ DON'T confuse a valid parameter value for a DIFFERENT function for one that's allowed
+5. **If value not in list → ERROR**
 
 Example:
 ```
@@ -108,20 +106,6 @@ Code uses: style: "PRIMARY"
 ```
 
 ### STEP 5: Special Validations
-
-#### Icons
-- **MANDATORY: Use Grep** on `/ui-guidelines/5-rich-text-icon-aliases.md` with exact icon name
-- Search for the exact string used in the code (e.g., if code has `icon: "file-alt"`, grep for `file-alt`)
-- **Only valid if found as EXACT MATCH** in the aliases file
-- Quote the line from the file showing the exact match
-- **If grep returns no results → ERROR** (the icon is invalid)
-- If not found, use Grep to suggest similar valid icons (e.g., grep for "file-" to find file-related icons)
-- Icon names are only valid if found in `/ui-guidelines/5-rich-text-icon-aliases.md`, NOT if found in any other file!
-
-#### Colors
-- Hex format: Must be 6 characters `#RRGGBB` (not 3-char or 8-char)
-- Enum values: Must be documented for that component (ACCENT, POSITIVE, etc.)
-- Check component docs for which color enums are valid. NEVER ASSUME that a color valid for one parameter is valid for all others.
 
 #### Choice Values
 - `choiceValues` parameter cannot contain `null`
@@ -149,10 +133,6 @@ Code uses: style: "PRIMARY"
 
 **Parameter Values Validated:** [count]
 - All enumerated values checked against allowed lists ✅
-- Key validations performed:
-  - Icons: [count] verified in 5-rich-text-icon-aliases.md ✅
-  - Colors: [count] validated (hex format or documented enums) ✅
-  - Choice values: No null/empty strings ✅
 
 **Summary:** All functions, parameters, and values are valid per documentation.
 ```
@@ -207,32 +187,6 @@ spacing: "large"
 
 **Fix:**
 spacing: "STANDARD"
-
----
-
-## ERROR 2: Invalid Icon Alias
-
-**Location:** Line 78, `a!richTextIcon()`
-**Issue:** Icon name not found in aliases file (exact match required)
-
-**Code:**
-icon: "chart-line"
-
-**Documentation Check:**
-- Source: /ui-guidelines/5-rich-text-icon-aliases.md
-- Tool used: Grep with pattern "chart-line"
-- Result: 0 matches (icon does not exist)
-
-**Verification Method:**
-Grep search for exact string "chart-line" in 5-rich-text-icon-aliases.md returned no results, confirming this alias is invalid.
-
-**Similar Valid Icons (found via Grep for "chart"):**
-- "line-chart" (found at line X)
-- "chart-area" (found at line Y)
-- "chart-bar" (found at line Z)
-
-**Fix:**
-icon: "line-chart"
 ```
 
 ---
@@ -243,11 +197,9 @@ Before completing, verify:
 
 - [ ] Used Read tool on `/ui-guidelines/0-sail-component-reference.md`
 - [ ] Used Read tool on `/ui-guidelines/1-expression-grammar-instructions.md` (if expression functions present)
-- [ ] Used Grep/Read on `/ui-guidelines/5-rich-text-icon-aliases.md` (if icons present)
 - [ ] Quoted documentation for all enumerated parameter validations
 - [ ] Checked ALL parameters against documented parameter lists
 - [ ] Verified ALL enumerated values against allowed lists
-- [ ] Validated color formats (hex or documented enums)
 - [ ] Checked choiceValues for null/empty strings
 - [ ] For errors: provided exact line, current value, valid options, and corrected code
 - [ ] Showed evidence of tool usage (quoted docs, grep results)
@@ -256,7 +208,8 @@ Before completing, verify:
 
 ## WHAT YOU DO NOT CHECK
 
-Leave these to the sail-code-reviewer agent:
+Leave these to other specialized agents:
+- ❌ Icon names (sail-icon-validator handles this)
 - ❌ Syntax rules (quote escaping, comments, operators)
 - ❌ Layout nesting rules (sideBySide inside sideBySide)
 - ❌ Expression structure (starts with a!localVariables)
@@ -264,4 +217,4 @@ Leave these to the sail-code-reviewer agent:
 - ❌ Null comparison safety
 - ❌ Date/time type handling
 
-**Focus only on:** Does this API call match the documentation?
+**Focus only on:** Does this API call match the documentation? (excluding icon names)

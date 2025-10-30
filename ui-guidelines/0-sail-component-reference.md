@@ -21,7 +21,14 @@
 - **Media**: `a!imageField`, `a!documentViewerField`, `a!webContentField`
 - **Visual Indicators**: `a!progressBarField`, `a!gaugeField`, `a!milestoneField`, `a!stampField`
 - **Lists & Links**: `a!tagField`, `a!linkField`
+- **Record Actions**: `a!recordActionField`
 - **Separators**: `a!horizontalLine`
+
+### Helper Components (Used within other components)
+- **Media Sources**: `a!webImage()`, `a!documentImage()`, `a!userImage()`, `a!webVideo()`
+- **Links**: `a!safeLink()`, `a!recordLink()`, `a!dynamicLink()`
+- **Rich Text Lists**: `a!richTextBulletedList()`, `a!richTextNumberedList()`
+- **Grid Helpers**: `a!sortInfo()`
 
 ### Data Visualization Components
 - **Grids**: `a!gridField`, `a!gridLayout`
@@ -205,6 +212,7 @@
 | `alignVertical` | Text | `TOP` | `TOP`\|`MIDDLE`\|`BOTTOM` |
 | `spacing` | Text | `STANDARD` | `STANDARD`\|`NONE`\|`DENSE`\|`SPARSE` |
 | `showDividers` | Boolean | `false` | Column separator lines |
+| `stackWhen` | List of Text | - | Screen widths when columns stack vertically. Values: `PHONE`\|`TABLET_PORTRAIT`\|`TABLET_LANDSCAPE`\|`DESKTOP`\|`DESKTOP_WIDE` |
 
 ---
 
@@ -626,6 +634,7 @@
 | `value` | Any Type | - | One or a list of `a!richTextItem`, `a!richTextIcon`, `a!richTextBulletedList`, `a!richTextNumberedList`, or plain text |
 | `align` | Text | `LEFT` | `LEFT`\|`CENTER`\|`RIGHT` |
 | `preventWrapping` | Boolean | `false` | Single line truncation |
+| `tooltip` | Text | - | Mouseover tooltip text |
 
 ---
 
@@ -660,6 +669,40 @@
 
 ---
 
+### a!linkField
+**Purpose**: Displays a list of clickable links
+
+**Inherits**: Labeling, Visibility, Accessibility
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `links` | Any Type | - | Array of link components created with `a!authorizationLink()`, `a!documentDownloadLink()`, `a!dynamicLink()`, `a!processTaskLink()`, `a!recordLink()`, `a!safeLink()`, `a!startProcessLink()`, `a!submitLink()`, `a!userRecordLink()`, etc. |
+| `align` | Text | - | `LEFT`\|`CENTER`\|`RIGHT` (recommended for Grid Layout only) |
+
+**Note**: Commonly used in grids to display action links for each row.
+
+---
+
+### a!recordActionField
+**Purpose**: Displays record actions in various configurable styles
+
+**Inherits**: Visibility, Accessibility
+
+**Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `actions` | Any Type | - | List of record action items configured with `a!recordActionItem()` |
+| `style` | Text | `TOOLBAR` | `TOOLBAR`\|`LINKS`\|`CARDS`\|`SIDEBAR`\|`CALL_TO_ACTION`\|`MENU`\|`MENU_ICON`\|`TOOLBAR_PRIMARY`\|`SIDEBAR_PRIMARY` |
+| `display` | Text | - | Controls how actions are displayed |
+| `openActionsIn` | Text | - | Where to open action dialogs |
+| `align` | Text | - | Alignment for action display |
+| `securityOnDemand` | Boolean | - | Load security only when needed (performance) |
+
+**Note**: Use `"MENU"` or `"MENU_ICON"` styles for better performance with multiple record actions.
+
+---
+
 ### a!progressBarField
 **Purpose**: Progress bar showing completion percentage
 
@@ -687,6 +730,7 @@
 | `size` | Text | `MEDIUM_PLUS` | `LARGE_PLUS`\|`LARGE`\|`MEDIUM_PLUS`\|`MEDIUM`\|`SMALL`\|`EXTRA_SMALL` |
 | `headingTag` | Text | - | `H1`\|`H2`\|`H3`\|`H4`\|`H5`\|`H6` (accessibility) |
 | `color` | Text | `STANDARD` | `ACCENT`\|`STANDARD`\|`SECONDARY` or hex |
+| `fontWeight` | Text | `BOLD` | `LIGHT`\|`NORMAL`\|`SEMI_BOLD`\|`BOLD`\|`EXTRA_BOLD` |
 
 ---
 
@@ -1185,5 +1229,194 @@
 |:---|:---|:---|:---|
 | `message` | Text | - | The validation message to display |
 | `color` | Text | `ERROR` | `ERROR`\|`WARN`\|`INFO`\|`SUCCESS` |
+
+---
+
+## Media Source Components
+
+### a!webImage
+**Purpose**: References an image from a web URL for use in imageField or billboardLayout
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `source` | Text | URL of the image (must be accessible) |
+| `altText` | Text | Alternative text for accessibility |
+
+**Usage Example**:
+```sail
+a!imageField(
+  images: a!webImage(
+    source: "https://example.com/image.jpg",
+    altText: "Product photo"
+  )
+)
+```
+
+---
+
+### a!documentImage
+**Purpose**: References an Appian document as an image source
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `document` | Document | Document identifier |
+| `altText` | Text | Alternative text for accessibility |
+
+**Usage Example**:
+```sail
+a!billboardLayout(
+  backgroundMedia: a!documentImage(
+    document: cons!HERO_IMAGE_DOC,
+    altText: "Company headquarters"
+  )
+)
+```
+
+---
+
+### a!userImage
+**Purpose**: References a user's profile image
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `user` | User | User identifier |
+| `altText` | Text | Alternative text for accessibility |
+
+---
+
+### a!webVideo
+**Purpose**: References a video from a web URL for use in billboardLayout
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `source` | Text | URL of the video file |
+
+---
+
+## Link Components
+
+### a!safeLink
+**Purpose**: Creates a link to an external URL that opens in a new tab/window
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `uri` | Text | The external URL to link to |
+| `label` | Text | Accessible label for the link |
+
+**Usage Example**:
+```sail
+a!richTextItem(
+  text: "Read our policies",
+  link: a!safeLink(
+    uri: "https://example.com/policies",
+    label: "Company policies"
+  ),
+  linkStyle: "INLINE"
+)
+```
+
+**Note**: Opens links in a new window/tab for security
+
+---
+
+### a!recordLink
+**Purpose**: Creates a link to an Appian record
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `record` | Record | Record identifier |
+| `label` | Text | Optional accessible label |
+
+**Usage Example**:
+```sail
+a!richTextItem(
+  text: fv!row.caseId,
+  link: a!recordLink(record: fv!row),
+  linkStyle: "STANDALONE"
+)
+```
+
+**Note**: Used for navigation to record views within Appian
+
+---
+
+## Rich Text List Components
+
+### a!richTextBulletedList
+**Purpose**: Creates a bulleted list within rich text display
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `items` | List of Text/RichTextItem | List items (can be plain text or styled richTextItems) |
+
+**Usage Example**:
+```sail
+a!richTextDisplayField(
+  value: a!richTextBulletedList(
+    items: {
+      "First item",
+      "Second item",
+      a!richTextItem(text: "Bold item", style: "STRONG")
+    }
+  )
+)
+```
+
+---
+
+### a!richTextNumberedList
+**Purpose**: Creates a numbered list within rich text display
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `items` | List of Text/RichTextItem | List items (can be plain text or styled richTextItems) |
+
+**Usage Example**:
+```sail
+a!richTextDisplayField(
+  value: a!richTextNumberedList(
+    items: {
+      "Step one",
+      "Step two",
+      "Step three"
+    }
+  )
+)
+```
+
+---
+
+## Grid Helper Components
+
+### a!sortInfo
+**Purpose**: Defines initial or secondary sorting for grid fields
+
+**Parameters**:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `field` | Text | Field name to sort by (must match a column's sortField) |
+| `ascending` | Boolean | Sort direction (true = ascending, false = descending) |
+
+**Usage Example**:
+```sail
+a!gridField(
+  data: local!data,
+  columns: {/* columns */},
+  initialSorts: {
+    a!sortInfo(field: "dateFiled", ascending: false)
+  },
+  secondarySorts: {
+    a!sortInfo(field: "amount", ascending: false)
+  }
+)
+```
 
 ---

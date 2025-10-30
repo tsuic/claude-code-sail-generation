@@ -109,8 +109,8 @@ When designing a full page, follow these planning steps (not necessary if user r
 
 ### When to Use Each Layout:
 #### ColumnsLayout vs SideBySideLayout
-- **ColumnsLayout**: Page structure, content sections, different widths
-- **SideBySideLayout**: Icon + text, label + value, small UI elements
+- **ColumnsLayout**: Page structure, fixed pixel widths
+- **SideBySideLayout**: Icon + text, label + value, minimized (flex 0) layouts
 
 ## COMPONENT SELECTION GUIDE
 
@@ -326,9 +326,10 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - choiceValues CANNOT be null or empty strings (“”)
 
 ## 🛑 MANDATORY VALIDATION CHECKLIST
-👉 Always call BOTH validation sub-agents to code review new expressions:
-1. **sail-function-validator** - Validates functions, parameters, and values against documentation
-2. **sail-code-reviewer** - Validates structure, syntax, and architectural patterns
+👉 Always call validation sub-agents to code review new expressions:
+1. **sail-schema-validator** - Validates function syntax
+2. **sail-icon-validator** - Checks for valid icon names
+3. **sail-code-reviewer** - Validates structure, syntax, and best practices
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()

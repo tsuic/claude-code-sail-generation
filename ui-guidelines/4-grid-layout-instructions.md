@@ -210,7 +210,7 @@ a!gridRowLayout(
 - `a!textField()` - Single line text input
 - `a!paragraphField()` - Multi-line text input
 - `a!integerField()` - Number input
-- `a!floatingPoint()` - Floating point number input
+- `a!floatingPointField()` - Floating point number input
 - `a!dateField()` - Date picker
 - `a!dateTimeField()` - Date and time picker
 - `a!dropdownField()` - Dropdown selection

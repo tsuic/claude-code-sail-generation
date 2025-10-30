@@ -34,7 +34,7 @@ a!sideBySideItem(
 )
 
 a!sideBySideItem(
-  item: {a!textField(...), a!button(...)}  // NO ARRAYS IN sideBySideItems  
+  item: {a!textField(...), a!richtextDisplayField(...)}  // NO ARRAYS IN sideBySideItems  
 )
 
 a!gridField(

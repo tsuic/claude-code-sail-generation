@@ -439,7 +439,7 @@ a!richTextDisplayField(
 - [ ] Color values are valid enums or 6-character hex codes
 - [ ] Size values are from approved list (SMALL through EXTRA_LARGE)
 - [ ] Style values are from approved list (PLAIN, EMPHASIS, STRONG, etc.)
-- [ ] Icons use valid Font Awesome 4.7 aliases
+- [ ] Icons use valid icon aliases (found in `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - [ ] Alignment values are LEFT, RIGHT, or CENTER
 
 Remember: Rich text display fields can only contain the following items in their value property: richTextItems, richTextIcons, ricrichTextBulletedList, richTextNumberedList, or plain text.
