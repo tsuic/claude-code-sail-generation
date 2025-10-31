@@ -362,3 +362,8 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Only richTextItems or richTextIcons in richTextDisplayField
 - [ ] At least one AUTO width column in columnsLayout
 - [ ] ❌ DON'T USE `less` or `more` for `spacing`!
+
+### Final Validation:
+Before finishing, you MUST validate the SAIL code that you have produced by using the `validate_sail.py` script inside the `scripts` folder.
+The script makes an API call to the Appian validation endpoint and returns the validation results.
+Fix any validation errors and re-validate until successful.
