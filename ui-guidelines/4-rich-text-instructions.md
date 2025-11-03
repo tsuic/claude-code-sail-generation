@@ -316,7 +316,7 @@ a!sideBySideLayout(
 ## Rich Text Icons
 
 ### a!richTextIcon Parameters
-- `icon`: must be a valid alias string (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
+- `icon`: must be a valid alias string (*READ* `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - `color`: Icon color (STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY, or hex)
 - `size`: Icon size (SMALL through EXTRA_LARGE)
 - `altText`: Accessibility text
@@ -386,49 +386,6 @@ a!richTextDisplayField(
 "#DC2626"  /* Red for negative states */
 "#D97706"  /* Orange for warnings */
 ```
-
-## Common Conversion Patterns
-
-### Tailwind to SAIL Rich Text
-
-**Tailwind CSS:**
-```html
-<h2 class="text-xl font-bold text-gray-900">User Details</h2>
-<p class="text-sm text-gray-600 mt-2">
-  Last updated: <span class="font-medium">2 hours ago</span>
-</p>
-```
-
-**SAIL Equivalent:**
-```sail
-{
-  a!richTextDisplayField(
-    value: a!richTextItem(
-      text: "User Details",
-      size: "MEDIUM_PLUS",
-      style: "STRONG",
-      color: "#111827"
-    ),
-    marginBelow: "STANDARD"
-  ),
-  a!richTextDisplayField(
-    value: {
-      a!richTextItem(
-        text: "Last updated: ",
-        color: "#6B7280",
-        size: "STANDARD"
-      ),
-      a!richTextItem(
-        text: "2 hours ago",
-        color: "#6B7280",
-        size: "STANDARD",
-        style: "STRONG"
-      )
-    }
-  )
-}
-```
-
 ## Validation Checklist
 
 ### Syntax Validation:

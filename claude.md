@@ -99,6 +99,10 @@ When designing a full page, follow these planning steps (not necessary if user r
   - If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
      - Break components up into separate sideBySideItems, OR,
      - Use a columnsLayout instead
+5. Avoid redundant card nesting (too much boxiness) for sections containing card collections
+  - ❌ DON'T wrap cardGroupLayout or lists of cards in a parent cardLayout
+  - ✅ DO place section titles and card collections directly on page background
+  - Example: Section heading → cardGroupLayout (NOT: cardLayout → Section heading + cardGroupLayout)
 
 ## LAYOUT SELECTION GUIDE
 
@@ -359,7 +363,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Define any local variables within the a!localVariables() function
 - All form inputs should save into a corresponding local variable
 - ButtonWidgets can't be on their own, they must be inside a ButtonArrayLayout
-- Use cardLayout for content blocks (but not inside sideBySideLayout)
+- Use cardLayout for content blocks, EXCEPT when the content is already a collection of cards (cardGroupLayout, multiple cardLayouts arranged in a list) - in those cases, place the cards directly on the page background without an outer wrapper card
 
 ## PARAMETER RESTRICTIONS
 - Only use parameters explicitly defined in the documentation

@@ -1052,7 +1052,7 @@
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `label` | Text | - | Button text |
-| `icon` | Text | - | Button icon displayed ahead of text label, same aliases as rich text icons (Font Awesome 4.7) |
+| `icon` | Text | - | Button icon displayed ahead of text label, same aliases as rich text icons (list in `ui-guidelines/5-rich-text-icon-aliases.md`) |
 | `style` | Text | `OUTLINE` | `OUTLINE`\|`GHOST`\|`LINK`\|`SOLID` |
 | `size` | Text | `STANDARD` | `SMALL`\|`STANDARD`\|`LARGE` |
 | `submit` | Boolean | - | Submit form after saving |
@@ -1117,7 +1117,7 @@
 **Parameters**:
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `icon` | Text | Font Awesome 4.7 icon name |
+| `icon` | Text | List in `ui-guidelines/5-rich-text-icon-aliases.md` |
 | `color` | Text | Icon color |
 | `size` | Text | `SMALL`\|`STANDARD`\|`MEDIUM`\|`MEDIUM_PLUS`\|`LARGE`\|`LARGE_PLUS`\|`EXTRA_LARGE` |
 | `altText` | Text | Accessibility text |

@@ -31,6 +31,12 @@ ColumnsLayout is the primary structural layout component in Appian SAIL for arra
   - `DENSE` (less space between columns)
   - `SPARSE` (more space between columns)
 
+### Vertical Alignment
+- Controls how content aligns vertically within columns of different heights:
+  - `TOP` (default): Align content to top of column
+  - `MIDDLE`: Center content vertically - useful for aligning icons, stamps, and text across columns
+  - `BOTTOM`: Align content to bottom of column
+
 ## Page Layout Strategy Using Columns Layout
 
 ### Option A: Content Columns Using Full Page Width
@@ -89,6 +95,7 @@ a!headerContentLayout(
   }
 )
 ```
+
 ## Converting from Tailwind CSS to SAIL Columns
 
 ### Tailwind Grid to SAIL Columns
@@ -143,6 +150,7 @@ a!columnsLayout(
 - Use `AUTO` columns for margins in centered layouts
 - Choose fixed widths based on content requirements
 - Use columnsLayout for main page structure
+- Set appropriate `alignVertical`
 
 ### ❌ DON'T:
 - Use all fixed-width columns (responsive issues)
@@ -159,6 +167,7 @@ a!columnsLayout(
 - [ ] At least one column has `AUTO` width
 - [ ] Column width is `AUTO`, `EXTRA_NARROW`, `NARROW`, `NARROW_PLUS`, `MEDIUM`, `MEDIUM_PLUS`, `WIDE`, `WIDE_PLUS`, `1X`, `2X`, `3X`, `4X`, `5X`, `6X`, `7X`, `8X`, `9X`, or `10X`
 - [ ] ‼️ MAKE SURE that you're ONLY using one of the VALID VALUES for `spacing` and `width`
+- [ ] `alignVertical` is set unless default of `TOP` is desired
 - [ ] ⚠️⚠️⚠️ `spacing` is `STANDARD`, `NONE`, `SPARSE`, or `DENSE`
 - [ ] ❌ DON'T USE `LESS` or `MORE` for `spacing`!
 - [ ] ⚠️⚠️⚠️ `spacing` is `STANDARD`, `NONE`, `SPARSE`, or `DENSE`

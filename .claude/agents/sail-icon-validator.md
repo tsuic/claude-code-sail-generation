@@ -47,8 +47,21 @@ Line 102: icon: "chart-line"
 For EACH icon name found:
 
 1. **Use Grep tool** on `/ui-guidelines/5-rich-text-icon-aliases.md`
-   - Search for the EXACT icon name (e.g., if code has `"check-circle"`, grep for `check-circle`)
-   - The icon must appear as an exact match in the backtick-separated list
+   - Search for the EXACT pattern: `icon-name` (include the backticks in the search)
+   - Example: if code has `"check-circle"`, grep for the pattern: `check-circle`
+   - The backticks ensure you're matching the icon as a complete token, not a substring
+
+**CRITICAL: Two-Phase Validation Process**
+
+**Phase 1: Exact Validation (MUST use this pattern)**
+- Pattern to search: `icon-name` (with backticks and trailing comma OR backtick)
+- Use Grep with pattern: `icon-name`
+- If grep finds a match → Icon is VALID, stop here
+- If grep finds NO match → Proceed to Phase 2
+
+**Phase 2: Suggestion Finding (ONLY after Phase 1 fails)**
+- Now you can search for partial patterns like "icon-" or "-name"
+- This is ONLY for finding suggestions, NOT for validation
 
 2. **Check the result:**
    - ✅ **If grep finds it:** Icon is VALID
@@ -57,6 +70,27 @@ For EACH icon name found:
 3. **For invalid icons, find suggestions:**
    - Grep for similar patterns (e.g., if "user-profile" fails, grep for "user-" or "profile")
    - List 3-5 similar valid alternatives from the search results
+
+---
+
+### ⚠️ COMMON MISTAKES TO AVOID
+
+❌ **WRONG - Fuzzy matching:**
+- Searching for "circle-question" and finding "question-circle" → Marking as valid
+- Searching for "user" and finding "user-circle" → Marking as valid
+- Searching for "arrow-left" and accepting any line containing both "arrow" and "left"
+
+✅ **RIGHT - Exact token matching:**
+- Searching for `circle-question` → No results → Mark as INVALID
+- Searching for `question-circle` → Found → Mark as VALID
+- Then search for "circle" and "question" separately to find suggestions
+
+**Why this matters:**
+- "circle-question" and "question-circle" are DIFFERENT icons
+- One exists, one doesn't - you must catch this!
+- The backticks in the file are delimiters that create exact tokens
+
+---
 
 ### STEP 3: Report Results
 
@@ -177,7 +211,10 @@ Before completing, verify:
 
 - [ ] Extracted ALL icon names from the code (searched for `icon:` parameter)
 - [ ] Used Grep on `/ui-guidelines/5-rich-text-icon-aliases.md` for EACH icon
-- [ ] For each grep, searched for the EXACT icon name
+- [ ] Used EXACT token match (with backticks) for initial validation
+- [ ] Did NOT accept partial/fuzzy matches as valid
+- [ ] Only used fuzzy matching AFTER exact match failed (for suggestions only)
+- [ ] Verified no inverted icon names were incorrectly validated (e.g., "circle-question" vs "question-circle")
 - [ ] For invalid icons: Used Grep to find similar valid alternatives
 - [ ] Provided line number, current value, and recommended fix for each error
 - [ ] Showed grep evidence for all validations

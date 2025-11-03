@@ -240,6 +240,70 @@ a!cardLayout(
 - ✅ Reserve colored backgrounds (INFO, SUCCESS, WARN, ERROR) for functional purposes like message banners
 - ❌ Avoid using different colored backgrounds for each content section
 
+## Avoiding Redundant Card Nesting
+
+When a page section's content is already a collection of cards (like a cardGroupLayout or list of cardLayouts), **do not wrap them in an additional parent card**. This creates excessive boxiness and visual clutter.
+
+Instead, place the section title and card collection directly on the page background. Use the headerContentLayout's `backgroundColor` parameter to create subtle contrast.
+
+### ❌ WRONG: Wrapping Card Collections in Parent Cards
+```sail
+a!headerContentLayout(
+  contents: {
+    /* DON'T: Card wrapping a cardGroupLayout */
+    a!cardLayout(
+      contents: {
+        a!richTextDisplayField( /* Secction title */
+          value: a!richTextItem(text: "Key Metrics", size: "LARGE", style: "STRONG"),
+          labelPosition: "COLLAPSED",
+          marginBelow: "STANDARD"
+        ),
+        a!cardGroupLayout( /* Set of KPI cards */
+          cards: {
+            a!cardLayout(contents: {/* KPI 1 */}, style: "NONE", shape: "ROUNDED"),
+            a!cardLayout(contents: {/* KPI 2 */}, style: "NONE", shape: "ROUNDED"),
+            a!cardLayout(contents: {/* KPI 3 */}, style: "NONE", shape: "ROUNDED")
+          },
+          cardWidth: "NARROW_PLUS"
+        )
+      },
+      style: "NONE",
+      shape: "ROUNDED",
+      padding: "STANDARD",
+      marginBelow: "STANDARD"
+    )
+  },
+  backgroundColor: "#F5F6F8"
+)
+```
+**Problem:** Creates a "box within boxes" effect - the outer card adds unnecessary visual weight when the inner cards already provide structure.
+
+### ✅ RIGHT: Section Title + Card Collection on Page Background
+```sail
+a!headerContentLayout(
+  contents: {
+    /* DO: Section title and cards directly on page background */
+    a!richTextDisplayField( /* Section title */
+      value: a!richTextItem(text: "Key Metrics", size: "LARGE", style: "STRONG"),
+      labelPosition: "COLLAPSED",
+      marginBelow: "STANDARD"
+    ),
+    a!cardGroupLayout(
+      cards: {
+        a!cardLayout(contents: {/* KPI 1 */}, style: "NONE", shape: "ROUNDED", showBorder: true),
+        a!cardLayout(contents: {/* KPI 2 */}, style: "NONE", shape: "ROUNDED", showBorder: true),
+        a!cardLayout(contents: {/* KPI 3 */}, style: "NONE", shape: "ROUNDED", showBorder: true)
+      },
+      cardWidth: "NARROW_PLUS"
+    )
+  },
+  backgroundColor: "#F5F6F8",  /* Page background creates contrast */
+  contentsPadding: "MORE"
+)
+```
+### Key Takeaway
+**Cards containing cards = Remove the outer wrapper.** Let section titles and card collections breathe on the page background.
+
 ## Layout Patterns
 
 ### Dashboard Cards (Using cardGroupLayout)
