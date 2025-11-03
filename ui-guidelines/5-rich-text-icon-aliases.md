@@ -3,12 +3,6 @@
 ## Overview
 This document lists the available icon aliases for use with `a!richTextIcon()` component in Appian SAIL.
 
-## Important Notes
-- Icons must reference valid Font Awesome v4.7 icon aliases
-- Brand name or trademarked icons are NOT supported
-- Use the icon name without the "fa-" prefix (e.g., use "home" not "fa-home")
-- All icon names are lowercase with hyphens
-
 ## Available Icon Categories
 
 ### Directional Icons (Arrows, Angles, Chevrons, Carets)
