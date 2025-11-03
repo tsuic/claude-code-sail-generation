@@ -41,6 +41,112 @@ a!gridField(
 local!firstSelected: index(local!selectedRows, 1, null)
 ```
 
+## ⚠️ CRITICAL: Grid Selection Behavior - selectionValue Contains Identifiers
+
+### Understanding selectionValue Content
+
+**MOST CRITICAL RULE**: `selectionValue` does NOT contain full row objects!
+
+When `selectable: true` is set on a gridField:
+- `selectionValue` contains **identifiers from the data array**, NOT full row objects
+- For static data using a!map(), `selectionValue` contains **integers** (the array indices - 1, 2, 3, etc.)
+- For record data, `selectionValue` contains **record identifiers** (not full record data)
+
+### ❌ CRITICAL ERROR: Accessing Properties on Selection Items
+
+**WRONG - This will cause runtime error:**
+```sail
+a!gridField(
+  data: local!courses,  /* Array of a!map() with id, name, type, etc. */
+  selectable: true,
+  selectionValue: local!selectedCourses,
+  selectionSaveInto: local!selectedCourses,
+  columns: {...}
+)
+
+/* Later in the code... */
+a!forEach(
+  items: local!selectedCourses,
+  expression: fv!item.type  /* ❌ ERROR: fv!item is an integer, not a map! */
+)
+```
+
+**Error Message You'll See:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'type' of type Text into type Number (Integer)
+```
+
+**RIGHT - Look up full objects using index():**
+```sail
+a!gridField(
+  data: local!courses,
+  selectable: true,
+  selectionValue: local!selectedCourses,  /* Contains integers like {1, 3, 5} */
+  selectionSaveInto: local!selectedCourses,
+  columns: {...}
+)
+
+/* ✅ Correct approach - look up full object using the identifier */
+a!forEach(
+  items: local!selectedCourses,
+  expression: a!localVariables(
+    local!course: index(local!courses, fv!item, a!map()),  /* fv!item is the integer ID */
+    local!course.type  /* ✅ Now we can access properties */
+  )
+)
+```
+
+### Common Patterns for Working with Selected Data
+
+**Pattern 1: Display selected items**
+```sail
+a!forEach(
+  items: local!selectedCourses,
+  expression: a!localVariables(
+    local!course: index(local!availableCourses, fv!item, a!map()),
+    a!richTextDisplayField(
+      value: {
+        a!richTextIcon(icon: "check-circle"),
+        " ",
+        local!course.name
+      },
+      labelPosition: "COLLAPSED"
+    )
+  )
+)
+```
+
+**Pattern 2: Conditional logic based on selection**
+```sail
+showWhen: and(
+  length(local!selectedCourses) > 0,
+  or(
+    a!forEach(
+      items: local!selectedCourses,
+      expression: index(local!availableCourses, fv!item, a!map()).type = "Contract"
+    )
+  )
+)
+```
+
+**Pattern 3: Validation using selected data**
+```sail
+disableNextButton: or(
+  length(local!selectedCourses) = 0,
+  a!forEach(
+    items: local!selectedCourses,
+    expression: isnull(index(local!availableCourses, fv!item, a!map()).startDate)
+  )
+)
+```
+
+### Key Takeaways
+- ✅ `selectionValue` contains **identifiers** (integers for static data, record IDs for records)
+- ❌ `selectionValue` does NOT contain full row objects with properties
+- ✅ Always use `index(dataArray, fv!item, defaultValue)` to look up full objects
+- ✅ Use `a!localVariables(local!item: index(...), ...)` pattern for cleaner code
+- ✅ Before iterating over selectionValue, ask: "Do I need to look up the full object?"
+
 ## ⚠️ CRITICAL GRID COLUMN RESTRICTIONS
 
 ### ❌ NEVER Use These in GridColumns:
