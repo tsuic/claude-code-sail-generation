@@ -20,6 +20,212 @@
 10. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
 </expression_structure>
 
+<form_interface_patterns>
+## 🚨 CRITICAL: Form Interface Data Patterns
+
+**BEFORE writing ANY form/wizard interface, determine the data pattern:**
+
+### Decision Tree:
+```
+Will users CREATE records? → Use ri! (Rule Input) pattern
+Will users UPDATE records? → Use ri! (Rule Input) pattern
+Is this ONLY displaying data? → Use query/a!recordData pattern
+Is this a static mockup? → Use local variables with hardcoded data
+```
+
+### 🔴 MOST CRITICAL RULE:
+**Forms that CREATE or UPDATE records MUST use rule inputs (ri!), NOT queries or local variables for the main record data.**
+
+### User Request Keywords That Indicate Rule Input Pattern:
+- "form to create/submit/add a [record]"
+- "interface to update/edit a [record]"
+- "wizard for creating/submitting"
+- "application submission"
+- "registration form"
+- "edit page for [record]"
+- "interface used to create or update"
+
+### ✅ CORRECT: Rule Input Pattern (for Create/Update Forms)
+
+**When to use**: Interface will be used to create new records or update existing records
+
+```sail
+/* Rule Inputs:
+ * - ri!recordName: The record being created/updated (null for new, populated for update)
+ * - ri!relatedRecord: Any related records needed for context
+ */
+a!localVariables(
+  /* NO QUERY for the main record being edited! */
+
+  /* Use local variables ONLY for transient UI state: */
+  local!selectedOptions: null,
+  local!dynamicArray: {},
+
+  /* Bind form fields directly to rule inputs: */
+  a!textField(
+    label: "First Name",
+    value: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'],
+    saveInto: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'],
+    required: true
+  ),
+
+  /* Validation checks rule input values: */
+  a!buttonArrayLayout(
+    buttons: {
+      a!buttonWidget(
+        label: "Submit",
+        disabled: a!isNullOrEmpty(ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'])
+      )
+    }
+  )
+)
+```
+
+**Key characteristics of ri! pattern:**
+- Main record data binds to `ri!recordName[...]`
+- NO `a!queryRecordType()` for the record being created/updated
+- Form fields save directly to `ri!` (auto-persists to record)
+- Use `a!isNullOrEmpty()` for validation checks on rule inputs
+- Local variables used ONLY for transient UI state (selections, dynamic arrays, temporary data)
+
+### ❌ WRONG: Query Pattern (for Create/Update Forms)
+
+**This pattern is ONLY for read-only displays, NOT for forms:**
+
+```sail
+/* DON'T DO THIS for create/update forms! */
+a!localVariables(
+  local!currentRecord: a!queryRecordType(...), /* WRONG for forms! */
+  local!firstName: a!defaultValue(local!currentRecord[...], null), /* WRONG! */
+
+  a!textField(
+    value: local!firstName, /* WRONG - not saving to record! */
+    saveInto: local!firstName /* WRONG - just saving to local variable! */
+  )
+)
+```
+
+**Why this is wrong:**
+- Changes only update local variables, not the actual record
+- Requires manual save logic to persist to record
+- Doesn't follow Appian best practices for form interfaces
+- Query is unnecessary overhead for create/update operations
+
+### ✅ CORRECT: Query Pattern (for Read-Only Displays)
+
+**When to use**: Displaying data without editing, dashboards, reports, read-only grids
+
+```sail
+a!localVariables(
+  local!recordData: a!queryRecordType(
+    recordType: 'recordType!{uuid}Type',
+    filters: a!queryFilter(...)
+  ),
+
+  /* Display in read-only grid: */
+  a!gridField(
+    data: a!recordData(
+      recordType: 'recordType!{uuid}Type',
+      filters: a!queryFilter(...)
+    ),
+    columns: {
+      a!gridColumn(
+        label: "Name",
+        value: fv!row['recordType!{uuid}Type.fields.{uuid}name']
+      )
+    }
+  )
+)
+```
+
+### Common Mistakes to Avoid:
+
+1. **Using queries for the main record in create/update forms**
+   - ❌ Wrong: `local!applicant: a!queryRecordType(...)` in a submission form
+   - ✅ Right: `ri!applicant` as rule input
+
+2. **Saving form inputs to local variables instead of rule inputs**
+   - ❌ Wrong: `saveInto: local!firstName` when creating/updating a record
+   - ✅ Right: `saveInto: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName']`
+
+3. **Mixing patterns inappropriately**
+   - ❌ Wrong: Using ri! for reference data that shouldn't be edited
+   - ✅ Right: Use ri! for main record, queries for reference/lookup data
+
+### MANDATORY CHECKLIST Before Coding Form Interfaces:
+
+- [ ] Read user request carefully - does it mention "create", "update", "edit", "submit", "form", or "wizard"?
+- [ ] If YES → Use ri! pattern for main record
+- [ ] If NO (display only) → Use query/a!recordData pattern
+- [ ] Main record data binds to ri!, NOT local variables
+- [ ] NO a!queryRecordType() for the record being created/updated
+- [ ] Local variables used ONLY for transient UI state (not main record fields)
+- [ ] Form validation checks ri! values, not local variables
+</form_interface_patterns>
+
+<non_existent_objects_handling>
+## 🚨 CRITICAL: Handling Non-Existent Constants and Environment Objects
+
+**Never assume constants, process models, or environment-specific objects exist. Always use placeholders with TODO comments.**
+
+### The Problem:
+Generated code often references objects that don't exist in the target environment:
+- Constants (`cons!FOLDER_NAME`, `cons!PROCESS_MODEL`)
+- Process models (for `a!startProcess()`)
+- Document folders (for file upload targets)
+- Integration objects
+- Expression rules
+
+### ✅ CORRECT Pattern - Placeholder with TODO
+
+```sail
+/* File upload fields */
+a!fileUploadField(
+  label: "Upload Supporting Document",
+  target: null,  /* TODO: Add constant value for case documents folder */
+  value: local!documentUpload,
+  saveInto: local!documentUpload
+)
+
+/* Process model references */
+a!startProcess(
+  processModel: null,  /* TODO: Add constant for case submission process model */
+  processParameters: {
+    case: ri!case,
+    submittedBy: loggedInUser()
+  }
+)
+```
+
+### ❌ WRONG Pattern - Assuming Objects Exist
+
+```sail
+/* DON'T DO THIS */
+a!fileUploadField(
+  target: cons!CASE_DOCUMENTS_FOLDER,  /* This constant may not exist! */
+  ...
+)
+
+a!startProcess(
+  processModel: cons!SUBMIT_CASE_PROCESS,  /* May not exist! */
+  ...
+)
+```
+
+### TODO Comment Format:
+```sail
+/* TODO: Add constant value for [specific purpose] */
+/* TODO: Configure [object type] - [what it should reference] */
+/* TODO: Add integration object for [external system] */
+```
+
+### Why This Matters:
+1. **Generated code runs immediately** for UI/UX testing
+2. **Clear configuration points** - developers search for "TODO"
+3. **Self-documenting** - explains what needs configuration
+4. **Prevents runtime errors** from missing objects
+</non_existent_objects_handling>
+
 <syntax_pattern_validation>
 ## 🚨 CRITICAL: Language-Specific Syntax Patterns
 
@@ -1492,6 +1698,56 @@ a!forEach(
 </record_link_identifier_rules>
 </record_links_and_identifiers>
 
+<grid_selection_behavior>
+## ⚠️ GRID SELECTION BEHAVIOR - CRITICAL RULE
+
+### selectionValue Contains Identifiers, NOT Full Objects
+
+**MOST COMMON MISTAKE**: Assuming `selectionValue` contains full row data
+
+```sail
+❌ WRONG:
+a!gridField(
+  data: local!courses,
+  selectable: true,
+  selectionValue: local!selectedCourses,
+  selectionSaveInto: local!selectedCourses
+)
+
+/* Later... */
+a!forEach(
+  items: local!selectedCourses,  /* This is selectionValue from a grid */
+  expression: fv!item.name        /* ❌ ERROR: fv!item is an integer, not an object! */
+)
+
+✅ RIGHT:
+a!forEach(
+  items: local!selectedCourses,
+  expression: a!localVariables(
+    local!course: index(local!courses, fv!item, a!map()),  /* Look up full object */
+    local!course.name  /* ✅ Now we can access properties */
+  )
+)
+```
+
+**Error you'll see if you get this wrong:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'name' of type Text into type Number (Integer)
+```
+
+### Rule Summary
+- Grid `selectionValue` contains **identifiers** (integers for static data, record IDs for records)
+- `selectionValue` does NOT contain full row objects with properties
+- Use `index(dataArray, identifier, defaultValue)` to retrieve full objects
+- Always check: "Am I iterating over a selectionValue? Then I need index()!"
+
+### Quick Decision Tree
+Before writing code with grid selections:
+1. "Is this variable from a grid's selectionValue?" → YES = need index() lookup
+2. "Am I accessing properties on fv!item?" → Must verify fv!item is an object, not an ID
+3. "Did I use index() to look up the full object first?" → If NO, you'll get a runtime error
+</grid_selection_behavior>
+
 <user_filters_vs_custom_filters>
 User Filters vs Custom Filters
 **MANDATORY**: If record type has user filters AND interface has custom filters, ASK user to choose:
@@ -1623,24 +1879,149 @@ Rule: Single checkbox fields automatically handle null-to-false conversion. Use 
 </component_usage_patterns>
 
 <one_to_many_relationship_management>
-## One-to-Many Relationship Data Management
-When creating or updating data in a form, always save data from related records with a one-to-many relationship on the base record type using the relationship.
+## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
 
+**When creating or updating data in a form using the ri! pattern, manage one-to-many related records through the parent record's relationship field. NEVER query them separately or use local variables.**
+
+### Core Principle:
+**In create/update forms, the relationship field IS the data source. No queries, no copies.**
+
+### ✅ CORRECT Pattern - Direct Relationship Access
+
+**Displaying related records in forms:**
 ```sail
-/* ✅ CORRECT - Save comments on the Case record using relationship */
-a!save(
-  ri!case['recordType!Case.relationships.caseComment'],
-  append(
-    ri!case['recordType!Case.relationships.caseComment'],
-    'recordType!Comment'(
-      'recordType!Comment.fields.description': local!newComment
-    )
+/* Iterate directly over the relationship - Case has many Comments */
+a!forEach(
+  items: ri!case['recordType!Case.relationships.caseComment'],
+  expression: a!cardLayout(
+    contents: {
+      a!paragraphField(
+        label: "Comment " & fv!index,
+        /* Access fields through fv!item */
+        value: fv!item['recordType!Comment.fields.description'],
+        saveInto: fv!item['recordType!Comment.fields.description'],
+        height: "MEDIUM"
+      ),
+      a!dateField(
+        label: "Date",
+        value: fv!item['recordType!Comment.fields.commentDate'],
+        saveInto: fv!item['recordType!Comment.fields.commentDate']
+      )
+    }
   )
 )
-
-/* ❌ WRONG - Don't use separate local variables for related data */
-local!comments: {...}  /* Avoid this pattern */
 ```
+
+**Adding new related records:**
+```sail
+a!buttonWidget(
+  label: "Add Comment",
+  saveInto: {
+    a!save(
+      ri!case['recordType!Case.relationships.caseComment'],
+      append(
+        ri!case['recordType!Case.relationships.caseComment'],
+        'recordType!Comment'(
+          'recordType!Comment.fields.commentDate': today(),
+          'recordType!Comment.fields.createdBy': loggedInUser()
+        )
+      )
+    )
+  }
+)
+```
+
+**Removing related records:**
+```sail
+a!buttonWidget(
+  label: "Remove Comment",
+  icon: "trash",
+  saveInto: {
+    a!save(
+      ri!case['recordType!Case.relationships.caseComment'],
+      remove(
+        ri!case['recordType!Case.relationships.caseComment'],
+        fv!index  /* Remove item at current index in forEach */
+      )
+    )
+  },
+  showWhen: length(ri!case['recordType!Case.relationships.caseComment']) > 1
+)
+```
+
+**Counting related records:**
+```sail
+a!richTextItem(
+  text: "Total Comments: " & length(
+    ri!case['recordType!Case.relationships.caseComment']
+  )
+)
+```
+
+**Checking if relationship is empty:**
+```sail
+if(
+  a!isNullOrEmpty(ri!case['recordType!Case.relationships.caseComment']),
+  /* Show message when no comments */
+  a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: a!richTextItem(
+          text: "No comments added yet. Click 'Add Comment' to begin.",
+          color: "SECONDARY"
+        )
+      )
+    }
+  ),
+  /* Show comments when data exists */
+  a!forEach(
+    items: ri!case['recordType!Case.relationships.caseComment'],
+    expression: ...
+  )
+)
+```
+
+### ❌ WRONG Pattern - Separate Queries or Local Variables
+
+**DON'T DO THIS:**
+```sail
+/* ❌ WRONG - Querying related data separately */
+local!caseComments: a!queryRecordType(
+  recordType: 'recordType!Comment',
+  filters: a!queryFilter(
+    field: 'recordType!Comment.fields.caseId',
+    operator: "=",
+    value: ri!case['recordType!Case.fields.caseId']
+  )
+).data,
+
+/* ❌ WRONG - Managing in local variable */
+a!forEach(
+  items: local!caseComments,  /* Don't use local variables! */
+  expression: ...
+)
+
+/* ❌ WRONG - Copying relationship to local variable */
+local!comments: ri!case['recordType!Case.relationships.caseComment']
+/* This creates a COPY - changes won't save to the relationship */
+```
+
+### Why This Pattern Is Mandatory:
+1. **Automatic persistence**: Changes to relationship fields auto-save
+2. **Correct foreign keys**: Appian manages the parent-child links
+3. **Single source of truth**: No sync issues between copies
+4. **Simpler code**: No manual save logic needed
+
+### Pattern Summary Table:
+
+| Action | Use This Pattern |
+|--------|------------------|
+| **Display** | `a!forEach(items: ri!case['...relationships.caseComment'], ...)` |
+| **Add** | `append(ri!case['...relationships.caseComment'], 'recordType!Comment'(...))` |
+| **Remove** | `remove(ri!case['...relationships.caseComment'], fv!index)` |
+| **Edit** | `fv!item['recordType!Comment.fields.description']` (in forEach) |
+| **Count** | `length(ri!case['...relationships.caseComment'])` |
+| **Check if empty** | `a!isNullOrEmpty(ri!case['...relationships.caseComment'])` |
 </one_to_many_relationship_management>
 
 <related_record_field_references>
@@ -1755,6 +2136,162 @@ a!gridColumn(
 - The relationship may provide access to additional User record properties, but for standard use cases (displaying names, filtering by user, etc.), always use the field
 </why_both_exist>
 </user_field_vs_relationship>
+
+<related_record_access_in_forms>
+## 🚨 CRITICAL: Accessing Related Record Data in Forms
+
+**When building forms, use a SINGLE rule input for the main record and access ALL related data through relationships.**
+
+### ✅ CORRECT Pattern - Single Rule Input with Relationship Navigation
+
+**Form interface signature:**
+```sail
+/* ✅ CORRECT - Single rule input for main record */
+/* Rule Inputs:
+ *   ri!case (Case) - The case record being edited
+ */
+```
+
+**Accessing many-to-one relationships (parent/related records):**
+```sail
+/* Access customer name through Case → Customer relationship */
+a!textField(
+  label: "Customer Name",
+  value: ri!case['recordType!Case.relationships.refCustomer.fields.customerName'],
+  saveInto: ri!case['recordType!Case.relationships.refCustomer.fields.customerName']
+)
+
+/* Access customer email through same relationship */
+a!textField(
+  label: "Customer Email",
+  value: ri!case['recordType!Case.relationships.refCustomer.fields.email'],
+  saveInto: ri!case['recordType!Case.relationships.refCustomer.fields.email']
+)
+
+/* Access customer phone through same relationship */
+a!textField(
+  label: "Customer Phone",
+  value: ri!case['recordType!Case.relationships.refCustomer.fields.phone'],
+  saveInto: ri!case['recordType!Case.relationships.refCustomer.fields.phone']
+)
+```
+
+**Accessing one-to-many relationships (child records):**
+```sail
+/* Display case comments through Case → Comment relationship */
+a!forEach(
+  items: ri!case['recordType!Case.relationships.caseComment'],
+  expression: a!cardLayout(
+    contents: {
+      a!paragraphField(
+        label: "Comment " & fv!index,
+        value: fv!item['recordType!Comment.fields.description'],
+        saveInto: fv!item['recordType!Comment.fields.description']
+      )
+    }
+  )
+)
+```
+
+### ❌ WRONG Pattern - Multiple Rule Inputs for Related Records
+
+**DON'T DO THIS:**
+```sail
+/* ❌ WRONG - Separate rule inputs for related records */
+/* Rule Inputs:
+ *   ri!case (Case) - The case record
+ *   ri!customer (Customer) - The related customer  /* DON'T DO THIS */
+ */
+
+/* ❌ WRONG - Accessing customer fields from separate rule input */
+a!textField(
+  label: "Customer Name",
+  value: ri!customer['recordType!Customer.fields.customerName'],  /* WRONG */
+  saveInto: ri!customer['recordType!Customer.fields.customerName']
+)
+```
+
+### When to Use This Pattern:
+
+| Relationship Type | Example | Use This Pattern |
+|-------------------|---------|------------------|
+| **Many-to-one (parent)** | Case → Customer | `ri!case['...relationships.refCustomer.fields.customerName']` |
+| **Many-to-one (reference)** | Case → Status | `ri!case['...relationships.refCaseStatus.fields.statusName']` |
+| **One-to-many (children)** | Case → Comments | `ri!case['...relationships.caseComment']` (see one-to-many section) |
+| **One-to-one** | Case → Details | `ri!case['...relationships.caseDetails.fields.description']` |
+
+### Why This Pattern Is Mandatory:
+
+1. **Maintains data integrity**: Single rule input ensures all changes are coordinated
+2. **Simpler interface signature**: Only one parameter instead of many
+3. **Correct foreign key handling**: Appian manages the relationships automatically
+4. **Easier to call**: Invoking interface only requires passing the main record
+5. **Prevents orphaned data**: Related records stay properly linked to parent
+
+### Pattern for Review Sections:
+
+When displaying read-only data for review, use the same relationship navigation pattern:
+
+```sail
+/* ✅ CORRECT - Review section accessing multiple relationships */
+a!sectionLayout(
+  label: "Case Summary",
+  contents: {
+    a!columnsLayout(
+      columns: {
+        a!columnLayout(
+          contents: {
+            a!richTextDisplayField(
+              labelPosition: "COLLAPSED",
+              value: {
+                a!richTextItem(text: "Customer: ", style: "STRONG"),
+                a!richTextItem(
+                  text: ri!case['recordType!Case.relationships.refCustomer.fields.customerName']
+                )
+              }
+            ),
+            a!richTextDisplayField(
+              labelPosition: "COLLAPSED",
+              value: {
+                a!richTextItem(text: "Status: ", style: "STRONG"),
+                a!richTextItem(
+                  text: ri!case['recordType!Case.relationships.refCaseStatus.fields.statusName']
+                )
+              }
+            )
+          }
+        ),
+        a!columnLayout(
+          contents: {
+            a!richTextDisplayField(
+              labelPosition: "COLLAPSED",
+              value: {
+                a!richTextItem(text: "Priority: ", style: "STRONG"),
+                a!richTextItem(
+                  text: ri!case['recordType!Case.relationships.refPriority.fields.priorityName']
+                )
+              }
+            ),
+            a!richTextDisplayField(
+              labelPosition: "COLLAPSED",
+              value: {
+                a!richTextItem(text: "Total Comments: ", style: "STRONG"),
+                a!richTextItem(
+                  text: length(ri!case['recordType!Case.relationships.caseComment'])
+                )
+              }
+            )
+          }
+        )
+      }
+    )
+  }
+)
+```
+
+### Key Principle:
+**One record type is the "owner" of the form → Make it the rule input → Access everything else through relationships**
+</related_record_access_in_forms>
 
 <date_time_critical_rules>
 ## Date/Time Critical Rules
@@ -2416,6 +2953,22 @@ Array Function Validation:
 - [ ] **Date/DateTime fields use FIELD references (createdOn, modifiedOn) NOT relationship references**
 - [ ] **Scalar fields (Text, Number, Boolean) use FIELD references, NOT relationships**
 </relationship_navigation_validation>
+
+<form_data_pattern_validation>
+🚨 CRITICAL: Form Data Pattern Validation
+- [ ] **Form interfaces use SINGLE rule input for main record (e.g., ri!case), not multiple inputs for related records**
+- [ ] **All related record data accessed through relationships from main rule input**
+- [ ] **Many-to-one relationships accessed via: `ri!mainRecord['...relationships.relatedRecord.fields.fieldName']`**
+- [ ] **One-to-many relationships accessed directly: `ri!mainRecord['...relationships.childRecords']` (no local variables)**
+- [ ] **No separate queries for related data that exists as relationships**
+- [ ] **No local variables copying relationship data (changes won't save)**
+- [ ] **Non-existent constants/process models use `null` with TODO comments, not assumed names**
+- [ ] **Only use fields that exist in the data model (check context/data-model-context.md)**
+- [ ] **No invented field names (e.g., "legalName" when only firstName/lastName exist)**
+- [ ] **One-to-many add operations use: `append(ri!record['...relationships.children'], cast(...))`**
+- [ ] **One-to-many remove operations use: `remove(ri!record['...relationships.children'], fv!index)`**
+- [ ] **One-to-many edit operations use: `fv!item['recordType!Child.fields.fieldName']` in a!forEach**
+</form_data_pattern_validation>
 
 <dropdown_record_data_validation>
 Dropdown & Record Data Validation:
