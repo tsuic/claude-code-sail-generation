@@ -679,6 +679,126 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 </null_rejecting_functions>
 </functions_that_reject_null>
 
+<query_filters_with_rule_inputs>
+## 🚨 CRITICAL: Protecting Query Filters That Use Rule Inputs
+
+**Rule inputs can be null in CREATE scenarios or when related data doesn't exist yet. Query filters that use rule input values MUST use `applyWhen` to prevent runtime errors.**
+
+<when_ri_values_are_null>
+**When Rule Input Values Can Be Null:**
+
+1. **CREATE Scenarios**: `ri!record` is null when creating a new record
+2. **Related Record Filtering**: Parent record's ID field may not exist yet
+3. **Optional Relationships**: Related records might not be populated
+4. **Conditional Data**: Fields that are only populated under certain conditions
+
+**The Problem**: Query filters with null values can cause runtime errors. Using `applyWhen` conditionally applies the filter only when the value exists.
+</when_ri_values_are_null>
+
+<applywhen_pattern>
+**Required Pattern for Filters Using Rule Inputs:**
+
+```sail
+/* ✅ CORRECT - Use applyWhen to protect against null rule input values */
+a!queryFilter(
+  field: 'recordType!ChildRecord.fields.parentId',
+  operator: "=",
+  value: ri!parentRecord['recordType!ParentRecord.fields.id'],
+  applyWhen: a!isNotNullOrEmpty(ri!parentRecord['recordType!ParentRecord.fields.id'])
+)
+
+/* ❌ WRONG - No applyWhen protection, will fail if ri!parentRecord is null or ID doesn't exist */
+a!queryFilter(
+  field: 'recordType!ChildRecord.fields.parentId',
+  operator: "=",
+  value: ri!parentRecord['recordType!ParentRecord.fields.id']
+)
+```
+
+**Key Rule**: Any query filter whose `value` parameter comes from a rule input (ri!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`.
+</applywhen_pattern>
+
+<common_scenarios>
+**Common Scenarios Requiring applyWhen:**
+
+**Scenario 1: Filtering Related Records in a Grid**
+```sail
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!SupportingDocument',
+    filters: a!queryFilter(
+      field: 'recordType!SupportingDocument.fields.applicationId',
+      operator: "=",
+      value: ri!application['recordType!Application.fields.applicationId'],
+      applyWhen: a!isNotNullOrEmpty(ri!application['recordType!Application.fields.applicationId'])
+    )
+  ),
+  /* ... */
+)
+```
+
+**Scenario 2: Querying Child Records Based on Parent**
+```sail
+local!childRecords: a!queryRecordType(
+  recordType: 'recordType!Comment',
+  filters: a!queryFilter(
+    field: 'recordType!Comment.fields.taskId',
+    operator: "=",
+    value: ri!task['recordType!Task.fields.taskId'],
+    applyWhen: a!isNotNullOrEmpty(ri!task['recordType!Task.fields.taskId'])
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: -1)
+).data
+```
+
+**Scenario 3: Multiple Filters with Rule Inputs**
+```sail
+a!queryRecordType(
+  recordType: 'recordType!Document',
+  filters: a!queryLogicalExpression(
+    operator: "AND",
+    filters: {
+      a!queryFilter(
+        field: 'recordType!Document.fields.caseId',
+        operator: "=",
+        value: ri!case['recordType!Case.fields.caseId'],
+        applyWhen: a!isNotNullOrEmpty(ri!case['recordType!Case.fields.caseId'])
+      ),
+      a!queryFilter(
+        field: 'recordType!Document.fields.status',
+        operator: "=",
+        value: "Active"
+        /* No applyWhen needed - literal values are never null */
+      )
+    }
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: -1)
+)
+```
+</common_scenarios>
+
+<applywhen_checklist>
+**✅ CHECKPOINT: Before Finalizing Query Filters**
+
+For every `a!queryFilter()` in your code, verify:
+- [ ] Does the `value` parameter use a rule input (ri!)?
+- [ ] If yes, have I added `applyWhen: a!isNotNullOrEmpty(value)`?
+- [ ] Have I tested the interface in CREATE mode where ri! might be null?
+- [ ] Are literal values (like "Active", 5, true) used without applyWhen? (correct - they're never null)
+</applywhen_checklist>
+
+<why_this_matters>
+**Why This Matters:**
+
+- **CREATE Forms**: When creating new records, `ri!record` is null and has no ID yet
+- **Runtime Safety**: Queries with null filter values can fail or return unexpected results
+- **User Experience**: Prevents interface errors when users create new records or when related data is missing
+- **Best Practice**: Using `applyWhen` is the standard Appian pattern for conditional filtering
+
+**Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen`.
+</why_this_matters>
+</query_filters_with_rule_inputs>
+
 <complex_scenario_handling>
 ## 🔥 Complex Scenario Handling
 
