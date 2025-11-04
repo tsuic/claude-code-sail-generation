@@ -19,37 +19,64 @@
 If you violate any of these rules, STOP and reconsider your approach.
 
 ## 📚 DOCUMENTATION REQUIREMENT
-**ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.**
-1. Find: Glob for `*-<component-name>-instructions.md`
-2. Read: Full file, especially templates and validation sections
-3. Follow: Use exact templates, check validation lists
-4. Never assume - only use documented parameters/values
-5. When in doubt, re-read the documentation
 
-### Key Files Available:
-- `0-sail-component-reference.md` - Overview of all UI components and parameters
-- `1-expression-grammar-instructions.md` - Explains expression grammar for calculation, logic, conversion etc. functions (✅ ALWAYS check this for existence and signatures of functions)
+**ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
+
+**Two-tier documentation structure:**
+1. **Component Reference** - `0-sail-component-reference.md` contains ALL SAIL components with their parameters and valid values
+2. **Detailed Instructions** - Select components have dedicated instruction files (listed below)
+
+### Available Documentation Files:
+
+**Core Reference (use for ALL components):**
+- `0-sail-component-reference.md` - Complete parameter reference for all SAIL components
+
+**Expression Grammar & Variables:**
+- `1-expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
+- `2-local-variables-instructions.md` - Local variable usage and patterns
+
+**Layout Components (3-*):**
 - `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
 - `3-columns-layout-instructions.md` - ColumnsLayout guidelines
 - `3-sidebyside-layout-instructions.md` - SideBySideLayout guidelines
+- `3-form-layout-instructions.md` - FormLayout guidelines
+- `3-pane-layout-instructions.md` - PaneLayout guidelines
+- `3-wizard-layout-instructions.md` - WizardLayout guidelines
+
+**Display Components (4-*):**
 - `4-card-layout-instructions.md` - CardLayout guidelines
 - `4-grid-field-instructions.md` - GridField (read-only grid) guidelines
 - `4-grid-layout-instructions.md` - GridLayout (editable grid) guidelines
 - `4-rich-text-instructions.md` - Rich Text component guidelines
 - `4-stamp-field-instructions.md` - Stamp Field guidelines
-- And many more...
+- `4-card-choice-field-instructions.md` - Card Choice Field guidelines
+- `4-chart-instructions.md` - Chart component guidelines
+- `4-image-field-instructions.md` - Image Field guidelines
+- `4-tabular-data-display-pattern.md` - Custom tabular display pattern
+
+**Icons:**
+- `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon
+
+**All other components** (textField, dropdownField, buttonWidget, etc.) are documented in `0-sail-component-reference.md` only.
+
+### Documentation Lookup Process:
+
+1. **Check if a dedicated instruction file exists** for the component (see list above)
+   - If YES → Read the dedicated file for templates, patterns, and detailed rules
+   - If NO → Use `0-sail-component-reference.md` for parameters and values
+
+2. **For unfamiliar components** - Read the component entry in `0-sail-component-reference.md` first to understand basic parameters
 
 ### ❌ NEVER:
-- Assume you know how a component works without reading the docs
-- Use parameters that aren't explicitly documented
-- Put components in parameters that don't accept them
+- Use parameters that aren't explicitly documented in either the reference or instruction files
+- Put components in layouts that don't accept them
 - Skip reading documentation because "it seems straightforward"
 
 ### ✅ ALWAYS:
-- Read first, code second
-- Follow templates exactly
+- Start with `0-sail-component-reference.md` for parameter validation
+- Read dedicated instruction files when available for templates and patterns
+- Follow templates exactly from instruction files
 - Verify against validation checklists
-- Reference documentation while writing
 
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
