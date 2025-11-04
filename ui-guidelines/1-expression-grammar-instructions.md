@@ -39,7 +39,7 @@ Use double quotes (`""`) to escape quotes, not backslash (`\"`)
 
 ### Comparison Rules
 - Text comparisons using `=` are case-insensitive
-- Use `isnull()` for null checking instead of `= null`
+- Use `a!isNullOrEmpty()` for null checking instead of `= null`
 - Comparisons should be between the same type (no automatic casting)
 - Arithmetic works on numbers and arrays: `{1,10}+3` returns `{4,13}`
 
@@ -326,7 +326,7 @@ a!map(
 ### ❌ Common Mistakes to Avoid
 - JavaScript-style operators (`&&`, `||`, `!`)
 - Empty parameters between commas in function calls
-- Using `=` for null checking (use `isnull()`)
+- Using `=` for null checking (use `a!isNullOrEmpty()`)
 - Trying to use `and`/`or` as operators
 - Backslash escaping in strings
 - 0-based array indexing

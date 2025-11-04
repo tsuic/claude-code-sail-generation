@@ -313,7 +313,7 @@ showWhen: local!selectedId = fv!item.id
 
 ✅ GOOD:
 showWhen: and(
-  not(isnull(local!selectedId)),
+  a!isNotNullOrEmpty(local!selectedId),
   local!selectedId = fv!item.id
 )
 ```
@@ -327,7 +327,7 @@ showWhen: and(
 **Validation Process:**
 1. Find all comparison operators: `=`, `<>`, `>`, `<`, `>=`, `<=`
 2. Identify if either operand could be null
-3. Check if null check exists: `not(isnull(variable))`
+3. Check if null check exists: `a!isNotNullOrEmpty(variable)`
 4. Flag missing null checks
 
 ---
@@ -341,6 +341,7 @@ showWhen: and(
 - `fixed()` - Cannot format null numbers
 - `upper()`, `lower()`, `proper()` - Cannot transform null text
 - `len()` - Cannot get length of null
+- `length()` - Cannot get length of null array
 - Mathematical operators (`+`, `-`, `*`, `/`) with null operands
 
 **High-Risk Contexts:**
@@ -354,7 +355,7 @@ showWhen: and(
 ```
 ✅ PATTERN 1: if() with null check
 value: if(
-  isnull(fv!row.dateField),
+  a!isNullOrEmpty(fv!row.dateField),
   "No date",
   text(fv!row.dateField, "MMM d, yyyy")
 )
@@ -380,7 +381,7 @@ value: text(fv!row.dateField, "MMM d, yyyy")
    - Related field → Check if null handling exists
    - Local variable that starts null → Check if null handling exists
 4. Verify one of these patterns is used:
-   - `if(isnull(value), default, operation(value))`
+   - `if(a!isNullOrEmpty(value), default, operation(value))`
    - `operation(a!defaultValue(value, default))`
 
 **Example Error Report:**
@@ -411,7 +412,7 @@ Runtime error: "A null parameter has been passed as parameter 1"
 ```
 a!richTextItem(
   text: if(
-    isnull(fv!row['recordType!{...}SCMA Case.fields.{...}createdOn']),
+    a!isNullOrEmpty(fv!row['recordType!{...}SCMA Case.fields.{...}createdOn']),
     "N/A",
     text(
       fv!row['recordType!{...}SCMA Case.fields.{...}createdOn'],
@@ -628,7 +629,7 @@ Runtime error when selectedId is null (initial state or after clearing)
 ```
 a!cardLayout(
   showWhen: and(
-    not(isnull(local!selectedId)),
+    a!isNotNullOrEmpty(local!selectedId),
     local!selectedId = fv!item.id
   )
 )

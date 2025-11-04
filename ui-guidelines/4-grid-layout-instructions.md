@@ -251,7 +251,7 @@ a!forEach(
         saveInto: fv!item.email,
         labelPosition: "COLLAPSED",
         validations: if(
-          isnull(fv!item.email),
+          a!isNullOrEmpty(fv!item.email),
           {},
           if(
             not(regexmatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", fv!item.email)),
@@ -332,7 +332,7 @@ a!forEach(
         labelPosition: "COLLAPSED",
         validations: if(
           or(
-            isnull(fv!item.quantity),
+            a!isNullOrEmpty(fv!item.quantity),
             fv!item.quantity < 1
           ),
           "Quantity must be at least 1",
@@ -573,7 +573,7 @@ a!textField(
   labelPosition: "COLLAPSED",
   validations: if(
     and(
-      not(isnull(fv!item.email)),
+      a!isNotNullOrEmpty(fv!item.email),
       not(regexmatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", fv!item.email))
     ),
     "Please enter a valid email address",
@@ -678,7 +678,7 @@ a!localVariables(
             labelPosition: "COLLAPSED",
             validations: if(
               and(
-                not(isnull(fv!item.dueDate)),
+                a!isNotNullOrEmpty(fv!item.dueDate),
                 fv!item.dueDate < today()
               ),
               "Due date cannot be in the past",
@@ -796,7 +796,7 @@ a!localVariables(
             required: true,
             validations: if(
               or(
-                isnull(fv!item.quantity),
+                a!isNullOrEmpty(fv!item.quantity),
                 fv!item.quantity < 1
               ),
               "Quantity must be at least 1",

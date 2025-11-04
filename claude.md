@@ -7,7 +7,7 @@
 - Use modern, but business-appropriate styling
 - Don't worry about making it functional, just hard-code sample content
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation (in the /ui-guidelines folder)!
+- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation!
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -169,7 +169,6 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `tabs.md` for tab bars
 
 ### Special Rules
-- Avoid using the KPIField unless data can be sourced dynamically from a record. The KPIField doesn't work well for static mockup KPI values.
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
 - When not setting a label on a component, explicitly set labelPosition to “COLLAPSED” so that space is not reserved for the label (for more reliable alignment)
 
@@ -184,26 +183,39 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - Use /* */ for comments, not //
 - Use "" to escape a double quote, not \"
 - Choice values cannot be null or empty strings (use " " if necessary)
-- **Always check for null before comparing values** - SAIL cannot compare null to numbers/text
+- **Always check for null/empty before comparing values** - SAIL cannot compare null to numbers/text
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
-     - **RIGHT:** `showWhen: and(not(isnull(local!selectedId)), local!selectedId = fv!item.id)`
+     - **RIGHT:** `showWhen: and(a!isNotNullOrEmpty(local!selectedId), local!selectedId = fv!item.id)`
      - Common scenarios: selection states, conditional visibility, dynamic styling
      - Any local variable that starts as null and gets populated later needs null checking
 
 ### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
 
-Many SAIL functions cannot accept null parameters and will cause runtime errors. Always check for null before passing values to these functions:
+Many SAIL functions cannot accept null parameters and will cause runtime errors. *ALWAYS* check for null/empty local variables (`local!`) and rule inputs (`ri!`) before passing to to these functions.
+
+✅ Use `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, or `a!defaultValue` to prevent errors
+
+❌ WRONG: 
+showWhen: length(local!selectedCourses) /* Fails if local!selectedCourses is null */
+
+✅ RIGHT:
+if(a!isNotNullOrEmpty(local!selectedCourses),
+  toboolean(length(local!selectedCourses)),
+  false()
+)  
 
 #### Functions That Cannot Accept Null:
 
-**text() function:**
+**String functions:**
+`text`, `len`, `concat`, etc. require null checks
+
 ```sail
 ❌ WRONG:
 text(fv!row.createdDate, "MMM d, yyyy")  /* Fails if createdDate is null */
 
 ✅ RIGHT - Option 1 (if statement):
 if(
-  isnull(fv!row.createdDate),
+  a!isNullOrEmpty(fv!row.createdDate),
   "N/A",
   text(fv!row.createdDate, "MMM d, yyyy")
 )
@@ -223,6 +235,9 @@ text: "CASE-" & fv!row.caseId  /* Fails if caseId is null */
 ✅ RIGHT:
 text: "CASE-" & a!defaultValue(fv!row.caseId, "")
 ```
+
+**Array functions:**
+`length`, `append`, etc. require null checks
 
 **Common scenarios requiring null checks:**
 - ✅ **Record fields from database** - Can be null if not required or not populated
@@ -369,9 +384,9 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons - use `and(not(isnull(variable)), variable = value)` ‼️
-- [ ] Null checks before text() formatting - use `if(isnull(value), "N/A", text(value, format))` ‼️
-- [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `isnull()` ‼️
+- [ ] Null checks before comparisons - use `and(isNotNullOrEmpty(local!variable), local!variable = value)` ‼️
+- [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
+- [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️

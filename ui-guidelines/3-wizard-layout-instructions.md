@@ -361,7 +361,7 @@ a!wizardStep(
   /* Disable Next button conditionally */
   disableNextButton: and(
     fv!activeStepIndex = 1,
-    isnull(local!requiredField)
+    a!isNullOrEmpty(local!requiredField)
   )
 )
 ```
@@ -502,8 +502,8 @@ a!wizardStep(
     )
   },
   disableNextButton: or(              /* ✅ Clear disable logic */
-    isnull(local!name),
-    isnull(local!email)
+    a!isNullOrEmpty(local!name),
+    a!isNullOrEmpty(local!email)
   )
 )
 ```
@@ -569,7 +569,7 @@ a!wizardLayout(
 ```sail
 a!wizardStep(
   label: "Account Type",
-  disableNextButton: isnull(local!accountType),
+  disableNextButton: a!isNullOrEmpty(local!accountType),
   contents: {
     a!radioButtonField(
       label: "Select account type:",

@@ -135,7 +135,7 @@ disableNextButton: or(
   length(local!selectedCourses) = 0,
   a!forEach(
     items: local!selectedCourses,
-    expression: isnull(index(local!availableCourses, fv!item, a!map()).startDate)
+    expression: a!isNullOrEmpty(index(local!availableCourses, fv!item, a!map()).startDate)
   )
 )
 ```
