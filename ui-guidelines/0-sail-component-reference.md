@@ -12,7 +12,7 @@
 - **Text Input**: `a!textField`, `a!paragraphField`, `a!encryptedTextField`, `a!styledTextEditorField`
 - **Numbers**: `a!integerField`, `a!floatingPointField`
 - **Dates & Time**: `a!dateField`, `a!dateTimeField`, `a!timeField`
-- **Selections**: `a!dropdownField`, `a!radioButtonField`, `a!checkboxField`, `a!cardChoiceField`, `a!checkboxFieldBoolean`
+- **Selections**: `a!dropdownField`, `a!radioButtonField`, `a!checkboxField`, `a!cardChoiceField`
 - **Files**: `a!fileUploadField`, `a!signatureField`, `a!barcodeField`
 - **Picker Components**: `a!pickerFieldUsers`, `a!pickerFieldGroups`, `a!pickerFieldUsersAndGroups`
 
@@ -562,16 +562,6 @@
 | Parameter | Type | Default | Description |
 |:---|:---|:---|:---|
 | `value` | Time | - | Display value |
-
-### a!checkboxFieldBoolean
-**Purpose**: Single selection checkbox for boolean values
-
-**Inherits**: Labeling, Validation, Visibility, Vertical Margins, Accessibility
-
-| Parameter | Type | Default | Description |
-|:---|:---|:---|:---|
-| `label` | Text | - | Label for the checkbox |
-| `value` | Boolean | - | Selected value |
 
 ### a!barcodeField
 **Purpose**: Displays and allows entry of a barcode value

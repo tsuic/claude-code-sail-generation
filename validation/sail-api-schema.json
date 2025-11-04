@@ -474,25 +474,6 @@
         "accessibilityText": { "type": "Text", "required": false }
       }
     },
-    "a!checkboxFieldBoolean": {
-      "category": "input",
-      "inherits": ["labeling", "validation", "visibility", "margins", "accessibility"],
-      "parameters": {
-        "label": { "type": "Text", "required": false },
-        "value": { "type": "Boolean", "required": false },
-        "instructions": { "type": "Text", "required": false },
-        "labelPosition": { "type": "Text", "required": false, "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"] },
-        "helpTooltip": { "type": "Text", "required": false },
-        "required": { "type": "Boolean", "required": false },
-        "requiredMessage": { "type": "Text", "required": false },
-        "validations": { "type": "List of Text", "required": false },
-        "validationGroup": { "type": "Text", "required": false },
-        "showWhen": { "type": "Boolean", "required": false },
-        "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
-        "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
-        "accessibilityText": { "type": "Text", "required": false }
-      }
-    },
     "a!barcodeField": {
       "category": "input",
       "inherits": ["labeling", "validation", "interaction", "visibility", "margins", "accessibility"],
