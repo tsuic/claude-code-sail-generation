@@ -268,6 +268,54 @@ local!firstSelected: index(local!selectedRows, 1, null)
 - Use `index(local!selectedRows, 1, null)` to get the first selected item
 - Check length before accessing: `if(length(local!selectedRows) > 0, ...)`
 
+## ⚠️ GRID SELECTION BEHAVIOR - CRITICAL RULE
+
+### selectionValue Contains Identifiers, NOT Full Objects
+
+**MOST COMMON MISTAKE**: Assuming `selectionValue` contains full row data
+
+```sail
+❌ WRONG:
+a!gridField(
+  data: local!courses,
+  selectable: true,
+  selectionValue: local!selectedCourses,
+  selectionSaveInto: local!selectedCourses
+)
+
+/* Later... */
+a!forEach(
+  items: local!selectedCourses,  /* This is selectionValue from a grid */
+  expression: fv!item.name        /* ❌ ERROR: fv!item is an integer, not an object! */
+)
+
+✅ RIGHT:
+a!forEach(
+  items: local!selectedCourses,
+  expression: a!localVariables(
+    local!course: index(local!courses, fv!item, a!map()),  /* Look up full object */
+    local!course.name  /* ✅ Now we can access properties */
+  )
+)
+```
+
+**Error you'll see if you get this wrong:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'name' of type Text into type Number (Integer)
+```
+
+### Rule Summary
+- Grid `selectionValue` contains **identifiers** (integers for static data, record IDs for records)
+- `selectionValue` does NOT contain full row objects with properties
+- Use `index(dataArray, identifier, defaultValue)` to retrieve full objects
+- Always check: "Am I iterating over a selectionValue? Then I need index()!"
+
+### Quick Decision Tree
+Before writing code with grid selections:
+1. "Is this variable from a grid's selectionValue?" → YES = need index() lookup
+2. "Am I accessing properties on fv!item?" → Must verify fv!item is an object, not an ID
+3. "Did I use index() to look up the full object first?" → If NO, you'll get a runtime error
+
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
 ### Always Cast Date Arithmetic with todate()
@@ -354,7 +402,13 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
 - [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
 - [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
-- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️ 
+- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️
+
+### Grid Selection Validation:
+- [ ] ✅ All grid `selectionValue` iterations use `index()` to look up full objects ‼️
+- [ ] ❌ NEVER access properties directly on selection items (e.g., `fv!item.property`) ‼️
+- [ ] ✅ Pattern: `index(dataArray, fv!item, a!map()).property` for accessing fields ‼️
+- [ ] ✅ Ask: "Is this from selectionValue? Then I MUST use index() first!" ‼️
 
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!

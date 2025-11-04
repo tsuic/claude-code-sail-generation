@@ -299,15 +299,19 @@ if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–"
 <error_9>
 **Error 9: Using .totalCount for KPI Metrics**
 - **Problem**: `local!caseCount: a!queryRecordType(..., fetchTotalCount: true).totalCount`
-- **Solution**: Use aggregations for ALL KPIs
+- **Solution**: Use aggregations for ALL KPIs with correct data extraction pattern
 ```sail
 local!caseCountQuery: a!queryRecordType(
   fields: a!aggregationFields(
-    groupings: {},
+    groupings: {},  /* No groupings = single row result */
     measures: {a!measure(function: "COUNT", field: recordType!Case.fields.id, alias: "count")}
   )
 ),
-local!caseCount: index(local!caseCountQuery.data, 1, {}).count
+/* For aggregations with NO groupings, use direct property access */
+local!caseCount: a!defaultValue(
+  local!caseCountQuery.data.count,  /* Direct access, not index() */
+  0
+)
 ```
 </error_9>
 
@@ -337,6 +341,42 @@ icon: index(
 )
 ```
 </error_10>
+
+<error_11>
+**Error 11: Incorrect Query Data Extraction Pattern**
+- **Problem 1**: Using array indexing on aggregations with no groupings
+- **Solution 1**: Use direct property access for aggregations with `groupings: {}`
+```sail
+/* ❌ WRONG - Over-complicated for aggregations with no groupings */
+local!kpiQuery: a!queryRecordType(
+  fields: a!aggregationFields(groupings: {}, measures: {a!measure(...)})
+),
+local!value: index(index(local!kpiQuery.data, 1, {}).alias, 1, null)
+
+/* ✅ RIGHT - Direct property access */
+local!value: a!defaultValue(local!kpiQuery.data.alias, 0)
+```
+
+- **Problem 2**: Missing array indexing on regular field queries
+- **Solution 2**: Use `[1]` to access first row of regular query results
+```sail
+/* ❌ WRONG - Missing array index for regular query */
+local!userQuery: a!queryRecordType(
+  fields: {recordType!User.fields.name}
+).data,
+local!name: local!userQuery['recordType!User.fields.name']  /* ERROR */
+
+/* ✅ RIGHT - Index into first row */
+local!name: a!defaultValue(
+  local!userQuery[1]['recordType!User.fields.name'],
+  ""
+)
+```
+
+**Key Rule**:
+- Aggregations with `groupings: {}` → Direct access: `query.data.alias`
+- Regular queries with `fields: {...}` → Array indexing: `query[1]['field']`
+</error_11>
 </common_critical_errors>
 
 <mandatory_null_safety>
@@ -620,7 +660,11 @@ local!caseCountQuery: a!queryRecordType(
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
   fetchTotalCount: true
 ),
-local!totalCases: index(local!caseCountQuery.data, 1, {}).case_count
+/* For aggregation queries with NO groupings, access field directly */
+local!totalCases: a!defaultValue(
+  local!caseCountQuery.data.case_count,
+  0
+)
 
 /* ✅ CORRECT - Aggregation for filtered KPI counts */
 local!openCasesQuery: a!queryRecordType(
@@ -643,7 +687,11 @@ local!openCasesQuery: a!queryRecordType(
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
   fetchTotalCount: true
 ),
-local!openCases: index(local!openCasesQuery.data, 1, {}).open_count
+/* For aggregation queries with NO groupings, access field directly */
+local!openCases: a!defaultValue(
+  local!openCasesQuery.data.open_count,
+  0
+)
 
 /* ✅ CORRECT - Aggregation for SUM */
 local!revenueSumQuery: a!queryRecordType(
@@ -661,7 +709,11 @@ local!revenueSumQuery: a!queryRecordType(
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
   fetchTotalCount: true
 ),
-local!totalRevenue: index(local!revenueSumQuery.data, 1, {}).total_revenue
+/* For aggregation queries with NO groupings, access field directly */
+local!totalRevenue: a!defaultValue(
+  local!revenueSumQuery.data.total_revenue,
+  0
+)
 
 /* ✅ CORRECT - Aggregation for AVERAGE */
 local!avgOrderQuery: a!queryRecordType(
@@ -679,7 +731,11 @@ local!avgOrderQuery: a!queryRecordType(
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
   fetchTotalCount: true
 ),
-local!avgOrderValue: index(local!avgOrderQuery.data, 1, {}).avg_order
+/* For aggregation queries with NO groupings, access field directly */
+local!avgOrderValue: a!defaultValue(
+  local!avgOrderQuery.data.avg_order,
+  0
+)
 
 /* ❌ WRONG - Using .totalCount for KPIs */
 local!caseQuery: a!queryRecordType(
@@ -709,6 +765,152 @@ local!totalCases: local!caseQuery.totalCount  /* AVOID - Use aggregation instead
 
 **MANDATORY: ALWAYS use `a!aggregationFields()` for dashboard KPIs, metrics, and statistics. Only use `.totalCount` for pagination display or simple conditional checks.**
 </kpi_aggregation_pattern>
+
+<query_data_extraction_patterns>
+🚨 CRITICAL: Query Data Extraction Patterns
+
+**IMPORTANT: Different query types require different data extraction patterns.**
+
+<aggregation_query_extraction>
+**Pattern 1: Aggregation Queries with NO Groupings**
+
+When using `a!aggregationFields()` with `groupings: {}` (no groupings), the query returns a SINGLE ROW with aggregated values. Access fields directly from `.data` property:
+
+```sail
+/* ✅ CORRECT - Direct property access for aggregations with no groupings */
+local!totalAppsQuery: a!queryRecordType(
+  recordType: recordType!Application,
+  fields: a!aggregationFields(
+    groupings: {},  /* NO groupings */
+    measures: {
+      a!measure(
+        function: "COUNT",
+        field: recordType!Application.fields.id,
+        alias: "total_count"
+      )
+    }
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
+  fetchTotalCount: true
+),
+local!totalApplications: a!defaultValue(
+  local!totalAppsQuery.data.total_count,  /* Direct property access */
+  0
+),
+
+/* ❌ WRONG - Unnecessary array indexing */
+local!totalApplications: a!defaultValue(
+  index(index(local!totalAppsQuery.data, 1, {}).total_count, 1, null),  /* Too complex! */
+  0
+)
+```
+</aggregation_query_extraction>
+
+<regular_query_extraction>
+**Pattern 2: Regular Queries Returning Rows**
+
+When using `fields: { ... }` (field list) instead of aggregations, the query returns an ARRAY of rows. You must index into the array to access individual rows:
+
+```sail
+/* ✅ CORRECT - Array indexing for regular queries */
+local!currentApplicant: a!queryRecordType(
+  recordType: recordType!Applicant,
+  filters: a!queryFilter(
+    field: recordType!Applicant.fields.userId,
+    operator: "=",
+    value: loggedInUser()
+  ),
+  fields: {
+    recordType!Applicant.fields.applicantId,
+    recordType!Applicant.fields.firstName,
+    recordType!Applicant.fields.lastName
+  },
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
+  fetchTotalCount: true
+).data,
+
+/* Extract from FIRST row using array index [1] */
+local!applicantId: a!defaultValue(
+  local!currentApplicant[1]['recordType!Applicant.fields.applicantId'],  /* Index into first row */
+  null
+),
+local!firstName: a!defaultValue(
+  local!currentApplicant[1]['recordType!Applicant.fields.firstName'],  /* Index into first row */
+  ""
+),
+
+/* ❌ WRONG - Trying to access property directly without array indexing */
+local!applicantId: a!defaultValue(
+  local!currentApplicant['recordType!Applicant.fields.applicantId'],  /* ERROR - Missing [1] */
+  null
+)
+```
+</regular_query_extraction>
+
+<pattern_decision_guide>
+**How to Decide Which Pattern to Use:**
+
+| Query Type | When to Use | Data Extraction Pattern | Example |
+|------------|-------------|------------------------|---------|
+| **Aggregation (no groupings)** | KPIs, metrics, counts, SUM, AVG | Direct property access: `query.data.alias` | `local!count: query.data.total_count` |
+| **Aggregation (with groupings)** | Grouped metrics, charts | Array iteration with matching | `index(results, wherecontains(value, results.field), {})` |
+| **Regular query (fields list)** | Single record lookup, form data | Array indexing: `query[1]['field']` | `query[1]['recordType!X.fields.name']` |
+| **Regular query (multiple rows)** | Lists, grids, dropdowns | Use `.data` property directly | `local!items: query.data` |
+
+**Key Indicators:**
+- See `groupings: {}`? → Use direct property access: `.data.alias`
+- See `groupings: {a!grouping(...)}`? → Use `a!forEach()` or `index()` + `wherecontains()` for matching
+- See `fields: { recordType!X.fields.y }`? → Use array indexing: `[1]['field']`
+- Using `a!aggregationFields()`? → Check if groupings exist
+  - No groupings → Direct access
+  - Has groupings → Iterate or match with wherecontains()
+
+**IMPORTANT: The index() + wherecontains() pattern is ONLY for:**
+- Lookups from configuration/reference arrays (see wherecontains section)
+- Aggregations WITH groupings where you need to match specific group values (see sparse aggregation section)
+
+**NEVER use index() for aggregations with NO groupings - use direct property access instead.**
+</pattern_decision_guide>
+
+<common_mistakes>
+**Common Mistakes to Avoid:**
+
+```sail
+/* ❌ MISTAKE 1: Array indexing on aggregations with no groupings */
+local!kpiQuery: a!queryRecordType(
+  fields: a!aggregationFields(groupings: {}, measures: {...})
+),
+local!value: local!kpiQuery.data[1].alias  /* WRONG - no need for [1] */
+
+/* ✅ CORRECT */
+local!value: local!kpiQuery.data.alias  /* Direct access */
+
+/* ❌ MISTAKE 2: Direct access on regular queries */
+local!userQuery: a!queryRecordType(
+  fields: {recordType!User.fields.name}
+).data,
+local!name: local!userQuery['recordType!User.fields.name']  /* WRONG - missing [1] */
+
+/* ✅ CORRECT */
+local!name: local!userQuery[1]['recordType!User.fields.name']  /* Array indexing */
+
+/* ❌ MISTAKE 3: Over-complicated extraction */
+local!value: index(index(query.data, 1, {}).field, 1, null)  /* Too complex */
+
+/* ✅ CORRECT - Simple pattern for aggregations */
+local!value: a!defaultValue(query.data.field, defaultValue)
+```
+</common_mistakes>
+
+<extraction_checklist>
+**Data Extraction Checklist:**
+- [ ] Identified query type: aggregation (no groupings), aggregation (with groupings), or regular query?
+- [ ] For aggregations with NO groupings: Using direct property access `.data.alias`?
+- [ ] For regular queries: Using array indexing `[1]['field']` to get first row?
+- [ ] Wrapped extraction in `a!defaultValue()` with appropriate default?
+- [ ] Not over-complicating with nested `index()` calls when simpler pattern exists?
+</extraction_checklist>
+</query_data_extraction_patterns>
 
 <direct_record_usage>
 Direct Record Type - For Simple Grids
@@ -2185,6 +2387,9 @@ Array Function Validation:
 - [ ] **Grid column values use only approved component types**
 - [ ] **Record actions use `a!recordActionField()` not button widgets**
 - [ ] **KPIs use a!aggregationFields() with a!measure(), NOT .totalCount**
+- [ ] **Aggregation queries with NO groupings use direct property access: `query.data.alias`**
+- [ ] **Regular field queries use array indexing for first row: `query[1]['field']`**
+- [ ] **Query data extraction pattern matches query type (aggregation vs regular)**
 - [ ] **Single checkbox fields use direct assignment without null handling or conversion logic**
 - [ ] **No `a!encryptedTextField()` used with synced record types - use `a!textField()` with warning banner instead**
 - [ ] **`fv!identifier` ONLY used in grids with `a!recordData()` or grid recordActions - use primary key field in `a!forEach()`**
