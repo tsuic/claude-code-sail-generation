@@ -5,7 +5,8 @@
 - Write generated output to a .sail file in the /output folder
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling
-- Don't worry about making it functional, just hard-code sample content
+- Don't worry about querying live data, just hard-code sample content
+- *IGNORE* dynamic behavior, validations, and other logic requirements. Just put a *TO-DO* comment in place of dynamism.
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation!
 
@@ -23,8 +24,8 @@ If you violate any of these rules, STOP and reconsider your approach.
 **ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
 **Two-tier documentation structure:**
-1. **Component Reference** - `0-sail-component-reference.md` contains ALL SAIL components with their parameters and valid values
-2. **Detailed Instructions** - Select components have dedicated instruction files (listed below)
+1. **Component Reference** - `0-sail-component-reference.md` summarizes ALL SAIL components with their parameters and valid values
+2. **Detailed Instructions** - Select components have dedicated instruction files (listed below) - don't use a component in code without first reading its instructions!!!
 
 ### Available Documentation Files:
 
@@ -156,8 +157,9 @@ When designing a full page, follow these planning steps (not necessary if user r
 - Use `cardGroupLayout` to show a responsive grid of cards with each card representing a list item. This creates a more visually interesting list than a basic `gridField`.
 
 ### Decorative Data Display
-- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc.
-- Use `tagField` to show UI elements styled like tags or chips
+- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `4-stamp-field-instructions.md`if using.
+- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `0-sail-component-reference.md` if using.
+- Use `richTextDisplayField` to show styled text and icons. Read `4-rich-text-instructions.md` if using.
 
 ### Common Patterns
 Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements.
