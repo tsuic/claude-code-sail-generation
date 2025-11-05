@@ -122,25 +122,62 @@ a!sideBySideItem(
 
 ### 3. COMPONENT PLACEMENT RULES
 
-#### Rule 3.1: richTextDisplayField contents
-**Only allowed inside richTextDisplayField:**
+#### Rule 3.1: richTextDisplayField contents validation
+
+**CRITICAL: This check must be EXHAUSTIVE - validate EVERY richTextDisplayField in the code**
+
+**Only allowed inside richTextDisplayField value parameter:**
 - `a!richTextItem()`
 - `a!richTextIcon()`
 - `a!richTextBulletedList()`
 - `a!richTextNumberedList()`
-- Plain text strings
+- Plain text strings (e.g., "hello", char(10))
+- Arrays containing only the above types
 
+**NOT ALLOWED:**
+- `a!tagField()` ❌
+- `a!tagItem()` ❌
+- `a!stampField()` ❌
+- `a!buttonWidget()` ❌
+- Any other component not listed as allowed ❌
+
+**Validation Process (MANDATORY):**
+1. Use Grep to find ALL instances: `a!richTextDisplayField(`
+2. For EACH instance found:
+   a. Read the code around that line (use Read tool with context)
+   b. Extract the `value:` parameter
+   c. Identify what's inside the value parameter
+   d. Verify it's ONLY allowed types (see list above)
+   e. Document the line number and what you found
+3. Report total count: "Checked [N] richTextDisplayField instances"
+4. List ALL line numbers checked (not just samples)
+5. Flag ANY violations with specific line number and what was found
+
+**Example Error Pattern to Catch:**
 ```
 ❌ BAD:
 a!richTextDisplayField(
-  value: a!tagField(...)  /* COMPONENT NOT ALLOWED INSIDE RICH TEXT */
+  value: a!tagItem(...)          /* INVALID - tagItem not allowed */
+)
+
+a!richTextDisplayField(
+  value: a!tagField(...)         /* INVALID - tagField not allowed */
+)
+
+a!richTextDisplayField(
+  value: a!stampField(...)       /* INVALID - stampField not allowed */
 )
 
 ✅ GOOD:
 a!richTextDisplayField(
+  value: a!richTextItem(text: "Status: Active")
+)
+
+a!richTextDisplayField(
   value: {
-    a!richTextItem(text: "Hello"),
-    a!richTextIcon(icon: "check")
+    a!richTextIcon(icon: "check"),
+    " ",
+    a!richTextItem(text: "Complete")
   }
 )
 ```
@@ -487,6 +524,9 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)
 
 **Component Placement:** Valid ✅
 - richTextDisplayField contents valid ✅
+  - Total instances found: [N]
+  - All instances checked: [line1, line2, line3, ..., lineN]
+  - Violations found: None ✅
 - ButtonWidgets in ButtonArrayLayout ✅
 - ColumnsLayout has AUTO width ✅
 
@@ -685,13 +725,70 @@ Use columnsLayout instead of sideBySideLayout when you need to place card layout
 
 ---
 
+## ERROR 4: Component Placement - Invalid Component in richTextDisplayField
+
+**Location:** Line 296
+**Rule Violated:** Rule 3.1 - Only richText components allowed in richTextDisplayField
+
+**Problematic Code:**
+```
+a!richTextDisplayField(
+  label: "Status",
+  labelPosition: "ABOVE",
+  value: a!tagItem(
+    text: local!application.applicationStatus,
+    backgroundColor: "#F59E0B"
+  )
+)
+```
+
+**Problem:**
+`a!tagItem()` is not allowed inside `richTextDisplayField`. Only `a!richTextItem()`, `a!richTextIcon()`, `a!richTextBulletedList()`, `a!richTextNumberedList()`, and plain text are permitted.
+
+**Impact:**
+Runtime error: "A rich text display component has an invalid value for 'value'. Value can only be of type text, rich text item, rich text image, rich text icon, rich text bulleted list, or rich text numbered list. Received TagItem."
+
+**Fix:**
+```
+a!tagField(
+  label: "Status",
+  labelPosition: "ABOVE",
+  tags: {
+    a!tagItem(
+      text: local!application.applicationStatus,
+      backgroundColor: "#F59E0B"
+    )
+  }
+)
+```
+
+**Explanation:**
+Replace `a!richTextDisplayField` with `a!tagField`. Tag items must be displayed using `a!tagField`, which wraps `a!tagItem()` in the `tags` parameter.
+
+---
+
+## CRITICAL VALIDATION CHECKPOINTS
+
+Before marking any validation category as ✅, you MUST:
+
+### Rule 3.1 Checkpoint - richTextDisplayField Contents
+- [ ] Used Grep to search for: `a!richTextDisplayField(`
+- [ ] Found [N] total instances
+- [ ] Read and validated EVERY instance (list line numbers: [line1, line2, line3...])
+- [ ] Confirmed each value contains ONLY: richTextItem, richTextIcon, richTextBulletedList, richTextNumberedList, or plain text
+- [ ] Flagged any violations (if none, explicitly state "No violations found")
+
+**DO NOT mark Rule 3.1 as valid unless you have completed ALL steps above**
+
+---
+
 ## VALIDATION CHECKLIST
 
 Before completing, verify:
 
 - [ ] Expression starts with a!localVariables()
 - [ ] All sideBySideLayout nesting checked (no nested sideBySide, columns, or cards)
-- [ ] All richTextDisplayField contents validated (ONLY `a!richTextItem()`, `a!richTextIcon()`, `a!richTextBulletedList()`, `a!richTextNumberedList()`, or plain text)
+- [ ] All richTextDisplayField contents validated (ONLY `a!richTextItem()`, `a!richTextIcon()`, `a!richTextBulletedList()`, `a!richTextNumberedList()`, or plain text) - **SEE CRITICAL VALIDATION CHECKPOINTS ABOVE**
 - [ ] All ButtonWidgets are in ButtonArrayLayout
 - [ ] All columnsLayout have at least one column with AUTO width
 - [ ] String escaping uses "" not \"
