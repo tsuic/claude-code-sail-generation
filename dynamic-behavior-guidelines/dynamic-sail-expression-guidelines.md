@@ -308,7 +308,7 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 - **Access rule inputs directly** - Avoid local variables for record data
 - **For one-to-many relationships** - Use main record type's relationships rather than new variables
 - **NEVER confuse relationships with fields** - Relationships navigate, fields display values
-- **Use aggregation queries for KPIs** - Leverage native `a!queryRecordType()` with `a!aggregationFields()` for better performance than manual filtering/calculations. Avoid manual calculations whenever possible, leverage aggregations instead.
+- **Use appropriate pattern for KPIs** - For simple record counts, use `.totalCount` with `fetchTotalCount: true`. For aggregations (SUM, AVG, MIN, MAX), use `a!aggregationFields()` with `a!measure()`. Avoid manual calculations whenever possible.
 - **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When using record data in charts, always use the `data` + `config` approach, never `categories` + `series`.
 </record_type_usage>
 
@@ -2455,9 +2455,39 @@ a!queryFilter(
 **Common Type Conversions:**
 - **DateTime fields**: Use `a!subtractDateTime()`, `a!addDateTime()`, `now()`, `dateTime()`
 - **Date fields**: Use `today()`, date arithmetic, `date()`
-- **Number fields**: Use `tointeger()`, `todecimal()` 
+- **Number fields**: Use `tointeger()`, `todecimal()`
 - **Text fields**: Use `totext()`
 </query_filter_type_matching>
+
+<min_max_type_safety>
+🚨 CRITICAL: min()/max() Return Type Casting
+
+**The min() and max() functions return variant types that may need explicit casting for comparisons:**
+
+```sail
+/* ❌ WRONG - min() result used directly without type casting */
+local!startDates: a!forEach(
+  items: local!courses,
+  expression: fv!item.startDate  /* Array of Date values */
+),
+local!earliestStart: min(local!startDates),  /* Returns variant */
+local!isUrgent: local!earliestStart < today() + 30  /* May cause type error */
+
+/* ✅ CORRECT - Cast min() result to proper type */
+local!startDates: a!forEach(
+  items: local!courses,
+  expression: fv!item.startDate  /* Array of Date values */
+),
+local!earliestStart: todate(min(local!startDates)),  /* Explicit Date type */
+local!isUrgent: local!earliestStart < today() + 30  /* Date comparison works */
+```
+
+**Rules:**
+- **Date arrays**: Wrap with `todate(min(...))` or `todate(max(...))`
+- **DateTime arrays**: Wrap with `todatetime(min(...))` or `todatetime(max(...))`
+- **Number arrays**: Wrap with `tointeger(...)` or `todecimal(...)` if specific type needed
+- **Always cast** when using the result in comparisons or calculations
+</min_max_type_safety>
 
 <type_matching_prevents_failures>
 Type Matching (Prevents Interface Failures)
@@ -3030,6 +3060,7 @@ Array Function Validation:
 - [ ] Placeholder always set on dropdowns when value can be null
 - [ ] `showWhen` used instead of `if()` around components
 - [ ] Date/DateTime type matching in filters
+- [ ] min()/max() results cast to appropriate type (todate, todatetime, tointeger)
 - [ ] Record actions use only `action` and `identifier` parameters
 - [ ] **One-to-many data saved on base record using relationships**
 - [ ] **Related record values use specific field paths, not bare relationships**
@@ -3043,7 +3074,7 @@ Array Function Validation:
 - [ ] **Rich text display fields use arrays of rich text components**
 - [ ] **Grid column values use only approved component types**
 - [ ] **Record actions use `a!recordActionField()` not button widgets**
-- [ ] **KPIs use a!aggregationFields() with a!measure(), NOT .totalCount**
+- [ ] **KPIs use appropriate pattern: .totalCount for simple counts, a!aggregationFields() with a!measure() for SUM/AVG/MIN/MAX**
 - [ ] **Aggregation queries with NO groupings use direct property access: `query.data.alias`**
 - [ ] **Regular field queries use array indexing for first row: `query[1]['field']`**
 - [ ] **Query data extraction pattern matches query type (aggregation vs regular)**
