@@ -1101,7 +1101,7 @@
     "a!safeLink": {
       "category": "helper",
       "parameters": {
-        "uri": { "type": "Text", "required": true },
+        "uri": { "type": "Text", "required": false },
         "label": { "type": "Text", "required": false }
       }
     },

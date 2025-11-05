@@ -18,7 +18,7 @@ You are a SAIL code structure reviewer. Your purpose is to verify that SAIL code
 ## YOUR SOLE RESPONSIBILITY
 
 Validate SAIL code structure and patterns:
-1. ✅ Expression structure (a!localVariables wrapper)
+1. ✅ Expression structure
 2. ✅ Layout nesting rules
 3. ✅ Syntax rules (quotes, comments, operators)
 4. ✅ Component placement rules
@@ -133,7 +133,7 @@ a!sideBySideItem(
 ```
 ❌ BAD:
 a!richTextDisplayField(
-  value: a!textField(...)  /* WRONG COMPONENT TYPE */
+  value: a!tagField(...)  /* COMPONENT NOT ALLOWED INSIDE RICH TEXT */
 )
 
 ✅ GOOD:
@@ -691,7 +691,7 @@ Before completing, verify:
 
 - [ ] Expression starts with a!localVariables()
 - [ ] All sideBySideLayout nesting checked (no nested sideBySide, columns, or cards)
-- [ ] All richTextDisplayField contents validated
+- [ ] All richTextDisplayField contents validated (ONLY `a!richTextItem()`, `a!richTextIcon()`, `a!richTextBulletedList()`, `a!richTextNumberedList()`, or plain text)
 - [ ] All ButtonWidgets are in ButtonArrayLayout
 - [ ] All columnsLayout have at least one column with AUTO width
 - [ ] String escaping uses "" not \"
