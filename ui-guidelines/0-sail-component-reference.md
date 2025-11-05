@@ -533,7 +533,7 @@
 **Parameters**:
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `target` | Document/Folder | - | Upload destination |
+| `target` | Document/Folder | - | Upload destination *OMIT FOR STATIC MOCKUPS* |
 | `value` | List of Document | - | Associated files |
 | `maxSelections` | Integer | - | Max files allowed |
 | `buttonStyle` | Text | `SECONDARY` | `NORMAL`\|`PRIMARY`\|`SECONDARY`\|`LINK` |

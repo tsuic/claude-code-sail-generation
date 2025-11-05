@@ -195,15 +195,6 @@ Many SAIL functions cannot accept null parameters and will cause runtime errors.
 
 ✅ Use `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, or `a!defaultValue` to prevent errors
 
-❌ WRONG: 
-showWhen: length(local!selectedCourses) /* Fails if local!selectedCourses is null */
-
-✅ RIGHT:
-if(a!isNotNullOrEmpty(local!selectedCourses),
-  toboolean(length(local!selectedCourses)),
-  false()
-)  
-
 #### Functions That Cannot Accept Null:
 
 **String functions:**
