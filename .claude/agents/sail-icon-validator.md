@@ -46,21 +46,21 @@ Line 102: icon: "chart-line"
 
 For EACH icon name found:
 
-1. **Use Grep tool** on `/ui-guidelines/5-rich-text-icon-aliases.md`
-   - Search for the EXACT pattern: `icon-name` (include the backticks in the search)
-   - Example: if code has `"check-circle"`, grep for the pattern: `check-circle`
-   - The backticks ensure you're matching the icon as a complete token, not a substring
+1. **Use Grep tool with exact line matching** on `/ui-guidelines/5-rich-text-icon-aliases.md`
+   - Use `grep -x "icon-name"` for exact full-line matching
+   - Example: if code has `"check-circle"`, use grep with `-x` flag: `grep -x "check-circle"`
+   - The `-x` flag ensures you match the entire line exactly, not a substring
 
 **CRITICAL: Two-Phase Validation Process**
 
 **Phase 1: Exact Validation (MUST use this pattern)**
-- Pattern to search: `icon-name` (with backticks and trailing comma OR backtick)
-- Use Grep with pattern: `icon-name`
+- Command to use: `grep -x "icon-name" /path/to/file`
+- The icon file has one icon per line with no extra formatting
 - If grep finds a match → Icon is VALID, stop here
 - If grep finds NO match → Proceed to Phase 2
 
 **Phase 2: Suggestion Finding (ONLY after Phase 1 fails)**
-- Now you can search for partial patterns like "icon-" or "-name"
+- Now search for partial patterns like "icon-" or "-name" (without `-x` flag)
 - This is ONLY for finding suggestions, NOT for validation
 
 2. **Check the result:**
@@ -78,17 +78,17 @@ For EACH icon name found:
 ❌ **WRONG - Fuzzy matching:**
 - Searching for "circle-question" and finding "question-circle" → Marking as valid
 - Searching for "user" and finding "user-circle" → Marking as valid
-- Searching for "arrow-left" and accepting any line containing both "arrow" and "left"
+- Using grep without `-x` flag and accepting partial line matches
 
-✅ **RIGHT - Exact token matching:**
-- Searching for `circle-question` → No results → Mark as INVALID
-- Searching for `question-circle` → Found → Mark as VALID
-- Then search for "circle" and "question" separately to find suggestions
+✅ **RIGHT - Exact line matching:**
+- Using `grep -x "circle-question"` → No results → Mark as INVALID
+- Using `grep -x "question-circle"` → Found → Mark as VALID
+- Then search for "circle" and "question" separately (without `-x`) to find suggestions
 
 **Why this matters:**
 - "circle-question" and "question-circle" are DIFFERENT icons
 - One exists, one doesn't - you must catch this!
-- The backticks in the file are delimiters that create exact tokens
+- Each line in the file is exactly one icon name - use `-x` flag to match full lines only
 
 ---
 
@@ -210,10 +210,10 @@ icon: "user-circle"
 Before completing, verify:
 
 - [ ] Extracted ALL icon names from the code (searched for `icon:` parameter)
-- [ ] Used Grep on `/ui-guidelines/5-rich-text-icon-aliases.md` for EACH icon
-- [ ] Used EXACT token match (with backticks) for initial validation
+- [ ] Used Grep with `-x` flag on `/ui-guidelines/5-rich-text-icon-aliases.md` for EACH icon
+- [ ] Used EXACT line match (`grep -x`) for initial validation
 - [ ] Did NOT accept partial/fuzzy matches as valid
-- [ ] Only used fuzzy matching AFTER exact match failed (for suggestions only)
+- [ ] Only used non-exact matching (without `-x`) AFTER exact match failed (for suggestions only)
 - [ ] Verified no inverted icon names were incorrectly validated (e.g., "circle-question" vs "question-circle")
 - [ ] For invalid icons: Used Grep to find similar valid alternatives
 - [ ] Provided line number, current value, and recommended fix for each error
@@ -224,8 +224,8 @@ Before completing, verify:
 ## KEY REMINDERS
 
 1. **ONLY validate icon names** - nothing else
-2. **MUST use Grep** - don't rely on memory
-3. **Exact matches only** - `"chart-line"` ≠ `"line-chart"`
-4. **Icon names in backticks** in the aliases file are the valid names
+2. **MUST use Grep with `-x` flag** - don't rely on memory
+3. **Exact line matches only** - `"chart-line"` ≠ `"line-chart"`
+4. **One icon per line** in the aliases file - no extra formatting
 5. **Be helpful** - suggest similar valid icons when one is invalid
 6. **One tool, one purpose** - keep it simple and fast
