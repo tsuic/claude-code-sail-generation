@@ -152,6 +152,47 @@ a!localVariables(
    - ❌ Wrong: Using ri! for reference data that shouldn't be edited
    - ✅ Right: Use ri! for main record, queries for reference/lookup data
 
+4. **Using a!map() for record instances**
+   - ❌ Wrong:
+     ```sail
+     local!newContact: a!map(
+       'recordType!{uuid}Contact.fields.{uuid}firstName': "Jane",
+       'recordType!{uuid}Contact.fields.{uuid}lastName': "Smith",
+       'recordType!{uuid}Contact.fields.{uuid}email': "jane.smith@example.com"
+     )
+     ```
+   - ✅ Right:
+     ```sail
+     local!newContact: 'recordType!{uuid}Contact'(
+       'recordType!{uuid}Contact.fields.{uuid}firstName': "Jane",
+       'recordType!{uuid}Contact.fields.{uuid}lastName': "Smith",
+       'recordType!{uuid}Contact.fields.{uuid}email': "jane.smith@example.com"
+     )
+     ```
+
+5. **Using empty {} for new records**
+   - ❌ Wrong: `append(ri!case.caseNotes, {})`
+   - ✅ Right: `append(ri!case.caseNotes, 'recordType!{uuid}CaseNote'())`
+
+6. **Detecting record type by null field check**
+   - ❌ Wrong:
+     ```sail
+     if(
+       a!isNotNullOrEmpty(fv!item.phoneNumber),
+       /* Show phone contact fields */,
+       /* Show email contact fields */
+     )
+     ```
+   - ✅ Right:
+     ```sail
+     if(
+       fv!item.contactMethodTypeId = 1,  /* 1 = Phone */
+       /* Show phone contact fields */,
+       /* Show email contact fields */
+     )
+     ```
+   - **Why:** Fields can be null for multiple reasons (not entered yet, optional, cleared). Use explicit type indicators instead.
+
 ### MANDATORY CHECKLIST Before Coding Form Interfaces:
 
 - [ ] Read user request carefully - does it mention "create", "update", "edit", "submit", "form", or "wizard"?
@@ -161,6 +202,9 @@ a!localVariables(
 - [ ] NO a!queryRecordType() for the record being created/updated
 - [ ] Local variables used ONLY for transient UI state (not main record fields)
 - [ ] Form validation checks ri! values, not local variables
+- [ ] All record instances created with record type constructor syntax `'recordType!{uuid}RecordTypeName'(...)`, not `a!map()` or `{}`
+- [ ] All one-to-many relationships use typed records when appending
+- [ ] Type discrimination uses dedicated type ID fields, not null field checks
 </form_interface_patterns>
 
 <non_existent_objects_handling>
@@ -406,6 +450,199 @@ local!color: index(
 ```
 </wherecontains_usage>
 </array_manipulation_patterns>
+
+<record_type_constructors>
+## Creating New Record Instances
+
+### ❌ WRONG - Using a!map() for Records
+```sail
+/* INCORRECT - a!map() creates untyped maps, not record instances */
+append(
+  ri!case['recordType!{uuid}Case.relationships.{uuid}caseNotes'],
+  a!map(
+    'recordType!{uuid}CaseNote.fields.{uuid}noteText': "Follow up needed",
+    'recordType!{uuid}CaseNote.fields.{uuid}noteType': "Status Update"
+  )
+)
+```
+
+### ✅ CORRECT - Using Record Type Constructor
+```sail
+/* CORRECT - Use record type constructor syntax */
+append(
+  ri!case['recordType!{uuid}Case.relationships.{uuid}caseNotes'],
+  'recordType!{uuid}CaseNote'(
+    'recordType!{uuid}CaseNote.fields.{uuid}noteText': "Follow up needed",
+    'recordType!{uuid}CaseNote.fields.{uuid}noteType': "Status Update"
+  )
+)
+```
+
+### Record Constructor Rules:
+1. **Always use the full record type reference as a function**: `'recordType!{uuid}RecordTypeName'(...)`
+2. **Use parentheses, not curly braces**: `RecordType'()` not `RecordType'{}'`
+3. **Field names must be fully qualified**: `'recordType!{uuid}RecordType.fields.{uuid}fieldName': value`
+4. **This applies to all one-to-many relationships**: Case notes, contact history, document attachments, etc.
+
+### Common Patterns:
+
+**Adding an empty record:**
+```sail
+append(
+  ri!case.caseNotes,
+  'recordType!{uuid}CaseNote'()  /* Empty parentheses for default values */
+)
+```
+
+**Adding a record with initial values:**
+```sail
+append(
+  ri!case.caseNotes,
+  'recordType!{uuid}CaseNote'(
+    'recordType!{uuid}CaseNote.fields.{uuid}noteTypeId': 1,
+    'recordType!{uuid}CaseNote.fields.{uuid}noteText': null,
+    'recordType!{uuid}CaseNote.fields.{uuid}createdDate': today()
+  )
+)
+```
+
+**Why this matters:**
+- `a!map()` creates untyped dictionary objects
+- Record type constructors create properly typed record instances
+- Typed instances are required for record relationships to work correctly
+- Type checking happens at save time, catching errors earlier
+
+</record_type_constructors>
+
+<multi_type_form_pattern>
+## Multi-Type Form Entry Pattern
+
+When a single relationship contains multiple types of records (e.g., Phone Contacts AND Email Contacts in one table, or Internal Notes AND External Communications in one list):
+
+### Pattern: Use Type ID Field
+
+**Data Model Setup:**
+- Single record type: `CaseContact`
+- Type field: `contactMethodTypeId` (1 = Phone, 2 = Email)
+- Shared fields: `contactName`, `contactDate`, `notes`
+- Phone-specific: `phoneNumber`, `callDuration`
+- Email-specific: `emailAddress`, `emailSubject`
+
+**UI Implementation:**
+```sail
+a!forEach(
+  items: ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+  expression: a!cardLayout(
+    contents: {
+      /* Card title based on type */
+      a!richTextDisplayField(
+        labelPosition: "COLLAPSED",
+        value: a!richTextItem(
+          text: if(
+            fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 2,
+            "Email Contact",
+            "Phone Contact"
+          ),
+          size: "MEDIUM",
+          style: "STRONG"
+        )
+      ),
+
+      /* Phone contact fields - show when type = 1 */
+      if(
+        fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 1,
+        {
+          a!textField(
+            label: "Phone Number",
+            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}phoneNumber'],
+            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}phoneNumber']
+          ),
+          a!integerField(
+            label: "Call Duration (minutes)",
+            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}callDuration'],
+            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}callDuration']
+          )
+        },
+        {}
+      ),
+
+      /* Email contact fields - show when type = 2 */
+      if(
+        fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 2,
+        {
+          a!textField(
+            label: "Email Address",
+            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailAddress'],
+            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailAddress']
+          ),
+          a!textField(
+            label: "Subject Line",
+            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailSubject'],
+            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailSubject']
+          )
+        },
+        {}
+      )
+    }
+  )
+)
+```
+
+**Add Buttons:**
+```sail
+a!buttonArrayLayout(
+  buttons: {
+    a!buttonWidget(
+      label: "Add Phone Contact",
+      icon: "phone",
+      style: "OUTLINE",
+      saveInto: {
+        a!save(
+          ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+          append(
+            ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+            'recordType!{uuid}CaseContact'(
+              'recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId': 1,  /* Set type on creation */
+              'recordType!{uuid}CaseContact.fields.{uuid}contactName': null,
+              'recordType!{uuid}CaseContact.fields.{uuid}phoneNumber': null,
+              'recordType!{uuid}CaseContact.fields.{uuid}callDuration': null
+            )
+          )
+        )
+      }
+    ),
+    a!buttonWidget(
+      label: "Add Email Contact",
+      icon: "envelope",
+      style: "OUTLINE",
+      saveInto: {
+        a!save(
+          ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+          append(
+            ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+            'recordType!{uuid}CaseContact'(
+              'recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId': 2,  /* Set type on creation */
+              'recordType!{uuid}CaseContact.fields.{uuid}contactName': null,
+              'recordType!{uuid}CaseContact.fields.{uuid}emailAddress': null,
+              'recordType!{uuid}CaseContact.fields.{uuid}emailSubject': null
+            )
+          )
+        )
+      }
+    )
+  },
+  align: "START"
+)
+```
+
+**Key Points:**
+1. **Set `typeId` immediately on record creation** - Don't rely on other field values to infer type
+2. **Use `typeId` for all conditional display logic** - Check the type field, not whether specific fields are null/empty
+3. **Don't use null/empty field checks for type detection** - Fields can be null for many reasons unrelated to type
+4. **Each button creates the same record type** - Only difference is the `typeId` value and which fields are initialized
+5. **Initialize type-specific fields to null** - Makes it clear which fields belong to which type
+
+</multi_type_form_pattern>
 </critical_rules>
 
 <button_widget_parameters>
