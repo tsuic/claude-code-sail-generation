@@ -1,3 +1,5 @@
 *.swp
 .claude/.DS_Store
 .DS_Store
+scripts/log.txt
+scripts/__pycache__/
