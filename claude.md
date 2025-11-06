@@ -45,6 +45,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - `3-wizard-layout-instructions.md` - WizardLayout guidelines
 
 **Display Components (4-*):**
+- `4-button-instructions.md` - Button and ButtonArrayLayout guidelines
 - `4-card-layout-instructions.md` - CardLayout guidelines
 - `4-grid-field-instructions.md` - GridField (read-only grid) guidelines
 - `4-grid-layout-instructions.md` - GridLayout (editable grid) guidelines
@@ -58,7 +59,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 **Icons:**
 - `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon
 
-**All other components** (textField, dropdownField, buttonWidget, etc.) are documented in `0-sail-component-reference.md` only.
+**All other components** (textField, dropdownField, etc.) are documented in `0-sail-component-reference.md` only.
 
 ### Documentation Lookup Process:
 
@@ -172,7 +173,13 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 
 ### Special Rules
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
-- When not setting a label on a component, explicitly set labelPosition to “COLLAPSED” so that space is not reserved for the label (for more reliable alignment)
+- When not setting a label on a component, explicitly set labelPosition to "COLLAPSED" so that space is not reserved for the label (for more reliable alignment)
+
+### Button Quick Rules
+- [ ] Style is ONLY: `"OUTLINE"` | `"GHOST"` | `"LINK"` | `"SOLID"` (no "PRIMARY" or "ACCENT"!)
+- [ ] Colors: `"ACCENT"` | `"SECONDARY"` | `"NEGATIVE"` | hex codes
+- [ ] Primary action = `style: "SOLID"` + `color: "ACCENT"` (both required)
+- [ ] Always wrapped in `a!buttonArrayLayout`
 
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
@@ -358,7 +365,6 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Color values must use 6-character hex codes (#RRGGBB) or documented enumeration values (like "ACCENT"). 
   - Allowed color enumeration values vary across components. Only use values specified in the documentation for that component.
   - HTML color names like "RED" are invalid
-- ButtonWidgets only take "ACCENT" or hex codes as color values
 - Icons must reference valid aliases (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - RichTextItem align parameter allowed values are "LEFT", "CENTER", or "RIGHT", do not use "START" or "END"!
 - Checkbox and radio button labels can only accept plain text, not rich text
