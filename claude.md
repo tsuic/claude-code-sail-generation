@@ -181,6 +181,14 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - [ ] Primary action = `style: "SOLID"` + `color: "ACCENT"` (both required)
 - [ ] Always wrapped in `a!buttonArrayLayout`
 
+## STYLING
+### Default color scheme for generated SAIL UIs
+- #F5F6F8: page background color
+- #1C2C44: (optional) page header bar background color
+- #FFFFFF: content card background color
+- #FF7F50: accent color (primary buttons, etc.)
+- #262626: text and heading color
+
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
      - **WRONG:** `if(a and b, ...)`
@@ -370,11 +378,13 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Checkbox and radio button labels can only accept plain text, not rich text
 - choiceValues CANNOT be null or empty strings (“”)
 
-## 🛑 MANDATORY VALIDATION CHECKLIST
-👉 Always call validation sub-agents to code review new expressions:
-1. **sail-schema-validator** - Validates function syntax
-2. **sail-icon-validator** - Checks for valid icon names
-3. **sail-code-reviewer** - Validates structure, syntax, and best practices
+## 🛑 MANDATORY VALIDATION DELEGATION CHECKLIST
+👉 Always use tools to validate new expressions:
+- [ ] *IF* mcp__appian-mcp-server__validate_sail is available, always call it for efficient syntax validation
+- [ ] *OTHERWISE*, call these sub-agents:
+    - [ ] 1. **sail-schema-validator** - Validates function syntax
+    - [ ] 2. **sail-icon-validator** - Checks for valid icon names
+    - [ ] 3. **sail-code-reviewer** - Validates structure, syntax, and best practices
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()
