@@ -149,8 +149,8 @@
         "height": { "type": "Text", "required": false, "validValues": ["EXTRA_SHORT", "SHORT", "SHORT_PLUS", "MEDIUM", "MEDIUM_PLUS", "TALL", "TALL_PLUS", "EXTRA_TALL", "AUTO"] },
         "link": { "type": "a!dynamicLink", "required": false },
         "decorativeBarPosition": { "type": "Text", "required": false, "validValues": ["NONE", "TOP", "BOTTOM", "START", "END"] },
-        "decorativeBarColor": { "type": "Text", "required": false, "acceptsHexColors": true },
-        "borderColor": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "decorativeBarColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "WARN", "NEGATIVE"], "acceptsHexColors": true },
+        "borderColor": { "type": "Text", "required": false, "validValues": ["ACCENT", "POSITIVE", "WARN", "NEGATIVE"], "acceptsHexColors": true },
         "showWhen": { "type": "Boolean", "required": false },
         "marginAbove": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
         "marginBelow": { "type": "Text", "required": false, "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"] },
@@ -1075,7 +1075,7 @@
       "category": "helper",
       "parameters": {
         "icon": { "type": "Text", "required": false },
-        "color": { "type": "Text", "required": false, "acceptsHexColors": true },
+        "color": { "type": "Text", "required": false, "validValues": ["STANDARD", "ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY"], "acceptsHexColors": true },
         "size": { "type": "Text", "required": false, "validValues": ["SMALL", "STANDARD", "MEDIUM", "MEDIUM_PLUS", "LARGE", "LARGE_PLUS", "EXTRA_LARGE"] },
         "altText": { "type": "Text", "required": false }
       }

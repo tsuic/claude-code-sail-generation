@@ -280,8 +280,8 @@
 | `height` | Text | `AUTO` | `EXTRA_SHORT`\|`SHORT`\|`SHORT_PLUS`\|`MEDIUM`\|`MEDIUM_PLUS`\|`TALL`\|`TALL_PLUS`\|`EXTRA_TALL`\|`AUTO` |
 | `link` | a!dynamicLink | - | Makes card clickable |
 | `decorativeBarPosition` | Text | `NONE` | `NONE`\|`TOP`\|`BOTTOM`\|`START`\|`END` |
-| `decorativeBarColor` | Text | - | Color for decorative bar |
-| `borderColor` | Text | - | Border color override |
+| `decorativeBarColor` | Text | - | `ACCENT`\|`POSITIVE`\|`WARN`\|`NEGATIVE` or hex |
+| `borderColor` | Text | - | `ACCENT`\|`POSITIVE`\|`WARN`\|`NEGATIVE` or hex |
 
 ---
 
@@ -1108,7 +1108,7 @@
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `icon` | Text | List in `ui-guidelines/5-rich-text-icon-aliases.md` |
-| `color` | Text | Icon color |
+| `color` | Text | `STANDARD`\|`ACCENT`\|`POSITIVE`\|`NEGATIVE`\|`SECONDARY` or hex |
 | `size` | Text | `SMALL`\|`STANDARD`\|`MEDIUM`\|`MEDIUM_PLUS`\|`LARGE`\|`LARGE_PLUS`\|`EXTRA_LARGE` |
 | `altText` | Text | Accessibility text |
 
