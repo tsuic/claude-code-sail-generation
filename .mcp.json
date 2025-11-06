@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "appian-mcp-server": {
+      "type": "http",
+      "url": "http://10.34.49.30:8000/mcp"
+    }
+  }
+}
