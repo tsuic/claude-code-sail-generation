@@ -8,7 +8,7 @@
 - Don't worry about querying live data, just hard-code sample content
 - *IGNORE* dynamic behavior, validations, and other logic requirements. Just put a *TO-DO* comment in place of dynamism.
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in documentation!
+- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/validation/sail-api-schema.json`
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -24,7 +24,37 @@ If you violate any of these rules, STOP and reconsider your approach.
 **ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
 **Two-tier documentation structure:**
-1. **Component Reference** - `0-sail-component-reference.md` summarizes ALL SAIL components with their parameters and valid values
+1. **Schema Reference** - `/validation/sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
+
+### Schema Structure:
+```json
+{
+  "components": {
+    "a!componentName": {
+      "description": "What it does",
+      "category": "layout|input|display|chart|helper|...",
+      "inherits": ["visibility", "margins", ...],
+      "parameters": {
+        "paramName": {
+          "type": "Text|Integer|Boolean|...",
+          "required": true|false,
+          "validValues": ["OPTION1", "OPTION2", ...],  // ONLY these!
+          "acceptsHexColors": true|false
+        }
+      },
+      "specialNote": "Important warnings or constraints"
+    }
+  },
+  "expressionFunctions": {
+    "functionName": {
+      "syntax": "functionName(param1, param2, ...)",
+      "parameterCount": 3,
+      "description": "What it does"
+    }
+  }
+}
+```
+
 2. **Detailed Instructions** - Select components have dedicated instruction files (listed below) - don't use a component in code without first reading its instructions!!!
 
 ### Available Documentation Files:
@@ -59,15 +89,15 @@ If you violate any of these rules, STOP and reconsider your approach.
 **Icons:**
 - `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon
 
-**All other components** (textField, dropdownField, etc.) are documented in `0-sail-component-reference.md` only.
+**All other components** (textField, dropdownField, etc.) are documented in `/validation/sail-api-schema.json` only.
 
 ### Documentation Lookup Process:
 
 1. **Check if a dedicated instruction file exists** for the component (see list above)
    - If YES → Read the dedicated file for templates, patterns, and detailed rules
-   - If NO → Use `0-sail-component-reference.md` for parameters and values
+   - If NO → Use `/validation/sail-api-schema.json` for parameters and values
 
-2. **For unfamiliar components** - Read the component entry in `0-sail-component-reference.md` first to understand basic parameters
+2. **For unfamiliar components** - Read the component entry in `/validation/sail-api-schema.json` first to understand basic parameters
 
 ### ❌ NEVER:
 - Use parameters that aren't explicitly documented in either the reference or instruction files
@@ -75,7 +105,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - Skip reading documentation because "it seems straightforward"
 
 ### ✅ ALWAYS:
-- Start with `0-sail-component-reference.md` for parameter validation
+- Start with `/validation/sail-api-schema.json` for parameter validation
 - Read dedicated instruction files when available for templates and patterns
 - Follow templates exactly from instruction files
 - Verify against validation checklists
