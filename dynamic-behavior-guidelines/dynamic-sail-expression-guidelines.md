@@ -16,9 +16,68 @@
 6. **Set audit fields on create/update** - createdBy, createdOn, modifiedBy, modifiedOn
 7. **Never use `append()` with record data in dropdown choices - use placeholders**
 8. **For dropdowns with record data**: Use record IDs as choiceValues and record text fields as choiceLabels - NO value-to-ID translation needed
-9. **wherecontains() signature**: `wherecontains(valuesToFind, arrayToSearchIn)` - Returns array of indices, always use with index() for extraction
+9. **wherecontains()**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section for complete usage
 10. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
 </expression_structure>
+
+<record_type_reference_convention>
+## 🚨 Record Type Reference Syntax
+
+**In these guidelines, record types are shown with clean semantic names for readability:**
+
+```sail
+/* Example syntax (for documentation purposes): */
+'recordType!Case.fields.title'
+'recordType!Employee.relationships.department.fields.name'
+'recordType!Task.relationships.assignee.fields.username'
+```
+
+### ⚠️ CRITICAL: These are EXAMPLES, not actual working code!
+
+**In actual Appian SAIL code, you MUST use fully qualified references with UUIDs:**
+
+```sail
+/* Actual Appian syntax (what you'll see in the designer): */
+'recordType!{abc-123}Case.fields.{def-456}title'
+'recordType!{ghi-789}Employee.relationships.{jkl-012}department.fields.{mno-345}name'
+```
+
+### How to Get Correct References in Appian Designer:
+
+1. **Start typing** the record type reference: `'recordType!`
+2. **Press Ctrl+Space** (or Cmd+Space on Mac) to open autocomplete
+3. **Select your record type** from the list (e.g., "Case")
+4. **Continue typing** `.fields.` or `.relationships.`
+5. **Press Ctrl+Space again** to see available fields/relationships
+6. **Select the field/relationship** you need
+7. **Appian automatically inserts** the correct UUIDs
+
+### Key Points:
+
+- ✅ **Always use Appian's autocomplete** to get qualified references
+- ✅ **Each UUID is unique** to your environment
+- ✅ **UUIDs are auto-generated** by Appian when you create record types/fields
+- ❌ **Never manually type UUIDs** or copy them between different fields
+- ❌ **Never use the example syntax** directly in working code
+
+### For Code Generation:
+
+When generating code, use the **placeholder pattern** to indicate where developers need to substitute actual references:
+
+```sail
+/* Generated code pattern: */
+ri!case['recordType!Case.fields.title']
+fv!row['recordType!Employee.relationships.department.fields.name']
+
+/* Developers replace with actual qualified references from their Appian environment */
+```
+
+This approach:
+- Makes generated code readable
+- Clearly shows the semantic structure
+- Requires developers to use proper Appian tooling for actual references
+- Prevents UUID copy-paste errors
+</record_type_reference_convention>
 
 <form_interface_patterns>
 ## 🚨 CRITICAL: Form Interface Data Patterns
@@ -64,8 +123,8 @@ a!localVariables(
   /* Bind form fields directly to rule inputs: */
   a!textField(
     label: "First Name",
-    value: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'],
-    saveInto: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'],
+    value: ri!recordName['recordType!Person.fields.firstName'],
+    saveInto: ri!recordName['recordType!Person.fields.firstName'],
     required: true
   ),
 
@@ -74,7 +133,7 @@ a!localVariables(
     buttons: {
       a!buttonWidget(
         label: "Submit",
-        disabled: a!isNullOrEmpty(ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName'])
+        disabled: a!isNullOrEmpty(ri!recordName['recordType!Person.fields.firstName'])
       )
     }
   )
@@ -152,45 +211,13 @@ a!localVariables(
    - ❌ Wrong: Using ri! for reference data that shouldn't be edited
    - ✅ Right: Use ri! for main record, queries for reference/lookup data
 
-4. **Using a!map() for record instances**
-   - ❌ Wrong:
-     ```sail
-     local!newContact: a!map(
-       'recordType!{uuid}Contact.fields.{uuid}firstName': "Jane",
-       'recordType!{uuid}Contact.fields.{uuid}lastName': "Smith",
-       'recordType!{uuid}Contact.fields.{uuid}email': "jane.smith@example.com"
-     )
-     ```
-   - ✅ Right:
-     ```sail
-     local!newContact: 'recordType!{uuid}Contact'(
-       'recordType!{uuid}Contact.fields.{uuid}firstName': "Jane",
-       'recordType!{uuid}Contact.fields.{uuid}lastName': "Smith",
-       'recordType!{uuid}Contact.fields.{uuid}email': "jane.smith@example.com"
-     )
-     ```
+4. **Using a!map() or {} for record instances**
+   - ❌ Wrong: Using `a!map()` or empty `{}` to create record instances
+   - ✅ Right: See "Creating New Record Instances" section for proper record type constructor syntax
 
-5. **Using empty {} for new records**
-   - ❌ Wrong: `append(ri!case.caseNotes, {})`
-   - ✅ Right: `append(ri!case.caseNotes, 'recordType!{uuid}CaseNote'())`
-
-6. **Detecting record type by null field check**
-   - ❌ Wrong:
-     ```sail
-     if(
-       a!isNotNullOrEmpty(fv!item.phoneNumber),
-       /* Show phone contact fields */,
-       /* Show email contact fields */
-     )
-     ```
-   - ✅ Right:
-     ```sail
-     if(
-       fv!item.contactMethodTypeId = 1,  /* 1 = Phone */
-       /* Show phone contact fields */,
-       /* Show email contact fields */
-     )
-     ```
+5. **Detecting record type by null field check**
+   - ❌ Wrong: Using `a!isNotNullOrEmpty()` on specific fields to infer record type
+   - ✅ Right: Use dedicated type ID field - See "Multi-Type Form Entry Pattern" section
    - **Why:** Fields can be null for multiple reasons (not entered yet, optional, cleared). Use explicit type indicators instead.
 
 ### MANDATORY CHECKLIST Before Coding Form Interfaces:
@@ -202,7 +229,7 @@ a!localVariables(
 - [ ] NO a!queryRecordType() for the record being created/updated
 - [ ] Local variables used ONLY for transient UI state (not main record fields)
 - [ ] Form validation checks ri! values, not local variables
-- [ ] All record instances created with record type constructor syntax `'recordType!{uuid}RecordTypeName'(...)`, not `a!map()` or `{}`
+- [ ] All record instances created with record type constructor syntax `'recordType!RecordTypeName'(...)`, not `a!map()` or `{}`
 - [ ] All one-to-many relationships use typed records when appending
 - [ ] Type discrimination uses dedicated type ID fields, not null field checks
 </form_interface_patterns>
@@ -328,17 +355,17 @@ fv!row['recordType!Case.relationships.status']['recordType!AnotherType.fields.va
 **CORRECT Sorting:**
 ```sail
 /* ✅ Sort on record fields only */
-sortField: recordType!Case.fields.createdOn,       /* Field reference */
-sortField: recordType!Case.fields.title,           /* Field reference */
-sortField: recordType!Case.relationships.status.fields.value,        /* Field reference on a many-to-one related record */
-sortField: recordType!Case.relationships.priority.fields.value,      /* Field reference on a many-to-one related record */
+sortField: 'recordType!Case.fields.createdOn',       /* Field reference */
+sortField: 'recordType!Case.fields.title',           /* Field reference */
+sortField: 'recordType!Case.relationships.status.fields.value',        /* Related field */
+sortField: 'recordType!Case.relationships.priority.fields.value',      /* Related field */
 ```
 
 **WRONG Sorting - NEVER DO THIS:**
 ```sail
 /* ❌ Never sort on relationships - CAUSES ERRORS */
-sortField: recordType!Case.relationships.status,    /* Relationship - INVALID */
-sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
+sortField: 'recordType!Case.relationships.status',    /* Relationship - INVALID */
+sortField: 'recordType!Case.relationships.priority',  /* Relationship - INVALID */
 ```
 
 **Fundamental Rule**: 
@@ -352,7 +379,7 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 - **Access rule inputs directly** - Avoid local variables for record data
 - **For one-to-many relationships** - Use main record type's relationships rather than new variables
 - **NEVER confuse relationships with fields** - Relationships navigate, fields display values
-- **Use appropriate pattern for KPIs** - For simple record counts, use `.totalCount` with `fetchTotalCount: true`. For aggregations (SUM, AVG, MIN, MAX), use `a!aggregationFields()` with `a!measure()`. Avoid manual calculations whenever possible.
+- **KPI Metrics** - ALWAYS use `a!aggregationFields()` with `a!measure()` for dashboard KPIs and metrics. Only use `.totalCount` for pagination display ("Showing X of Y") or simple conditional checks. See Error 9 and KPI Aggregation Pattern sections for details.
 - **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When using record data in charts, always use the `data` + `config` approach, never `categories` + `series`.
 </record_type_usage>
 
@@ -362,6 +389,402 @@ sortField: recordType!Case.relationships.priority,  /* Relationship - INVALID */
 2. Built-in search (showSearchBox: true) over custom search fields
 Only use custom filtering if built-in features are unavailable.
 </checkpoint>
+
+<foreach_function_variables>
+## 🚨 CRITICAL: a!forEach() Function Variables Reference
+
+### Available Function Variables in a!forEach()
+
+When using `a!forEach()`, Appian automatically provides these function variables within the `expression` parameter:
+
+| Variable | Type | Description | Common Use Cases |
+|----------|------|-------------|------------------|
+| `fv!item` | Any | Current item value from the array | Accessing properties, creating UI components, data transformations |
+| `fv!index` | Integer | Current iteration position (1-based) | Array manipulation, numbering, position-based logic |
+| `fv!isFirst` | Boolean | `true` only on first iteration | Special formatting for first item, conditional headers |
+| `fv!isLast` | Boolean | `true` only on last iteration | Special formatting for last item, conditional footers |
+| `fv!itemCount` | Integer | Total number of items in array | Progress indicators, conditional logic based on total |
+| `fv!identifier` | Integer/Text | Record identifier (only with recordData) | Record links when iterating over `a!recordData()` results |
+
+**⚠️ CRITICAL:** These variables are **ONLY** available inside `a!forEach()` expressions. They do NOT exist in grid columns, chart configurations, or other iteration functions.
+
+---
+
+### fv!item - Accessing Current Item
+
+**Purpose:** Access the current item's value or properties during iteration
+
+**SAIL-Specific Syntax:**
+- **Record fields:** Use bracket notation: `fv!item[recordType!Case.fields.title]`
+- **Map properties:** Use dot notation: `fv!item.title`
+- **Scalar values:** Use `fv!item` directly
+
+```sail
+/* Record data with bracket notation */
+a!forEach(
+  items: a!queryRecordType(
+    recordType: recordType!Comment,
+    fields: {
+      recordType!Comment.fields.author,
+      recordType!Comment.fields.text
+    }
+  ).data,
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: fv!item[recordType!Comment.fields.author]  /* Bracket syntax */
+      ),
+      a!richTextDisplayField(
+        value: fv!item[recordType!Comment.fields.text]
+      )
+    }
+  )
+)
+
+/* Map data with dot notation */
+a!forEach(
+  items: {
+    a!map(title: "Overview", icon: "info-circle"),
+    a!map(title: "Details", icon: "list")
+  },
+  expression: a!sectionLayout(
+    label: fv!item.title,  /* Dot notation for maps */
+    contents: {
+      a!richTextIcon(icon: fv!item.icon)
+    }
+  )
+)
+```
+
+---
+
+### fv!index - Current Position (1-Based)
+
+**Purpose:** Get the current iteration position for array manipulation or position-based logic
+
+**IMPORTANT:** Appian uses 1-based indexing. First item is index 1, not 0.
+
+#### Critical Pattern: Removing Items from Arrays
+```sail
+/* Common pattern: Remove button in one-to-many relationships */
+a!forEach(
+  items: ri!case[recordType!Case.relationships.caseComments],
+  expression: a!cardLayout(
+    contents: {
+      a!textField(
+        label: "Comment " & fv!index,  /* Use for labeling */
+        value: fv!item[recordType!Comment.fields.text],
+        saveInto: fv!item[recordType!Comment.fields.text]
+      )
+    },
+    link: a!dynamicLink(
+      label: "Remove",
+      value: fv!index,  /* Pass index to identify which item to remove */
+      saveInto: {
+        a!save(
+          ri!case[recordType!Case.relationships.caseComments],
+          remove(
+            ri!case[recordType!Case.relationships.caseComments],
+            fv!index  /* Remove at this position */
+          )
+        )
+      }
+    )
+  )
+)
+```
+
+#### Parallel Array Lookups (Status/Icon Mapping)
+```sail
+/* Map colors and icons to status values by position */
+local!statuses: {"Open", "In Progress", "Completed"},
+local!icons: {"folder-open", "clock", "check-circle"},
+local!colors: {"#EF4444", "#F59E0B", "#10B981"},
+
+a!forEach(
+  items: local!statuses,
+  expression: a!stampField(
+    icon: index(local!icons, fv!index, "file"),      /* Match by position */
+    backgroundColor: index(local!colors, fv!index, "#6B7280"),
+    contentColor: "#FFFFFF",
+    size: "MEDIUM"
+  )
+)
+```
+
+---
+
+### fv!isFirst - First Iteration Detection
+
+**Purpose:** Detect the first iteration for conditional headers or skipping separators
+
+```sail
+a!forEach(
+  items: local!sections,
+  expression: {
+    /* Add divider before all items EXCEPT the first */
+    if(
+      fv!isFirst,
+      {},  /* No divider for first item */
+      a!columnsLayout(
+        columns: {a!columnLayout(contents: {}, width: "FILL")},
+        marginBelow: "STANDARD"
+      )
+    ),
+    /* Then show the content */
+    a!cardLayout(
+      contents: {
+        a!richTextDisplayField(value: fv!item.content)
+      }
+    )
+  }
+)
+```
+
+---
+
+### fv!isLast - Last Iteration Detection
+
+**Purpose:** Detect the last iteration for conditional footers, "Add" buttons, or skipping separators
+
+#### Critical Pattern: Add Button After Last Item
+```sail
+a!forEach(
+  items: local!invoiceItems,
+  expression: {
+    /* Show each line item */
+    a!columnsLayout(
+      columns: {
+        a!columnLayout(
+          contents: {a!richTextDisplayField(value: fv!item.description)}
+        ),
+        a!columnLayout(
+          contents: {a!richTextDisplayField(value: "$" & fv!item.amount)},
+          width: "NARROW"
+        )
+      }
+    ),
+    /* Show "Add" button or total only after last item */
+    if(
+      fv!isLast,
+      a!richTextDisplayField(
+        value: a!richTextItem(
+          text: "Total: $" & sum(property(local!invoiceItems, "amount")),
+          size: "LARGE",
+          style: "STRONG"
+        )
+      ),
+      {}
+    )
+  }
+)
+```
+
+---
+
+### fv!itemCount - Total Item Count
+
+**Purpose:** Access the total number of items for progress indicators or conditional logic
+
+```sail
+/* Progress indicator pattern */
+a!forEach(
+  items: local!uploadQueue,
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: a!richTextItem(
+          text: "Processing " & fv!index & " of " & fv!itemCount,
+          style: "STRONG"
+        )
+      ),
+      a!textField(
+        label: "File",
+        value: fv!item.filename,
+        readOnly: true
+      )
+    }
+  )
+)
+```
+
+---
+
+### fv!identifier - Record Identifier (CRITICAL)
+
+**⚠️ AVAILABILITY RULE:**
+
+`fv!identifier` is **ONLY** available when iterating over data from `a!recordData()`:
+
+✅ **Available:** `a!forEach()` over results from `a!recordData()`
+❌ **NOT Available:** `a!forEach()` over `a!queryRecordType().data`
+
+```sail
+/* ✅ CORRECT - fv!identifier available with a!recordData() */
+a!forEach(
+  items: a!recordData(
+    recordType: recordType!Case,
+    filters: a!queryFilter(
+      field: recordType!Case.fields.status,
+      operator: "=",
+      value: "Open"
+    )
+  ),
+  expression: a!cardLayout(
+    contents: {
+      a!richTextItem(
+        text: fv!item[recordType!Case.fields.title],
+        link: a!recordLink(
+          recordType: recordType!Case,
+          identifier: fv!identifier  /* ✅ Works with a!recordData() */
+        )
+      )
+    }
+  )
+)
+
+/* ❌ WRONG - fv!identifier not available with a!queryRecordType() */
+local!cases: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    recordType!Case.fields.caseId,
+    recordType!Case.fields.title
+  }
+).data,
+
+a!forEach(
+  items: local!cases,
+  expression: a!recordLink(
+    recordType: recordType!Case,
+    identifier: fv!identifier  /* ❌ ERROR - Not available with queries! */
+  )
+)
+
+/* ✅ CORRECT - Use primary key field instead */
+local!cases: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {
+    recordType!Case.fields.caseId,  /* Must query primary key */
+    recordType!Case.fields.title
+  }
+).data,
+
+a!forEach(
+  items: local!cases,
+  expression: a!recordLink(
+    recordType: recordType!Case,
+    identifier: fv!item[recordType!Case.fields.caseId]  /* ✅ Use primary key */
+  )
+)
+```
+
+**Key Rules:**
+1. **With `a!recordData()`** → Use `fv!identifier`
+2. **With `a!queryRecordType().data`** → Use primary key field
+3. **Always query the primary key field** when creating record links in queries
+
+---
+
+### Combining Multiple Variables
+
+```sail
+/* Dynamic remove button logic with fv!itemCount and fv!isLast */
+a!forEach(
+  items: local!lineItems,
+  expression: a!cardLayout(
+    contents: {
+      a!textField(
+        label: "Item " & fv!index,
+        value: fv!item.name
+      )
+    },
+    link: if(
+      and(
+        fv!itemCount > 1,  /* Only show remove if more than 1 item */
+        not(fv!isLast)     /* Keep at least the last item */
+      ),
+      a!dynamicLink(
+        label: "Remove",
+        value: fv!index,
+        saveInto: a!save(local!lineItems, remove(local!lineItems, fv!index))
+      ),
+      {}
+    )
+  )
+)
+```
+
+---
+
+### Real-World Patterns
+
+For complete examples of using `fv!item`, `fv!index`, and `fv!isLast` together, see the **One-to-Many Relationships** section in this document, which demonstrates:
+- Using `fv!item` to access and save relationship field values
+- Using `fv!index` for item labeling and array removal
+- Using `fv!isLast` to show "Add" button after last item
+
+---
+
+### ⚠️ Common Mistakes
+
+#### ❌ MISTAKE: Using fv!identifier with a!queryRecordType()
+This is the **MOST COMMON ERROR** with `a!forEach` and causes runtime failures.
+
+```sail
+/* ❌ WRONG - fv!identifier doesn't exist with queries */
+a!forEach(
+  items: a!queryRecordType(...).data,
+  expression: a!recordLink(
+    identifier: fv!identifier  /* ❌ ERROR */
+  )
+)
+
+/* ✅ RIGHT - Use primary key field */
+a!forEach(
+  items: a!queryRecordType(
+    fields: {recordType!Case.fields.caseId, ...}  /* Query primary key */
+  ).data,
+  expression: a!recordLink(
+    identifier: fv!item[recordType!Case.fields.caseId]  /* ✅ Use primary key */
+  )
+)
+```
+
+#### ❌ MISTAKE: Accessing properties on scalar values
+```sail
+/* ❌ WRONG - fv!item is a string, not an object */
+a!forEach(
+  items: {"Open", "Closed"},
+  expression: fv!item.status  /* ❌ ERROR */
+)
+
+/* ✅ RIGHT */
+a!forEach(
+  items: {"Open", "Closed"},
+  expression: a!tagField(text: fv!item)  /* ✅ fv!item IS the value */
+)
+```
+
+---
+
+### Best Practices Summary
+
+#### ✅ DO:
+- **Understand fv!item type** - Scalar, map, or record object?
+- **Use fv!index for array manipulation** - `remove()`, `insert()`, `a!update()`
+- **Use fv!isFirst/isLast for conditional rendering** - Headers, footers, dividers
+- **Remember fv!index is 1-based** - Matches Appian's `index()` function
+- **Use fv!identifier ONLY with a!recordData()** - Otherwise use primary key field
+- **Combine variables for complex logic** - e.g., `and(fv!itemCount > 1, not(fv!isLast))`
+
+#### ❌ DON'T:
+- **Don't assume fv!identifier exists everywhere** - Only with `a!recordData()`
+- **Don't access properties on scalar fv!item** - Check your data type first
+- **Don't use 0-based indexing** - Appian is 1-based throughout
+- **Don't use fv! variables outside a!forEach()** - They don't exist in other contexts
+- **Don't forget null checks on fv!item properties** - Record fields can be null
+
+</foreach_function_variables>
 
 <array_manipulation_patterns>
 ## Array and Data Manipulation Patterns
@@ -458,10 +881,10 @@ local!color: index(
 ```sail
 /* INCORRECT - a!map() creates untyped maps, not record instances */
 append(
-  ri!case['recordType!{uuid}Case.relationships.{uuid}caseNotes'],
+  ri!case['recordType!Case.relationships.caseNotes'],
   a!map(
-    'recordType!{uuid}CaseNote.fields.{uuid}noteText': "Follow up needed",
-    'recordType!{uuid}CaseNote.fields.{uuid}noteType': "Status Update"
+    'recordType!CaseNote.fields.noteText': "Follow up needed",
+    'recordType!CaseNote.fields.noteType': "Status Update"
   )
 )
 ```
@@ -470,18 +893,18 @@ append(
 ```sail
 /* CORRECT - Use record type constructor syntax */
 append(
-  ri!case['recordType!{uuid}Case.relationships.{uuid}caseNotes'],
-  'recordType!{uuid}CaseNote'(
-    'recordType!{uuid}CaseNote.fields.{uuid}noteText': "Follow up needed",
-    'recordType!{uuid}CaseNote.fields.{uuid}noteType': "Status Update"
+  ri!case['recordType!Case.relationships.caseNotes'],
+  'recordType!CaseNote'(
+    'recordType!CaseNote.fields.noteText': "Follow up needed",
+    'recordType!CaseNote.fields.noteType': "Status Update"
   )
 )
 ```
 
 ### Record Constructor Rules:
-1. **Always use the full record type reference as a function**: `'recordType!{uuid}RecordTypeName'(...)`
+1. **Always use the full record type reference as a function**: `'recordType!RecordTypeName'(...)`
 2. **Use parentheses, not curly braces**: `RecordType'()` not `RecordType'{}'`
-3. **Field names must be fully qualified**: `'recordType!{uuid}RecordType.fields.{uuid}fieldName': value`
+3. **Field names must be fully qualified**: `'recordType!RecordType.fields.fieldName': value`
 4. **This applies to all one-to-many relationships**: Case notes, contact history, document attachments, etc.
 
 ### Common Patterns:
@@ -490,7 +913,7 @@ append(
 ```sail
 append(
   ri!case.caseNotes,
-  'recordType!{uuid}CaseNote'()  /* Empty parentheses for default values */
+  'recordType!CaseNote'()  /* Empty parentheses for default values */
 )
 ```
 
@@ -498,10 +921,10 @@ append(
 ```sail
 append(
   ri!case.caseNotes,
-  'recordType!{uuid}CaseNote'(
-    'recordType!{uuid}CaseNote.fields.{uuid}noteTypeId': 1,
-    'recordType!{uuid}CaseNote.fields.{uuid}noteText': null,
-    'recordType!{uuid}CaseNote.fields.{uuid}createdDate': today()
+  'recordType!CaseNote'(
+    'recordType!CaseNote.fields.noteTypeId': 1,
+    'recordType!CaseNote.fields.noteText': null,
+    'recordType!CaseNote.fields.createdDate': today()
   )
 )
 ```
@@ -747,7 +1170,7 @@ if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–"
 local!caseCountQuery: a!queryRecordType(
   fields: a!aggregationFields(
     groupings: {},  /* No groupings = single row result */
-    measures: {a!measure(function: "COUNT", field: recordType!Case.fields.id, alias: "count")}
+    measures: {a!measure(function: "COUNT", field: 'recordType!Case.fields.id', alias: "count")}
   )
 ),
 /* For aggregations with NO groupings, use direct property access */
@@ -762,8 +1185,8 @@ local!caseCount: a!defaultValue(
 **Error 10: Incorrect Array and Data Manipulation Functions**
 - **Problem 1**: Using `append(map, array)` - append only works with arrays of compatible types
 - **Solution 1**: Use `a!update(data: array, index: 1, value: map)` to insert at beginning
-- **Problem 2**: Using `wherecontains()` with 3 parameters
-- **Solution 2**: `wherecontains(value, array)` only takes 2 params - use nested index() for lookups
+- **Problem 2**: Using `wherecontains()` incorrectly
+- **Solution 2**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section
 - **Problem 3**: Using `append()` to add single item to beginning of array
 - **Solution 3**: Use `a!update()` or `insert()` for positional insertion
 ```sail
@@ -773,15 +1196,7 @@ local!combined: append(local!singleMap, local!arrayOfMaps)  /* ERROR */
 /* ✅ RIGHT - Use a!update() to insert at position */
 local!combined: a!update(data: local!arrayOfMaps, index: 1, value: local!singleMap)
 
-/* ❌ WRONG - wherecontains() only takes 2 parameters */
-icon: wherecontains(value, array, arrayToExtractFrom)
-
-/* ✅ RIGHT - Use nested index() for lookups */
-icon: index(
-  index(configArray, wherecontains(value, configArray.field), {}).propertyName,
-  1,
-  "default"
-)
+/* For wherecontains() examples, see Array Manipulation Patterns section */
 ```
 </error_10>
 
@@ -805,9 +1220,9 @@ local!value: a!defaultValue(local!kpiQuery.data.alias, 0)
 ```sail
 /* ❌ WRONG - Missing array index for regular query */
 local!userQuery: a!queryRecordType(
-  fields: {recordType!User.fields.name}
+  fields: {'recordType!User.fields.name'}
 ).data,
-local!name: local!userQuery['recordType!User.fields.name']  /* ERROR */
+local!name: local!userQuery['recordType!User.fields.name']  /* ERROR - Query returns array */
 
 /* ✅ RIGHT - Index into first row */
 local!name: a!defaultValue(
@@ -828,10 +1243,10 @@ local!name: a!defaultValue(
 <null_checking_checkpoint>
 **CHECKPOINT: Before finalizing any SAIL expression, verify EVERY direct field reference uses a!defaultValue()**
 
-- ✅ `a!defaultValue(ri!record[recordType!Example.fields.field], "")` 
-- ✅ `a!defaultValue(ri!record[recordType!Example.fields.field], null)`
-- ✅ `a!defaultValue(ri!record[recordType!Example.relationships.rel], {})`
-- ❌ `ri!record[recordType!Example.fields.field]` (naked field reference)
+- ✅ `a!defaultValue(ri!record['recordType!Example.fields.field'], "")`
+- ✅ `a!defaultValue(ri!record['recordType!Example.fields.field'], null)`
+- ✅ `a!defaultValue(ri!record['recordType!Example.relationships.rel'], {})`
+- ❌ `ri!record['recordType!Example.fields.field']` (naked field reference)
 </null_checking_checkpoint>
 
 <required_patterns>
@@ -839,7 +1254,7 @@ local!name: a!defaultValue(
 
 1. **Form Field Values**: Always wrap in `a!defaultValue()`
    ```sail
-   value: a!defaultValue(ri!record[recordType!X.fields.title], ""),
+   value: a!defaultValue(ri!record['recordType!X.fields.title'], ""),
    ```
 
 2. **User Function Calls**: Always check for null user IDs BEFORE calling user() function
@@ -870,13 +1285,13 @@ local!name: a!defaultValue(
 
 3. **Array Operations**: Protect all array references
    ```sail
-   length(a!defaultValue(ri!record[recordType!X.relationships.items], {}))
+   length(a!defaultValue(ri!record['recordType!X.relationships.items'], {}))
    ```
 
 4. **Validation Logic**: Wrap all validation checks
    ```sail
    if(
-     a!isNullOrEmpty(a!defaultValue(ri!record[recordType!X.fields.required], "")),
+     a!isNullOrEmpty(a!defaultValue(ri!record['recordType!X.fields.required'], "")),
      "Field is required",
      null
    )
@@ -889,31 +1304,29 @@ local!name: a!defaultValue(
 </mandatory_null_safety>
 
 <functions_that_reject_null>
-## 🚨 CRITICAL: Functions That Cannot Accept Null Values
+### Advanced: Functions That Reject Null
 
-**Some Appian functions will fail immediately if passed null values, even with a!defaultValue(). These require if() checks BEFORE calling the function:**
+**Some functions fail even with `a!defaultValue()` and require `if()` checks BEFORE calling:**
 
-<null_rejecting_functions>
-**Functions That Reject Null:**
-- `user(userId, property)` - Cannot accept null userId
-- `group(groupId, property)` - Cannot accept null groupId
-- `text(value, format)` - Cannot accept null value when formatting dates/numbers
-- String manipulation functions on null: `upper()`, `lower()`, `left()`, `right()`, `find()`
+**Null-Rejecting Functions:**
+- `user(userId, property)`, `group(groupId, property)` - Cannot accept null ID
+- `text(value, format)` - Cannot format null dates/numbers
+- String manipulation: `upper()`, `lower()`, `left()`, `right()`, `find()` - Fail on null
 
+**Required Pattern:**
 ```sail
-/* ✅ CORRECT Pattern for null-rejecting functions */
+/* ✅ CORRECT - Check for null BEFORE calling function */
 if(
   a!isNotNullOrEmpty(a!defaultValue(fieldValue, null)),
   functionThatRejectsNull(fieldValue, otherParams),
   fallbackValue
 )
 
-/* ❌ WRONG - a!defaultValue() inside the function doesn't prevent the error */
+/* ❌ WRONG - a!defaultValue() wrapper doesn't prevent the error */
 functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 ```
 
-**Rule**: When a function operates ON a value (not just passing it through), check for null BEFORE calling the function. The a!defaultValue() wrapper alone is not sufficient for these functions.
-</null_rejecting_functions>
+**Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
 </functions_that_reject_null>
 
 <query_filters_with_rule_inputs>
@@ -958,7 +1371,7 @@ a!queryFilter(
 <common_scenarios>
 **Common Scenarios Requiring applyWhen:**
 
-**Scenario 1: Filtering Related Records in a Grid**
+**Single Filter Example (Grid with Related Records):**
 ```sail
 a!gridField(
   data: a!recordData(
@@ -974,21 +1387,7 @@ a!gridField(
 )
 ```
 
-**Scenario 2: Querying Child Records Based on Parent**
-```sail
-local!childRecords: a!queryRecordType(
-  recordType: 'recordType!Comment',
-  filters: a!queryFilter(
-    field: 'recordType!Comment.fields.taskId',
-    operator: "=",
-    value: ri!task['recordType!Task.fields.taskId'],
-    applyWhen: a!isNotNullOrEmpty(ri!task['recordType!Task.fields.taskId'])
-  ),
-  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: -1)
-).data
-```
-
-**Scenario 3: Multiple Filters with Rule Inputs**
+**Multiple Filters Example (Combining Rule Inputs and Literals):**
 ```sail
 a!queryRecordType(
   recordType: 'recordType!Document',
@@ -999,13 +1398,12 @@ a!queryRecordType(
         field: 'recordType!Document.fields.caseId',
         operator: "=",
         value: ri!case['recordType!Case.fields.caseId'],
-        applyWhen: a!isNotNullOrEmpty(ri!case['recordType!Case.fields.caseId'])
+        applyWhen: a!isNotNullOrEmpty(ri!case['recordType!Case.fields.caseId'])  /* Protect rule input */
       ),
       a!queryFilter(
         field: 'recordType!Document.fields.status',
         operator: "=",
-        value: "Active"
-        /* No applyWhen needed - literal values are never null */
+        value: "Active"  /* No applyWhen needed - literal values are never null */
       )
     }
   ),
@@ -1025,14 +1423,7 @@ For every `a!queryFilter()` in your code, verify:
 </applywhen_checklist>
 
 <why_this_matters>
-**Why This Matters:**
-
-- **CREATE Forms**: When creating new records, `ri!record` is null and has no ID yet
-- **Runtime Safety**: Queries with null filter values can fail or return unexpected results
-- **User Experience**: Prevents interface errors when users create new records or when related data is missing
-- **Best Practice**: Using `applyWhen` is the standard Appian pattern for conditional filtering
-
-**Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen`.
+**Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
 </why_this_matters>
 </query_filters_with_rule_inputs>
 
@@ -1302,8 +1693,8 @@ local!avgOrderValue: a!defaultValue(
 
 /* ❌ WRONG - Using .totalCount for KPIs */
 local!caseQuery: a!queryRecordType(
-  recordType: recordType!Case,
-  fields: {recordType!Case.fields.id},
+  recordType: 'recordType!Case',
+  fields: {'recordType!Case.fields.id'},
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
   fetchTotalCount: true
 ),
@@ -1450,7 +1841,7 @@ local!value: local!kpiQuery.data.alias  /* Direct access */
 
 /* ❌ MISTAKE 2: Direct access on regular queries */
 local!userQuery: a!queryRecordType(
-  fields: {recordType!User.fields.name}
+  fields: {'recordType!User.fields.name'}
 ).data,
 local!name: local!userQuery['recordType!User.fields.name']  /* WRONG - missing [1] */
 
@@ -1650,10 +2041,10 @@ a!queryRecordType(
 <array_functions_exact_counts>
 Array Functions - EXACT Parameter Counts
 ```sail
-/* ✅ CORRECT - wherecontains() takes ONLY 2 parameters */
+/* ✅ CORRECT - wherecontains() takes ONLY 2 parameters (see Array Manipulation Patterns for usage) */
 wherecontains(value, array)
 
-/* ✅ CORRECT - contains() takes ONLY 2 parameters */  
+/* ✅ CORRECT - contains() takes ONLY 2 parameters */
 contains(array, value)
 
 /* ✅ CORRECT - index() takes 2 or 3 parameters */
@@ -3268,6 +3659,14 @@ Critical Syntax:
 - [ ] **ALL direct field references wrapped in `a!defaultValue()`**
 - [ ] **User function calls protected with null checking via `if()` statements**
 - [ ] **Array operations use `a!defaultValue()` with empty array fallbacks**
+
+<record_type_reference_validation>
+Record Type Reference Syntax:
+- [ ] **All record type references use clean semantic names** (e.g., `'recordType!Case.fields.title'`)
+- [ ] **No `{uuid}` placeholders in generated code** - developers will use Appian autocomplete for actual refs
+- [ ] **Record type constructors use semantic names**: `'recordType!CaseNote'(...)` not `'recordType!{uuid}CaseNote'(...)`
+- [ ] **All references properly quoted**: `'recordType!Case.fields.title'` not `recordType!Case.fields.title`
+</record_type_reference_validation>
 
 <array_function_validation>
 Array Function Validation:
