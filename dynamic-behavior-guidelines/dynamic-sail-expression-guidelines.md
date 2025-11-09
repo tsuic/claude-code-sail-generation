@@ -1,5 +1,44 @@
 # DYNAMIC SAIL UI EXPRESSION GUIDELINES
 
+## 📑 Quick Navigation Index
+
+### By Task Type:
+- **Building a form/wizard that creates or updates records** → Lines 77-229 (Form Interface Data Patterns)
+- **Displaying data in grids or charts** → Lines 1450-1906 (Data Querying Patterns)
+- **Working with arrays and loops** → Lines 370-763 (a!forEach() Reference), Lines 764-845 (Array Patterns)
+- **Managing one-to-many relationships in forms** → Lines 2498-2641 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 1450-1906 (Data Querying Patterns)
+- **Handling user selections in grids** → Lines 2285-2497 (Grid Selection Behavior)
+- **Implementing record actions** → Lines 3266-3317 (Record Actions)
+- **Working with dates and times** → Lines 2897-3022 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 3023-3234 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 2642-2896 (Related Record Field References and Patterns)
+
+### By Error Type:
+- **"Variable not defined" errors** → Lines 3-19 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 1187-1268 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 3357-3415 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 1907-1946 (Function Parameter Validation)
+- **Record type reference errors** → Lines 20-76 (Record Type Reference Syntax)
+- **Syntax errors (and/or, if statements)** → Lines 291-369 (Language-Specific Syntax Patterns)
+- **Grid selection not working** → Lines 2285-2497 (Grid Selection Behavior)
+- **Query filter errors with rule inputs** → Lines 1269-1373 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 2498-2641 (One-to-Many Relationships), Lines 2642-2896 (Related Record References)
+- **Button/wizard configuration errors** → Lines 1035-1064 (Button Parameters), Lines 1050-1064 (Wizard Parameters)
+
+### Critical Sections (Read These First):
+- 🚨 **Lines 3-19**: Mandatory Foundation Rules
+- 🚨 **Lines 77-229**: Form Interface Data Patterns
+- 🚨 **Lines 370-763**: a!forEach() Function Variables Reference
+- 🚨 **Lines 1187-1268**: Null Safety Implementation
+- 🚨 **Lines 2498-2641**: One-to-Many Relationship Data Management
+
+### Validation & Troubleshooting:
+- **Final validation checklist** → Lines 3416-3433 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 1065-1186 (Common Critical Errors)
+
+---
+
 ## 🚨 MANDATORY FOUNDATION RULES
 
 1. **All SAIL expressions must begin with `a!localVariables()`** - even if no variables are defined
