@@ -584,7 +584,7 @@ a!forEach(
       fv!isLast,
       a!richTextDisplayField(
         value: a!richTextItem(
-          text: "Total: $" & sum(property(local!invoiceItems, "amount")),
+          text: "Total: $" & sum(local!invoiceItems.amount),
           size: "LARGE",
           style: "STRONG"
         )
@@ -801,6 +801,187 @@ a!forEach(
 
 
 ## Array and Data Manipulation Patterns
+
+### Accessing Properties Across Arrays - Dot Notation
+
+**The ONLY way to access a property across all items in an array of maps is using dot notation.**
+
+#### ✅ CORRECT: Dot Notation
+```sail
+local!items: {
+  a!map(id: 1, name: "Item A", price: 100),
+  a!map(id: 2, name: "Item B", price: 200),
+  a!map(id: 3, name: "Item C", price: 300)
+},
+
+/* Access a single property across all items */
+local!allNames: local!items.name,
+/* Returns: {"Item A", "Item B", "Item C"} */
+
+local!allPrices: local!items.price,
+/* Returns: {100, 200, 300} */
+
+/* Use in calculations */
+local!totalPrice: sum(local!items.price),
+/* Returns: 600 */
+
+/* Use in comparisons */
+local!contractTypes: intersection(local!items.type, {"Contract"}),
+/* Returns all "Contract" values found */
+```
+
+#### ❌ WRONG: property() Function Does NOT Exist
+```sail
+/* ❌ ERROR - property() is not a valid SAIL function */
+local!allNames: property(local!items, "name", {}),
+
+/* ❌ ERROR - This syntax is invalid */
+sum(property(local!items, "price"))
+```
+
+**Key Rules:**
+- Use `array.propertyName` to extract property values across all items
+- Works with any array of maps (local variables, record data, etc.)
+- Returns an array of the property values in the same order
+- Returns empty array `{}` if source array is empty
+- Returns `null` elements for items missing that property
+
+---
+
+### Deriving Full Data from ID Arrays
+
+**Common Pattern:** Grid selections store IDs only, but you need full row data for business logic.
+
+**Solution:** Use `a!forEach() + index() + wherecontains()` to derive full objects from ID array.
+
+#### The Pattern
+
+```sail
+/* Step 1: Source data (all available items) */
+local!availableItems: {
+  a!map(id: 1, name: "Item A", type: "Public", price: 100),
+  a!map(id: 2, name: "Item B", type: "Contract", price: 200),
+  a!map(id: 3, name: "Item C", type: "Public", price: 150)
+},
+
+/* Step 2: ID array (from grid selection, user input, etc.) */
+local!selectedIds: {1, 3},
+
+/* Step 3: Derive full data using forEach + index + wherecontains */
+local!selectedItems: a!forEach(
+  items: local!selectedIds,
+  expression: index(
+    local!availableItems,
+    wherecontains(fv!item, local!availableItems.id),
+    null
+  )
+),
+/* Returns: {
+  a!map(id: 1, name: "Item A", type: "Public", price: 100),
+  a!map(id: 3, name: "Item C", type: "Public", price: 150)
+} */
+
+/* Step 4: Use derived data for business logic */
+local!totalPrice: sum(local!selectedItems.price),
+/* Returns: 250 */
+
+local!hasContractType: length(
+  intersection(local!selectedItems.type, {"Contract"})
+) > 0
+/* Returns: false (no Contract items selected) */
+```
+
+#### How It Works
+
+1. **a!forEach(items: local!selectedIds, ...)** - Iterate over each selected ID
+2. **fv!item** - Current ID being processed (e.g., 1, then 3)
+3. **wherecontains(fv!item, local!availableItems.id)** - Find position of this ID in source array
+   - Searches `{1, 2, 3}` (all IDs) for `fv!item` (current ID)
+   - Returns array of positions: `{1}` or `{3}`
+4. **index(local!availableItems, positions, null)** - Get full object at that position
+   - Returns the complete `a!map(id: ..., name: ..., type: ..., price: ...)`
+5. **null** - Default value if ID not found (defensive programming)
+
+#### Common Use Cases
+
+**Use Case 1: Grid Selection + Conditional Logic**
+```sail
+local!selectedCourseIds: {2, 4},  /* From grid selection */
+local!selectedCourses: a!forEach(
+  items: local!selectedCourseIds,
+  expression: index(
+    local!availableCourses,
+    wherecontains(fv!item, local!availableCourses.id),
+    null
+  )
+),
+
+/* Show field only if Contract course selected */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedCourses),
+    length(intersection(local!selectedCourses.type, {"Contract"})) > 0,
+    false
+  ),
+  a!textField(label: "Registration Code", ...),
+  {}
+)
+```
+
+**Use Case 2: Calculating Totals**
+```sail
+local!cartItemIds: {5, 12, 8},
+local!cartItems: a!forEach(
+  items: local!cartItemIds,
+  expression: index(
+    local!productCatalog,
+    wherecontains(fv!item, local!productCatalog.productId),
+    null
+  )
+),
+
+local!cartTotal: sum(local!cartItems.price),
+local!taxableItems: length(
+  wherecontains(true, local!cartItems.isTaxable)
+)
+```
+
+**Use Case 3: Remove Button in Display**
+```sail
+/* Display selected items with Remove buttons */
+a!forEach(
+  items: local!selectedItems,  /* Already derived from IDs */
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(value: fv!item.name),
+      a!buttonArrayLayout(
+        buttons: {
+          a!buttonWidget(
+            label: "Remove",
+            value: fv!item.id,
+            saveInto: {
+              a!save(
+                local!selectedIds,
+                remove(local!selectedIds, wherecontains(fv!item.id, local!selectedIds))
+              )
+            }
+          )
+        }
+      )
+    }
+  )
+)
+```
+
+#### Key Points
+
+- **Always maintain two variables**: IDs array + computed full data array
+- **Grid `selectionValue` always stores IDs**, never full row data
+- **Computed variable updates automatically** when ID array changes
+- **Always null-check computed variable** before accessing properties (use nested `if()`)
+- **Pattern works for any ID → full object mapping**, not just grid selections
+
+---
 
 ### Combining Different Data Types
 
@@ -2119,6 +2300,124 @@ and(
   a!isNotNullOrEmpty(local!value),
   local!value > 0,
   local!isEnabled
+)
+```
+
+### 🚨 CRITICAL: Short-Circuit Evaluation Rules
+
+**SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
+
+#### ❌ WRONG: Using and() for Null Safety
+```sail
+/* ❌ ERROR - and() evaluates BOTH arguments */
+/* If local!computedData is empty, the second argument still evaluates */
+/* This causes: "Invalid index: Cannot index property 'type' of Null" */
+and(
+  a!isNotNullOrEmpty(local!computedData),
+  local!computedData.type = "Contract"  /* CRASHES if computedData is empty */
+)
+```
+
+#### ✅ CORRECT: Use Nested if() for Short-Circuit Behavior
+```sail
+/* ✅ if() short-circuits - only evaluates the returned branch */
+if(
+  if(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.type = "Contract",  /* Only evaluated when not empty */
+    false
+  ),
+  /* Then branch - show registration code field */,
+  /* Else branch - hide field */
+)
+```
+
+#### When to Use Nested if() vs and()
+
+**Use nested if() when:**
+- Checking null/empty before property access on computed variables
+- Any scenario where the second condition CANNOT be safely evaluated if the first is false
+- Accessing properties on variables that could be empty arrays or null
+
+**Use and() when:**
+- All conditions are independent and can be safely evaluated in any order
+- All variables involved are guaranteed to have values (not null, not empty)
+- Simple boolean combinations without property access
+
+#### Quick Reference Table
+
+| Function | Short-Circuits? | Use For |
+|----------|----------------|---------|
+| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic |
+| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
+| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
+| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching with multiple conditions |
+
+#### Common Scenarios Requiring Nested if()
+
+**Scenario 1: Computed Variables from Grid Selections**
+```sail
+/* Grid selection derives full data */
+local!selectedItems: a!forEach(
+  items: local!selectedIds,
+  expression: index(...)
+),
+
+/* ❌ WRONG - Crashes when no items selected */
+showWhen: and(
+  length(local!selectedItems) > 0,
+  local!selectedItems.type = "Contract"  /* ERROR if empty */
+)
+
+/* ✅ RIGHT - Nested if() prevents crash */
+showWhen: if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(intersection(local!selectedItems.type, {"Contract"})) > 0,
+    false
+  ),
+  true,
+  false
+)
+```
+
+**Scenario 2: Record Field Access**
+```sail
+/* ❌ WRONG - Crashes if recordData is null */
+and(
+  a!isNotNullOrEmpty(local!recordData),
+  local!recordData['recordType!Case.fields.status'] = "Open"  /* ERROR if null */
+)
+
+/* ✅ RIGHT */
+if(
+  if(
+    a!isNotNullOrEmpty(local!recordData),
+    local!recordData['recordType!Case.fields.status'] = "Open",
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
+)
+```
+
+**Scenario 3: Array Property Access**
+```sail
+/* ❌ WRONG - Crashes if items array is empty */
+and(
+  length(local!items) > 0,
+  local!items.price > 100  /* ERROR if items is {} */
+)
+
+/* ✅ RIGHT */
+if(
+  if(
+    a!isNotNullOrEmpty(local!items),
+    length(where(local!items.price > 100)) > 0,
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
 )
 ```
 
@@ -3797,15 +4096,41 @@ If your interface fails to load, check:
 
 Before finalizing any SAIL interface, verify these critical items:
 
+### Foundation & Structure
 - [ ] **Expression starts with `a!localVariables()`** (see MANDATORY FOUNDATION RULES)
 - [ ] **a!recordData() ONLY in grids/charts** (see Data Querying Patterns - CRITICAL USAGE RULES)
-- [ ] **All null checks implemented** (see MANDATORY: Null Safety Implementation)
-- [ ] **Function parameters match documented signatures** (see CRITICAL: Function Parameter Validation)
-- [ ] **Relationship navigation follows single-path pattern** (see Relationship Navigation Syntax)
 - [ ] **Form data uses ri! pattern correctly** (see CRITICAL: Form Interface Data Patterns)
+
+### Grid Selection Pattern
+- [ ] **Grid selection uses two-variable approach** (see CRITICAL: Grid Selection Implementation Pattern)
+  - [ ] ID array variable for `selectionValue` (e.g., `local!selectedCourseIds`)
+  - [ ] Computed variable using `a!forEach() + index() + wherecontains()` pattern
+  - [ ] All `saveInto` operations modify ID array only
+- [ ] **Grid `selectionValue` treated as ID array**, never as full row data
+- [ ] **Computed variables have null checks** before property access (see next section)
+
+### Null Safety & Short-Circuit Evaluation
+- [ ] **All null checks implemented** (see MANDATORY: Null Safety Implementation)
+- [ ] **Computed variables protected with nested `if()`** - NOT `and()` (see Short-Circuit Evaluation Rules)
+- [ ] **Property access on arrays uses nested `if()`** when array could be empty
+- [ ] **No `and()` used for null-safe property access** - Use nested `if()` instead
+
+### Array & Property Access
+- [ ] **Dot notation used for property access** (e.g., `local!items.price`)
+- [ ] **NO usage of `property()` function** - Function does not exist in SAIL
 - [ ] **Array functions use correct parameter order** (see Array and Data Manipulation Patterns)
-- [ ] **Record actions use a!recordActionField()** (see Record Actions)
+- [ ] **Derived data pattern follows `a!forEach() + index() + wherecontains()`** (see Deriving Full Data from ID Arrays)
+
+### Function Validation
+- [ ] **Function parameters match documented signatures** (see CRITICAL: Function Parameter Validation)
 - [ ] **All functions exist in Appian** (see Available Appian Functions)
+- [ ] **Short-circuit evaluation rules followed** (see Short-Circuit Evaluation Rules)
+  - Use nested `if()` for null-safe property access
+  - Use `and()`/`or()` only for independent conditions
+
+### Component Patterns
+- [ ] **Relationship navigation follows single-path pattern** (see Relationship Navigation Syntax)
+- [ ] **Record actions use a!recordActionField()** (see Record Actions)
 - [ ] **Checkbox patterns match documented approach** (see Single Checkbox Field Pattern)
 
 Each item above links to its authoritative section for complete rules and examples.
