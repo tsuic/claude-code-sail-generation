@@ -2591,37 +2591,85 @@ a!localVariables(
 <single_checkbox_field_pattern>
 Single Checkbox Field Pattern
 
-**When using `a!checkboxField()` with a single choice (one choiceLabel/choiceValue pair):**
+**Pattern 1: Boolean Database Field (Simple Toggle)**
+
+When binding a single checkbox directly to a boolean record field with no dependent logic:
+
 ```sail
-/* ✅ CORRECT - Direct assignment, no null handling needed */
+/* ✅ CORRECT - Direct assignment for boolean database fields */
 a!checkboxField(
   label: "Options",
   choiceLabels: {"Enable Feature"},
-  choiceValues: {true()},
+  choiceValues: {true},
   value: ri!record['recordType!Example.fields.booleanField'],
   saveInto: ri!record['recordType!Example.fields.booleanField'],
   choiceLayout: "STACKED"
 )
+```
 
-/* ❌ WRONG - Unnecessary null checking and conversion logic */
+**Pattern 2: Local Variable with Dependent Field Clearing**
+
+When using a single checkbox with local variables that start as null or need to clear dependent fields:
+
+```sail
+/* ✅ CORRECT - Null-aware toggle pattern with dependent field clearing */
 a!checkboxField(
-  label: "Options",
-  choiceLabels: {"Enable Feature"},
-  choiceValues: {true()},
-  value: if(
-    a!defaultValue(ri!record['recordType!Example.fields.booleanField'], false()),
-    {true()},
-    {}
-  ),
+  label: "Employment Status",
+  choiceLabels: {"I am not currently employed"},
+  choiceValues: {true},
+  value: local!notCurrentlyEmployed,
   saveInto: {
-    a!save(
-      ri!record['recordType!Example.fields.booleanField'],
-      contains(save!value, true())
+    if(
+      a!isNullOrEmpty(local!notCurrentlyEmployed),
+      /* If the user checked the box, save its value and clear dependent fields */
+      {
+        local!notCurrentlyEmployed,
+        a!save(local!jobTitle, null),
+        a!save(local!company, null)
+      },
+      /* If the user unchecked the box, clear its value */
+      {
+        a!save(local!notCurrentlyEmployed, null)
+      }
     )
   }
 )
+
+/* Dependent fields check null state */
+a!textField(
+  label: "Job Title",
+  value: local!jobTitle,
+  saveInto: local!jobTitle,
+  required: a!isNullOrEmpty(local!notCurrentlyEmployed),
+  disabled: a!isNotNullOrEmpty(local!notCurrentlyEmployed)
+)
 ```
-Rule: Single checkbox fields automatically handle null-to-false conversion. Use direct assignment for both value and saveInto parameters without a!defaultValue(), if(), or contains() logic.
+
+**Key Differences:**
+- **Pattern 1**: Use when binding to a boolean database field with no side effects
+- **Pattern 2**: Use when the checkbox state affects other fields or starts as null
+
+**Common Mistakes:**
+```sail
+/* ❌ WRONG - Using conditional value binding unnecessarily */
+value: if(local!notCurrentlyEmployed, {true}, {})
+
+/* ✅ RIGHT - Direct assignment */
+value: local!notCurrentlyEmployed
+
+/* ❌ WRONG - Using save!value in conditional */
+saveInto: {
+  a!save(local!var, or(save!value = {true})),
+  if(or(save!value = {true}), ...) /* ERROR: save!value not allowed here */
+}
+
+/* ✅ RIGHT - Check local variable state, not save!value */
+saveInto: {
+  if(a!isNullOrEmpty(local!var), ...)
+}
+```
+
+**Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
 </single_checkbox_field_pattern>
 
 </component_usage_patterns>
