@@ -3,39 +3,43 @@
 ## 📑 Quick Navigation Index
 
 ### By Task Type:
-- **Building a form/wizard that creates or updates records** → Lines 77-229 (Form Interface Data Patterns)
-- **Displaying data in grids or charts** → Lines 1450-1906 (Data Querying Patterns)
-- **Working with arrays and loops** → Lines 370-763 (a!forEach() Reference), Lines 764-845 (Array Patterns)
-- **Managing one-to-many relationships in forms** → Lines 2498-2641 (One-to-Many Relationship Data Management)
-- **Creating dropdown choices from record data** → Lines 1450-1906 (Data Querying Patterns)
-- **Handling user selections in grids** → Lines 2285-2497 (Grid Selection Behavior)
-- **Implementing record actions** → Lines 3266-3317 (Record Actions)
-- **Working with dates and times** → Lines 2897-3022 (Date/Time Critical Rules)
-- **Building charts and visualizations** → Lines 3023-3234 (Chart Configuration and Components)
-- **Accessing related record data** → Lines 2642-2896 (Related Record Field References and Patterns)
+- **Building a form/wizard that creates or updates records** → Lines 116-268 (Form Interface Data Patterns)
+- **Displaying data in grids or charts** → Lines 1809-2265 (Data Querying Patterns)
+- **Working with arrays and loops** → Lines 409-802 (a!forEach() Reference), Lines 803-1065 (Array Patterns)
+- **Handling grid selections (ID arrays + full data)** → Lines 2975-3176 (Grid Selection Implementation Pattern)
+- **Managing one-to-many relationships in forms** → Lines 3177-3320 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 1809-2265 (Data Querying Patterns)
+- **Understanding grid selection behavior** → Lines 2762-2974 (Grid Selection Behavior)
+- **Implementing record actions** → Lines 3945-3996 (Record Actions)
+- **Working with dates and times** → Lines 3576-3701 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 3702-3913 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 3321-3575 (Related Record Field References and Patterns)
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 3-19 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 1187-1268 (Null Safety Implementation)
-- **"Function does not exist" errors** → Lines 3357-3415 (Essential Functions Reference)
-- **Invalid function parameters** → Lines 1907-1946 (Function Parameter Validation)
-- **Record type reference errors** → Lines 20-76 (Record Type Reference Syntax)
-- **Syntax errors (and/or, if statements)** → Lines 291-369 (Language-Specific Syntax Patterns)
-- **Grid selection not working** → Lines 2285-2497 (Grid Selection Behavior)
-- **Query filter errors with rule inputs** → Lines 1269-1373 (Protecting Query Filters)
-- **Relationship navigation errors** → Lines 2498-2641 (One-to-Many Relationships), Lines 2642-2896 (Related Record References)
-- **Button/wizard configuration errors** → Lines 1035-1064 (Button Parameters), Lines 1050-1064 (Wizard Parameters)
+- **"Variable not defined" errors** → Lines 42-58 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 1407-1627 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 4036-4072 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 2266-2423 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 2306-2422 (Short-Circuit Evaluation Rules)
+- **Property access errors (property() function)** → Lines 805-983 (Dot Notation & Derived Data Patterns)
+- **Record type reference errors** → Lines 59-115 (Record Type Reference Syntax)
+- **Syntax errors (and/or, if statements)** → Lines 330-408 (Language-Specific Syntax Patterns)
+- **Grid selection not working** → Lines 2762-2974 (Grid Selection Behavior), Lines 2975-3176 (Implementation Pattern)
+- **Query filter errors with rule inputs** → Lines 1628-1713 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 3177-3320 (One-to-Many Relationships), Lines 3321-3575 (Related Record References)
+- **Button/wizard configuration errors** → Lines 1255-1269 (Button Parameters), Lines 1270-1284 (Wizard Parameters)
 
 ### Critical Sections (Read These First):
-- 🚨 **Lines 3-19**: Mandatory Foundation Rules
-- 🚨 **Lines 77-229**: Form Interface Data Patterns
-- 🚨 **Lines 370-763**: a!forEach() Function Variables Reference
-- 🚨 **Lines 1187-1268**: Null Safety Implementation
-- 🚨 **Lines 2498-2641**: One-to-Many Relationship Data Management
+- 🚨 **Lines 42-58**: Mandatory Foundation Rules
+- 🚨 **Lines 116-268**: Form Interface Data Patterns
+- 🚨 **Lines 409-802**: a!forEach() Function Variables Reference
+- 🚨 **Lines 1407-1627**: Null Safety Implementation (including computed variables)
+- 🚨 **Lines 2975-3176**: Grid Selection Implementation Pattern (two-variable approach)
+- 🚨 **Lines 3177-3320**: One-to-Many Relationship Data Management
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 3416-3433 (Syntax Validation Checklist)
-- **Common error troubleshooting** → Lines 1065-1186 (Common Critical Errors)
+- **Final validation checklist** → Lines 4095-4136 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 1285-1406 (Common Critical Errors)
 
 ---
 
