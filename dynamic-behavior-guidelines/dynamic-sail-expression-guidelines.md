@@ -1305,6 +1305,145 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
 
+### 🚨 CRITICAL: Null Safety for Computed Variables and Short-Circuit Evaluation
+
+**Computed variables that derive from empty arrays require special null checking with nested if() statements.**
+
+#### The Problem with and()
+
+SAIL's `and()` and `or()` functions **DO NOT short-circuit** - they evaluate ALL arguments before returning a result. This means property access will always be evaluated, even when the variable is null/empty.
+
+```sail
+/* ❌ WRONG - and() evaluates ALL arguments */
+if(
+  and(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.field = "value"  /* ❌ ALWAYS evaluated, even when computedData is empty! */
+  ),
+  ...
+)
+```
+
+**Error you'll see:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'field' of type Text into type Null
+```
+
+#### ✅ CORRECT Solution: Nested if() for Short-Circuit Evaluation
+
+SAIL's `if()` function **DOES short-circuit** - it only evaluates the branch that will be returned.
+
+```sail
+/* ✅ CORRECT - Nested if() short-circuits */
+if(
+  if(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.field = "value",  /* ✅ Only evaluated when computedData is not empty */
+    false  /* Safe default when empty */
+  ),
+  /* Then branch - execute when condition is true */,
+  /* Else branch - execute when condition is false */
+)
+```
+
+#### Pattern for Null-Safe Property Access
+
+**Always use this nested if() pattern when accessing properties on computed variables:**
+
+```sail
+if(
+  if(
+    a!isNotNullOrEmpty(local!variable),
+    /* Safe to access properties here - variable is guaranteed not empty */
+    local!variable.propertyName = "expectedValue",
+    /* Return safe default - false, null, or {} depending on context */
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
+)
+```
+
+#### Common Scenarios Requiring Nested if()
+
+1. **Computed variables from grid selections:**
+```sail
+local!selectedItemIds: {},
+local!selectedItems: a!forEach(
+  items: local!selectedItemIds,
+  expression: index(local!allItems, wherecontains(fv!item, local!allItems.id), null)
+),
+
+/* ✅ Accessing properties */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(intersection(local!selectedItems.type, {"Contract"})) > 0,
+    false
+  ),
+  /* Show additional fields */,
+  {}
+)
+```
+
+2. **Filtered or derived arrays:**
+```sail
+local!activeUsers: a!forEach(
+  items: local!allUsers,
+  expression: if(fv!item.status = "Active", fv!item, null)
+),
+
+/* ✅ Checking properties */
+if(
+  if(
+    a!isNotNullOrEmpty(local!activeUsers),
+    wherecontains("ADMIN", local!activeUsers.role),
+    false
+  ),
+  /* Show admin panel */,
+  {}
+)
+```
+
+3. **Query results that might be empty:**
+```sail
+local!relatedRecords: a!queryRecordType(
+  recordType: recordType!Related,
+  filters: {...}
+).data,
+
+/* ✅ Safe property access */
+if(
+  if(
+    a!isNotNullOrEmpty(local!relatedRecords),
+    local!relatedRecords.status = "Approved",
+    false
+  ),
+  /* Process approved records */,
+  {}
+)
+```
+
+#### Why This Matters
+
+**Without proper null safety:**
+- Interface fails to load with cryptic property access errors
+- Users see error pages instead of forms
+- No graceful degradation - complete failure
+
+**With nested if() pattern:**
+- Interface loads successfully even when data is empty
+- Conditional UI elements hide/show correctly
+- Professional user experience with no errors
+
+#### Quick Reference
+
+| Function | Short-Circuits? | Use For Null Safety? |
+|----------|-----------------|----------------------|
+| `if()` | ✅ YES | ✅ ALWAYS use for null-safe property access |
+| `and()` | ❌ NO | ❌ NEVER use for null checking before property access |
+| `or()` | ❌ NO | ❌ NEVER use for null checking before property access |
+
 ## ⚠️ Protecting Query Filters That Use Rule Inputs
 
 **Rule inputs can be null in CREATE scenarios or when related data doesn't exist yet. Query filters that use rule input values MUST use `applyWhen` to prevent runtime errors.**
@@ -2532,6 +2671,208 @@ saveInto: {
 ```
 
 **Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
+
+
+## 🚨 CRITICAL: Grid Selection Implementation Pattern - Two-Variable Approach
+
+### The Core Problem
+Grid `selectionValue` stores **ONLY identifiers** (Integer Array or Text Array), NOT full row data. Trying to access row properties directly from `selectionValue` will cause runtime errors.
+
+### ❌ WRONG Pattern - Single Variable (Common Mistake)
+```sail
+local!selectedItems: {},  /* ❌ Trying to use one variable for both selection and data */
+
+a!gridField(
+  data: local!availableItems,
+  columns: {...},
+  selectionValue: local!selectedItems,  /* ❌ This stores IDs only! */
+  selectionSaveInto: local!selectedItems
+)
+
+/* Later trying to access row data */
+if(
+  length(
+    intersection(
+      local!selectedItems.type,  /* ❌ ERROR: selectedItems contains IDs, not objects! */
+      {"Contract"}
+    )
+  ) > 0,
+  ...
+)
+```
+
+**Error you'll see:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'type' of type Text into type Number (Integer)
+```
+
+### ✅ CORRECT Pattern - Two-Variable Approach
+
+**Step 1: Declare TWO variables**
+```sail
+local!availableItems: {
+  a!map(id: 1, name: "Item A", type: "Public"),
+  a!map(id: 2, name: "Item B", type: "Contract"),
+  a!map(id: 3, name: "Item C", type: "Public")
+},
+local!selectedItemIds: {},  /* Stores grid selection (IDs only) */
+local!selectedItems: a!forEach(  /* Computed: derives full data from IDs */
+  items: local!selectedItemIds,
+  expression: index(
+    local!availableItems,
+    wherecontains(fv!item, local!availableItems.id),
+    null
+  )
+),
+```
+
+**How the computed variable works:**
+1. `a!forEach()` iterates over each ID in `local!selectedItemIds` (e.g., {1, 3})
+2. For each ID (`fv!item`), `wherecontains(fv!item, local!availableItems.id)` finds the position in the array
+3. `index()` retrieves the full map at that position
+4. Result: An array of complete objects for all selected IDs
+
+**Step 2: Configure grid to use the IDs variable**
+```sail
+a!gridField(
+  data: local!availableItems,
+  columns: {
+    a!gridColumn(label: "Name", value: fv!row.name),
+    a!gridColumn(label: "Type", value: fv!row.type)
+  },
+  selectable: true,
+  selectionValue: local!selectedItemIds,  /* ✅ Use IDs variable */
+  selectionSaveInto: local!selectedItemIds  /* ✅ Save to IDs variable */
+)
+```
+
+**Step 3: Access full data using the computed variable (with null safety)**
+```sail
+/* ✅ CORRECT: Use nested if() for null-safe property access */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(
+      intersection(
+        local!selectedItems.type,  /* ✅ Safe: has full data */
+        {"Contract"}
+      )
+    ) > 0,
+    false  /* Return safe default when empty */
+  ),
+  /* Show registration code field */,
+  {} /* Hide field */
+)
+```
+
+**Step 4: Display selected items**
+```sail
+a!forEach(
+  items: local!selectedItems,  /* ✅ Iterate over full data */
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: {
+          a!richTextItem(text: fv!item.name, style: "STRONG"),
+          " - ",
+          fv!item.type
+        }
+      )
+    }
+  )
+)
+```
+
+**Step 5: Remove items (modify IDs only)**
+```sail
+/* Remove button in forEach */
+a!buttonWidget(
+  label: "Remove",
+  value: fv!item.id,
+  saveInto: a!save(
+    local!selectedItemIds,  /* ✅ Modify IDs variable only */
+    remove(local!selectedItemIds, wherecontains(fv!item.id, local!selectedItemIds))
+  )
+)
+```
+
+### Critical Rules
+1. ✅ **Always use TWO variables**: one for IDs (selectionValue), one computed for full data
+2. ✅ **Use a!forEach() + index() + wherecontains()** to derive full data from IDs
+3. ✅ **Never save to the computed variable** - it recalculates automatically
+4. ✅ **Always use nested if() for null safety** - `and()` does NOT short-circuit (see Null Safety section)
+5. ✅ **Grid selectionValue is ALWAYS a list** - even with maxSelections: 1
+6. ❌ **Never use filter()** for deriving data - requires fv!item context that doesn't exist in variable declarations
+
+### Why and() Doesn't Work for Null Safety
+```sail
+/* ❌ WRONG - and() evaluates ALL arguments */
+and(
+  a!isNotNullOrEmpty(local!selectedItems),
+  local!selectedItems.type = "value"  /* ❌ Still evaluated even when null! */
+)
+
+/* ✅ CORRECT - nested if() short-circuits */
+if(
+  a!isNotNullOrEmpty(local!selectedItems),
+  local!selectedItems.type = "value",  /* ✅ Only evaluated when not null */
+  false
+)
+```
+
+### Complete Working Example
+```sail
+a!localVariables(
+  local!availableCourses: {
+    a!map(id: 1, number: "OSHA #500", name: "Construction Safety", type: "Public"),
+    a!map(id: 2, number: "OSHA #501", name: "Maritime Safety", type: "Public"),
+    a!map(id: 3, number: "OSHA #5600", name: "Disaster Response", type: "Contract")
+  },
+  local!selectedCourseIds: {},
+  local!selectedCourses: a!forEach(
+    items: local!selectedCourseIds,
+    expression: index(
+      local!availableCourses,
+      wherecontains(fv!item, local!availableCourses.id),
+      null
+    )
+  ),
+  local!registrationCode,
+  {
+    a!gridField(
+      data: local!availableCourses,
+      columns: {
+        a!gridColumn(label: "Number", value: fv!row.number),
+        a!gridColumn(label: "Name", value: fv!row.name),
+        a!gridColumn(label: "Type", value: fv!row.type)
+      },
+      selectable: true,
+      selectionValue: local!selectedCourseIds,
+      selectionSaveInto: local!selectedCourseIds
+    ),
+    /* Show registration code field if contract course selected */
+    if(
+      if(
+        a!isNotNullOrEmpty(local!selectedCourses),
+        length(
+          intersection(
+            local!selectedCourses.type,
+            {"Contract"}
+          )
+        ) > 0,
+        false
+      ),
+      a!textField(
+        label: "Registration Code",
+        value: local!registrationCode,
+        saveInto: local!registrationCode,
+        required: true
+      ),
+      {}
+    )
+  }
+)
+```
 
 
 ## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
