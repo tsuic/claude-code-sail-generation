@@ -68,8 +68,7 @@ a!cardGroupLayout(
 ✅ **Best for:**
 - Specific grid arrangements that don't auto-wrap (like always a row of 3 cards)
 - Cards that need different widths (but same widths is also fine)
-- Complex layouts mixing cards with other content
-- Custom spacing and margin control
+- EVEN when above is true, if you need automatic height matching across cards, use cardGroupLayout instead!
 
 **Example: Cards with same widths - always on one row**
 ```sail

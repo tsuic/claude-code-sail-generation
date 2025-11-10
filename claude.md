@@ -15,7 +15,8 @@
 2. ❌ NEVER put arrays of components inside sideBySideLayouts
 3. ❌ NEVER put columnsLayouts or cardLayouts inside sideBySideLayouts
 4. ✅ ONLY richTextItems or richTextIcons are allowed inside richTextDisplayField
-5. ❌ choiceValues CANNOT be null or empty strings
+5. ✅ Each columnsLayout must have at least one AUTO-width columnLayout
+6. ❌ choiceValues CANNOT be null or empty strings
 
 If you violate any of these rules, STOP and reconsider your approach.
 
@@ -151,8 +152,8 @@ When designing a full page, follow these planning steps (not necessary if user r
   - [ ] If using HeaderContentLayout → Read `3-header-content-layout-instructions.md`
   - [ ] If using PaneLayout → Read `3-pane-layout-instructions.md`
   - [ ] If using WizardLayout → Read `3-wizard-layout-instructions.md`
-3. Plan the main page content layout using columnsLayout
-4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button
+3. Plan the main page content layout using columnsLayout → Always read `3-columns-layout-instructions.md`
+4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `3-sidebyside-layout-instructions.md`
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
   - If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
@@ -452,5 +453,5 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] No nested sideBySideLayouts
 - [ ] No columns or card layouts inside sideBySideItems
 - [ ] Only richTextItems or richTextIcons in richTextDisplayField
-- [ ] At least one AUTO width column in columnsLayout
+- [ ] At least one AUTO width column in each columnsLayout
 - [ ] ❌ DON'T USE `less` or `more` for `spacing`!
