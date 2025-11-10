@@ -153,6 +153,9 @@ When designing a full page, follow these planning steps (not necessary if user r
   - [ ] If using PaneLayout → Read `3-pane-layout-instructions.md`
   - [ ] If using WizardLayout → Read `3-wizard-layout-instructions.md`
 3. Plan the main page content layout using columnsLayout → Always read `3-columns-layout-instructions.md`
+  - Does the page need to be broken up into multiple columns? If NO, then you don't need a columnsLayout
+  - How many columns?
+  - How wide should each column be? Remember at least one column should be AUTO (e.g., AUTO-width main content + MEDIUM_PLUS side bar)
 4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `3-sidebyside-layout-instructions.md`
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
