@@ -28,12 +28,15 @@
 - **Query filter errors with rule inputs** → Lines 1628-1713 (Protecting Query Filters)
 - **Relationship navigation errors** → Lines 3177-3320 (One-to-Many Relationships), Lines 3321-3575 (Related Record References)
 - **Button/wizard configuration errors** → Lines 1255-1269 (Button Parameters), Lines 1270-1284 (Wizard Parameters)
+- **Checkbox initialization errors (false vs null)** → Lines 2916+ (Variable Initialization for Pattern 2)
+- **Checkbox state checking errors (length vs null)** → Lines 2976+ (save!value Null Checking in Checkbox saveInto)
 
 ### Critical Sections (Read These First):
 - 🚨 **Lines 42-58**: Mandatory Foundation Rules
 - 🚨 **Lines 116-268**: Form Interface Data Patterns
 - 🚨 **Lines 409-802**: a!forEach() Function Variables Reference
 - 🚨 **Lines 1407-1627**: Null Safety Implementation (including computed variables)
+- 🚨 **Lines 2896-3000**: Single Checkbox Field Pattern (initialization and null checking)
 - 🚨 **Lines 2975-3176**: Grid Selection Implementation Pattern (two-variable approach)
 - 🚨 **Lines 3177-3320**: One-to-Many Relationship Data Management
 
@@ -2915,37 +2918,65 @@ a!checkboxField(
 
 When using a single checkbox with local variables that start as null or need to clear dependent fields:
 
+**Critical: Variable Initialization for Pattern 2**
+
+When using Pattern 2 (local variables with checkboxes), nullable boolean variables MUST be initialized to `null`, NOT `false`:
+
 ```sail
-/* ✅ CORRECT - Null-aware toggle pattern with dependent field clearing */
-a!checkboxField(
-  label: "Employment Status",
-  choiceLabels: {"I am not currently employed"},
-  choiceValues: {true},
-  value: local!notCurrentlyEmployed,
-  saveInto: {
-    if(
-      a!isNullOrEmpty(local!notCurrentlyEmployed),
-      /* If the user checked the box, save its value and clear dependent fields */
-      {
-        local!notCurrentlyEmployed,
-        a!save(local!jobTitle, null),
-        a!save(local!company, null)
-      },
-      /* If the user unchecked the box, clear its value */
-      {
-        a!save(local!notCurrentlyEmployed, null)
-      }
-    )
-  }
+/* ✅ CORRECT - Null-initialized */
+a!localVariables(
+  local!caseUrgent,      /* null by default */
+  local!requiresReview,  /* null by default */
+  local!publicRecord,    /* null by default */
+  ...
 )
 
-/* Dependent fields check null state */
-a!textField(
-  label: "Job Title",
-  value: local!jobTitle,
-  saveInto: local!jobTitle,
-  required: a!isNullOrEmpty(local!notCurrentlyEmployed),
-  disabled: a!isNotNullOrEmpty(local!notCurrentlyEmployed)
+/* ❌ WRONG - False-initialized */
+a!localVariables(
+  local!caseUrgent: false,      /* ERROR: false is not a valid choiceValue! */
+  local!requiresReview: false,
+  local!publicRecord: false,
+  ...
+)
+```
+
+**Why?** Single checkboxes with `choiceValues: {true}` can only represent two states:
+- **Checked**: `{true}` (stored as the value `true`)
+- **Unchecked**: `{}` or `null` (NOT `false`)
+
+Since `choiceValues` can only contain `{true}`, the variable must be `null` when unchecked. Initializing to `false` creates a mismatch between the variable state and the checkbox's valid values.
+
+**Complete Pattern 2 Example:**
+
+```sail
+/* ✅ CORRECT - Null-aware toggle pattern with dependent field clearing */
+a!localVariables(
+  /* Initialize checkbox variable to null, NOT false */
+  local!caseUrgent,        /* null by default */
+  local!assignedTo,
+  local!escalationReason,
+
+  {
+    a!checkboxField(
+      label: "Case Priority",
+      choiceLabels: {"This is an urgent case requiring immediate attention"},
+      choiceValues: {true},
+      value: if(a!defaultValue(local!caseUrgent, false), {true}, {}),
+      saveInto: {
+        a!save(local!caseUrgent, if(a!isNotNullOrEmpty(save!value), true, null)),
+        a!save(local!assignedTo, if(a!isNotNullOrEmpty(save!value), "urgent-team@example.com", local!assignedTo)),
+        a!save(local!escalationReason, if(a!isNullOrEmpty(save!value), null, local!escalationReason))
+      }
+    ),
+    /* Dependent fields check null state */
+    a!textField(
+      label: "Escalation Reason",
+      value: local!escalationReason,
+      saveInto: local!escalationReason,
+      required: a!isNotNullOrEmpty(local!caseUrgent),
+      showWhen: a!isNotNullOrEmpty(local!caseUrgent)
+    )
+  }
 )
 ```
 
@@ -2956,10 +2987,10 @@ a!textField(
 **Common Mistakes:**
 ```sail
 /* ❌ WRONG - Using conditional value binding unnecessarily */
-value: if(local!notCurrentlyEmployed, {true}, {})
+value: if(local!caseUrgent, {true}, {})
 
 /* ✅ RIGHT - Direct assignment */
-value: local!notCurrentlyEmployed
+value: local!caseUrgent
 
 /* ❌ WRONG - Using save!value in conditional */
 saveInto: {
@@ -2971,9 +3002,99 @@ saveInto: {
 saveInto: {
   if(a!isNullOrEmpty(local!var), ...)
 }
+
+/* ❌ WRONG - Using length() on save!value */
+saveInto: {
+  a!save(local!var, if(length(save!value) > 0, true, null))  /* ERROR: fails when null */
+}
+
+/* ✅ RIGHT - Use a!isNotNullOrEmpty() */
+saveInto: {
+  a!save(local!var, if(a!isNotNullOrEmpty(save!value), true, null))
+}
 ```
 
 **Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
+
+
+### 🚨 CRITICAL: save!value Null Checking in Checkbox saveInto
+
+**The Problem:**
+When a checkbox is **unchecked**, `save!value` is `null`, NOT an empty array `{}`. Using `length(save!value)` will cause runtime errors.
+
+```sail
+/* ❌ WRONG - length() fails on null */
+a!checkboxField(
+  choiceLabels: {"Case requires legal review"},
+  choiceValues: {true},
+  value: if(a!defaultValue(local!requiresLegalReview, false), {true}, {}),
+  saveInto: {
+    a!save(local!requiresLegalReview, if(length(save!value) > 0, true, null)),  /* ERROR when unchecked! */
+    a!save(local!legalReviewer, if(length(save!value) = 0, null, local!legalReviewer))  /* ERROR! */
+  }
+)
+
+/* ✅ CORRECT - Use a!isNotNullOrEmpty() for null safety */
+a!checkboxField(
+  choiceLabels: {"Case requires legal review"},
+  choiceValues: {true},
+  value: if(a!defaultValue(local!requiresLegalReview, false), {true}, {}),
+  saveInto: {
+    a!save(local!requiresLegalReview, if(a!isNotNullOrEmpty(save!value), true, null)),
+    a!save(local!legalReviewer, if(a!isNullOrEmpty(save!value), null, local!legalReviewer))
+  }
+)
+```
+
+**Key Rules:**
+- ✅ **Always use `a!isNotNullOrEmpty(save!value)` or `a!isNullOrEmpty(save!value)`** to check checkbox state
+- ❌ **Never use `length(save!value)`** - it fails when checkbox is unchecked (null state)
+- ✅ **Checked state**: `save!value = {true}` → `a!isNotNullOrEmpty(save!value)` returns `true`
+- ✅ **Unchecked state**: `save!value = null` → `a!isNullOrEmpty(save!value)` returns `true`
+
+**Multi-Checkbox Pattern:**
+For checkboxes with multiple values, STILL use null checking first:
+
+```sail
+/* ✅ CORRECT - Null-safe multi-checkbox saveInto */
+a!checkboxField(
+  label: "Case Categories",
+  choiceLabels: {"Financial", "Legal", "Technical", "Administrative"},
+  choiceValues: {"FINANCIAL", "LEGAL", "TECHNICAL", "ADMIN"},
+  value: a!flatten({
+    if(a!defaultValue(local!isFinancial, false), "FINANCIAL", null),
+    if(a!defaultValue(local!isLegal, false), "LEGAL", null),
+    if(a!defaultValue(local!isTechnical, false), "TECHNICAL", null),
+    if(a!defaultValue(local!isAdmin, false), "ADMIN", null)
+  }),
+  saveInto: {
+    /* Always check for null first, THEN use contains() */
+    a!save(local!isFinancial, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "FINANCIAL"), true, null), null)),
+    a!save(local!isLegal, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "LEGAL"), true, null), null)),
+    a!save(local!isTechnical, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "TECHNICAL"), true, null), null)),
+    a!save(local!isAdmin, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "ADMIN"), true, null), null))
+  }
+)
+```
+
+**Checkbox with Dependent Field Clearing:**
+When unchecking should clear dependent fields:
+
+```sail
+/* ✅ CORRECT - Clear multiple dependent fields when unchecked */
+a!checkboxField(
+  choiceLabels: {"Case is closed"},
+  choiceValues: {true},
+  value: if(a!defaultValue(local!caseClosed, false), {true}, {}),
+  saveInto: {
+    a!save(local!caseClosed, if(a!isNotNullOrEmpty(save!value), true, null)),
+    /* Clear dependent fields when checkbox is unchecked */
+    a!save(local!closureReason, if(a!isNullOrEmpty(save!value), null, local!closureReason)),
+    a!save(local!closureDate, if(a!isNullOrEmpty(save!value), null, local!closureDate)),
+    a!save(local!closureNotes, if(a!isNullOrEmpty(save!value), null, local!closureNotes))
+  }
+)
+```
 
 
 ## 🚨 CRITICAL: Grid Selection Implementation Pattern - Two-Variable Approach
@@ -4133,9 +4254,11 @@ Before finalizing any SAIL interface, verify these critical items:
   - Use `and()`/`or()` only for independent conditions
 
 ### Component Patterns
+- [ ] **Checkbox boolean variables are null-initialized, NOT false-initialized** (see Single Checkbox Field Pattern - Variable Initialization)
+- [ ] **Checkbox saveInto uses a!isNotNullOrEmpty(save!value), NOT length(save!value)** (see save!value Null Checking)
+- [ ] **Multi-checkbox saveInto checks for null before using contains()** (see Multi-Checkbox Pattern)
 - [ ] **Relationship navigation follows single-path pattern** (see Relationship Navigation Syntax)
 - [ ] **Record actions use a!recordActionField()** (see Record Actions)
-- [ ] **Checkbox patterns match documented approach** (see Single Checkbox Field Pattern)
 
 Each item above links to its authoritative section for complete rules and examples.
 
