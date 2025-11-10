@@ -230,6 +230,12 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - Use /* */ for comments, not //
 - Use "" to escape a double quote, not \"
 - Choice values cannot be null or empty strings (use " " if necessary)
+- Choice field value initialization:
+  - Checkbox, radio, and dropdown field `value` parameters must contain ONLY values present in `choiceValues`
+  - For unchecked/unselected state, leave the local variable uninitialized (null), do NOT set to false()
+  - **WRONG:** `local!agreeToTerms: false()` with `choiceValues: {true()}`
+  - **RIGHT:** `local!agreeToTerms,` (uninitialized = unchecked)
+  - **RIGHT:** `local!agreeToTerms: true()` (pre-checked, if true() is in choiceValues)
 - **Always check for null/empty before comparing values** - SAIL cannot compare null to numbers/text
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
      - **RIGHT:** `showWhen: and(a!isNotNullOrEmpty(local!selectedId), local!selectedId = fv!item.id)`
@@ -392,6 +398,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 ## EXPRESSION STRUCTURE RULES
 - All expressions must begin with a!localVariables() as the parent element
 - Place the main interface as the last argument of a!localVariables()
+   - When the top-level layout is `a!paneLayout`, `a!formLayout`, `a!wizardLayout`, or `a!headerContentLayout`, DON'T put it in an array ({})
 - Define any local variables within the a!localVariables() function
 - All form inputs should save into a corresponding local variable
 - ButtonWidgets can't be on their own, they must be inside a ButtonArrayLayout
