@@ -1,9 +1,50 @@
 # DYNAMIC SAIL UI EXPRESSION GUIDELINES
 
-<critical_rules>
+## 📑 Quick Navigation Index
+
+### By Task Type:
+- **Building a form/wizard that creates or updates records** → Lines 116-268 (Form Interface Data Patterns)
+- **Displaying data in grids or charts** → Lines 1809-2265 (Data Querying Patterns)
+- **Working with arrays and loops** → Lines 409-802 (a!forEach() Reference), Lines 803-1065 (Array Patterns)
+- **Handling grid selections (ID arrays + full data)** → Lines 2975-3176 (Grid Selection Implementation Pattern)
+- **Managing one-to-many relationships in forms** → Lines 3177-3320 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 1809-2265 (Data Querying Patterns)
+- **Understanding grid selection behavior** → Lines 2762-2974 (Grid Selection Behavior)
+- **Implementing record actions** → Lines 3945-3996 (Record Actions)
+- **Working with dates and times** → Lines 3576-3701 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 3702-3913 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 3321-3575 (Related Record Field References and Patterns)
+
+### By Error Type:
+- **"Variable not defined" errors** → Lines 42-58 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 1407-1627 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 4036-4072 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 2266-2423 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 2306-2422 (Short-Circuit Evaluation Rules)
+- **Property access errors (property() function)** → Lines 805-983 (Dot Notation & Derived Data Patterns)
+- **Record type reference errors** → Lines 59-115 (Record Type Reference Syntax)
+- **Syntax errors (and/or, if statements)** → Lines 330-408 (Language-Specific Syntax Patterns)
+- **Grid selection not working** → Lines 2762-2974 (Grid Selection Behavior), Lines 2975-3176 (Implementation Pattern)
+- **Query filter errors with rule inputs** → Lines 1628-1713 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 3177-3320 (One-to-Many Relationships), Lines 3321-3575 (Related Record References)
+- **Button/wizard configuration errors** → Lines 1255-1269 (Button Parameters), Lines 1270-1284 (Wizard Parameters)
+
+### Critical Sections (Read These First):
+- 🚨 **Lines 42-58**: Mandatory Foundation Rules
+- 🚨 **Lines 116-268**: Form Interface Data Patterns
+- 🚨 **Lines 409-802**: a!forEach() Function Variables Reference
+- 🚨 **Lines 1407-1627**: Null Safety Implementation (including computed variables)
+- 🚨 **Lines 2975-3176**: Grid Selection Implementation Pattern (two-variable approach)
+- 🚨 **Lines 3177-3320**: One-to-Many Relationship Data Management
+
+### Validation & Troubleshooting:
+- **Final validation checklist** → Lines 4095-4136 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 1285-1406 (Common Critical Errors)
+
+---
+
 ## 🚨 MANDATORY FOUNDATION RULES
 
-<expression_structure>
 1. **All SAIL expressions must begin with `a!localVariables()`** - even if no variables are defined
 2. **ALL local variables must be declared before use** - No undeclared variables allowed
 3. **Use only available Appian functions** - No JavaScript equivalents exist
@@ -18,10 +59,8 @@
 8. **For dropdowns with record data**: Use record IDs as choiceValues and record text fields as choiceLabels - NO value-to-ID translation needed
 9. **wherecontains()**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section for complete usage
 10. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
-</expression_structure>
 
-<record_type_reference_convention>
-## 🚨 Record Type Reference Syntax
+## ⚠️ Record Type Reference Syntax
 
 **In these guidelines, record types are shown with clean semantic names for readability:**
 
@@ -77,9 +116,7 @@ This approach:
 - Clearly shows the semantic structure
 - Requires developers to use proper Appian tooling for actual references
 - Prevents UUID copy-paste errors
-</record_type_reference_convention>
 
-<form_interface_patterns>
 ## 🚨 CRITICAL: Form Interface Data Patterns
 
 **BEFORE writing ANY form/wizard interface, determine the data pattern:**
@@ -232,10 +269,8 @@ a!localVariables(
 - [ ] All record instances created with record type constructor syntax `'recordType!RecordTypeName'(...)`, not `a!map()` or `{}`
 - [ ] All one-to-many relationships use typed records when appending
 - [ ] Type discrimination uses dedicated type ID fields, not null field checks
-</form_interface_patterns>
 
-<non_existent_objects_handling>
-## 🚨 CRITICAL: Handling Non-Existent Constants and Environment Objects
+## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects
 
 **Never assume constants, process models, or environment-specific objects exist. Always use placeholders with TODO comments.**
 
@@ -295,12 +330,9 @@ a!startProcess(
 2. **Clear configuration points** - developers search for "TODO"
 3. **Self-documenting** - explains what needs configuration
 4. **Prevents runtime errors** from missing objects
-</non_existent_objects_handling>
 
-<syntax_pattern_validation>
-## 🚨 CRITICAL: Language-Specific Syntax Patterns
+## ⚠️ Language-Specific Syntax Patterns
 
-<conditional_syntax>
 **Appian SAIL Conditional Syntax:**
 ```sail
 /* ✅ CORRECT - Use if() function */
@@ -309,18 +341,13 @@ value: if(condition, trueValue, falseValue)
 /* ❌ WRONG - Python/JavaScript ternary operator */
 value: condition ? trueValue : falseValue
 ```
-</conditional_syntax>
 
-<language_pattern_violations>
 **Never use patterns from other languages:**
 - ❌ Python ternary: `condition ? value1 : value2`
 - ❌ JavaScript arrow functions: `() => {}`
 - ❌ Java/C# syntax: `public void`, `private static`
 - ✅ Always use Appian SAIL function syntax: `functionName(parameters)`
-</language_pattern_violations>
-</syntax_pattern_validation>
 
-<relationship_navigation_syntax>
 🚨 CRITICAL: Relationship Field Navigation Syntax
 
 **CORRECT Syntax:**
@@ -347,9 +374,7 @@ fv!row['recordType!Case.relationships.status']['recordType!AnotherType.fields.va
 ```
 
 **Fundamental Rule**: Relationships provide a navigation path - use dot notation to traverse from base record → relationship → field in one continuous path. Never use double bracket syntax with separate record type references.
-</relationship_navigation_syntax>
 
-<sorting_rules>
 🚨 CRITICAL: Grid Column Sorting Rules
 
 **CORRECT Sorting:**
@@ -372,25 +397,19 @@ sortField: 'recordType!Case.relationships.priority',  /* Relationship - INVALID 
 - **Relationships** = Navigation to related records (no sorting allowed)
 - **Fields** = Data values that can be sorted, filtered, displayed
 - Always sort on record fields from either the base record type or a related record type with a many-to-one relationship from the base record type
-</sorting_rules>
 
-<record_type_usage>
 - **Use available record types, fields, and relationships** - Don't create new ones
 - **Access rule inputs directly** - Avoid local variables for record data
 - **For one-to-many relationships** - Use main record type's relationships rather than new variables
 - **NEVER confuse relationships with fields** - Relationships navigate, fields display values
 - **KPI Metrics** - ALWAYS use `a!aggregationFields()` with `a!measure()` for dashboard KPIs and metrics. Only use `.totalCount` for pagination display ("Showing X of Y") or simple conditional checks. See Error 9 and KPI Aggregation Pattern sections for details.
 - **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When using record data in charts, always use the `data` + `config` approach, never `categories` + `series`.
-</record_type_usage>
 
-<checkpoint>
 🚨 MANDATORY CHECKPOINT: For grids with record data, ALWAYS check for and prefer:
 1. User filters (userFilters parameter) over custom dropdowns
 2. Built-in search (showSearchBox: true) over custom search fields
 Only use custom filtering if built-in features are unavailable.
-</checkpoint>
 
-<foreach_function_variables>
 ## 🚨 CRITICAL: a!forEach() Function Variables Reference
 
 ### Available Function Variables in a!forEach()
@@ -569,7 +588,7 @@ a!forEach(
       fv!isLast,
       a!richTextDisplayField(
         value: a!richTextItem(
-          text: "Total: $" & sum(property(local!invoiceItems, "amount")),
+          text: "Total: $" & sum(local!invoiceItems.amount),
           size: "LARGE",
           style: "STRONG"
         )
@@ -784,12 +803,190 @@ a!forEach(
 - **Don't use fv! variables outside a!forEach()** - They don't exist in other contexts
 - **Don't forget null checks on fv!item properties** - Record fields can be null
 
-</foreach_function_variables>
 
-<array_manipulation_patterns>
 ## Array and Data Manipulation Patterns
 
-<combining_data>
+### Accessing Properties Across Arrays - Dot Notation
+
+**The ONLY way to access a property across all items in an array of maps is using dot notation.**
+
+#### ✅ CORRECT: Dot Notation
+```sail
+local!items: {
+  a!map(id: 1, name: "Item A", price: 100),
+  a!map(id: 2, name: "Item B", price: 200),
+  a!map(id: 3, name: "Item C", price: 300)
+},
+
+/* Access a single property across all items */
+local!allNames: local!items.name,
+/* Returns: {"Item A", "Item B", "Item C"} */
+
+local!allPrices: local!items.price,
+/* Returns: {100, 200, 300} */
+
+/* Use in calculations */
+local!totalPrice: sum(local!items.price),
+/* Returns: 600 */
+
+/* Use in comparisons */
+local!contractTypes: intersection(local!items.type, {"Contract"}),
+/* Returns all "Contract" values found */
+```
+
+#### ❌ WRONG: property() Function Does NOT Exist
+```sail
+/* ❌ ERROR - property() is not a valid SAIL function */
+local!allNames: property(local!items, "name", {}),
+
+/* ❌ ERROR - This syntax is invalid */
+sum(property(local!items, "price"))
+```
+
+**Key Rules:**
+- Use `array.propertyName` to extract property values across all items
+- Works with any array of maps (local variables, record data, etc.)
+- Returns an array of the property values in the same order
+- Returns empty array `{}` if source array is empty
+- Returns `null` elements for items missing that property
+
+---
+
+### Deriving Full Data from ID Arrays
+
+**Common Pattern:** Grid selections store IDs only, but you need full row data for business logic.
+
+**Solution:** Use `a!forEach() + index() + wherecontains()` to derive full objects from ID array.
+
+#### The Pattern
+
+```sail
+/* Step 1: Source data (all available items) */
+local!availableItems: {
+  a!map(id: 1, name: "Item A", type: "Public", price: 100),
+  a!map(id: 2, name: "Item B", type: "Contract", price: 200),
+  a!map(id: 3, name: "Item C", type: "Public", price: 150)
+},
+
+/* Step 2: ID array (from grid selection, user input, etc.) */
+local!selectedIds: {1, 3},
+
+/* Step 3: Derive full data using forEach + index + wherecontains */
+local!selectedItems: a!forEach(
+  items: local!selectedIds,
+  expression: index(
+    local!availableItems,
+    wherecontains(fv!item, local!availableItems.id),
+    null
+  )
+),
+/* Returns: {
+  a!map(id: 1, name: "Item A", type: "Public", price: 100),
+  a!map(id: 3, name: "Item C", type: "Public", price: 150)
+} */
+
+/* Step 4: Use derived data for business logic */
+local!totalPrice: sum(local!selectedItems.price),
+/* Returns: 250 */
+
+local!hasContractType: length(
+  intersection(local!selectedItems.type, {"Contract"})
+) > 0
+/* Returns: false (no Contract items selected) */
+```
+
+#### How It Works
+
+1. **a!forEach(items: local!selectedIds, ...)** - Iterate over each selected ID
+2. **fv!item** - Current ID being processed (e.g., 1, then 3)
+3. **wherecontains(fv!item, local!availableItems.id)** - Find position of this ID in source array
+   - Searches `{1, 2, 3}` (all IDs) for `fv!item` (current ID)
+   - Returns array of positions: `{1}` or `{3}`
+4. **index(local!availableItems, positions, null)** - Get full object at that position
+   - Returns the complete `a!map(id: ..., name: ..., type: ..., price: ...)`
+5. **null** - Default value if ID not found (defensive programming)
+
+#### Common Use Cases
+
+**Use Case 1: Grid Selection + Conditional Logic**
+```sail
+local!selectedCourseIds: {2, 4},  /* From grid selection */
+local!selectedCourses: a!forEach(
+  items: local!selectedCourseIds,
+  expression: index(
+    local!availableCourses,
+    wherecontains(fv!item, local!availableCourses.id),
+    null
+  )
+),
+
+/* Show field only if Contract course selected */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedCourses),
+    length(intersection(local!selectedCourses.type, {"Contract"})) > 0,
+    false
+  ),
+  a!textField(label: "Registration Code", ...),
+  {}
+)
+```
+
+**Use Case 2: Calculating Totals**
+```sail
+local!cartItemIds: {5, 12, 8},
+local!cartItems: a!forEach(
+  items: local!cartItemIds,
+  expression: index(
+    local!productCatalog,
+    wherecontains(fv!item, local!productCatalog.productId),
+    null
+  )
+),
+
+local!cartTotal: sum(local!cartItems.price),
+local!taxableItems: length(
+  wherecontains(true, local!cartItems.isTaxable)
+)
+```
+
+**Use Case 3: Remove Button in Display**
+```sail
+/* Display selected items with Remove buttons */
+a!forEach(
+  items: local!selectedItems,  /* Already derived from IDs */
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(value: fv!item.name),
+      a!buttonArrayLayout(
+        buttons: {
+          a!buttonWidget(
+            label: "Remove",
+            value: fv!item.id,
+            saveInto: {
+              a!save(
+                local!selectedIds,
+                remove(local!selectedIds, wherecontains(fv!item.id, local!selectedIds))
+              )
+            }
+          )
+        }
+      )
+    }
+  )
+)
+```
+
+#### Key Points
+
+- **Always maintain two variables**: IDs array + computed full data array
+- **Grid `selectionValue` always stores IDs**, never full row data
+- **Computed variable updates automatically** when ID array changes
+- **Always null-check computed variable** before accessing properties (use nested `if()`)
+- **Pattern works for any ID → full object mapping**, not just grid selections
+
+---
+
 ### Combining Different Data Types
 
 ```sail
@@ -816,9 +1013,7 @@ local!combined: append(local!array1, local!array2)  /* Returns {1, 2, 3, 4, 5, 6
 - `append(array, value)` - Both parameters must be arrays or compatible scalar/array combinations
 - `a!update(data: array, index: position, value: newValue)` - Insert or replace at any position
 - `insert(array, value, index)` - Insert value at specific position (pushes existing items down)
-</combining_data>
 
-<wherecontains_usage>
 ### Using wherecontains() Correctly
 
 **Function Signature:** `wherecontains(valuesToFind, arrayToSearchIn)`
@@ -871,10 +1066,7 @@ local!color: index(
 )
 /* Returns: "#059669" (first element of colors array) */
 ```
-</wherecontains_usage>
-</array_manipulation_patterns>
 
-<record_type_constructors>
 ## Creating New Record Instances
 
 ### ❌ WRONG - Using a!map() for Records
@@ -935,9 +1127,7 @@ append(
 - Typed instances are required for record relationships to work correctly
 - Type checking happens at save time, catching errors earlier
 
-</record_type_constructors>
 
-<multi_type_form_pattern>
 ## Multi-Type Form Entry Pattern
 
 When a single relationship contains multiple types of records (e.g., Phone Contacts AND Email Contacts in one table, or Internal Notes AND External Communications in one list):
@@ -1065,11 +1255,8 @@ a!buttonArrayLayout(
 4. **Each button creates the same record type** - Only difference is the `typeId` value and which fields are initialized
 5. **Initialize type-specific fields to null** - Makes it clear which fields belong to which type
 
-</multi_type_form_pattern>
-</critical_rules>
 
-<button_widget_parameters>
-## 🚨 CRITICAL: a!buttonWidget() Parameter Rules
+## ⚠️ a!buttonWidget() Parameter Rules
 
 **Valid Parameters ONLY:**
 - `label`, `value`, `saveInto`, `submit`, `style`, `color`, `size`, `icon`
@@ -1083,10 +1270,8 @@ a!buttonArrayLayout(
 - **Form validations**: On `a!formLayout()` validations parameter
 - **Button validations**: On `a!buttonWidget()` → ✅ `validations` parameter exists
 - **Field validations**: On individual field components
-</button_widget_parameters>
 
-<wizard_layout_parameters>
-## 🚨 CRITICAL: a!wizardLayout() Parameters
+## ⚠️ a!wizardLayout() Parameters
 
 **Valid Parameters:**
 - `titleBar`, `isTitleBarFixed`, `showTitleBarDivider`, `backgroundColor`
@@ -1100,32 +1285,27 @@ a!buttonArrayLayout(
 **✅ Validation Placement for Wizards:**
 - **Form-level validations**: Place on individual `a!buttonWidget()` in `primaryButtons`
 - **Field validations**: Place on individual field components within steps
-</wizard_layout_parameters>
 
-<common_critical_errors>
-## 🚨 MOST COMMON CRITICAL ERRORS
+## Common Critical Errors
 
 These errors cause immediate interface failures and violate core SAIL patterns:
 
-<error_1>
+### Error 1:
 **Error 1: Initialized Dropdown Variables with Record Data**
 - **Problem**: `local!filter: "All"` when choiceValues come from records
 - **Solution**: `local!filter,` (uninitialized) + `placeholder: "All"`
-</error_1>
 
-<error_2>
+### Error 2:
 **Error 2: Query Results in Grid/Chart Data**
 - **Problem**: `data: local!queryResults` 
 - **Solution**: `data: a!recordData(...)`
-</error_2>
 
-<error_3>
+### Error 3:
 **Error 3: Data Type Mismatches in Query Filters**
 - **Problem**: DateTime field + Date value
 - **Solution**: Use matching data type functions
-</error_3>
 
-<error_4>
+### Error 4:
 **Error 4: Invalid Chart Patterns**
 - **Problem 1**: `categories: {...}, series: {...}` with record data
 - **Solution 1**: `data: a!recordData(...), config: a!columnChartConfig(...)`
@@ -1133,36 +1313,31 @@ These errors cause immediate interface failures and violate core SAIL patterns:
 - **Solution 2**: Use valid intervals: "MONTH_SHORT_TEXT", "DATE_SHORT_TEXT", etc.
 - **Problem 3**: `stacking: "NORMAL"` in chart config
 - **Solution 3**: Place `stacking` on chart field, not in config
-</error_4>
 
-<error_5>
+### Error 5:
 **Error 5: Non-existent Functions**
 - **Problem**: Using `a!decimalField()`, `a!dateTimeValue()`
 - **Solution**: Use `a!floatingPointField()`, `dateTime()` respectively
-</error_5>
 
-<error_6>
+### Error 6:
 **Error 6: Invalid Parameters on Components**
 - **Problem**: `validations` parameter on `a!wizardLayout()`
 - **Solution**: Place validations on `a!buttonWidget()` or field components
-</error_6>
 
-<error_7>
+### Error 7:
 **Error 7: Python/JavaScript Syntax in SAIL**
 - **Problem**: `condition ? trueValue : falseValue`
 - **Solution**: `if(condition, trueValue, falseValue)`
-</error_7>
 
-<error_8>
+### Error 8:
 **Error 8: Passing Null to Functions That Reject It**
 - **Problem**: `text(a!defaultValue(dateField, null), "format")` or `user(a!defaultValue(userId, null), "firstName")`
 - **Solution**: Check for null with if() BEFORE calling these functions
 ```sail
 if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–")
 ```
-</error_8>
 
-<error_9>
+### Error 9:
 **Error 9: Using .totalCount for KPI Metrics**
 - **Problem**: `local!caseCount: a!queryRecordType(..., fetchTotalCount: true).totalCount`
 - **Solution**: Use aggregations for ALL KPIs with correct data extraction pattern
@@ -1179,9 +1354,8 @@ local!caseCount: a!defaultValue(
   0
 )
 ```
-</error_9>
 
-<error_10>
+### Error 10:
 **Error 10: Incorrect Array and Data Manipulation Functions**
 - **Problem 1**: Using `append(map, array)` - append only works with arrays of compatible types
 - **Solution 1**: Use `a!update(data: array, index: 1, value: map)` to insert at beginning
@@ -1198,9 +1372,8 @@ local!combined: a!update(data: local!arrayOfMaps, index: 1, value: local!singleM
 
 /* For wherecontains() examples, see Array Manipulation Patterns section */
 ```
-</error_10>
 
-<error_11>
+### Error 11:
 **Error 11: Incorrect Query Data Extraction Pattern**
 - **Problem 1**: Using array indexing on aggregations with no groupings
 - **Solution 1**: Use direct property access for aggregations with `groupings: {}`
@@ -1234,22 +1407,16 @@ local!name: a!defaultValue(
 **Key Rule**:
 - Aggregations with `groupings: {}` → Direct access: `query.data.alias`
 - Regular queries with `fields: {...}` → Array indexing: `query[1]['field']`
-</error_11>
-</common_critical_errors>
 
-<mandatory_null_safety>
 ## 🚨 MANDATORY: Null Safety Implementation
 
-<null_checking_checkpoint>
 **CHECKPOINT: Before finalizing any SAIL expression, verify EVERY direct field reference uses a!defaultValue()**
 
 - ✅ `a!defaultValue(ri!record['recordType!Example.fields.field'], "")`
 - ✅ `a!defaultValue(ri!record['recordType!Example.fields.field'], null)`
 - ✅ `a!defaultValue(ri!record['recordType!Example.relationships.rel'], {})`
 - ❌ `ri!record['recordType!Example.fields.field']` (naked field reference)
-</null_checking_checkpoint>
 
-<required_patterns>
 **Required Null Safety Patterns:**
 
 1. **Form Field Values**: Always wrap in `a!defaultValue()`
@@ -1296,14 +1463,9 @@ local!name: a!defaultValue(
      null
    )
    ```
-</required_patterns>
 
-<implementation_reminder>
 **🚨 CRITICAL REMINDER**: The `a!defaultValue()` function prevents interface failures by handling null field references gracefully. This is MANDATORY for all direct field access, not optional. Missing this causes immediate runtime errors.
-</implementation_reminder>
-</mandatory_null_safety>
 
-<functions_that_reject_null>
 ### Advanced: Functions That Reject Null
 
 **Some functions fail even with `a!defaultValue()` and require `if()` checks BEFORE calling:**
@@ -1327,14 +1489,150 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 ```
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
-</functions_that_reject_null>
 
-<query_filters_with_rule_inputs>
-## 🚨 CRITICAL: Protecting Query Filters That Use Rule Inputs
+### 🚨 CRITICAL: Null Safety for Computed Variables and Short-Circuit Evaluation
+
+**Computed variables that derive from empty arrays require special null checking with nested if() statements.**
+
+#### The Problem with and()
+
+SAIL's `and()` and `or()` functions **DO NOT short-circuit** - they evaluate ALL arguments before returning a result. This means property access will always be evaluated, even when the variable is null/empty.
+
+```sail
+/* ❌ WRONG - and() evaluates ALL arguments */
+if(
+  and(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.field = "value"  /* ❌ ALWAYS evaluated, even when computedData is empty! */
+  ),
+  ...
+)
+```
+
+**Error you'll see:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'field' of type Text into type Null
+```
+
+#### ✅ CORRECT Solution: Nested if() for Short-Circuit Evaluation
+
+SAIL's `if()` function **DOES short-circuit** - it only evaluates the branch that will be returned.
+
+```sail
+/* ✅ CORRECT - Nested if() short-circuits */
+if(
+  if(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.field = "value",  /* ✅ Only evaluated when computedData is not empty */
+    false  /* Safe default when empty */
+  ),
+  /* Then branch - execute when condition is true */,
+  /* Else branch - execute when condition is false */
+)
+```
+
+#### Pattern for Null-Safe Property Access
+
+**Always use this nested if() pattern when accessing properties on computed variables:**
+
+```sail
+if(
+  if(
+    a!isNotNullOrEmpty(local!variable),
+    /* Safe to access properties here - variable is guaranteed not empty */
+    local!variable.propertyName = "expectedValue",
+    /* Return safe default - false, null, or {} depending on context */
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
+)
+```
+
+#### Common Scenarios Requiring Nested if()
+
+1. **Computed variables from grid selections:**
+```sail
+local!selectedItemIds: {},
+local!selectedItems: a!forEach(
+  items: local!selectedItemIds,
+  expression: index(local!allItems, wherecontains(fv!item, local!allItems.id), null)
+),
+
+/* ✅ Accessing properties */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(intersection(local!selectedItems.type, {"Contract"})) > 0,
+    false
+  ),
+  /* Show additional fields */,
+  {}
+)
+```
+
+2. **Filtered or derived arrays:**
+```sail
+local!activeUsers: a!forEach(
+  items: local!allUsers,
+  expression: if(fv!item.status = "Active", fv!item, null)
+),
+
+/* ✅ Checking properties */
+if(
+  if(
+    a!isNotNullOrEmpty(local!activeUsers),
+    wherecontains("ADMIN", local!activeUsers.role),
+    false
+  ),
+  /* Show admin panel */,
+  {}
+)
+```
+
+3. **Query results that might be empty:**
+```sail
+local!relatedRecords: a!queryRecordType(
+  recordType: recordType!Related,
+  filters: {...}
+).data,
+
+/* ✅ Safe property access */
+if(
+  if(
+    a!isNotNullOrEmpty(local!relatedRecords),
+    local!relatedRecords.status = "Approved",
+    false
+  ),
+  /* Process approved records */,
+  {}
+)
+```
+
+#### Why This Matters
+
+**Without proper null safety:**
+- Interface fails to load with cryptic property access errors
+- Users see error pages instead of forms
+- No graceful degradation - complete failure
+
+**With nested if() pattern:**
+- Interface loads successfully even when data is empty
+- Conditional UI elements hide/show correctly
+- Professional user experience with no errors
+
+#### Quick Reference
+
+| Function | Short-Circuits? | Use For Null Safety? |
+|----------|-----------------|----------------------|
+| `if()` | ✅ YES | ✅ ALWAYS use for null-safe property access |
+| `and()` | ❌ NO | ❌ NEVER use for null checking before property access |
+| `or()` | ❌ NO | ❌ NEVER use for null checking before property access |
+
+## ⚠️ Protecting Query Filters That Use Rule Inputs
 
 **Rule inputs can be null in CREATE scenarios or when related data doesn't exist yet. Query filters that use rule input values MUST use `applyWhen` to prevent runtime errors.**
 
-<when_ri_values_are_null>
 **When Rule Input Values Can Be Null:**
 
 1. **CREATE Scenarios**: `ri!record` is null when creating a new record
@@ -1343,9 +1641,7 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 4. **Conditional Data**: Fields that are only populated under certain conditions
 
 **The Problem**: Query filters with null values can cause runtime errors. Using `applyWhen` conditionally applies the filter only when the value exists.
-</when_ri_values_are_null>
 
-<applywhen_pattern>
 **Required Pattern for Filters Using Rule Inputs:**
 
 ```sail
@@ -1366,9 +1662,7 @@ a!queryFilter(
 ```
 
 **Key Rule**: Any query filter whose `value` parameter comes from a rule input (ri!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`.
-</applywhen_pattern>
 
-<common_scenarios>
 **Common Scenarios Requiring applyWhen:**
 
 **Single Filter Example (Grid with Related Records):**
@@ -1410,9 +1704,7 @@ a!queryRecordType(
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: -1)
 )
 ```
-</common_scenarios>
 
-<applywhen_checklist>
 **✅ CHECKPOINT: Before Finalizing Query Filters**
 
 For every `a!queryFilter()` in your code, verify:
@@ -1420,14 +1712,9 @@ For every `a!queryFilter()` in your code, verify:
 - [ ] If yes, have I added `applyWhen: a!isNotNullOrEmpty(value)`?
 - [ ] Have I tested the interface in CREATE mode where ri! might be null?
 - [ ] Are literal values (like "Active", 5, true) used without applyWhen? (correct - they're never null)
-</applywhen_checklist>
 
-<why_this_matters>
 **Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
-</why_this_matters>
-</query_filters_with_rule_inputs>
 
-<complex_scenario_handling>
 ## 🔥 Complex Scenario Handling
 
 **For interfaces with multiple record types:**
@@ -1436,9 +1723,7 @@ For every `a!queryFilter()` in your code, verify:
 - **Use relationship navigation instead of separate queries where possible**
 - **Consolidate filters at the primary record level**
 - **Avoid creating unnecessary local variables for related data**
-</complex_scenario_handling>
 
-<assumption_documentation>
 ## 📝 REQUIRED ASSUMPTION TRACKING
 
 When making assumptions about:
@@ -1448,12 +1733,9 @@ When making assumptions about:
 - **Data structure** - Note any inferred patterns from context
 
 **Format:** "ASSUMPTION: [what you're assuming] - REASON: [why you're assuming this]"
-</assumption_documentation>
 
-<sail_structure>
 ## Essential SAIL Structure
 
-<local_variables_pattern>
 ```sail
 a!localVariables(
   /* Variable definitions first - ALL must be declared */
@@ -1469,16 +1751,12 @@ a!localVariables(
   )
 )
 ```
-</local_variables_pattern>
 
-<variable_declaration_rules>
 - **With initial values**: `local!variable: value`
 - **Without initial values**: `local!variable` (no null/empty placeholders)
 - **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
 - **For booleans**: Always explicit: `true()` or `false()`
-</variable_declaration_rules>
 
-<nested_context_variables>
 🚨 CRITICAL: Local Variable Scope in Nested Contexts
 - **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
 - **Cannot declare variables inline within expressions**
@@ -1501,13 +1779,9 @@ a!forEach(
   )
 )
 ```
-</nested_context_variables>
-</sail_structure>
 
-<audit_fields_management>
 ## Audit Fields Management
 
-<create_scenario>
 Set ALL Fields
 ```sail
 saveInto: {
@@ -1517,9 +1791,7 @@ saveInto: {
   a!save(ri!record.fields.modifiedOn, now())
 }
 ```
-</create_scenario>
 
-<update_scenario>
 Set ONLY Modified Fields
 ```sail
 saveInto: {
@@ -1527,9 +1799,7 @@ saveInto: {
   a!save(ri!record.fields.modifiedOn, now())
 }
 ```
-</update_scenario>
 
-<related_record_creation>
 ```sail
 'recordType!Comment'(
   'recordType!Comment.fields.description': local!commentText,
@@ -1539,16 +1809,11 @@ saveInto: {
   'recordType!Comment.fields.modifiedOn': now()
 )
 ```
-</related_record_creation>
-</audit_fields_management>
 
-<data_querying_patterns>
 ## Data Querying Patterns - CRITICAL USAGE RULES
 
-<mandatory_usage_rules>
 🚨 MANDATORY: Use Cases by Function
 
-<recorddata_usage>
 a!recordData() - ONLY for Grid/Chart Data
 ```sail
 /* ✅ Use a!recordData() ONLY inside grids/charts */
@@ -1569,9 +1834,7 @@ a!gridField(
 /* ❌ WRONG - Never use a!recordData() outside grids/charts */
 local!cases: a!recordData(recordType!Case)  /* This is incorrect */
 ```
-</recorddata_usage>
 
-<queryrecordtype_usage>
 a!queryRecordType() - For ALL Other Data Queries
 ```sail
 /* ✅ Use a!queryRecordType() for ALL other data querying */
@@ -1592,9 +1855,7 @@ local!employees: a!queryRecordType(
   fetchTotalCount: true
 ).data
 ```
-</queryrecordtype_usage>
 
-<kpi_aggregation_pattern>
 🚨 CRITICAL: Use Aggregations for KPI Calculations
 ALWAYS use a!aggregationFields() with a!measure() for KPIs - NEVER use .totalCount for metrics
 ```sail
@@ -1718,14 +1979,11 @@ local!totalCases: local!caseQuery.totalCount  /* AVOID - Use aggregation instead
 - Allows grouping and multiple measures in one query
 
 **MANDATORY: ALWAYS use `a!aggregationFields()` for dashboard KPIs, metrics, and statistics. Only use `.totalCount` for pagination display or simple conditional checks.**
-</kpi_aggregation_pattern>
 
-<query_data_extraction_patterns>
 🚨 CRITICAL: Query Data Extraction Patterns
 
 **IMPORTANT: Different query types require different data extraction patterns.**
 
-<aggregation_query_extraction>
 **Pattern 1: Aggregation Queries with NO Groupings**
 
 When using `a!aggregationFields()` with `groupings: {}` (no groupings), the query returns a SINGLE ROW with aggregated values. Access fields directly from `.data` property:
@@ -1758,9 +2016,7 @@ local!totalApplications: a!defaultValue(
   0
 )
 ```
-</aggregation_query_extraction>
 
-<regular_query_extraction>
 **Pattern 2: Regular Queries Returning Rows**
 
 When using `fields: { ... }` (field list) instead of aggregations, the query returns an ARRAY of rows. You must index into the array to access individual rows:
@@ -1799,9 +2055,7 @@ local!applicantId: a!defaultValue(
   null
 )
 ```
-</regular_query_extraction>
 
-<pattern_decision_guide>
 **How to Decide Which Pattern to Use:**
 
 | Query Type | When to Use | Data Extraction Pattern | Example |
@@ -1824,9 +2078,7 @@ local!applicantId: a!defaultValue(
 - Aggregations WITH groupings where you need to match specific group values (see sparse aggregation section)
 
 **NEVER use index() for aggregations with NO groupings - use direct property access instead.**
-</pattern_decision_guide>
 
-<common_mistakes>
 **Common Mistakes to Avoid:**
 
 ```sail
@@ -1854,19 +2106,14 @@ local!value: index(index(query.data, 1, {}).field, 1, null)  /* Too complex */
 /* ✅ CORRECT - Simple pattern for aggregations */
 local!value: a!defaultValue(query.data.field, defaultValue)
 ```
-</common_mistakes>
 
-<extraction_checklist>
 **Data Extraction Checklist:**
 - [ ] Identified query type: aggregation (no groupings), aggregation (with groupings), or regular query?
 - [ ] For aggregations with NO groupings: Using direct property access `.data.alias`?
 - [ ] For regular queries: Using array indexing `[1]['field']` to get first row?
 - [ ] Wrapped extraction in `a!defaultValue()` with appropriate default?
 - [ ] Not over-complicating with nested `index()` calls when simpler pattern exists?
-</extraction_checklist>
-</query_data_extraction_patterns>
 
-<direct_record_usage>
 Direct Record Type - For Simple Grids
 ```sail
 /* ✅ Use direct record type when no filtering needed */
@@ -1875,10 +2122,7 @@ a!gridField(
   /* Columns auto-generated from record list configuration */
 )
 ```
-</direct_record_usage>
-</mandatory_usage_rules>
 
-<critical_data_usage_violations>
 🚨 CRITICAL VIOLATIONS TO AVOID:
 
 ❌ **NEVER use query results in grid data parameter:**
@@ -1906,9 +2150,7 @@ a!columnChartField(
   config: a!columnChartConfig(...)
 )
 ```
-</critical_data_usage_violations>
 
-<sparse_aggregation_handling>
 🚨 CRITICAL: Handling Sparse Aggregation Results
 - **Aggregation queries only return records that exist** - Missing statuses/categories won't appear in results
 - **Never assume array position matching** between full reference lists and aggregation results
@@ -1935,12 +2177,9 @@ a!forEach(
   )
 )
 ```
-</sparse_aggregation_handling>
 
-<filter_rules>
 Critical Filter Rules
 
-<filter_structure_options>
 ```sail
 /* ✅ CORRECT - Simple array with conditional filters */
 filters: {
@@ -1972,10 +2211,7 @@ filters: {
 /* ❌ WRONG - Never wrap logical expression in array */
 filters: {a!queryLogicalExpression(...)}  /* Remove array wrapper */
 ```
-</filter_structure_options>
-</filter_rules>
 
-<aggregation_usage>
 Aggregation Usage
 ```sail
 /* ✅ CORRECT - Use fields parameter with aggregationFields */
@@ -2006,9 +2242,7 @@ a!queryRecordType(
   aggregations: {...}  /* This parameter doesn't exist */
 )
 ```
-</aggregation_usage>
 
-<sorting_in_query>
 Sorting in a!queryRecordType
 ```sail
 /* ✅ CORRECT - Sort inside pagingInfo */
@@ -2032,13 +2266,9 @@ a!queryRecordType(
   sort: a!sortInfo(...),  /* This parameter doesn't exist */
 )
 ```
-</sorting_in_query>
-</data_querying_patterns>
 
-<function_parameter_validation>
-## 🚨 CRITICAL: Function Parameter Validation
+## ⚠️ Function Parameter Validation
 
-<array_functions_exact_counts>
 Array Functions - EXACT Parameter Counts
 ```sail
 /* ✅ CORRECT - wherecontains() takes ONLY 2 parameters (see Array Manipulation Patterns for usage) */
@@ -2055,16 +2285,12 @@ index(array, position, default)
 wherecontains(value, array, 1)  /* Third parameter doesn't exist */
 contains(array, value, true)    /* Third parameter doesn't exist */
 ```
-</array_functions_exact_counts>
 
-<function_parameter_rules>
 Common Function Parameter Rules
 - **Always verify parameter counts match Appian documentation exactly**
 - **Function signature errors cause immediate interface failures**
 - **No optional parameters exist unless explicitly documented**
-</function_parameter_rules>
 
-<logical_functions_boolean_logic>
 Logical Functions - Proper Boolean Logic
 ```sail
 /* ✅ CORRECT - Use proper boolean logic in and() */
@@ -2080,13 +2306,127 @@ and(
   local!isEnabled
 )
 ```
-</logical_functions_boolean_logic>
-</function_parameter_validation>
 
-<component_usage_patterns>
+### 🚨 CRITICAL: Short-Circuit Evaluation Rules
+
+**SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
+
+#### ❌ WRONG: Using and() for Null Safety
+```sail
+/* ❌ ERROR - and() evaluates BOTH arguments */
+/* If local!computedData is empty, the second argument still evaluates */
+/* This causes: "Invalid index: Cannot index property 'type' of Null" */
+and(
+  a!isNotNullOrEmpty(local!computedData),
+  local!computedData.type = "Contract"  /* CRASHES if computedData is empty */
+)
+```
+
+#### ✅ CORRECT: Use Nested if() for Short-Circuit Behavior
+```sail
+/* ✅ if() short-circuits - only evaluates the returned branch */
+if(
+  if(
+    a!isNotNullOrEmpty(local!computedData),
+    local!computedData.type = "Contract",  /* Only evaluated when not empty */
+    false
+  ),
+  /* Then branch - show registration code field */,
+  /* Else branch - hide field */
+)
+```
+
+#### When to Use Nested if() vs and()
+
+**Use nested if() when:**
+- Checking null/empty before property access on computed variables
+- Any scenario where the second condition CANNOT be safely evaluated if the first is false
+- Accessing properties on variables that could be empty arrays or null
+
+**Use and() when:**
+- All conditions are independent and can be safely evaluated in any order
+- All variables involved are guaranteed to have values (not null, not empty)
+- Simple boolean combinations without property access
+
+#### Quick Reference Table
+
+| Function | Short-Circuits? | Use For |
+|----------|----------------|---------|
+| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic |
+| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
+| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
+| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching with multiple conditions |
+
+#### Common Scenarios Requiring Nested if()
+
+**Scenario 1: Computed Variables from Grid Selections**
+```sail
+/* Grid selection derives full data */
+local!selectedItems: a!forEach(
+  items: local!selectedIds,
+  expression: index(...)
+),
+
+/* ❌ WRONG - Crashes when no items selected */
+showWhen: and(
+  length(local!selectedItems) > 0,
+  local!selectedItems.type = "Contract"  /* ERROR if empty */
+)
+
+/* ✅ RIGHT - Nested if() prevents crash */
+showWhen: if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(intersection(local!selectedItems.type, {"Contract"})) > 0,
+    false
+  ),
+  true,
+  false
+)
+```
+
+**Scenario 2: Record Field Access**
+```sail
+/* ❌ WRONG - Crashes if recordData is null */
+and(
+  a!isNotNullOrEmpty(local!recordData),
+  local!recordData['recordType!Case.fields.status'] = "Open"  /* ERROR if null */
+)
+
+/* ✅ RIGHT */
+if(
+  if(
+    a!isNotNullOrEmpty(local!recordData),
+    local!recordData['recordType!Case.fields.status'] = "Open",
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
+)
+```
+
+**Scenario 3: Array Property Access**
+```sail
+/* ❌ WRONG - Crashes if items array is empty */
+and(
+  length(local!items) > 0,
+  local!items.price > 100  /* ERROR if items is {} */
+)
+
+/* ✅ RIGHT */
+if(
+  if(
+    a!isNotNullOrEmpty(local!items),
+    length(where(local!items.price > 100)) > 0,
+    false
+  ),
+  /* Then branch */,
+  /* Else branch */
+)
+```
+
 ## Component Usage Patterns
 
-<button_widget_rules>
 Button Widget Rules
 **CRITICAL**: `a!buttonWidget` does NOT have a `validations` parameter.
 
@@ -2106,9 +2446,7 @@ a!formLayout(
   }
 )
 ```
-</button_widget_rules>
 
-<user_group_field_components>
 User and Group Field Components
 **CRITICAL**: When using record fields of type User or Group in forms, use the appropriate picker components.
 
@@ -2134,9 +2472,7 @@ a!pickerFieldGroups(
 /* ❌ WRONG - Don't use dropdowns for User/Group fields */
 a!dropdownField(...)  /* Incorrect for User/Group types */
 ```
-</user_group_field_components>
 
-<encrypted_text_field_limitations>
 Encrypted Text Field with Synced Record Types
 
 **CRITICAL**: `a!encryptedTextField()` is NOT compatible with synced record types.
@@ -2172,12 +2508,9 @@ a!textField(
 3. Include clear message explaining the technical limitation
 4. Mark as "Review required" to flag for stakeholder attention
 5. This is an acceptable UX modification exception due to technical constraints
-</encrypted_text_field_limitations>
 
-<dropdown_field_critical_patterns>
 Dropdown Field Rules - CRITICAL PATTERNS
 
-<dropdown_initialization_critical>
 🚨 CRITICAL: Dropdown Variable Initialization
 
 **NEVER initialize dropdown variables when using record data:**
@@ -2190,7 +2523,6 @@ local!selectedStatus,  /* Starts as null, placeholder shows */
 ```
 
 **Rule**: When dropdown choiceValues come from record queries, the variable must start uninitialized (null) to prevent value/choiceValues mismatches.
-</dropdown_initialization_critical>
 
 ```sail
 /* ✅ CORRECT - Record data dropdowns. Use query results directly  */
@@ -2219,9 +2551,7 @@ local!selectedId: index(
 /* ❌ WRONG - wherecontains() with index() for single values */
 wherecontains("text", array)  /* Returns [2, 5] not 2 */
 ```
-</dropdown_field_critical_patterns>
 
-<rich_text_display_field_structure>
 Rich Text Display Field Structure
 **CRITICAL**: `a!richTextDisplayField()` value parameter takes arrays of rich text components.
 
@@ -2250,7 +2580,6 @@ a!richTextDisplayField(
 )
 ```
 
-<available_rich_text_components>
 Available Rich Text Components:
 - `a!richTextItem()` - Text with formatting and optional links
 - `a!richTextIcon()` - Icons with color and size
@@ -2259,10 +2588,7 @@ Available Rich Text Components:
 - `a!richTextNumberedList()` - Numbered lists
 - `char(10)` - Line breaks
 - Plain text strings
-</available_rich_text_components>
-</rich_text_display_field_structure>
 
-<grid_field_essentials>
 Grid Field Essentials
 **CRITICAL**: Grid column `value` property must be one of these specific component types:
 - Text (string)
@@ -2308,9 +2634,7 @@ a!gridField(
   emptyGridMessage: "No records found"  /* Text only - no rich text or components */
 )
 ```
-</grid_field_essentials>
 
-<builtin_grid_features>
 Built-in Grid Features (Always Prefer)
 
 ```sail
@@ -2335,12 +2659,9 @@ a!gridField(
   )
 )
 ```
-</builtin_grid_features>
 
-<record_links_and_identifiers>
-## 🚨 CRITICAL: Record Links and Identifiers
+## Record Links and Identifiers
 
-<fv_identifier_availability>
 **fv!identifier Availability Rules**
 
 `fv!identifier` is ONLY automatically available in specific contexts where Appian provides it:
@@ -2432,9 +2753,7 @@ a!forEach(
   )
 )
 ```
-</fv_identifier_availability>
 
-<record_link_identifier_rules>
 **Record Link Identifier Rules:**
 
 1. **When using `a!recordData()` in grids/charts**: Use `fv!identifier`
@@ -2443,10 +2762,7 @@ a!forEach(
 4. **Primary key fields are typically**: `id`, `caseId`, `orderId`, `employeeId`, etc.
 
 **Rule of Thumb**: If you're iterating with `a!forEach()` over query results and need record links, you MUST include the primary key field in your query and use it as the identifier.
-</record_link_identifier_rules>
-</record_links_and_identifiers>
 
-<grid_selection_behavior>
 ## ⚠️ GRID SELECTION BEHAVIOR - CRITICAL RULE
 
 ### selectionValue Contains Identifiers, NOT Full Objects
@@ -2494,15 +2810,12 @@ Before writing code with grid selections:
 1. "Is this variable from a grid's selectionValue?" → YES = need index() lookup
 2. "Am I accessing properties on fv!item?" → Must verify fv!item is an object, not an ID
 3. "Did I use index() to look up the full object first?" → If NO, you'll get a runtime error
-</grid_selection_behavior>
 
-<user_filters_vs_custom_filters>
 User Filters vs Custom Filters
 **MANDATORY**: If record type has user filters AND interface has custom filters, ASK user to choose:
 - Use built-in user filters (pros/cons)
 - Keep custom filtering experience (pros/cons)
 
-<builtin_user_filters>
 Built-in User Filters
 ```sail
 a!gridField(
@@ -2512,9 +2825,7 @@ a!gridField(
   }
 )
 ```
-</builtin_user_filters>
 
-<custom_filtering_experience>
 Custom Filtering Experience
 ```sail
 a!localVariables(
@@ -2544,10 +2855,7 @@ a!localVariables(
   }
 )
 ```
-</custom_filtering_experience>
-</user_filters_vs_custom_filters>
 
-<conditional_visibility_showwhen>
 Conditional Visibility - showWhen Pattern
 ```sail
 /* ✅ Use showWhen instead of if() around components */
@@ -2566,9 +2874,7 @@ a!columnChartField(
   )
 )
 ```
-</conditional_visibility_showwhen>
 
-<selection_component_patterns>
 Selection Component Patterns
 ```sail
 /* ✅ Single array variable with checkbox controls */
@@ -2586,47 +2892,292 @@ a!localVariables(
   }
 )
 ```
-</selection_component_patterns>
 
-<single_checkbox_field_pattern>
 Single Checkbox Field Pattern
 
-**When using `a!checkboxField()` with a single choice (one choiceLabel/choiceValue pair):**
+**Pattern 1: Boolean Database Field (Simple Toggle)**
+
+When binding a single checkbox directly to a boolean record field with no dependent logic:
+
 ```sail
-/* ✅ CORRECT - Direct assignment, no null handling needed */
+/* ✅ CORRECT - Direct assignment for boolean database fields */
 a!checkboxField(
   label: "Options",
   choiceLabels: {"Enable Feature"},
-  choiceValues: {true()},
+  choiceValues: {true},
   value: ri!record['recordType!Example.fields.booleanField'],
   saveInto: ri!record['recordType!Example.fields.booleanField'],
   choiceLayout: "STACKED"
 )
+```
 
-/* ❌ WRONG - Unnecessary null checking and conversion logic */
+**Pattern 2: Local Variable with Dependent Field Clearing**
+
+When using a single checkbox with local variables that start as null or need to clear dependent fields:
+
+```sail
+/* ✅ CORRECT - Null-aware toggle pattern with dependent field clearing */
 a!checkboxField(
-  label: "Options",
-  choiceLabels: {"Enable Feature"},
-  choiceValues: {true()},
-  value: if(
-    a!defaultValue(ri!record['recordType!Example.fields.booleanField'], false()),
-    {true()},
-    {}
-  ),
+  label: "Employment Status",
+  choiceLabels: {"I am not currently employed"},
+  choiceValues: {true},
+  value: local!notCurrentlyEmployed,
   saveInto: {
-    a!save(
-      ri!record['recordType!Example.fields.booleanField'],
-      contains(save!value, true())
+    if(
+      a!isNullOrEmpty(local!notCurrentlyEmployed),
+      /* If the user checked the box, save its value and clear dependent fields */
+      {
+        local!notCurrentlyEmployed,
+        a!save(local!jobTitle, null),
+        a!save(local!company, null)
+      },
+      /* If the user unchecked the box, clear its value */
+      {
+        a!save(local!notCurrentlyEmployed, null)
+      }
+    )
+  }
+)
+
+/* Dependent fields check null state */
+a!textField(
+  label: "Job Title",
+  value: local!jobTitle,
+  saveInto: local!jobTitle,
+  required: a!isNullOrEmpty(local!notCurrentlyEmployed),
+  disabled: a!isNotNullOrEmpty(local!notCurrentlyEmployed)
+)
+```
+
+**Key Differences:**
+- **Pattern 1**: Use when binding to a boolean database field with no side effects
+- **Pattern 2**: Use when the checkbox state affects other fields or starts as null
+
+**Common Mistakes:**
+```sail
+/* ❌ WRONG - Using conditional value binding unnecessarily */
+value: if(local!notCurrentlyEmployed, {true}, {})
+
+/* ✅ RIGHT - Direct assignment */
+value: local!notCurrentlyEmployed
+
+/* ❌ WRONG - Using save!value in conditional */
+saveInto: {
+  a!save(local!var, or(save!value = {true})),
+  if(or(save!value = {true}), ...) /* ERROR: save!value not allowed here */
+}
+
+/* ✅ RIGHT - Check local variable state, not save!value */
+saveInto: {
+  if(a!isNullOrEmpty(local!var), ...)
+}
+```
+
+**Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
+
+
+## 🚨 CRITICAL: Grid Selection Implementation Pattern - Two-Variable Approach
+
+### The Core Problem
+Grid `selectionValue` stores **ONLY identifiers** (Integer Array or Text Array), NOT full row data. Trying to access row properties directly from `selectionValue` will cause runtime errors.
+
+### ❌ WRONG Pattern - Single Variable (Common Mistake)
+```sail
+local!selectedItems: {},  /* ❌ Trying to use one variable for both selection and data */
+
+a!gridField(
+  data: local!availableItems,
+  columns: {...},
+  selectionValue: local!selectedItems,  /* ❌ This stores IDs only! */
+  selectionSaveInto: local!selectedItems
+)
+
+/* Later trying to access row data */
+if(
+  length(
+    intersection(
+      local!selectedItems.type,  /* ❌ ERROR: selectedItems contains IDs, not objects! */
+      {"Contract"}
+    )
+  ) > 0,
+  ...
+)
+```
+
+**Error you'll see:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'type' of type Text into type Number (Integer)
+```
+
+### ✅ CORRECT Pattern - Two-Variable Approach
+
+**Step 1: Declare TWO variables**
+```sail
+local!availableItems: {
+  a!map(id: 1, name: "Item A", type: "Public"),
+  a!map(id: 2, name: "Item B", type: "Contract"),
+  a!map(id: 3, name: "Item C", type: "Public")
+},
+local!selectedItemIds: {},  /* Stores grid selection (IDs only) */
+local!selectedItems: a!forEach(  /* Computed: derives full data from IDs */
+  items: local!selectedItemIds,
+  expression: index(
+    local!availableItems,
+    wherecontains(fv!item, local!availableItems.id),
+    null
+  )
+),
+```
+
+**How the computed variable works:**
+1. `a!forEach()` iterates over each ID in `local!selectedItemIds` (e.g., {1, 3})
+2. For each ID (`fv!item`), `wherecontains(fv!item, local!availableItems.id)` finds the position in the array
+3. `index()` retrieves the full map at that position
+4. Result: An array of complete objects for all selected IDs
+
+**Step 2: Configure grid to use the IDs variable**
+```sail
+a!gridField(
+  data: local!availableItems,
+  columns: {
+    a!gridColumn(label: "Name", value: fv!row.name),
+    a!gridColumn(label: "Type", value: fv!row.type)
+  },
+  selectable: true,
+  selectionValue: local!selectedItemIds,  /* ✅ Use IDs variable */
+  selectionSaveInto: local!selectedItemIds  /* ✅ Save to IDs variable */
+)
+```
+
+**Step 3: Access full data using the computed variable (with null safety)**
+```sail
+/* ✅ CORRECT: Use nested if() for null-safe property access */
+if(
+  if(
+    a!isNotNullOrEmpty(local!selectedItems),
+    length(
+      intersection(
+        local!selectedItems.type,  /* ✅ Safe: has full data */
+        {"Contract"}
+      )
+    ) > 0,
+    false  /* Return safe default when empty */
+  ),
+  /* Show registration code field */,
+  {} /* Hide field */
+)
+```
+
+**Step 4: Display selected items**
+```sail
+a!forEach(
+  items: local!selectedItems,  /* ✅ Iterate over full data */
+  expression: a!cardLayout(
+    contents: {
+      a!richTextDisplayField(
+        value: {
+          a!richTextItem(text: fv!item.name, style: "STRONG"),
+          " - ",
+          fv!item.type
+        }
+      )
+    }
+  )
+)
+```
+
+**Step 5: Remove items (modify IDs only)**
+```sail
+/* Remove button in forEach */
+a!buttonWidget(
+  label: "Remove",
+  value: fv!item.id,
+  saveInto: a!save(
+    local!selectedItemIds,  /* ✅ Modify IDs variable only */
+    remove(local!selectedItemIds, wherecontains(fv!item.id, local!selectedItemIds))
+  )
+)
+```
+
+### Critical Rules
+1. ✅ **Always use TWO variables**: one for IDs (selectionValue), one computed for full data
+2. ✅ **Use a!forEach() + index() + wherecontains()** to derive full data from IDs
+3. ✅ **Never save to the computed variable** - it recalculates automatically
+4. ✅ **Always use nested if() for null safety** - `and()` does NOT short-circuit (see Null Safety section)
+5. ✅ **Grid selectionValue is ALWAYS a list** - even with maxSelections: 1
+6. ❌ **Never use filter()** for deriving data - requires fv!item context that doesn't exist in variable declarations
+
+### Why and() Doesn't Work for Null Safety
+```sail
+/* ❌ WRONG - and() evaluates ALL arguments */
+and(
+  a!isNotNullOrEmpty(local!selectedItems),
+  local!selectedItems.type = "value"  /* ❌ Still evaluated even when null! */
+)
+
+/* ✅ CORRECT - nested if() short-circuits */
+if(
+  a!isNotNullOrEmpty(local!selectedItems),
+  local!selectedItems.type = "value",  /* ✅ Only evaluated when not null */
+  false
+)
+```
+
+### Complete Working Example
+```sail
+a!localVariables(
+  local!availableCourses: {
+    a!map(id: 1, number: "OSHA #500", name: "Construction Safety", type: "Public"),
+    a!map(id: 2, number: "OSHA #501", name: "Maritime Safety", type: "Public"),
+    a!map(id: 3, number: "OSHA #5600", name: "Disaster Response", type: "Contract")
+  },
+  local!selectedCourseIds: {},
+  local!selectedCourses: a!forEach(
+    items: local!selectedCourseIds,
+    expression: index(
+      local!availableCourses,
+      wherecontains(fv!item, local!availableCourses.id),
+      null
+    )
+  ),
+  local!registrationCode,
+  {
+    a!gridField(
+      data: local!availableCourses,
+      columns: {
+        a!gridColumn(label: "Number", value: fv!row.number),
+        a!gridColumn(label: "Name", value: fv!row.name),
+        a!gridColumn(label: "Type", value: fv!row.type)
+      },
+      selectable: true,
+      selectionValue: local!selectedCourseIds,
+      selectionSaveInto: local!selectedCourseIds
+    ),
+    /* Show registration code field if contract course selected */
+    if(
+      if(
+        a!isNotNullOrEmpty(local!selectedCourses),
+        length(
+          intersection(
+            local!selectedCourses.type,
+            {"Contract"}
+          )
+        ) > 0,
+        false
+      ),
+      a!textField(
+        label: "Registration Code",
+        value: local!registrationCode,
+        saveInto: local!registrationCode,
+        required: true
+      ),
+      {}
     )
   }
 )
 ```
-Rule: Single checkbox fields automatically handle null-to-false conversion. Use direct assignment for both value and saveInto parameters without a!defaultValue(), if(), or contains() logic.
-</single_checkbox_field_pattern>
 
-</component_usage_patterns>
 
-<one_to_many_relationship_management>
 ## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
 
 **When creating or updating data in a form using the ri! pattern, manage one-to-many related records through the parent record's relationship field. NEVER query them separately or use local variables.**
@@ -2770,9 +3321,7 @@ local!comments: ri!case['recordType!Case.relationships.caseComment']
 | **Edit** | `fv!item['recordType!Comment.fields.description']` (in forEach) |
 | **Count** | `length(ri!case['...relationships.caseComment'])` |
 | **Check if empty** | `a!isNullOrEmpty(ri!case['...relationships.caseComment'])` |
-</one_to_many_relationship_management>
 
-<related_record_field_references>
 ## Related Record Field References
 Don't use relationships to display values. Instead, use the first text field from the related record type.
 
@@ -2792,22 +3341,17 @@ length(ri!case['recordType!Case.relationships.caseComment.fields.description'])
 /* ✅ CORRECT - For displaying related data in grids */
 fv!item['recordType!Comment.fields.description']
 ```
-</related_record_field_references>
 
-<user_field_vs_relationship>
-## 🚨 CRITICAL: User/Group Fields vs Relationships
+## User/Group Fields vs Relationships
 
 **When the data model shows BOTH a field AND a relationship for users, ALWAYS use the FIELD reference, NEVER the relationship.**
 
-<critical_distinction>
 Many record types have both:
 - **Field** (e.g., `assignedTo`, `createdBy`, `modifiedBy`): User type field
 - **Relationship** (e.g., `assignedToUser`, `createdByUser`, `modifiedByUser`): many-to-one relationship to User record type
 
 **ALWAYS query and display using the FIELD, NOT the relationship:**
-</critical_distinction>
 
-<correct_user_field_usage>
 ```sail
 /* ✅ CORRECT - Use the User field directly in queries */
 a!queryRecordType(
@@ -2859,9 +3403,7 @@ a!gridColumn(
   value: fv!row[recordType!Case.relationships.assignedToUser]  /* CAUSES ERRORS */
 )
 ```
-</correct_user_field_usage>
 
-<rule_of_thumb>
 **Rule of Thumb for Fields vs Relationships:**
 
 | Data Type | When to Use | Example |
@@ -2875,18 +3417,13 @@ a!gridColumn(
 **Key Principle:**
 - **Fields** store scalar values (User, Date, Text, Number, Boolean) → Access directly
 - **Relationships** navigate to related records via foreign keys → Use for accessing fields on the related record
-</rule_of_thumb>
 
-<why_both_exist>
 **Why Both Field and Relationship Exist:**
 - The **field** (e.g., `assignedTo`) stores the actual User value and is what you use for queries, displays, and forms
 - The **relationship** (e.g., `assignedToUser`) exists primarily for advanced relationship modeling and is rarely used in interfaces
 - The relationship may provide access to additional User record properties, but for standard use cases (displaying names, filtering by user, etc.), always use the field
-</why_both_exist>
-</user_field_vs_relationship>
 
-<related_record_access_in_forms>
-## 🚨 CRITICAL: Accessing Related Record Data in Forms
+## Accessing Related Record Data in Forms
 
 **When building forms, use a SINGLE rule input for the main record and access ALL related data through relationships.**
 
@@ -3039,12 +3576,9 @@ a!sectionLayout(
 
 ### Key Principle:
 **One record type is the "owner" of the form → Make it the rule input → Access everything else through relationships**
-</related_record_access_in_forms>
 
-<date_time_critical_rules>
 ## Date/Time Critical Rules
 
-<correct_datetime_functions>
 🚨 CRITICAL: Correct Date/Time Functions
 ```sail
 /* ✅ CORRECT - Use dateTime() for specific date/time creation */
@@ -3053,9 +3587,7 @@ dateTime(year(today()), month(today()), 1, 0, 0, 0)  /* Month to Date */
 /* ❌ WRONG - a!dateTimeValue() does NOT exist in Appian */
 a!dateTimeValue(year: year(today()), month: month(today()), day: 1)
 ```
-</correct_datetime_functions>
 
-<query_filter_type_matching>
 🚨 CRITICAL: Query Filter Data Type Matching
 
 **The a!queryFilter function requires exact data type matching between field and value:**
@@ -3085,9 +3617,7 @@ a!queryFilter(
 - **Date fields**: Use `today()`, date arithmetic, `date()`
 - **Number fields**: Use `tointeger()`, `todecimal()`
 - **Text fields**: Use `totext()`
-</query_filter_type_matching>
 
-<min_max_type_safety>
 🚨 CRITICAL: min()/max() Return Type Casting
 
 **The min() and max() functions return variant types that may need explicit casting for comparisons:**
@@ -3115,9 +3645,7 @@ local!isUrgent: local!earliestStart < today() + 30  /* Date comparison works */
 - **DateTime arrays**: Wrap with `todatetime(min(...))` or `todatetime(max(...))`
 - **Number arrays**: Wrap with `tointeger(...)` or `todecimal(...)` if specific type needed
 - **Always cast** when using the result in comparisons or calculations
-</min_max_type_safety>
 
-<type_matching_prevents_failures>
 Type Matching (Prevents Interface Failures)
 ```sail
 /* ✅ Date field with Date value */
@@ -3140,9 +3668,7 @@ a!queryFilter(
   value: a!subtractDateTime(...)            /* DateTime - FAILS */
 )
 ```
-</type_matching_prevents_failures>
 
-<date_function_corrections>
 Date Function Corrections
 ```sail
 /* ❌ WRONG - addDateTime rejects negative values */
@@ -3151,9 +3677,7 @@ value: a!addDateTime(startDateTime: today(), days: -30)
 /* ✅ CORRECT - Use subtractDateTime for past dates */
 value: a!subtractDateTime(startDateTime: now(), days: 30)
 ```
-</date_function_corrections>
 
-<text_function_with_dates>
 🚨 CRITICAL: text() Function with Date/DateTime Values
 
 **The text() function CANNOT accept null values. Always check for null before calling text():**
@@ -3178,13 +3702,9 @@ if(
 ```
 
 **Rule**: When formatting dates with text(), ALWAYS wrap in a null check that returns a fallback string (like "–" or "N/A"), NOT null.
-</text_function_with_dates>
-</date_time_critical_rules>
 
-<chart_data_configuration>
 ## Chart Data Configuration
 
-<record_data_charts_recommended>
 Record Data Charts (Recommended)
 ```sail
 a!barChartField(
@@ -3208,9 +3728,7 @@ a!barChartField(
   )
 )
 ```
-</record_data_charts_recommended>
 
-<mock_data_charts_prototyping>
 Mock Data Charts (Prototyping)
 ```sail
 a!barChartField(
@@ -3223,20 +3741,14 @@ a!barChartField(
   }
 )
 ```
-</mock_data_charts_prototyping>
 
-<chart_data_extraction_rules>
 Chart Data Extraction Rules
 **CRITICAL**: Charts are display-only components
 - **Cannot extract data from chart components** - Only from queries
 - **Use separate aggregation queries for KPIs** - Don't try to read chart data
-</chart_data_extraction_rules>
-</chart_data_configuration>
 
-<chart_components_usage>
 ## Chart Components Usage
 
-<available_chart_types>
 **Available Chart Functions:**
 1. `a!areaChartField()` - Filled areas under lines for trends and cumulative values
 2. `a!barChartField()` - Horizontal bars for comparing categories
@@ -3244,9 +3756,7 @@ Chart Data Extraction Rules
 4. `a!lineChartField()` - Connected points for trends over time
 5. `a!pieChartField()` - Pie slices for part-to-whole relationships
 6. `a!scatterChartField()` - Points on X/Y axes for correlations (record data only)
-</available_chart_types>
 
-<chart_shared_parameters>
 **Parameters Shared by All Chart Types:**
 - `label`, `labelPosition` (usually "COLLAPSED"), `instructions`
 - `height` - Values vary by type:
@@ -3256,9 +3766,7 @@ Chart Data Extraction Rules
 - `xAxisTitle`, `yAxisTitle` (not available for pie charts)
 - `showLegend` (column, line, bar, area only - NOT pie)
 - `showDataLabels`, `colorScheme`
-</chart_shared_parameters>
 
-<chart_stacking_property>
 🚨 CRITICAL: Stacking Property
 
 **ONLY these chart types have a `stacking` property:**
@@ -3285,9 +3793,7 @@ a!columnChartField(
 ```
 
 **Valid stacking values:** "NONE" (default), "NORMAL", "PERCENT_TO_TOTAL"
-</chart_stacking_property>
 
-<chart_data_approaches>
 **Two Data Approaches for Charts:**
 
 **Approach 1: Static Mockup Data** (categories + series)
@@ -3318,9 +3824,7 @@ a!columnChartField(
 
 ❌ **NEVER mix approaches:** Don't use `categories` + `series` with record data
 ❌ **NEVER use scatter charts with static mockup data** - they require record data
-</chart_data_approaches>
 
-<chart_config_parameters>
 **Valid Parameters for Chart Config Functions:**
 - `primaryGrouping` - a!grouping() for main data grouping
 - `secondaryGrouping` - a!grouping() for multi-series charts
@@ -3334,9 +3838,7 @@ a!columnChartField(
 - `stacking` - This is on the chart field, NOT in config
 - `aggregations` - Use `measures` instead
 - `aggregationFields` - Use `measures` instead
-</chart_config_parameters>
 
-<chart_interval_values>
 🚨 CRITICAL: Valid Interval Values for a!grouping()
 
 **The `interval` parameter in a!grouping() can ONLY be used with Date/DateTime/Time fields.**
@@ -3379,9 +3881,7 @@ a!grouping(
 ```
 
 **Rule**: Only use interval values from the documented list above. For weekly groupings, use "DATE_SHORT_TEXT" or "DATE" instead.
-</chart_interval_values>
 
-<chart_record_data_example>
 **Complete Record Data Chart Example:**
 ```sail
 a!columnChartField(
@@ -3414,10 +3914,7 @@ a!columnChartField(
   height: "MEDIUM"
 )
 ```
-</chart_record_data_example>
-</chart_components_usage>
 
-<kpi_performance_calculations>
 ## KPI and Performance Calculations
 **Best Practice**: Use aggregation queries for KPIs - Leverage native `a!queryRecordType()` with `a!aggregationFields()` for better performance than manual filtering/calculations.
 
@@ -3448,12 +3945,9 @@ local!caseStats: a!queryRecordType(
 local!allCases: a!queryRecordType(...).data,
 local!openCases: length(filter(rule: local!allCases.status = "Open", data: local!allCases))
 ```
-</kpi_performance_calculations>
 
-<record_actions>
 ## Record Actions
 
-<critical_recordactionfield_usage>
 🚨 CRITICAL: Use a!recordActionField() for Standalone Actions
 ```sail
 /* ✅ CORRECT - Standalone record actions */
@@ -3476,9 +3970,7 @@ a!buttonWidget(
   saveInto: a!startProcess(processModel: ...)  /* Use recordActionField instead */
 )
 ```
-</critical_recordactionfield_usage>
 
-<recordactionitem_function>
 a!recordActionItem() Function
 ```sail
 /* Grid record actions */
@@ -3499,21 +3991,15 @@ a!recordActionField(
   style: "TOOLBAR_PRIMARY"
 )
 ```
-</recordactionitem_function>
 
-<record_action_implementation_rules>
 Record Action Implementation Rules
 - **For standalone record actions**: Always use `a!recordActionField()` with `a!recordActionItem()`
 - **For grid record actions**: Use `recordActions` parameter with `a!recordActionItem()`
 - **Never use `a!startProcess()`** when record actions are available
 - **Never use button widgets** to trigger record actions
-</record_action_implementation_rules>
-</record_actions>
 
-<create_update_scenarios>
 ## Create/Update Scenarios
 
-<critical_null_checking>
 Critical Null Checking
 ```sail
 /* ✅ CORRECT - Direct field references */
@@ -3529,9 +4015,7 @@ if(
   "Unknown"
 )
 ```
-</critical_null_checking>
 
-<record_instance_creation>
 Record Instance Creation
 ```sail
 'recordType!Case'(
@@ -3539,9 +4023,7 @@ Record Instance Creation
   'recordType!Case.fields.priority': 1
 )
 ```
-</record_instance_creation>
 
-<form_field_with_record_data>
 Form Field with Record Data
 ```sail
 a!textField(
@@ -3554,13 +4036,9 @@ a!textField(
   )
 )
 ```
-</form_field_with_record_data>
-</create_update_scenarios>
 
-<essential_functions_reference>
 ## Essential Functions Reference
 
-<preferred_functions>
 Preferred Functions
 - **Null Checking**: `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()` over `isnull()`
 - **Logical**: `and()`, `or()`, `not()` over infix operators
@@ -3568,9 +4046,7 @@ Preferred Functions
 - **Matching**: `a!match()` over `choose()`
 - **Array Operations**: `append()`, `a!update()` for immutable operations
 - **Audit Functions**: `loggedInUser()`, `now()` for audit fields
-</preferred_functions>
 
-<json_functions>
 JSON Functions
 ```sail
 /* Convert to JSON */
@@ -3585,9 +4061,7 @@ a!fromJson('{"name":"John","age":30}')
 /* Extract with JSONPath */
 a!jsonPath(json: local!data, expression: "$.employees[0].name")
 ```
-</json_functions>
 
-<contains_usage>
 contains() Usage
 ```sail
 /* Arrays */
@@ -3599,187 +4073,70 @@ contains(
   "Alice"
 )
 ```
-</contains_usage>
 
-<available_appian_functions>
-Available Appian Functions (Use Only These)
+## Quick Function Reference
 
-<core_functions>
-Core Functions:
-- **Array**: `a!flatten()`, `append()`, `index()`, `length()`, `where()`, `wherecontains()`
-- **Logical**: `and()`, `or()`, `not()`, `if()`, `a!match()`
-- **Null Checking**: `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()`
-- **Looping**: `a!forEach()`, `filter()`, `reduce()`, `merge()`
-- **Text**: `concat()`, `find()`, `left()`, `len()`, `substitute()`, `upper()`, `lower()`
-- **Date/Time**: `today()`, `now()`, `dateTime()`, `a!addDateTime()`, `a!subtractDateTime()`
-- **JSON**: `a!toJson()`, `a!fromJson()`, `a!jsonPath()`
-- **User/System**: `loggedInUser()`, `user()`
-</core_functions>
+| Category | Functions |
+|----------|-----------|
+| Array | `a!flatten()`, `append()`, `index()`, `length()`, `where()`, `wherecontains()` |
+| Logical | `and()`, `or()`, `not()`, `if()`, `a!match()` |
+| Null Checking | `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()` |
+| Looping | `a!forEach()`, `filter()`, `reduce()`, `merge()` |
+| Text | `concat()`, `find()`, `left()`, `len()`, `substitute()`, `upper()`, `lower()` |
+| Date/Time | `today()`, `now()`, `dateTime()`, `a!addDateTime()`, `a!subtractDateTime()` |
+| JSON | `a!toJson()`, `a!fromJson()`, `a!jsonPath()` |
+| User/System | `loggedInUser()`, `user()` |
+| Query | `a!queryRecordType()`, `a!recordData()`, `a!queryFilter()`, `a!pagingInfo()`, `a!aggregationFields()` |
 
-<query_functions>
-Query Functions:
-- **Primary**: `a!queryRecordType()`, `a!recordData()`
-- **Filters**: `a!queryFilter()`, `a!queryLogicalExpression()`
-- **Paging**: `a!pagingInfo()`, `a!sortInfo()`
-- **Aggregation**: `a!aggregationFields()`, `a!grouping()`, `a!measure()`
-</query_functions>
-</available_appian_functions>
-</essential_functions_reference>
+## 🔧 Quick Troubleshooting
 
-<when_implementation_fails>
-## 🔧 When Implementation Fails
+If your interface fails to load, check:
+1. **Syntax basics** - All parentheses/brackets matched, variables declared at top
+2. **Data patterns** - a!recordData() only in grids/charts (see Data Querying Patterns - CRITICAL USAGE RULES)
+3. **Null handling** - All rule inputs protected (see MANDATORY: Null Safety Implementation)
+4. **Relationships** - Single continuous path, no double brackets (see Relationship Navigation Syntax)
 
-**If interface fails to load:**
-1. **Check all parentheses and brackets are matched** - Use IDE bracket matching
-2. **Verify all local variables are declared at top** - No undeclared variable usage
-3. **Confirm a!recordData() only used in grids/charts** - Never in local variables
-4. **Validate function parameter counts** - Use function validation checkpoint
-5. **Check field vs relationship usage** - User/Group/Date/Text/Number fields use FIELD references, NOT relationships; relationships only for navigating to related record data
-6. **Verify record type references are exact** - No truncated UUIDs
-7. **Confirm all saveInto targets are valid** - Local variables or rule inputs only
-8. **Check null handling** - Use a!isNotNullOrEmpty() for validation
-9. **Verify relationship navigation syntax** - Single continuous path, no double brackets
-10. **Check grid column sorting** - Only sort on fields, never on relationships
-</when_implementation_fails>
+## Syntax Validation Checklist
 
-<syntax_validation_checklist>
-## 🚨 SYNTAX VALIDATION CHECKLIST
+Before finalizing any SAIL interface, verify these critical items:
 
-<critical_syntax_checks>
-Critical Syntax:
-- [ ] Expression starts with `a!localVariables()`
-- [ ] **ALL local variables declared before use**
-- [ ] **`a!recordData()` used ONLY inside `a!gridField()` or charts**
-- [ ] **`a!queryRecordType()` used for all other data queries**
-- [ ] **Audit fields set on create/update operations**
-- [ ] **`a!pickerFieldUsers()` used for User fields, `a!pickerFieldGroups()` for Group fields**
-- [ ] **Function parameter counts verified: `wherecontains(value, array)`, `contains(array, value)`**
-- [ ] **Relationship navigation uses single continuous path: `record.relationships.relation.fields.field`**
-- [ ] **Grid sorting uses ONLY field references, NEVER relationship references**
-- [ ] **ALL direct field references wrapped in `a!defaultValue()`**
-- [ ] **User function calls protected with null checking via `if()` statements**
-- [ ] **Array operations use `a!defaultValue()` with empty array fallbacks**
+### Foundation & Structure
+- [ ] **Expression starts with `a!localVariables()`** (see MANDATORY FOUNDATION RULES)
+- [ ] **a!recordData() ONLY in grids/charts** (see Data Querying Patterns - CRITICAL USAGE RULES)
+- [ ] **Form data uses ri! pattern correctly** (see CRITICAL: Form Interface Data Patterns)
 
-<record_type_reference_validation>
-Record Type Reference Syntax:
-- [ ] **All record type references use clean semantic names** (e.g., `'recordType!Case.fields.title'`)
-- [ ] **No `{uuid}` placeholders in generated code** - developers will use Appian autocomplete for actual refs
-- [ ] **Record type constructors use semantic names**: `'recordType!CaseNote'(...)` not `'recordType!{uuid}CaseNote'(...)`
-- [ ] **All references properly quoted**: `'recordType!Case.fields.title'` not `recordType!Case.fields.title`
-</record_type_reference_validation>
+### Grid Selection Pattern
+- [ ] **Grid selection uses two-variable approach** (see CRITICAL: Grid Selection Implementation Pattern)
+  - [ ] ID array variable for `selectionValue` (e.g., `local!selectedCourseIds`)
+  - [ ] Computed variable using `a!forEach() + index() + wherecontains()` pattern
+  - [ ] All `saveInto` operations modify ID array only
+- [ ] **Grid `selectionValue` treated as ID array**, never as full row data
+- [ ] **Computed variables have null checks** before property access (see next section)
 
-<array_function_validation>
-Array Function Validation:
-- [ ] **append() used only with array + array or array + compatible scalar**
-- [ ] **wherecontains() called with exactly 2 parameters: `wherecontains(value, array)`**
-- [ ] **a!update() used for inserting/replacing at specific index positions**
-- [ ] **Single items prepended to arrays use `a!update()` or `insert()`, NOT `append()`**
-- [ ] **No mixing of incompatible types in `append()` (e.g., map + array)**
-</array_function_validation>
-- [ ] **Form validations use `a!defaultValue()` for field references**
-- [ ] **No naked field references (ri!record[field] without a!defaultValue)**
-- [ ] **Dropdown variables with record data are uninitialized (declared without values)**
-- [ ] **All a!queryFilter value parameters match field data types (DateTime to DateTime, etc.)**
-- [ ] **Charts use a!recordData() with config parameter, not categories/series**
-- [ ] **Grids use a!recordData() directly, not query results in local variables**
-- [ ] **All functions exist in Appian (no made-up functions like a!decimalField)**
-- [ ] **No Python/JavaScript syntax patterns (use if() not ternary operators)**
-- [ ] **a!wizardLayout() has no validations parameter**
-- [ ] **a!buttonWidget() parameters are all valid**
-- [ ] **a!floatingPointField() used for decimal values, not a!decimalField()**
-- [ ] All parentheses `()` and curly brackets `{}` properly matched
-- [ ] Field references use square brackets: `fv!row[recordType!Name.fields.field]`
-- [ ] No `a!flatten()` in filter arrays
-- [ ] `applyWhen` used for conditional filters instead of `if()` around them
-- [ ] `fetchTotalCount: true` always set in `a!queryRecordType()`
-- [ ] Sort configured inside `a!pagingInfo()`, not directly on query
-- [ ] Placeholder always set on dropdowns when value can be null
-- [ ] `showWhen` used instead of `if()` around components
-- [ ] Date/DateTime type matching in filters
-- [ ] min()/max() results cast to appropriate type (todate, todatetime, tointeger)
-- [ ] Record actions use only `action` and `identifier` parameters
-- [ ] **One-to-many data saved on base record using relationships**
-- [ ] **Related record values use specific field paths, not bare relationships**
-- [ ] **`emptyGridMessage` contains text only - no rich text or components**
-- [ ] **Aggregation uses `fields: a!aggregationFields()` not separate `aggregations` parameter**
-- [ ] **Never use `append()` with record data in dropdown choices - use placeholders**
-- [ ] **Proper boolean logic in `and()` and `or()` functions**
-- [ ] **Use `dateTime()` function, never `a!dateTimeValue()` (doesn't exist)**
-- [ ] **Local variables in nested contexts use `a!localVariables()` blocks**
-- [ ] **Sparse aggregation data handled with record-based matching, not position matching**
-- [ ] **Rich text display fields use arrays of rich text components**
-- [ ] **Grid column values use only approved component types**
-- [ ] **Record actions use `a!recordActionField()` not button widgets**
-- [ ] **KPIs use appropriate pattern: .totalCount for simple counts, a!aggregationFields() with a!measure() for SUM/AVG/MIN/MAX**
-- [ ] **Aggregation queries with NO groupings use direct property access: `query.data.alias`**
-- [ ] **Regular field queries use array indexing for first row: `query[1]['field']`**
-- [ ] **Query data extraction pattern matches query type (aggregation vs regular)**
-- [ ] **Single checkbox fields use direct assignment without null handling or conversion logic**
-- [ ] **No `a!encryptedTextField()` used with synced record types - use `a!textField()` with warning banner instead**
-- [ ] **`fv!identifier` ONLY used in grids with `a!recordData()` or grid recordActions - use primary key field in `a!forEach()`**
-- [ ] **Record links in `a!forEach()` use primary key field as identifier, NOT `fv!identifier`**
-- [ ] **Primary key field included in query when creating record links in `a!forEach()`**
-- [ ] **text() function with dates wrapped in null check that returns string fallback (NOT null)**
-- [ ] **user() and group() functions called ONLY after null checking with if() statement**
-- [ ] **No null values passed to functions that operate on values (user, group, text, upper, lower, etc.)**
-- [ ] **All date/time formatting with text() has fallback string like "–" or "N/A"**
-- [ ] **Charts use a!recordData() with config parameter when using record data**
-- [ ] **Chart interval values are from valid list (MONTH_SHORT_TEXT, DATE_SHORT_TEXT, etc.) - NOT "MONTH" or "WEEK"**
-- [ ] **Stacking property (if used) is on chart field level, NOT in config**
-- [ ] **Chart config uses only valid parameters: primaryGrouping, secondaryGrouping, measures, sort, dataLimit, link, showIntervalsWithNoData**
-- [ ] **Scatter charts ONLY use record data approach (data + config), never categories + series**
-</critical_syntax_checks>
+### Null Safety & Short-Circuit Evaluation
+- [ ] **All null checks implemented** (see MANDATORY: Null Safety Implementation)
+- [ ] **Computed variables protected with nested `if()`** - NOT `and()` (see Short-Circuit Evaluation Rules)
+- [ ] **Property access on arrays uses nested `if()`** when array could be empty
+- [ ] **No `and()` used for null-safe property access** - Use nested `if()` instead
 
-<relationship_navigation_validation>
-🚨 CRITICAL: Relationship Navigation Validation
-- [ ] **All relationship field references use single continuous path**
-- [ ] **No double bracket syntax: `record.relation.field` NOT `[record.relation][otherRecord.field]`**
-- [ ] **Grid sorting references fields only, never relationships**
-- [ ] **Related record values accessed through relationships with proper field paths**
-- [ ] **User/Group fields use FIELD references (assignedTo, createdBy) NOT relationship references (assignedToUser, createdByUser)**
-- [ ] **Date/DateTime fields use FIELD references (createdOn, modifiedOn) NOT relationship references**
-- [ ] **Scalar fields (Text, Number, Boolean) use FIELD references, NOT relationships**
-</relationship_navigation_validation>
+### Array & Property Access
+- [ ] **Dot notation used for property access** (e.g., `local!items.price`)
+- [ ] **NO usage of `property()` function** - Function does not exist in SAIL
+- [ ] **Array functions use correct parameter order** (see Array and Data Manipulation Patterns)
+- [ ] **Derived data pattern follows `a!forEach() + index() + wherecontains()`** (see Deriving Full Data from ID Arrays)
 
-<form_data_pattern_validation>
-🚨 CRITICAL: Form Data Pattern Validation
-- [ ] **Form interfaces use SINGLE rule input for main record (e.g., ri!case), not multiple inputs for related records**
-- [ ] **All related record data accessed through relationships from main rule input**
-- [ ] **Many-to-one relationships accessed via: `ri!mainRecord['...relationships.relatedRecord.fields.fieldName']`**
-- [ ] **One-to-many relationships accessed directly: `ri!mainRecord['...relationships.childRecords']` (no local variables)**
-- [ ] **No separate queries for related data that exists as relationships**
-- [ ] **No local variables copying relationship data (changes won't save)**
-- [ ] **Non-existent constants/process models use `null` with TODO comments, not assumed names**
-- [ ] **Only use fields that exist in the data model (check context/data-model-context.md)**
-- [ ] **No invented field names (e.g., "legalName" when only firstName/lastName exist)**
-- [ ] **One-to-many add operations use: `append(ri!record['...relationships.children'], cast(...))`**
-- [ ] **One-to-many remove operations use: `remove(ri!record['...relationships.children'], fv!index)`**
-- [ ] **One-to-many edit operations use: `fv!item['recordType!Child.fields.fieldName']` in a!forEach**
-</form_data_pattern_validation>
+### Function Validation
+- [ ] **Function parameters match documented signatures** (see CRITICAL: Function Parameter Validation)
+- [ ] **All functions exist in Appian** (see Available Appian Functions)
+- [ ] **Short-circuit evaluation rules followed** (see Short-Circuit Evaluation Rules)
+  - Use nested `if()` for null-safe property access
+  - Use `and()`/`or()` only for independent conditions
 
-<dropdown_record_data_validation>
-Dropdown & Record Data Validation:
-- [ ] **Dropdown choiceValues use record IDs, choiceLabels use record text fields**
-- [ ] **No append() used with record data - placeholders used instead**
-- [ ] **No value-to-ID translation logic - dropdowns store IDs directly**
-- [ ] **No wherecontains() + index() patterns for single value lookups**
-- [ ] **Filter variables contain IDs that match database field types**
-</dropdown_record_data_validation>
+### Component Patterns
+- [ ] **Relationship navigation follows single-path pattern** (see Relationship Navigation Syntax)
+- [ ] **Record actions use a!recordActionField()** (see Record Actions)
+- [ ] **Checkbox patterns match documented approach** (see Single Checkbox Field Pattern)
 
-<layout_validation>
-Layout Validation:
-- [ ] No `sideBySideLayout` in grid columns
-- [ ] Rich text contains only allowed elements
-- [ ] `emptyGridMessage` used instead of conditional grid rendering
-- [ ] Grid selection parameters configured when using record actions
-</layout_validation>
-
-<grid_features_validation>
-Grid Features:
-- [ ] Used userFilters parameter when record type has user filters
-- [ ] Used showSearchBox: true for text search (not custom search fields)
-- [ ] No custom filter dropdowns when built-in features available
-</grid_features_validation>
-</syntax_validation_checklist>
+Each item above links to its authoritative section for complete rules and examples.
 
 
