@@ -25,6 +25,9 @@
 - **Record type reference errors** → Lines 59-115 (Record Type Reference Syntax)
 - **Syntax errors (and/or, if statements)** → Lines 330-408 (Language-Specific Syntax Patterns)
 - **Grid selection not working** → Lines 2762-2974 (Grid Selection Behavior), Lines 2975-3176 (Implementation Pattern)
+- **Grid selection variable naming errors** → Lines 3100+ (Variable Naming Conventions for Grid Selections)
+- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 3100+ (Grid Selection Anti-Patterns)
+- **Type mismatch: Cannot index property into Integer/Text** → Lines 3100+ (Grid Selection Anti-Patterns)
 - **Query filter errors with rule inputs** → Lines 1628-1713 (Protecting Query Filters)
 - **Relationship navigation errors** → Lines 3177-3320 (One-to-Many Relationships), Lines 3321-3575 (Related Record References)
 - **Button/wizard configuration errors** → Lines 1255-1269 (Button Parameters), Lines 1270-1284 (Wizard Parameters)
@@ -3097,6 +3100,114 @@ a!checkboxField(
 ```
 
 
+## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections
+
+### The Naming Problem
+
+Grid `selectionValue` stores **ONLY identifiers** (Integer Array or Text Array), NOT full row objects. Variables that store these IDs MUST use naming conventions that make this clear.
+
+### ❌ WRONG - Ambiguous Names That Suggest Full Objects
+```sail
+local!selectedCases: {},      /* ❌ WRONG: Suggests full case objects */
+local!selectedTasks: {},      /* ❌ WRONG: Suggests full task objects */
+local!selectedEmployees: {},  /* ❌ WRONG: Suggests full employee objects */
+local!chosenItems: {},        /* ❌ WRONG: Suggests full item data */
+```
+
+**Why this is dangerous:**
+- Code readers assume these variables contain full objects
+- Leads to property access errors like `local!selectedCases.title` (ERROR: trying to access .title on integer array)
+- Runtime error: "Cannot index property 'title' of type Text into type Number (Integer)"
+
+### ✅ CORRECT - Clear Names That Indicate ID Arrays
+```sail
+/* Option 1: "Ids" suffix (recommended for primary keys) */
+local!selectedCaseIds: {},       /* ✅ CLEAR: Integer array of case IDs */
+local!selectedTaskIds: {},       /* ✅ CLEAR: Integer array of task IDs */
+local!selectedEmployeeIds: {},   /* ✅ CLEAR: Integer array of employee IDs */
+
+/* Option 2: "Keys" suffix (recommended for text identifiers) */
+local!selectedStatusKeys: {},    /* ✅ CLEAR: Text array of status keys */
+local!selectedCategoryKeys: {},  /* ✅ CLEAR: Text array of category keys */
+
+/* Option 3: "Indexes" suffix (recommended for positional selection) */
+local!selectedRowIndexes: {},    /* ✅ CLEAR: Integer array of row positions */
+```
+
+### Naming Convention Rules
+
+**MANDATORY naming pattern for grid selection ID arrays:**
+
+1. **For Integer IDs** (most common):
+   - ✅ Use suffix: `Ids`
+   - Examples: `local!selectedCaseIds`, `local!selectedTaskIds`, `local!chosenEmployeeIds`
+
+2. **For Text Keys**:
+   - ✅ Use suffix: `Keys`
+   - Examples: `local!selectedStatusKeys`, `local!selectedCategoryKeys`
+
+3. **For Array Indexes**:
+   - ✅ Use suffix: `Indexes`
+   - Examples: `local!selectedRowIndexes`
+
+4. **Computed Variables** (full data derived from IDs):
+   - ✅ Use descriptive name WITHOUT suffix
+   - Examples: `local!selectedCases`, `local!selectedTasks`, `local!selectedEmployees`
+
+### Complete Example with Correct Naming
+
+```sail
+a!localVariables(
+  /* Available data - all cases */
+  local!allCases: {
+    a!map(id: 1, title: "Case A", priority: "High"),
+    a!map(id: 2, title: "Case B", priority: "Low"),
+    a!map(id: 3, title: "Case C", priority: "High")
+  },
+
+  /* ✅ CORRECT: ID array with "Ids" suffix */
+  local!selectedCaseIds: {},
+
+  /* ✅ CORRECT: Computed variable with descriptive name (no suffix) */
+  local!selectedCases: a!forEach(
+    items: local!selectedCaseIds,
+    expression: index(
+      local!allCases,
+      wherecontains(fv!item, local!allCases.id),
+      null
+    )
+  ),
+
+  /* Grid configuration */
+  a!gridField(
+    data: local!allCases,
+    columns: {
+      a!gridColumn(label: "Title", value: fv!row.title),
+      a!gridColumn(label: "Priority", value: fv!row.priority)
+    },
+    selectable: true,
+    selectionValue: local!selectedCaseIds,  /* ✅ Use ID variable */
+    selectionSaveInto: local!selectedCaseIds
+  ),
+
+  /* ❌ WRONG: Trying to access properties on ID array */
+  /* local!selectedCaseIds.title */  /* ERROR! */
+
+  /* ✅ CORRECT: Access properties on computed variable */
+  local!selectedCases.title  /* Works! Returns array of titles */
+)
+```
+
+### Enforcement Checklist
+
+**Before writing grid selection code, verify:**
+- [ ] ID array variable name ends with "Ids", "Keys", or "Indexes"
+- [ ] Computed variable name is descriptive WITHOUT suffix
+- [ ] `selectionValue` and `selectionSaveInto` use the ID variable (with suffix)
+- [ ] Property access (`.fieldName`) ONLY uses computed variable (no suffix)
+- [ ] No property access attempted on ID array variable
+
+
 ## 🚨 CRITICAL: Grid Selection Implementation Pattern - Two-Variable Approach
 
 ### The Core Problem
@@ -3220,13 +3331,66 @@ a!buttonWidget(
 )
 ```
 
-### Critical Rules
-1. ✅ **Always use TWO variables**: one for IDs (selectionValue), one computed for full data
-2. ✅ **Use a!forEach() + index() + wherecontains()** to derive full data from IDs
-3. ✅ **Never save to the computed variable** - it recalculates automatically
-4. ✅ **Always use nested if() for null safety** - `and()` does NOT short-circuit (see Null Safety section)
-5. ✅ **Grid selectionValue is ALWAYS a list** - even with maxSelections: 1
-6. ❌ **Never use filter()** for deriving data - requires fv!item context that doesn't exist in variable declarations
+### Critical Rules - COMPLETE ENFORCEMENT CHECKLIST
+
+**Before writing ANY grid with selection, verify ALL of these:**
+
+1. ✅ **Variable Naming Convention (MANDATORY)**:
+   - [ ] ID array variable name ends with "Ids", "Keys", or "Indexes"
+   - [ ] Computed variable name is descriptive WITHOUT suffix
+   - [ ] Variable names clearly distinguish between IDs and full data
+   - Example: `local!selectedCaseIds` (IDs) vs `local!selectedCases` (computed data)
+
+2. ✅ **Two-Variable Pattern (MANDATORY)**:
+   - [ ] TWO variables declared: one for IDs, one computed for full data
+   - [ ] ID variable initialized as empty array: `{}`
+   - [ ] Computed variable uses `a!forEach() + index() + wherecontains()` pattern
+   - [ ] Both variables declared before use
+
+3. ✅ **Grid Configuration (MANDATORY)**:
+   - [ ] `selectionValue` parameter uses ID variable (with suffix)
+   - [ ] `selectionSaveInto` parameter uses ID variable (with suffix)
+   - [ ] Grid `selectionValue` treated as ID array, NEVER as full row data
+
+4. ✅ **Property Access Rules (MANDATORY)**:
+   - [ ] ALL property access (`.fieldName`) uses computed variable ONLY
+   - [ ] NEVER attempt property access on ID array variable
+   - [ ] Null checks precede all property access on computed variable
+
+5. ✅ **Null Safety (MANDATORY)**:
+   - [ ] Use nested `if()` for null-safe property access (NOT `and()`)
+   - [ ] Pattern: `if(a!isNotNullOrEmpty(computed), computed.property, defaultValue)`
+   - [ ] `and()` does NOT short-circuit - see Short-Circuit Evaluation Rules
+
+6. ✅ **Data Derivation (MANDATORY)**:
+   - [ ] Use `a!forEach() + index() + wherecontains()` to derive full data from IDs
+   - [ ] Never use `filter()` for deriving data (requires fv!item context)
+   - [ ] Never save to computed variable (it recalculates automatically)
+
+7. ✅ **Iteration Patterns (MANDATORY)**:
+   - [ ] When iterating to display data: use computed variable (full data)
+   - [ ] When modifying selection: modify ID variable only
+   - [ ] Never iterate over ID array expecting full objects
+
+8. ✅ **Conditional Logic (MANDATORY)**:
+   - [ ] When checking properties: use computed variable with null checks
+   - [ ] Never check properties on ID array variable
+   - [ ] Pattern: `if(a!isNotNullOrEmpty(computed), <property check>, false)`
+
+9. ✅ **Selection Modifications (MANDATORY)**:
+   - [ ] All `saveInto` operations modify ID array ONLY
+   - [ ] Use `append()`, `remove()`, `a!save()` on ID variable
+   - [ ] Computed variable updates automatically
+
+10. ✅ **Grid Context (MANDATORY)**:
+    - [ ] Grid `selectionValue` is ALWAYS a list (even with `maxSelections: 1`)
+    - [ ] Use `index(selectionValue, 1, null)` to get first selection from list
+    - [ ] Check `length(selectionValue) > 0` before accessing selections
+
+11. ✅ **Code Review (MANDATORY)**:
+    - [ ] Search code for ID variable name - verify NO property access attempted
+    - [ ] Search code for computed variable name - verify ALL property access uses it
+    - [ ] Verify naming convention followed consistently throughout interface
 
 ### Why and() Doesn't Work for Null Safety
 ```sail
@@ -3297,6 +3461,273 @@ a!localVariables(
   }
 )
 ```
+
+
+## 🚨 CRITICAL ANTI-PATTERNS - DO NOT DO THIS
+
+### Anti-Pattern 1: Property Access on ID Array Variable
+
+**THE ERROR:**
+```sail
+a!localVariables(
+  local!allTasks: {
+    a!map(id: 1, title: "Review contract", status: "Open"),
+    a!map(id: 2, title: "Update case file", status: "Closed"),
+    a!map(id: 3, title: "Schedule hearing", status: "Open")
+  },
+
+  /* ❌ WRONG: Variable name suggests objects but stores IDs */
+  local!selectedTasks: {},
+
+  a!gridField(
+    data: local!allTasks,
+    columns: {
+      a!gridColumn(label: "Title", value: fv!row.title),
+      a!gridColumn(label: "Status", value: fv!row.status)
+    },
+    selectable: true,
+    selectionValue: local!selectedTasks,  /* Stores integers {1, 3}, NOT objects! */
+    selectionSaveInto: local!selectedTasks
+  ),
+
+  /* ❌ WRONG: Trying to access .status property on integer array */
+  a!textField(
+    label: "Selected Task Status",
+    value: local!selectedTasks.status,  /* ERROR: Cannot access .status on {1, 3}! */
+    readOnly: true
+  )
+)
+```
+
+**Runtime Error:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'status' of type Text into type Number (Integer)
+```
+
+**THE FIX:**
+```sail
+a!localVariables(
+  local!allTasks: {
+    a!map(id: 1, title: "Review contract", status: "Open"),
+    a!map(id: 2, title: "Update case file", status: "Closed"),
+    a!map(id: 3, title: "Schedule hearing", status: "Open")
+  },
+
+  /* ✅ CORRECT: Clear naming - stores IDs only */
+  local!selectedTaskIds: {},
+
+  /* ✅ CORRECT: Computed variable derives full data */
+  local!selectedTasks: a!forEach(
+    items: local!selectedTaskIds,
+    expression: index(
+      local!allTasks,
+      wherecontains(fv!item, local!allTasks.id),
+      null
+    )
+  ),
+
+  a!gridField(
+    data: local!allTasks,
+    columns: {
+      a!gridColumn(label: "Title", value: fv!row.title),
+      a!gridColumn(label: "Status", value: fv!row.status)
+    },
+    selectable: true,
+    selectionValue: local!selectedTaskIds,  /* ✅ Use ID variable */
+    selectionSaveInto: local!selectedTaskIds
+  ),
+
+  /* ✅ CORRECT: Access properties on computed variable */
+  a!textField(
+    label: "Selected Task Status",
+    value: joinarray(local!selectedTasks.status, ", "),  /* ✅ Works! */
+    readOnly: true
+  )
+)
+```
+
+### Anti-Pattern 2: Using forEach on ID Array Without Lookup
+
+**THE ERROR:**
+```sail
+a!localVariables(
+  local!allEmployees: {
+    a!map(id: 101, name: "Alice Smith", department: "Legal"),
+    a!map(id: 102, name: "Bob Jones", department: "Finance"),
+    a!map(id: 103, name: "Carol White", department: "Legal")
+  },
+
+  /* ❌ WRONG: Ambiguous variable name */
+  local!selectedEmployees: {},
+
+  a!gridField(
+    data: local!allEmployees,
+    columns: {...},
+    selectionValue: local!selectedEmployees,  /* Stores {101, 103} */
+    selectionSaveInto: local!selectedEmployees
+  ),
+
+  /* ❌ WRONG: Iterating over IDs as if they were objects */
+  a!forEach(
+    items: local!selectedEmployees,  /* This is {101, 103}, NOT employee objects! */
+    expression: a!richTextDisplayField(
+      value: a!richTextItem(
+        text: fv!item.name  /* ERROR: fv!item is 101, not an object! */
+      )
+    )
+  )
+)
+```
+
+**Runtime Error:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'name' of type Text into type Number (Integer)
+```
+
+**THE FIX:**
+```sail
+a!localVariables(
+  local!allEmployees: {
+    a!map(id: 101, name: "Alice Smith", department: "Legal"),
+    a!map(id: 102, name: "Bob Jones", department: "Finance"),
+    a!map(id: 103, name: "Carol White", department: "Legal")
+  },
+
+  /* ✅ CORRECT: Clear ID variable naming */
+  local!selectedEmployeeIds: {},
+
+  /* ✅ CORRECT: Computed variable with full data */
+  local!selectedEmployees: a!forEach(
+    items: local!selectedEmployeeIds,
+    expression: index(
+      local!allEmployees,
+      wherecontains(fv!item, local!allEmployees.id),
+      null
+    )
+  ),
+
+  a!gridField(
+    data: local!allEmployees,
+    columns: {...},
+    selectionValue: local!selectedEmployeeIds,  /* ✅ Use ID variable */
+    selectionSaveInto: local!selectedEmployeeIds
+  ),
+
+  /* ✅ CORRECT: Iterate over computed variable with full data */
+  a!forEach(
+    items: local!selectedEmployees,  /* Full employee objects */
+    expression: a!richTextDisplayField(
+      value: a!richTextItem(
+        text: fv!item.name  /* ✅ Works! fv!item is now a complete employee object */
+      )
+    )
+  )
+)
+```
+
+### Anti-Pattern 3: Conditional Logic on ID Array Properties
+
+**THE ERROR:**
+```sail
+a!localVariables(
+  local!allCases: {
+    a!map(id: 1, title: "Case A", isUrgent: true),
+    a!map(id: 2, title: "Case B", isUrgent: false),
+    a!map(id: 3, title: "Case C", isUrgent: true)
+  },
+
+  /* ❌ WRONG: Stores IDs but name suggests objects */
+  local!selectedCases: {},
+
+  a!gridField(
+    data: local!allCases,
+    columns: {...},
+    selectionValue: local!selectedCases,  /* Stores {1, 3} */
+    selectionSaveInto: local!selectedCases
+  ),
+
+  /* ❌ WRONG: Trying to filter/check properties on ID array */
+  a!textField(
+    label: "Urgency Notes",
+    instructions: "Required for urgent cases",
+    value: local!urgencyNotes,
+    saveInto: local!urgencyNotes,
+    showWhen: length(
+      a!forEach(
+        items: local!selectedCases,  /* IDs: {1, 3} */
+        expression: if(fv!item.isUrgent, fv!item, null)  /* ERROR: fv!item is integer! */
+      )
+    ) > 0
+  )
+)
+```
+
+**Runtime Error:**
+```
+Expression evaluation error: Invalid index: Cannot index property 'isUrgent' of type Boolean (Boolean) into type Number (Integer)
+```
+
+**THE FIX:**
+```sail
+a!localVariables(
+  local!allCases: {
+    a!map(id: 1, title: "Case A", isUrgent: true),
+    a!map(id: 2, title: "Case B", isUrgent: false),
+    a!map(id: 3, title: "Case C", isUrgent: true)
+  },
+
+  /* ✅ CORRECT: Clear ID variable naming */
+  local!selectedCaseIds: {},
+
+  /* ✅ CORRECT: Computed variable with full data */
+  local!selectedCases: a!forEach(
+    items: local!selectedCaseIds,
+    expression: index(
+      local!allCases,
+      wherecontains(fv!item, local!allCases.id),
+      null
+    )
+  ),
+
+  a!gridField(
+    data: local!allCases,
+    columns: {...},
+    selectionValue: local!selectedCaseIds,  /* ✅ Use ID variable */
+    selectionSaveInto: local!selectedCaseIds
+  ),
+
+  /* ✅ CORRECT: Check properties on computed variable with null safety */
+  a!textField(
+    label: "Urgency Notes",
+    instructions: "Required for urgent cases",
+    value: local!urgencyNotes,
+    saveInto: local!urgencyNotes,
+    showWhen: if(
+      a!isNotNullOrEmpty(local!selectedCases),  /* Null check first */
+      length(
+        intersection(
+          local!selectedCases.isUrgent,  /* ✅ Access property on full data */
+          {true}
+        )
+      ) > 0,
+      false
+    )
+  )
+)
+```
+
+### Key Takeaways from Anti-Patterns
+
+**Every anti-pattern shares these root causes:**
+1. ❌ Ambiguous variable naming (no "Ids"/"Keys"/"Indexes" suffix)
+2. ❌ Only ONE variable created (missing computed variable)
+3. ❌ Property access attempted on ID array
+
+**Every fix requires:**
+1. ✅ Clear variable naming with suffix for IDs
+2. ✅ TWO variables (IDs + computed)
+3. ✅ Property access ONLY on computed variable
+4. ✅ Null checking before property access
 
 
 ## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
@@ -4228,11 +4659,15 @@ Before finalizing any SAIL interface, verify these critical items:
 
 ### Grid Selection Pattern
 - [ ] **Grid selection uses two-variable approach** (see CRITICAL: Grid Selection Implementation Pattern)
-  - [ ] ID array variable for `selectionValue` (e.g., `local!selectedCourseIds`)
+  - [ ] ID array variable for `selectionValue` (e.g., `local!selectedCaseIds`, `local!selectedTaskIds`)
+  - [ ] **ID variable name MUST end with "Ids", "Keys", or "Indexes"** (MANDATORY naming convention)
   - [ ] Computed variable using `a!forEach() + index() + wherecontains()` pattern
+  - [ ] **Computed variable name is descriptive WITHOUT suffix** (e.g., `local!selectedCases`, `local!selectedTasks`)
   - [ ] All `saveInto` operations modify ID array only
 - [ ] **Grid `selectionValue` treated as ID array**, never as full row data
+- [ ] **NO property access on ID array variable** - ALL property access uses computed variable
 - [ ] **Computed variables have null checks** before property access (see next section)
+- [ ] **Variable names clearly distinguish IDs from full data** - ambiguous names cause runtime errors
 
 ### Null Safety & Short-Circuit Evaluation
 - [ ] **All null checks implemented** (see MANDATORY: Null Safety Implementation)
