@@ -3099,6 +3099,52 @@ a!checkboxField(
 )
 ```
 
+### ❌ CRITICAL: Multi-Checkbox Anti-Pattern - a!flatten() in value
+
+**NEVER use a!flatten() to construct multi-checkbox value from individual variables:**
+
+```sail
+/* ❌ WRONG - Breaks two-way binding */
+a!checkboxField(
+  choiceLabels: {"Option A", "Option B", "Option C"},
+  choiceValues: {"A", "B", "C"},
+  value: a!flatten({
+    if(local!hasA, "A", null),
+    if(local!hasB, "B", null),
+    if(local!hasC, "C", null)
+  }),
+  saveInto: {
+    a!save(local!hasA, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "A"), true, null), null)),
+    a!save(local!hasB, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "B"), true, null), null)),
+    a!save(local!hasC, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "C"), true, null), null))
+  }
+)
+```
+
+**Why it fails:** When user unchecks a box, individual variables (e.g., `local!hasA`) stay `true` but checkbox UI doesn't reflect it because `value` is recalculated from stale data.
+
+**✅ CORRECT - Use dedicated value variable:**
+
+```sail
+/* Declare dedicated variable for checkbox state */
+local!selectedValues: {},
+
+a!checkboxField(
+  choiceLabels: {"Option A", "Option B", "Option C"},
+  choiceValues: {"A", "B", "C"},
+  value: local!selectedValues,  /* Direct binding to dedicated variable */
+  saveInto: {
+    local!selectedValues,  /* Save checkbox state FIRST */
+    /* Then update individual tracking variables */
+    a!save(local!hasA, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "A"), true, null), null)),
+    a!save(local!hasB, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "B"), true, null), null)),
+    a!save(local!hasC, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "C"), true, null), null))
+  }
+)
+```
+
+**Rule:** Multi-checkbox `value` must be a dedicated variable, not `a!flatten()`. The `saveInto` must save to that variable FIRST, then update individual tracking variables.
+
 
 ## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections
 
