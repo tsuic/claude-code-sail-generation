@@ -41,7 +41,7 @@ Individual styled text element within rich text displays.
 - SMALL: 12px
 - STANDARD: 14px (default)
 - MEDIUM: 17px
-- MEDIUM_PLUS: 24px
+- MEDIUM_PLUS: 24px /* the best size for most section headings */
 - LARGE: 32px /* the best size for most page titles */
 - LARGE_PLUS: 52px
 - EXTRA_LARGE: 72px
@@ -63,14 +63,14 @@ Individual styled text element within rich text displays.
 
 ## Common Rich Text Patterns
 
-### 1. Styled Headings
+### 1. Styled Section Headings
 ```sail
 a!richTextDisplayField(
   value: a!richTextItem(
-    text: "Dashboard Overview",
-    size: "LARGE",
+    text: "My Tasks",
+    size: "MEDIUM_PLUS",
     style: "STRONG",
-    color: "#1F2937"
+    color: "STANDARD"
   )
 )
 ```
@@ -316,7 +316,7 @@ a!sideBySideLayout(
 ## Rich Text Icons
 
 ### a!richTextIcon Parameters
-- `icon`: must be a valid alias string (*READ* `/ui-guidelines/5-rich-text-icon-aliases.md`)
+- `icon`: must be a valid alias string (*MUST READ* `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - `color`: Icon color (STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY, or hex)
 - `size`: Icon size (SMALL through EXTRA_LARGE)
 - `altText`: Accessibility text
@@ -376,16 +376,6 @@ a!richTextDisplayField(
 - **SECONDARY**: Muted text, subtitles, less important information
 - **STANDARD**: Default text color, body content
 
-### Custom Colors (Hex Values)
-```sail
-/* Common hex color patterns */
-"#1F2937"  /* Dark gray for headings */
-"#6B7280"  /* Medium gray for secondary text */
-"#3B82F6"  /* Blue for links and accents */
-"#059669"  /* Green for positive states */
-"#DC2626"  /* Red for negative states */
-"#D97706"  /* Orange for warnings */
-```
 ## Validation Checklist
 
 ### Syntax Validation:

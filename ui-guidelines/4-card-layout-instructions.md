@@ -253,7 +253,7 @@ a!headerContentLayout(
     a!cardLayout(
       contents: {
         a!richTextDisplayField( /* Secction title */
-          value: a!richTextItem(text: "Key Metrics", size: "LARGE", style: "STRONG"),
+          value: a!richTextItem(text: "Key Metrics", size: "MEDIUM_PLUS", style: "STRONG"),
           labelPosition: "COLLAPSED",
           marginBelow: "STANDARD"
         ),
@@ -283,7 +283,7 @@ a!headerContentLayout(
   contents: {
     /* DO: Section title and cards directly on page background */
     a!richTextDisplayField( /* Section title */
-      value: a!richTextItem(text: "Key Metrics", size: "LARGE", style: "STRONG"),
+      value: a!richTextItem(text: "Key Metrics", size: "MEDIUM_PLUS", style: "STRONG"),
       labelPosition: "COLLAPSED",
       marginBelow: "STANDARD"
     ),
