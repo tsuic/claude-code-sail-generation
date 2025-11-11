@@ -71,7 +71,7 @@ To stop Claude Code from asking for your permission each time it calls the SAIL 
 {
   "permissions": {
     "allow": [
-      "Bash(curl -X POST http://10.34.49.30:8000/upload -F \"file=@/Users/user.name/Documents/SAIL-Generation/output/*\")",
+      "Bash(curl -X POST http://10.34.49.30:8000/upload -F \"file=@/Users/user.name/Documents/SAIL-Generation/output/*\")"
     ],
     "deny": [],
     "ask": []

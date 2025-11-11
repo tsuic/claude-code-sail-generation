@@ -932,8 +932,9 @@
           ]
         },
         "overlay": {
-          "type": "Any Type",
-          "required": false
+          "type": "a!fullOverlay | a!barOverlay | a!columnOverlay",
+          "required": false,
+          "specialNote": "Must use a!fullOverlay(), a!barOverlay(), or a!columnOverlay() - cannot accept components directly"
         },
         "showWhen": {
           "type": "Boolean",

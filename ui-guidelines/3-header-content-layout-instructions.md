@@ -236,16 +236,138 @@ a!headerContentLayout(
 )
 ```
 
+## Billboard Layout with Overlay - CRITICAL RULES
+
+### ⚠️ Billboard Overlay Requirement
+The `overlay` parameter in `a!billboardLayout()` **MUST** use one of these wrapper functions:
+- `a!fullOverlay()` - Covers entire billboard
+- `a!barOverlay()` - Horizontal bar at top, middle, or bottom
+- `a!columnOverlay()` - Vertical column at left, center, or right
+
+**Components cannot be placed directly in the overlay parameter!**
+
+### ❌ WRONG: Direct Component in Overlay
+```sail
+/* THIS WILL CAUSE AN ERROR */
+a!billboardLayout(
+  backgroundMedia: a!webImage(source: "hero.jpg"),
+  overlay: {
+    a!richTextDisplayField(...)  /* ERROR: Cannot use component directly */
+  }
+)
+
+/* THIS WILL ALSO CAUSE AN ERROR */
+a!billboardLayout(
+  backgroundMedia: a!webImage(source: "hero.jpg"),
+  overlay: a!richTextDisplayField(...)  /* ERROR: Must wrap in overlay type */
+)
+```
+
+### ✅ CORRECT: Full Overlay with Centered Content
+```sail
+a!billboardLayout(
+  backgroundMedia: a!webImage(
+    source: "https://example.com/hero-image.jpg",
+    altText: "Hero background"
+  ),
+  backgroundColor: "#1C2C44",
+  height: "MEDIUM_PLUS",
+  overlay: a!fullOverlay(  /* Must use overlay wrapper! */
+    alignVertical: "MIDDLE",
+    style: "SEMI_DARK",  /* Darkens background for text readability */
+    contents: {
+      a!richTextDisplayField(
+        labelPosition: "COLLAPSED",
+        value: {
+          a!richTextItem(
+            text: "Welcome to Our Platform",
+            size: "LARGE",
+            style: "STRONG",
+            color: "#FFFFFF"
+          )
+        },
+        align: "CENTER"
+      )
+    }
+  )
+)
+```
+
+### ✅ CORRECT: Bar Overlay at Bottom
+```sail
+a!billboardLayout(
+  backgroundMedia: a!webImage(source: "banner.jpg"),
+  height: "TALL",
+  overlay: a!barOverlay(
+    position: "BOTTOM",
+    style: "DARK",
+    contents: {
+      a!richTextDisplayField(
+        labelPosition: "COLLAPSED",
+        value: {
+          a!richTextItem(
+            text: "New Product Launch",
+            size: "MEDIUM",
+            style: "STRONG",
+            color: "#FFFFFF"
+          )
+        }
+      )
+    }
+  )
+)
+```
+
+### ✅ CORRECT: Column Overlay on Left
+```sail
+a!billboardLayout(
+  backgroundMedia: a!webImage(source: "hero.jpg"),
+  height: "TALL_PLUS",
+  overlay: a!columnOverlay(
+    position: "START",
+    alignVertical: "MIDDLE",
+    width: "MEDIUM",
+    style: "SEMI_DARK",
+    contents: {
+      a!richTextDisplayField(
+        labelPosition: "COLLAPSED",
+        value: {
+          a!richTextItem(
+            text: "Transforming Business",
+            size: "LARGE",
+            style: "STRONG",
+            color: "#FFFFFF"
+          ),
+          char(10),
+          a!richTextItem(
+            text: "Discover how we can help your organization succeed",
+            color: "#FFFFFF"
+          )
+        }
+      )
+    }
+  )
+)
+```
+
 ## Multiple Headers Example
 ```sail
 a!headerContentLayout(
   header: {
     a!billboardLayout(
       backgroundMedia: a!webImage(source: "hero-bg.jpg"),
-      /* Hero section with background image */
+      overlay: a!fullOverlay(
+        alignVertical: "MIDDLE",
+        style: "SEMI_DARK",
+        contents: {
+          /* Hero section content with background image */
+        }
+      )
     ),
     a!cardLayout(
-      /* Action bar - no background image */
+      contents: {
+        /* Action bar - no background image */
+      }
     )
   },
   contents: {
