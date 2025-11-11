@@ -14,6 +14,7 @@
 - **Working with dates and times** → Lines 3576-3701 (Date/Time Critical Rules)
 - **Building charts and visualizations** → Lines 3702-3913 (Chart Configuration and Components)
 - **Accessing related record data** → Lines 3321-3575 (Related Record Field References and Patterns)
+- **Implementing role-based access control** → Lines 1643-1687 (Group-Based Access Control Pattern)
 
 ### By Error Type:
 - **"Variable not defined" errors** → Lines 42-58 (Mandatory Foundation Rules)
@@ -65,6 +66,11 @@
 8. **For dropdowns with record data**: Use record IDs as choiceValues and record text fields as choiceLabels - NO value-to-ID translation needed
 9. **wherecontains()**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section for complete usage
 10. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
+11. **Single checkbox variables MUST be initialized to null, NOT false()** - See Lines 2896-3000 for complete pattern
+12. **Rule inputs (ri!) are interface parameters, NOT local variables** - Never initialize ri! inside the interface
+    - ❌ `ri!isUpdate: false()` - WRONG: Cannot initialize parameters
+    - ✅ `/* ri!isUpdate (Boolean) */` - RIGHT: Document in comments only
+    - ✅ Always null-check: `a!isNotNullOrEmpty(ri!param)` or `a!defaultValue(ri!param, default)`
 
 ## ⚠️ Record Type Reference Syntax
 
@@ -1634,6 +1640,51 @@ if(
 | `if()` | ✅ YES | ✅ ALWAYS use for null-safe property access |
 | `and()` | ❌ NO | ❌ NEVER use for null checking before property access |
 | `or()` | ❌ NO | ❌ NEVER use for null checking before property access |
+
+## Group-Based Access Control Pattern
+
+When implementing role-based access control in SAIL interfaces, use Group type parameters with integer mock IDs for mockups.
+
+### ✅ CORRECT Pattern
+
+```sail
+/* ===== INTERFACE PARAMETERS ===== */
+/* ri!currentUserGroup (Group): Group of the logged-in user for access control */
+/* TODO: Replace integer group IDs with actual Group constant objects once available */
+
+/* ===== GROUP CONSTANTS (Mock - using integers until Group constants are available) ===== */
+/* TODO: Replace with cons!PARTNER_GROUP and cons!INDEPENDENCE_TEAM_GROUP */
+local!PARTNER_GROUP_ID: 1,
+local!INDEPENDENCE_TEAM_GROUP_ID: 2,
+
+/* ===== CONDITIONAL DISPLAY FLAGS ===== */
+/* TODO: Once Group constants are available, compare ri!currentUserGroup directly to cons!PARTNER_GROUP */
+local!isPartner: a!defaultValue(ri!currentUserGroup, local!PARTNER_GROUP_ID) = local!PARTNER_GROUP_ID,
+local!isIndependenceTeam: a!defaultValue(ri!currentUserGroup, local!INDEPENDENCE_TEAM_GROUP_ID) = local!INDEPENDENCE_TEAM_GROUP_ID
+```
+
+### ❌ WRONG Pattern (Text-based roles)
+
+```sail
+/* DON'T USE TEXT TYPE FOR ROLES */
+/* ri!userRole (Text): "Partner" or "Independence Team" */
+local!isPartner: ri!userRole = "Partner"
+```
+
+### Key Rules
+
+1. **Use Group type for role-based rule inputs** - Not Text type
+2. **Define mock group ID constants** - Use integers (1, 2, 3, etc.) as placeholders
+3. **Add TODO comments** - Document that integers should be replaced with Group constants
+4. **Use a!defaultValue() for comparisons** - Safely handle null group values
+5. **Specify constant names in TODOs** - Help future developers know which constants to create (e.g., `cons!PARTNER_GROUP`)
+
+### Why Use Group Type Instead of Text
+
+- **Security**: Groups are managed in Appian's security model, not hardcoded strings
+- **Maintainability**: Group membership changes don't require code updates
+- **Type Safety**: Group type provides proper validation and prevents typos
+- **Best Practice**: Aligns with Appian's security architecture
 
 ## ⚠️ Protecting Query Filters That Use Rule Inputs
 
@@ -4637,6 +4688,12 @@ a!textField(
 
 ## Essential Functions Reference
 
+⚠️ **CRITICAL: Verify ALL functions exist in `/validation/sail-api-schema.json` before use**
+
+Common functions that DO NOT exist:
+- `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click
+- `property()` - Use dot notation instead: `object.field`
+
 Preferred Functions
 - **Null Checking**: `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()` over `isnull()`
 - **Logical**: `and()`, `or()`, `not()` over infix operators
@@ -4702,6 +4759,7 @@ Before finalizing any SAIL interface, verify these critical items:
 - [ ] **Expression starts with `a!localVariables()`** (see MANDATORY FOUNDATION RULES)
 - [ ] **a!recordData() ONLY in grids/charts** (see Data Querying Patterns - CRITICAL USAGE RULES)
 - [ ] **Form data uses ri! pattern correctly** (see CRITICAL: Form Interface Data Patterns)
+- [ ] **All functions verified in schema** - No a!isPageLoad(), property(), or assumed functions
 
 ### Grid Selection Pattern
 - [ ] **Grid selection uses two-variable approach** (see CRITICAL: Grid Selection Implementation Pattern)
@@ -4740,6 +4798,9 @@ Before finalizing any SAIL interface, verify these critical items:
 - [ ] **Multi-checkbox saveInto checks for null before using contains()** (see Multi-Checkbox Pattern)
 - [ ] **Relationship navigation follows single-path pattern** (see Relationship Navigation Syntax)
 - [ ] **Record actions use a!recordActionField()** (see Record Actions)
+
+### Access Control
+- [ ] **Group-based access uses Group type (not Text) with integer mock IDs and TODO notes** (see Group-Based Access Control Pattern)
 
 Each item above links to its authoritative section for complete rules and examples.
 
