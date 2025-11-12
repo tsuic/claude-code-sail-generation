@@ -29,6 +29,9 @@
 - **Grid selection variable naming errors** → Lines 3100+ (Variable Naming Conventions for Grid Selections)
 - **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 3100+ (Grid Selection Anti-Patterns)
 - **Type mismatch: Cannot index property into Integer/Text** → Lines 3100+ (Grid Selection Anti-Patterns)
+- **Query returning only primary key (missing fields parameter)** → Lines 1916-1969 (a!queryRecordType Fields Parameter)
+- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1971-1998 (fetchTotalCount Parameter)
+- **DateTime vs Date type mismatch in filters** → Lines 4243-4319 (Date/Time Type Matching)
 - **Query filter errors with rule inputs** → Lines 1628-1713 (Protecting Query Filters)
 - **Relationship navigation errors** → Lines 3177-3320 (One-to-Many Relationships), Lines 3321-3575 (Related Record References)
 - **Button/wizard configuration errors** → Lines 1255-1269 (Button Parameters), Lines 1270-1284 (Wizard Parameters)
@@ -40,9 +43,12 @@
 - 🚨 **Lines 116-268**: Form Interface Data Patterns
 - 🚨 **Lines 409-802**: a!forEach() Function Variables Reference
 - 🚨 **Lines 1407-1627**: Null Safety Implementation (including computed variables)
+- 🚨 **Lines 1916-1969**: a!queryRecordType() Fields Parameter (MUST specify all display fields)
+- 🚨 **Lines 1971-1998**: fetchTotalCount Parameter (REQUIRED for .totalCount access)
 - 🚨 **Lines 2896-3000**: Single Checkbox Field Pattern (initialization and null checking)
 - 🚨 **Lines 2975-3176**: Grid Selection Implementation Pattern (two-variable approach)
 - 🚨 **Lines 3177-3320**: One-to-Many Relationship Data Management
+- 🚨 **Lines 4243-4319**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
 
 ### Validation & Troubleshooting:
 - **Final validation checklist** → Lines 4095-4136 (Syntax Validation Checklist)
@@ -906,6 +912,97 @@ local!hasContractType: length(
 ) > 0
 /* Returns: false (no Contract items selected) */
 ```
+
+---
+
+### Finding a Single Matching Item by ID
+
+**Common Pattern:** You have a single ID and need to find the matching item from an array to access its fields.
+
+**✅ CORRECT: Use index() + wherecontains() + dot notation**
+
+```sail
+/* Pattern: Find one item by ID and extract a field */
+local!selectedOrgId: 5,
+local!organizations: {
+  a!map(id: 3, name: "Org A", type: "Nonprofit"),
+  a!map(id: 5, name: "Org B", type: "Corporation"),
+  a!map(id: 7, name: "Org C", type: "Government")
+},
+
+/* Get the organization type for the selected organization */
+local!orgType: a!defaultValue(
+  index(
+    local!organizations,
+    wherecontains(local!selectedOrgId, local!organizations.id),
+    null
+  ).type,  /* Use dot notation to extract the field */
+  ""
+)
+/* Returns: "Corporation" */
+```
+
+**With Record Type Field References:**
+
+```sail
+/* Same pattern with record type field references */
+local!selectedOrgId: ri!submission['recordType!Submission.fields.organizationId'],
+local!organizations: a!queryRecordType(
+  recordType: 'recordType!Organization',
+  fields: {
+    'recordType!Organization.fields.organizationId',
+    'recordType!Organization.fields.organizationType'
+  },
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 500)
+),
+
+/* Extract organization type from matching organization */
+local!orgType: a!defaultValue(
+  index(
+    local!organizations.data,
+    wherecontains(
+      local!selectedOrgId,
+      local!organizations.data['recordType!Organization.fields.organizationId']
+    ),
+    null
+  )['recordType!Organization.fields.organizationType'],  /* Bracket notation for record fields */
+  ""
+)
+```
+
+**❌ WRONG: Using a!forEach() creates array with nulls**
+
+```sail
+/* ❌ DON'T DO THIS - Returns array like {null, "Corporation", null} */
+local!orgType: a!defaultValue(
+  index(
+    a!forEach(
+      items: local!organizations,
+      expression: if(
+        fv!item.id = local!selectedOrgId,
+        fv!item.type,  /* Only ONE item matches */
+        null  /* Everything else is null */
+      )
+    ),
+    1,  /* ❌ ERROR: First element might be null! */
+    null
+  ),
+  ""
+)
+```
+
+**Why a!forEach() is wrong:**
+- Creates an array where most elements are `null`
+- `index(..., 1, null)` grabs the FIRST element, which could be `null`
+- No guarantee the matching item is at position 1
+
+**Key Rules:**
+- Use `wherecontains(singleId, array.idField)` to find the position
+- Use `index(array, position, null)` to get the matching item
+- Use dot notation `.fieldName` or `[fieldRef]` to extract the field
+- Wrap in `a!defaultValue()` to handle not-found cases
+
+---
 
 #### How It Works
 
@@ -1912,6 +2009,90 @@ local!employees: a!queryRecordType(
   fetchTotalCount: true
 ).data
 ```
+
+🚨 CRITICAL: a!queryRecordType() Fields Parameter - MUST SPECIFY ALL FIELDS
+
+**WITHOUT the `fields` parameter, a!queryRecordType() ONLY returns the PRIMARY KEY field. All other fields will be NULL!**
+
+```sail
+/* ❌ WRONG - No fields parameter means ONLY primary key is returned */
+local!submissions: a!queryRecordType(
+  recordType: recordType!Submission,
+  filters: a!queryFilter(
+    field: recordType!Submission.fields.userId,
+    operator: "=",
+    value: loggedInUser()
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 10),
+  fetchTotalCount: true
+).data
+
+/* When you try to display fields in a!forEach(): */
+a!forEach(
+  items: local!submissions,
+  expression: fv!item['recordType!Submission.fields.title']  /* NULL! Field was not queried! */
+)
+
+/* ✅ CORRECT - Explicitly list ALL fields you need to display */
+local!submissions: a!queryRecordType(
+  recordType: recordType!Submission,
+  fields: {
+    recordType!Submission.fields.submissionId,      /* Primary key */
+    recordType!Submission.fields.title,             /* Display field */
+    recordType!Submission.fields.status,            /* Display field */
+    recordType!Submission.fields.createdOn,         /* Display field */
+    recordType!Submission.relationships.user.fields.name  /* Related field */
+  },
+  filters: a!queryFilter(
+    field: recordType!Submission.fields.userId,
+    operator: "=",
+    value: loggedInUser()
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 10),
+  fetchTotalCount: true
+).data
+
+/* Now all fields are available in a!forEach(): */
+a!forEach(
+  items: local!submissions,
+  expression: fv!item['recordType!Submission.fields.title']  /* ✅ Returns actual value */
+)
+```
+
+**Key Rules:**
+- **ALWAYS include `fields` parameter** with ALL fields you need to display
+- **Include primary key field** if you need to create record links
+- **Include related record fields** using relationship dot notation
+- **Check data model context** to confirm available fields before querying
+
+🚨 CRITICAL: fetchTotalCount Parameter - REQUIRED for .totalCount Access
+
+**The `fetchTotalCount: true` parameter is REQUIRED if you plan to use `.totalCount` property:**
+
+```sail
+/* ❌ WRONG - Missing fetchTotalCount means .totalCount is not available */
+local!caseQuery: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {recordType!Case.fields.id},
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1)
+),
+local!count: local!caseQuery.totalCount  /* ERROR or NULL - fetchTotalCount not set! */
+
+/* ✅ CORRECT - Include fetchTotalCount: true */
+local!caseQuery: a!queryRecordType(
+  recordType: recordType!Case,
+  fields: {recordType!Case.fields.id},
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
+  fetchTotalCount: true  /* REQUIRED for .totalCount */
+),
+local!count: local!caseQuery.totalCount  /* ✅ Returns actual count */
+```
+
+**When to use `fetchTotalCount: true`:**
+- When displaying KPI metrics using `.totalCount`
+- When showing pagination info ("Showing X of Y results")
+- When conditionally displaying content based on result count
+- **ALWAYS include it** - there's minimal performance impact and it prevents errors
 
 🚨 CRITICAL: Use Aggregations for KPI Calculations
 ALWAYS use a!aggregationFields() with a!measure() for KPIs - NEVER use .totalCount for metrics
@@ -4782,6 +4963,7 @@ Before finalizing any SAIL interface, verify these critical items:
 ### Array & Property Access
 - [ ] **Dot notation used for property access** (e.g., `local!items.price`)
 - [ ] **NO usage of `property()` function** - Function does not exist in SAIL
+- [ ] **Single item lookup uses `index() + wherecontains()`** - NOT `a!forEach()` with nulls (see Finding a Single Matching Item by ID)
 - [ ] **Array functions use correct parameter order** (see Array and Data Manipulation Patterns)
 - [ ] **Derived data pattern follows `a!forEach() + index() + wherecontains()`** (see Deriving Full Data from ID Arrays)
 
