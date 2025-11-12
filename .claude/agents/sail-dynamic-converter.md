@@ -85,7 +85,22 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
 - Design any necessary filters, sorts, or calculations
 
 **Step 3: Implement Dynamic Queries**
-- Read and follow guidelines from `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` and `/dynamic-behavior-guidelines/record-type-handling-guidelines.md`
+
+**🚨 MANDATORY PRE-CODE VERIFICATION** - Search guidelines BEFORE writing any code:
+
+Use the Grep tool to search `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
+- [ ] **Query sorting**: Search for "sort.*pagingInfo" to verify sort parameter placement
+  - Confirms: `sort` goes INSIDE `a!pagingInfo()`, NOT as direct parameter to `a!queryRecordType()`
+  - Example: `pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100, sort: a!sortInfo(...))`
+
+- [ ] **save!value restrictions**: Search for "save!value.*ONLY" to understand where save!value can be used
+  - Confirms: `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`
+  - NEVER use `save!value` in conditionals like `if(save!value = ...)` - use the local variable instead
+
+- [ ] **Process integration**: Search for "writeRecords|process model|smart service" to check data persistence patterns
+  - Confirms: Avoid `a!writeRecords()` in interfaces - use TODO comments for process model integration
+
+After completing mandatory verification, implement dynamic queries:
 - Replace static data with appropriate query methods
 - Add local variables for query results where needed
 - Implement proper null checking before all comparisons
@@ -118,6 +133,29 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
 - [ ] Am I avoiding nested sideBySideLayouts?
 - [ ] Are all strings escaped with `""` not `\"`?
 - [ ] Does the expression start with `a!localVariables()`?
+
+⚠️ **CRITICAL: a!queryRecordType() REQUIREMENTS - VALIDATE EVERY QUERY:**
+- [ ] Does EVERY `a!queryRecordType()` have `fetchTotalCount: true` parameter?
+  - **WHY**: Without this, `.totalCount` property will not be available for KPI metrics
+  - **EXAMPLE**: `a!queryRecordType(..., fetchTotalCount: true)`
+
+- [ ] Does EVERY `a!queryRecordType()` have a `fields` parameter listing ALL fields needed for display?
+  - **WHY**: Without `fields`, ONLY the primary key field is returned - all other fields will be null!
+  - **EXAMPLE**:
+    ```sail
+    fields: {
+      recordType!Case.fields.id,
+      recordType!Case.fields.title,
+      recordType!Case.relationships.status.fields.statusName
+    }
+    ```
+
+- [ ] Do ALL DateTime field filters use `now()` and Date field filters use `today()`?
+  - **WHY**: Type mismatch errors occur when DateTime fields are compared to Date values
+  - **Date field**: `value: today() - 30` ✅
+  - **DateTime field**: `value: now() - 30` ✅
+  - **DateTime field**: `value: today() - 30` ❌ TYPE MISMATCH ERROR!
+  - **VERIFY**: Check the data model context to confirm field types before writing filters
 
 ## QUALITY STANDARDS
 
