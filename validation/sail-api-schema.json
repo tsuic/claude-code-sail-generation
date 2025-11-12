@@ -5810,7 +5810,7 @@
           "required": false
         }
       },
-      "specialNote": "NOT compatible with synced record types - use a!textField with warning banner instead",
+      "specialNote": "Returns Encrypted Text type which CANNOT be compared, concatenated, or used in expressions. NOT compatible with synced record types - use a!textField with warning banner instead",
       "description": "Encrypted text input field"
     },
     "a!recordActionItem": {
