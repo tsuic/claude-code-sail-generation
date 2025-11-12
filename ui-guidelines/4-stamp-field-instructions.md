@@ -1,5 +1,16 @@
 # SAIL StampField Usage Instructions
 
+## ⚠️ CRITICAL: Icon Parameter Validation
+
+**BEFORE using ANY icons in stampField, you MUST:**
+- [ ] Read `/ui-guidelines/5-rich-text-icon-aliases.md` in full to see all valid icon names
+- [ ] ONLY use icon names that appear exactly in that file
+- [ ] NEVER guess icon names - always verify first
+
+**The `icon` parameter accepts ONLY valid icon aliases.** Using invalid icon names will cause validation errors. There are ~1000 valid icons - guessing will fail.
+
+---
+
 ## Overview
 StampField creates an icon and/or text displayed on a colored background shape. It's designed for creating badges, status indicators, avatars, and decorative icons that need visual emphasis with a background.
 
@@ -14,6 +25,11 @@ StampField creates an icon and/or text displayed on a colored background shape. 
 - **Complex multi-element badges** → Use `a!cardLayout()` with custom styling
 
 ## Core StampField Parameters
+
+### Icon Parameter
+- **icon**: Valid icon alias string from `/ui-guidelines/5-rich-text-icon-aliases.md`
+- **⚠️ MANDATORY**: Look up icon name in aliases file BEFORE use
+- **❌ DO NOT GUESS** icon names - they must match exactly
 
 ### Shape Options
 - **ROUNDED**: Perfect circle (best for avatars, status dots)
@@ -141,12 +157,14 @@ a!stampField(
 ## Best Practices
 
 ### ✅ DO:
+- **ALWAYS read `/ui-guidelines/5-rich-text-icon-aliases.md` before using ANY icon parameter**
 - Choose shape based on content: ROUNDED for avatars/status, SEMI_ROUNDED for modern badges
 - Use TINY size for most UI elements to avoid overwhelming the interface
 - Provide tooltips for icon-only stamps
 - Use consistent sizing within the same UI section
 
 ### ❌ DON'T:
+- **Guess icon names - ALWAYS verify in aliases file first**
 - Use stamps for plain icons without backgrounds (use richTextIcon instead)
 - Make stamps too large (MEDIUM/LARGE should be rare)
 - Put complex content in stamps (use cardLayout instead)
@@ -188,3 +206,28 @@ Use `a!cardLayout()` with `a!sideBySideLayout()` inside, not `a!stampField()`.
 - No → **RichTextIcon**
 
 Remember: StampField is for simple badges and indicators with background shapes. When in doubt, start with TINY size and ROUNDED shape for maximum versatility.
+
+---
+
+## ⚠️ MANDATORY VALIDATION CHECKLIST
+
+Before using stampField in your code:
+
+### Icon Validation (CRITICAL):
+- [ ] **IF using `icon` parameter:** Read `/ui-guidelines/5-rich-text-icon-aliases.md` FIRST
+- [ ] **Verify icon name exists** in aliases file using exact string match
+- [ ] **DO NOT GUESS** icon names based on other frameworks (Font Awesome, Material Icons, etc.)
+- [ ] Common mistake: "chart-bar" ❌ → Correct: "bar-chart" ✅ (always check the file!)
+
+### Parameter Validation:
+- [ ] `shape` is one of: `"ROUNDED"`, `"SEMI_ROUNDED"`, `"SQUARED"`
+- [ ] `size` is one of: `"TINY"`, `"SMALL"`, `"MEDIUM"`, `"LARGE"`
+- [ ] `backgroundColor` is semantic color or valid 6-character hex code
+- [ ] `contentColor` is semantic color or valid 6-character hex code
+- [ ] `labelPosition` is set to `"COLLAPSED"` when appropriate
+
+### Design Validation:
+- [ ] Using stampField for appropriate use case (needs background shape)
+- [ ] Not using for plain icons (use richTextIcon instead)
+- [ ] Size is appropriate (TINY for most UI elements)
+- [ ] Colors have sufficient contrast for accessibility

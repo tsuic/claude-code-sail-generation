@@ -87,7 +87,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - `4-tabular-data-display-pattern.md` - Custom tabular display pattern
 
 **Icons:**
-- `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon
+- `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
 
 **All other components** (textField, dropdownField, etc.) are documented in `/validation/sail-api-schema.json` only.
 
@@ -109,6 +109,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - Read dedicated instruction files when available for templates and patterns
 - Follow templates exactly from instruction files
 - Verify against validation checklists
+- **Read `/ui-guidelines/5-rich-text-icon-aliases.md` in full before using ANY icons**
 
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 

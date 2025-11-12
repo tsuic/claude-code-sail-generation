@@ -1,5 +1,12 @@
 # SAIL Rich Text Usage Instructions
 
+## ⚠️ CRITICAL: Icon Validation
+**BEFORE using `a!richTextIcon()` with ANY icon:**
+- [ ] Read `/ui-guidelines/5-rich-text-icon-aliases.md` to verify icon name exists
+- [ ] NEVER guess icon names - always look up first
+
+---
+
 ## Overview
 Rich text components in SAIL provide formatted text display with styling, icons, images, links, and lists. They're essential for creating visually appealing and semantic text content in interfaces.
 
@@ -316,7 +323,7 @@ a!sideBySideLayout(
 ## Rich Text Icons
 
 ### a!richTextIcon Parameters
-- `icon`: must be a valid alias string (*MUST READ* `/ui-guidelines/5-rich-text-icon-aliases.md`)
+- `icon`: **MUST** be valid alias from `/ui-guidelines/5-rich-text-icon-aliases.md` - DO NOT GUESS
 - `color`: Icon color (STANDARD, ACCENT, POSITIVE, NEGATIVE, SECONDARY, or hex)
 - `size`: Icon size (SMALL through EXTRA_LARGE)
 - `altText`: Accessibility text
@@ -378,6 +385,10 @@ a!richTextDisplayField(
 
 ## Validation Checklist
 
+### Icon Validation (CRITICAL):
+- [ ] **IF using `a!richTextIcon()`:** Verify icon name in `/ui-guidelines/5-rich-text-icon-aliases.md` FIRST
+- [ ] DO NOT GUESS icon names (e.g., "chart-bar" ❌ → "bar-chart" ✅)
+
 ### Syntax Validation:
 - [ ] Rich text value is array of richTextItems, richTextIcons, ricrichTextBulletedList, richTextNumberedList, or plain text. No other components!
 - [ ] Line breaks use char(10) function
@@ -386,7 +397,6 @@ a!richTextDisplayField(
 - [ ] Color values are valid enums or 6-character hex codes
 - [ ] Size values are from approved list (SMALL through EXTRA_LARGE)
 - [ ] Style values are from approved list (PLAIN, EMPHASIS, STRONG, etc.)
-- [ ] Icons use valid icon aliases (found in `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - [ ] Alignment values are LEFT, RIGHT, or CENTER
 
 Remember: Rich text display fields can only contain the following items in their value property: richTextItems, richTextIcons, ricrichTextBulletedList, richTextNumberedList, or plain text.
