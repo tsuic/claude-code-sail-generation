@@ -254,8 +254,11 @@ a!forEach(
           a!isNullOrEmpty(fv!item.email),
           {},
           if(
-            not(regexmatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", fv!item.email)),
-            "Invalid email format",
+            and(
+              not(contains(fv!item.email, "@")),
+              not(contains(fv!item.email, "."))
+            ),
+            "Please enter a valid email address",
             {}
           )
         )
@@ -574,7 +577,10 @@ a!textField(
   validations: if(
     and(
       a!isNotNullOrEmpty(fv!item.email),
-      not(regexmatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", fv!item.email))
+      or(
+        not(contains(fv!item.email, "@")),
+        not(contains(fv!item.email, "."))
+      )
     ),
     "Please enter a valid email address",
     {}

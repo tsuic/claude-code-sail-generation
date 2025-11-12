@@ -112,6 +112,19 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
+## 🔄 DYNAMIC SAIL EXPRESSIONS
+
+**When working with dynamic data (arrays, loops, conditionals), ALWAYS read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` FIRST.**
+
+### When to Read Dynamic Guidelines:
+- ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
+- ✅ Before filtering or searching arrays
+- ✅ Before accessing properties on dynamic data
+- ✅ Before concatenating variables (type safety)
+- ✅ Before implementing conditional logic with data
+
+**THIS IS NOT OPTIONAL for dynamic code. Static forms may skip this.**
+
 ## INITIAL REQUEST CATEGORIZATION
 
 Determine if the user wants a full page or just a component.
@@ -434,6 +447,10 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
     - [ ] 1. **sail-schema-validator** - Validates function syntax
     - [ ] 2. **sail-icon-validator** - Checks for valid icon names
     - [ ] 3. **sail-code-reviewer** - Validates structure, syntax, and best practices
+
+### Before Writing Dynamic Code:
+- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, data operations, or null checking
+- [ ] Remember that SAIL doesn't support regex
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()

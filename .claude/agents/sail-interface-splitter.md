@@ -1,5 +1,5 @@
 ---
-name: sail-refactoring-agent
+name: sail-interface-splitter
 description: Analyze a monolithic SAIL interface and refactor it into focused, reusable components following Appian best practices. This agent is explicitly invoked when a user wants to improve maintainability of a large interface.
 model: inherit
 ---
