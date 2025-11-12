@@ -153,9 +153,18 @@ When designing a full page, follow these planning steps (not necessary if user r
   - [ ] If using PaneLayout → Read `3-pane-layout-instructions.md`
   - [ ] If using WizardLayout → Read `3-wizard-layout-instructions.md`
 3. Plan the main page content layout using columnsLayout → Always read `3-columns-layout-instructions.md`
-  - Does the page need to be broken up into multiple columns? If NO, then you don't need a columnsLayout
-  - How many columns?
-  - How wide should each column be? Remember at least one column should be AUTO (e.g., AUTO-width main content + MEDIUM_PLUS side bar)
+  - **For FormLayout/WizardLayout:** Use the `contentsWidth` parameter to control max content width (no columnsLayout needed unless splitting into multiple columns)
+  - **For HeaderContentLayout:** Content fills full width by default. Use columnsLayout for either:
+    - **Width constraint:** Limit all contents to a max width instead of spanning the full screen
+      - Pattern: AUTO (gutter) + WIDE_PLUS (content) + AUTO (gutter)
+      - The AUTO columns create responsive margins on both sides
+    - **Multi-column layout:** Split contents into 2-3 columns for better space utilization
+      - Equal widths: Use all AUTO columns
+      - Mixed widths: Use AUTO for main content + fixed widths (e.g., MEDIUM_PLUS) for sidebars
+  - **Decision checklist:**
+    - [ ] Does content need a max width constraint? → Use gutter + WIDE_PLUS + gutter pattern
+    - [ ] Should content be split into multiple columns? → Use 2-3 columns with appropriate widths
+    - [ ] If NO to both → Skip columnsLayout
 4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `3-sidebyside-layout-instructions.md`
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
