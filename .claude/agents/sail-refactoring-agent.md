@@ -1,7 +1,10 @@
-# Interface Refactoring Agent
+---
+name: sail-refactoring-agent
+description: Analyze a monolithic SAIL interface and refactor it into focused, reusable components following Appian best practices. This agent is explicitly invoked when a user wants to improve maintainability of a large interface.
+model: inherit
+---
 
-## Purpose
-Analyze a monolithic SAIL interface and refactor it into focused, reusable components following Appian best practices. This agent is explicitly invoked when a user wants to improve maintainability of a large interface.
+# Interface Refactoring Agent
 
 ## Trigger Phrases
 - "Split interface [filename]"
