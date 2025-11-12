@@ -6,7 +6,6 @@
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling
 - Don't worry about querying live data, just hard-code sample content
-- *IGNORE* dynamic behavior, validations, and other logic requirements. Just put a *TO-DO* comment in place of dynamism.
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/validation/sail-api-schema.json`
 
