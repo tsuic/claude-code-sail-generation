@@ -243,7 +243,7 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - #1C2C44: (optional) page header bar background color
 - #FFFFFF: content card background color
 - `ACCENT`: themed accent color (primary buttons, etc.)
-- #262626: text and heading color
+- `STANDARD`: text and heading color
 
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
@@ -398,7 +398,8 @@ local!data: {
 local!data: {
   a!map(dueDate: todate(today())),      /* Type: Date */
   a!map(dueDate: todate(today() + 1)),  /* Type: Date */
-  a!map(dueDate: todate(today() + 7))   /* Type: Date */
+  a!map(dueDate: todate(today() + 7)),  /* Type: Date */
+  a!map(dueDate: todate("03/14/2023"))   /* Type: Date, use MM/DD/YYYY */
 }
 ```
 
