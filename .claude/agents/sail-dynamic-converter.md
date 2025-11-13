@@ -14,11 +14,15 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
 
 2. **Maintain Syntax Integrity**: You must preserve all syntax requirements from the project's CLAUDE.md:
    - Never use JavaScript operators (use `and()`, `or()`, `not()` functions instead)
-   - Always check for null before comparisons: `and(not(isnull(variable)), variable = value)`
+   - Always check for null before comparisons: `and(a!isNotNullOrEmpty(variable), variable = value)`
+   - For computed variables/property access, use nested `if()` pattern for null safety
    - Use `a!forEach()` instead of `apply()`
    - Comments must use `/* */` not `//`
    - Escape quotes as `""` not `\"`
    - All expressions must begin with `a!localVariables()`
+   - Use record type constructors for new instances: `'recordType!Name'(...)` NOT `a!map(...)`
+   - NEVER confuse relationships (for navigation) with fields (for values)
+   - Always use single continuous path for related fields: `[relationship.fields.field]`
 
 3. **Preserve UI layout and styling**: Don't get creative; keep the UI looking the same as the mockup:
    - You should usually NOT have to change any layouts or UI components nor their styling parameters
@@ -37,12 +41,27 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
    - Understand relationships between record types
    - Apply proper field references and data types
 
-6. **Implement Dynamic Behaviors**: Follow guidelines from `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` and `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` for:
-   - Proper query construction
-   - Filter implementation
-   - Sorting and pagination
-   - Relationship traversal
-   - Aggregations and calculations
+6. **Implement Dynamic Behaviors**: Follow guidelines from:
+   - `/dynamic-behavior-guidelines/functional-interface.md` for:
+     - Record type reference syntax with UUIDs (lines 65-121)
+     - Form interface data patterns - ri! vs queries (lines 122-274)
+     - Data querying patterns - a!queryRecordType() and a!recordData() (lines 977-1513)
+     - Null safety implementation (lines 679-796)
+     - Short-circuit evaluation rules (lines 1554-1603)
+     - One-to-many relationship management in forms (lines 1922-2065)
+     - Relationship field navigation syntax (lines 399-425)
+     - Date/Time type matching (lines 2321-2446)
+   - `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` for:
+     - Critical rules for record type vs field usage
+     - Relationship type usage patterns (many-to-one, one-to-many, one-to-one)
+     - Field mapping strategies when data models don't match requirements
+     - Record type constructors vs a!map()
+   - `/dynamic-behavior-guidelines/mock-interface.md` for:
+     - SAIL syntax patterns - and()/or()/if() functions (lines 166-207)
+     - Function parameter validation (lines 750-787)
+     - Null checking patterns (lines 788-1100)
+     - Array manipulation with a!forEach() (lines 208-469)
+     - Short-circuit evaluation with nested if() (lines 828-925)
 
 7. **Determine Data Pattern Based on Interface Purpose**:
    **BEFORE converting any interface**, analyze whether it's:
@@ -68,6 +87,15 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
 
 ## YOUR WORKFLOW
 
+**📝 CONTEXT**: This agent is called AFTER a static mockup has been created using mock-interface.md guidelines. The mockup already follows:
+- ✅ SAIL syntax rules (and/or/if functions, not JavaScript operators)
+- ✅ Proper a!forEach() usage with function variables (fv!item, fv!index)
+- ✅ Null checking patterns with a!isNullOrEmpty()/a!isNotNullOrEmpty()
+- ✅ Correct function parameter counts
+- ✅ Essential SAIL structure with a!localVariables()
+
+**Your job is to replace mock data with live queries while preserving all syntax patterns.**
+
 **Step 1: Analyze the Static UI**
 - Identify all components with hardcoded data
 - Determine which record types should provide the data
@@ -76,34 +104,73 @@ You are an elite Appian SAIL UI architect specializing in transforming static mo
 
 **Step 2: Plan the Conversion**
 - **FIRST**: Determine if this is a CREATE/UPDATE form or READ-ONLY display
+  - **Reference**: functional-interface.md lines 122-274 (Form Interface Data Patterns)
   - If CREATE/UPDATE → Plan ri! pattern (no main record query!)
   - If READ-ONLY → Plan query pattern
 - For each grid/chart: Plan `a!recordData()` implementation
+  - **Reference**: functional-interface.md lines 977-1513 (Data Querying Patterns)
 - For other components in READ-ONLY: Plan `a!queryRecordType()` in local variables
 - For forms: Plan `ri!recordName` as rule input, access via relationships
+  - **Reference**: functional-interface.md lines 399-425 (Relationship Field Navigation Syntax)
+  - **Reference**: record-type-handling-guidelines.md Critical Rule 4 (one-to-many forms)
 - Map static data fields to record type fields from data model context
+  - **Reference**: record-type-handling-guidelines.md "Field Mapping Strategies"
+  - Use Strategy 1 (available fields) or Strategy 2 (local variables for reference data)
 - Design any necessary filters, sorts, or calculations
+  - **Reference**: functional-interface.md lines 842-927 (Protecting Query Filters)
+  - **Reference**: record-type-handling-guidelines.md "Relationship Type Usage" for sort rules
 
 **Step 3: Implement Dynamic Queries**
 
 **🚨 MANDATORY PRE-CODE VERIFICATION** - Search guidelines BEFORE writing any code:
 
-Use the Grep tool to search `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
-- [ ] **Query sorting**: Search for "sort.*pagingInfo" to verify sort parameter placement
-  - Confirms: `sort` goes INSIDE `a!pagingInfo()`, NOT as direct parameter to `a!queryRecordType()`
-  - Example: `pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100, sort: a!sortInfo(...))`
+Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.md`:
+- [ ] **Form vs Display pattern**: Search for "Form Interface Data Patterns" (lines 122-274)
+  - Confirms: CREATE/UPDATE forms use ri! pattern, READ-ONLY uses queries
+  - Confirms: No a!queryRecordType() for main record in forms
 
-- [ ] **save!value restrictions**: Search for "save!value.*ONLY" to understand where save!value can be used
-  - Confirms: `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`
-  - NEVER use `save!value` in conditionals like `if(save!value = ...)` - use the local variable instead
+- [ ] **Query construction**: Search for "Data Querying Patterns" (lines 977-1513)
+  - Confirms: Grids/charts use a!recordData(), other components use a!queryRecordType()
+  - Confirms: ALL queries need `fields` parameter listing all fields to display
+  - Confirms: ALL queries need `fetchTotalCount: true` for KPI metrics
 
-- [ ] **Process integration**: Search for "writeRecords|process model|smart service" to check data persistence patterns
-  - Confirms: Avoid `a!writeRecords()` in interfaces - use TODO comments for process model integration
+- [ ] **Relationship navigation**: Search for "Relationship Field Navigation Syntax" (lines 399-425)
+  - Confirms: Single continuous path - ONE bracket for entire path
+  - Confirms: `ri!record['recordType!Main.relationships.related.fields.field']` ✅
+  - Confirms: NOT `ri!record['recordType!Main.relationships.related']['recordType!Related.fields.field']` ❌
+
+- [ ] **Date/Time type matching**: Search for "Date/Time Type Matching" (lines 2321-2446)
+  - Confirms: DateTime fields use now(), Date fields use today()
+  - Confirms: Type mismatches cause interface failures
+
+- [ ] **Null safety**: Search for "Null Safety Implementation" (lines 679-796)
+  - Confirms: All comparisons need null checks with nested if()
+  - Confirms: Computed variables need special null handling
+  - Confirms: Use a!isNullOrEmpty() and a!isNotNullOrEmpty()
+
+Use the Grep tool to search `/dynamic-behavior-guidelines/record-type-handling-guidelines.md`:
+- [ ] **Record type rules**: Search for "CRITICAL RULES"
+  - Confirms: Use record type constructors, NOT a!map()
+  - Confirms: NEVER confuse relationships (navigation) with fields (values)
+  - Confirms: Use main record's relationships to access related data in forms
+
+- [ ] **Relationship types**: Search for "Relationship Type Usage"
+  - Confirms: many-to-one can sort on related fields
+  - Confirms: one-to-many cannot sort, use length() or a!forEach()
+
+Use the Grep tool to search `/dynamic-behavior-guidelines/mock-interface.md`:
+- [ ] **Syntax validation**: Search for "Language-Specific Syntax" (lines 166-207)
+  - Confirms: Use and()/or()/not() functions, NOT JavaScript operators
+  - Confirms: Use if() function, NOT ternary operators
+
+- [ ] **Function parameters**: Search for "Function Parameter Validation" (lines 750-787)
+  - Confirms: Exact parameter counts for array functions
+  - Confirms: wherecontains() takes ONLY 2 parameters
 
 After completing mandatory verification, implement dynamic queries:
 - Replace static data with appropriate query methods
 - Add local variables for query results where needed
-- Implement proper null checking before all comparisons
+- Implement proper null checking before all comparisons (use a!isNotNullOrEmpty())
 - Add filters and sorting as required
 - Ensure all syntax follows SAIL requirements (no JavaScript operators!)
 
@@ -127,12 +194,39 @@ After completing mandatory verification, implement dynamic queries:
 - [ ] Have I determined if this is CREATE/UPDATE (use ri!) or READ-ONLY (use queries)?
 - [ ] For forms: Am I using `ri!recordName` rule input instead of queries for the main record?
 - [ ] Am I using `and()`, `or()`, `not()` functions instead of operators?
-- [ ] Do all comparisons have null checks: `and(not(isnull(var)), var = value)`?
+- [ ] Do all comparisons have null checks: `and(a!isNotNullOrEmpty(var), var = value)`?
+- [ ] For property access on computed variables, am I using nested `if()` pattern?
 - [ ] Are grids/charts using `a!recordData()` directly?
 - [ ] Are other components in READ-ONLY displays using `a!queryRecordType()` in local variables?
+- [ ] Am I using record type constructors `'recordType!Name'(...)` NOT `a!map(...)`?
+- [ ] Am I using single continuous path for relationships: `[relationship.fields.field]`?
 - [ ] Am I avoiding nested sideBySideLayouts?
 - [ ] Are all strings escaped with `""` not `\"`?
 - [ ] Does the expression start with `a!localVariables()`?
+
+⚠️ **CRITICAL: SAIL SYNTAX PRESERVATION - Verify Against mock-interface.md:**
+The static mockup was created using mock-interface.md. Ensure all syntax patterns are maintained:
+- [ ] All conditional logic uses `and()`, `or()`, `not()`, `if()` functions (lines 166-207)
+- [ ] All null checks use `a!isNullOrEmpty()` or `a!isNotNullOrEmpty()` (lines 788-1100)
+- [ ] Array operations use correct parameter counts (lines 750-787)
+- [ ] Short-circuit evaluation uses nested `if()` for computed variables (lines 828-925)
+- [ ] Grid selections use two-variable pattern: IDs + computed (lines 1429-1800)
+- [ ] Comments use `/* */` not `//`
+- [ ] String escaping uses `""` not `\"`
+- [ ] Expression starts with `a!localVariables()`
+
+⚠️ **CRITICAL: RECORD TYPE PATTERNS - Reference record-type-handling-guidelines.md:**
+- [ ] Using record type constructors for new instances: `'recordType!Name'(...)`
+- [ ] NOT using a!map() for record instances
+- [ ] Relationships used for NAVIGATION only, not as values
+- [ ] Fields used for VALUES, filtering, sorting
+- [ ] Single continuous path for related fields:
+  - ✅ `ri!case['recordType!Case.relationships.client.fields.firstName']`
+  - ❌ `ri!case['recordType!Case.relationships.client']['recordType!Client.fields.firstName']`
+- [ ] many-to-one relationships: Can sort on related fields
+- [ ] one-to-many relationships: Cannot sort, use length() or a!forEach()
+- [ ] User fields: Use `a!pickerFieldUsers()` NOT dropdown
+- [ ] Group fields: Use `a!pickerFieldGroups()` NOT dropdown
 
 ⚠️ **CRITICAL: a!queryRecordType() REQUIREMENTS - VALIDATE EVERY QUERY:**
 - [ ] Does EVERY `a!queryRecordType()` have `fetchTotalCount: true` parameter?
@@ -161,6 +255,21 @@ After completing mandatory verification, implement dynamic queries:
 
 - **Accuracy**: Every record type and field reference must match the data model context
 - **Syntax Compliance**: Zero tolerance for syntax errors - they are DISASTROUS
+  - **Verify against**: mock-interface.md lines 2184-2374 (Syntax Validation Checklist)
+- **Pattern Preservation**: Maintain all syntax patterns from the original mockup
+  - Conditional logic using and()/or()/if() functions (mock-interface.md lines 166-207)
+  - Null checking with a!isNullOrEmpty()/a!isNotNullOrEmpty() (mock-interface.md lines 788-1100)
+  - Array operations with a!forEach() (mock-interface.md lines 208-469)
+- **Record Integration**: Follow patterns from functional-interface.md
+  - Form data patterns - ri! vs queries (lines 122-274)
+  - Query patterns - a!recordData() and a!queryRecordType() (lines 977-1513)
+  - Relationship navigation - single continuous path (lines 399-425)
+  - One-to-many relationship management (lines 1922-2065)
+- **Record Type Handling**: Follow rules from record-type-handling-guidelines.md
+  - Use record type constructors, not a!map()
+  - Never confuse relationships (navigation) with fields (values)
+  - Apply correct relationship type patterns (many-to-one vs one-to-many)
+  - Use field mapping strategies when data models don't match
 - **Performance**: Use efficient queries with appropriate filters and limits
 - **Maintainability**: Write clear, well-structured code with helpful comments
 - **Completeness**: Ensure all static data is replaced with dynamic queries
