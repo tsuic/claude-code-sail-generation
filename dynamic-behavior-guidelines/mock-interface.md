@@ -8,35 +8,39 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **Lines 43-57**: Mandatory Foundation Rules
 - **Lines 59-103**: Essential SAIL Structure
 - **Lines 208-469**: a!forEach() Function Variables Reference
-- **Lines 788-925**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 1257-1427**: Single Checkbox Field Pattern (initialization and null checking)
-- **Lines 1429-1800**: Grid Selection Patterns (naming conventions and two-variable approach)
-- **Lines 1991-2044**: Date/Time Type Matching
+- **Lines 472-559**: Dynamic Form Fields with forEach (parallel array pattern for storing user input)
+- **Lines 876-1013**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 1405-1418**: Multi-Checkbox Pattern (single array variable - NOT separate booleans)
+- **Lines 1345-1515**: Single Checkbox Field Pattern (initialization and null checking)
+- **Lines 1517-1888**: Grid Selection Patterns (naming conventions and two-variable approach)
+- **Lines 2079-2132**: Date/Time Type Matching
 
 ### By Task Type:
-- **Working with arrays and loops** → Lines 208-469 (a!forEach() Reference), Lines 470-787 (Array Patterns)
-- **Managing grid selections (ID arrays + full data)** → Lines 1429-1800 (Complete Grid Selection Guide)
-- **Building charts with mock data** → Lines 2045-2183 (Chart Data Configuration)
-- **Working with dates and times** → Lines 1991-2044 (Date/Time Critical Rules)
-- **Using checkboxes with proper initialization** → Lines 1257-1427 (Single Checkbox Field Pattern)
+- **Working with arrays and loops** → Lines 208-469 (a!forEach() Reference), Lines 560-875 (Array Patterns)
+- **forEach generating input fields (textField, dateField, fileUploadField)** → Lines 472-559 (Dynamic Form Fields Pattern)
+- **Managing grid selections (ID arrays + full data)** → Lines 1517-1888 (Complete Grid Selection Guide)
+- **Building charts with mock data** → Lines 2133-2271 (Chart Data Configuration)
+- **Working with dates and times** → Lines 2079-2132 (Date/Time Critical Rules)
+- **Using single checkbox with proper initialization** → Lines 1345-1515 (Single Checkbox Field Pattern)
+- **Using multiple checkbox selections** → Lines 1405-1418 (Multi-Checkbox Pattern - single array variable)
 
 ### By Error Type:
 - **"Variable not defined" errors** → Lines 43-57 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 788-1100 (Null Safety Implementation)
-- **Invalid function parameters** → Lines 750-787 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 828-925 (Short-Circuit Evaluation Rules)
-- **Property access errors (property() function)** → Lines 472-659 (Dot Notation & Derived Data Patterns)
+- **Null reference errors** → Lines 876-1188 (Null Safety Implementation)
+- **Invalid function parameters** → Lines 838-875 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 916-1013 (Short-Circuit Evaluation Rules)
+- **Property access errors (property() function)** → Lines 560-747 (Dot Notation & Derived Data Patterns)
 - **Syntax errors (and/or, if statements)** → Lines 166-207 (Language-Specific Syntax Patterns)
-- **Grid selection not working** → Lines 1191-1289 (Grid Selection Behavior), Lines 1537-1800 (Implementation Pattern)
-- **Grid selection variable naming errors** → Lines 1429-1536 (Variable Naming Conventions)
-- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 1801-2137 (Grid Selection Anti-Patterns)
-- **Type mismatch: Cannot index property into Integer/Text** → Lines 1801-2137 (Grid Selection Anti-Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 1991-2044 (Date/Time Type Matching)
-- **Checkbox initialization errors (false vs null)** → Lines 1280-1340 (Variable Initialization for Pattern 2)
-- **Checkbox state checking errors (length vs null)** → Lines 1365-1427 (Common Mistakes - save!value)
+- **Grid selection not working** → Lines 1279-1377 (Grid Selection Behavior), Lines 1625-1888 (Implementation Pattern)
+- **Grid selection variable naming errors** → Lines 1517-1624 (Variable Naming Conventions)
+- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 1889-2225 (Grid Selection Anti-Patterns)
+- **Type mismatch: Cannot index property into Integer/Text** → Lines 1889-2225 (Grid Selection Anti-Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 2079-2132 (Date/Time Type Matching)
+- **Checkbox initialization errors (false vs null)** → Lines 1368-1428 (Variable Initialization for Pattern 2)
+- **Checkbox state checking errors (length vs null)** → Lines 1453-1515 (Common Mistakes - save!value)
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 2184-2374 (Syntax Validation Checklist)
+- **Final validation checklist** → Lines 2272-2317 (Syntax Validation Checklist)
 
 ---
 
@@ -465,6 +469,214 @@ a!forEach(
 - **Don't use 0-based indexing** - Appian is 1-based throughout
 - **Don't use fv! variables outside a!forEach()** - They don't exist in other contexts
 - **Don't forget null checks on fv!item properties** - Map fields can be null
+
+
+## ⚠️ CRITICAL: Direct Property Saving in forEach
+
+When updating individual properties of items in a forEach loop, save directly to the property—do NOT reconstruct the entire map.
+
+### ✅ CORRECT - Direct Property Save
+```sail
+a!forEach(
+  items: local!employers,
+  expression: a!textField(
+    label: "Employer Name",
+    value: a!defaultValue(fv!item.employerName, ""),
+    saveInto: fv!item.employerName,  /* Directly updates just this property */
+    required: true
+  )
+)
+```
+
+### ❌ WRONG - Full Map Reconstruction
+```sail
+a!forEach(
+  items: local!employers,
+  expression: a!textField(
+    label: "Employer Name",
+    value: a!defaultValue(fv!item.employerName, ""),
+    saveInto: a!save(
+      local!employers,
+      a!update(
+        local!employers,
+        fv!index,
+        a!map(
+          employerName: save!value,
+          jobTitle: fv!item.jobTitle,
+          contactName: fv!item.contactName,
+          /* ...reconstructing all fields is inefficient and verbose... */
+        )
+      )
+    )
+  )
+)
+```
+
+### When to Use Multi-Save Pattern
+Use the multi-save pattern ONLY when a field update must trigger dependent calculations:
+
+```sail
+a!dateField(
+  label: "Start Date",
+  value: fv!item.startDate,
+  saveInto: {
+    fv!item.startDate,           /* Save the date */
+    a!save(                       /* Calculate dependent field */
+      fv!item.experienceYears,
+      if(
+        and(
+          a!isNotNullOrEmpty(save!value),
+          a!isNotNullOrEmpty(fv!item.endDate)
+        ),
+        fixed(tointeger(fv!item.endDate - save!value) / 365, 1),
+        0
+      )
+    )
+  }
+)
+```
+
+### Key Rules
+- ✅ Simple field updates → `saveInto: fv!item.propertyName`
+- ✅ Dependent calculations → Use multi-save with direct property updates
+- ❌ NEVER reconstruct the entire map for a single field change
+
+
+## Dynamic Form Fields with forEach - Parallel Array Pattern
+
+When using forEach to generate multiple input fields (textField, dateField, fileUploadField, etc.), each field MUST save to a specific position in an array using `fv!index`.
+
+### Pattern: Parallel Arrays for Multiple Fields per Item
+
+Use this pattern when forEach generates multiple input fields that need to store user data.
+
+```sail
+/* Initialize parallel arrays - one per field type */
+local!uploadedFiles: {},
+local!completionDates: {},
+local!notes: {},
+
+a!forEach(
+  items: local!requiredItems,
+  expression: {
+    a!fileUploadField(
+      label: "Upload " & fv!item.name,
+      value: index(local!uploadedFiles, fv!index, null),  /* ✅ Access by index */
+      saveInto: a!save(
+        local!uploadedFiles,
+        a!update(local!uploadedFiles, fv!index, save!value)  /* ✅ Update by index */
+      )
+    ),
+    a!dateField(
+      label: "Completion Date",
+      value: index(local!completionDates, fv!index, null),  /* ✅ Access by index */
+      saveInto: a!save(
+        local!completionDates,
+        a!update(local!completionDates, fv!index, save!value)  /* ✅ Update by index */
+      )
+    ),
+    a!textField(
+      label: "Notes",
+      value: index(local!notes, fv!index, null),  /* ✅ Access by index */
+      saveInto: a!save(
+        local!notes,
+        a!update(local!notes, fv!index, save!value)  /* ✅ Update by index */
+      )
+    )
+  }
+)
+```
+
+### ❌ WRONG - Not storing user input:
+```sail
+a!forEach(
+  items: local!requiredItems,
+  expression: a!fileUploadField(
+    label: "Upload " & fv!item.name,
+    value: null,      /* ❌ No data access */
+    saveInto: null    /* ❌ User input lost! */
+  )
+)
+```
+
+### ❌ WRONG - Trying to use fv!item properties:
+```sail
+/* This doesn't work - you can't store different values in the same property */
+a!forEach(
+  items: local!requiredItems,
+  expression: a!fileUploadField(
+    label: "Upload " & fv!item.name,
+    value: fv!item.uploadedFile,        /* ❌ Can't write to fv!item */
+    saveInto: fv!item.uploadedFile      /* ❌ fv!item is read-only */
+  )
+)
+```
+
+### ⚠️ CRITICAL: Type Safety with index() in Arithmetic Operations
+
+The `index()` function returns a **List type**, even when accessing a single element. When using `index()` results in arithmetic operations (date calculations, numeric operations), you MUST wrap the result in a type converter.
+
+**❌ WRONG - Direct use in date arithmetic:**
+```sail
+a!dateField(
+  label: "Completion Date",
+  value: index(local!completionDates, fv!index, null),
+  saveInto: a!save(
+    local!completionDates,
+    a!update(local!completionDates, fv!index, save!value)
+  ),
+  validations: if(
+    fv!item.startDate - index(local!completionDates, fv!index, today()) > 365,  /* ❌ ERROR: List type! */
+    "Date too old",
+    null
+  )
+)
+```
+
+**✅ CORRECT - Wrapped in todate():**
+```sail
+a!dateField(
+  label: "Completion Date",
+  value: index(local!completionDates, fv!index, null),
+  saveInto: a!save(
+    local!completionDates,
+    a!update(local!completionDates, fv!index, save!value)
+  ),
+  validations: if(
+    fv!item.startDate - todate(index(local!completionDates, fv!index, today())) > 365,  /* ✅ todate() wrapper */
+    "Date too old",
+    null
+  )
+)
+```
+
+**Required Type Converters by Operation:**
+- **Date/DateTime arithmetic**: Use `todate(index(...))` or `todatetime(index(...))`
+- **Numeric calculations**: Use `tonumber(index(...))` or `tointeger(index(...))`
+- **Text concatenation**: Use `totext(index(...))` if needed
+
+**Validation Checkpoint:**
+- [ ] Any `index()` result used in date arithmetic is wrapped in `todate()`
+- [ ] Any `index()` result used in numeric operations is wrapped in `tonumber()` or `tointeger()`
+
+### Key Rules:
+1. **One local variable per field type** - Use parallel arrays indexed by `fv!index`
+2. **Initialize as empty arrays** - `local!uploadedFiles: {}`
+3. **Access pattern** - `value: index(local!array, fv!index, null)`
+4. **Save pattern** - `saveInto: a!save(local!array, a!update(local!array, fv!index, save!value))`
+5. **Array synchronization** - All parallel arrays maintain same index positions for same item
+6. **Type safety for arithmetic** - Wrap `index()` in type converters (`todate()`, `tonumber()`) when used in calculations
+
+### When to Use This Pattern:
+- ✅ forEach generating file upload fields for multiple items
+- ✅ forEach generating date fields for multiple items
+- ✅ forEach generating text input fields for multiple items
+- ✅ Any scenario where forEach creates input fields that need to store different values per item
+
+### When NOT to Use This Pattern:
+- ❌ forEach only displaying data (use fv!item properties directly)
+- ❌ Single input field not in forEach (use regular local variable)
+- ❌ Input fields where all items share one value (use single local variable)
 
 
 ## Array and Data Manipulation Patterns
@@ -1253,6 +1465,94 @@ a!localVariables(
   }
 )
 ```
+
+## ⚠️ CRITICAL: Multi-Checkbox Field Pattern
+
+When a checkbox field has multiple choice values (multi-select), use a **single array variable** to store selections—do NOT use separate boolean variables for each choice.
+
+### ✅ CORRECT - Single Array Variable
+```sail
+a!localVariables(
+  local!selectedPriorities: {},  /* Single array for all selections */
+  {
+    a!checkboxField(
+      label: "Case Priorities",
+      choiceLabels: {"High", "Medium", "Low", "Critical"},
+      choiceValues: {"HIGH", "MEDIUM", "LOW", "CRITICAL"},
+      value: local!selectedPriorities,     /* Direct reference */
+      saveInto: local!selectedPriorities,  /* Direct save */
+      choiceLayout: "STACKED"
+    ),
+    /* Check if any selections exist */
+    if(
+      a!isNotNullOrEmpty(local!selectedPriorities),
+      a!textField(
+        label: "Filter Reason",
+        value: local!filterReason,
+        saveInto: local!filterReason
+      ),
+      {}
+    ),
+    /* Check if specific value is selected */
+    if(
+      contains(local!selectedPriorities, "CRITICAL"),
+      a!textField(
+        label: "Escalation Contact",
+        value: local!escalationContact,
+        saveInto: local!escalationContact,
+        required: true
+      ),
+      {}
+    )
+  }
+)
+```
+
+### ❌ WRONG - Separate Boolean Variables
+```sail
+a!localVariables(
+  /* DON'T create separate variables for each choice */
+  local!highPriority,
+  local!mediumPriority,
+  local!lowPriority,
+  local!criticalPriority,
+  {
+    a!checkboxField(
+      label: "Case Priorities",
+      choiceLabels: {"High", "Medium", "Low", "Critical"},
+      choiceValues: {"HIGH", "MEDIUM", "LOW", "CRITICAL"},
+      /* DON'T reconstruct array from multiple booleans */
+      value: a!flatten({
+        if(a!defaultValue(local!highPriority, false), "HIGH", null),
+        if(a!defaultValue(local!mediumPriority, false), "MEDIUM", null),
+        if(a!defaultValue(local!lowPriority, false), "LOW", null),
+        if(a!defaultValue(local!criticalPriority, false), "CRITICAL", null)
+      }),
+      /* DON'T reverse-map array back to separate booleans */
+      saveInto: {
+        a!save(local!highPriority, if(contains(save!value, "HIGH"), true, null)),
+        a!save(local!mediumPriority, if(contains(save!value, "MEDIUM"), true, null)),
+        a!save(local!lowPriority, if(contains(save!value, "LOW"), true, null)),
+        a!save(local!criticalPriority, if(contains(save!value, "CRITICAL"), true, null))
+      }
+    )
+  }
+)
+```
+
+### Why the Wrong Pattern Fails
+- **Complex and verbose**: Requires mapping logic in both `value` and `saveInto`
+- **Maintenance nightmare**: Adding/removing choices requires changes in 4+ places
+- **Error-prone**: Easy to miss updating one of the mappings
+- **Inefficient**: Unnecessary data transformation on every interaction
+
+### Key Rules
+- ✅ Multi-select checkboxes → Single array variable
+- ✅ Check selections using `contains(arrayVariable, value)`
+- ✅ Check if any selected using `a!isNotNullOrEmpty(arrayVariable)`
+- ✅ Get selection count using `length(arrayVariable)`
+- ❌ NEVER create separate boolean variables for each checkbox choice
+- ❌ NEVER use `a!flatten()` to reconstruct arrays from booleans
 
 Single Checkbox Field Pattern
 

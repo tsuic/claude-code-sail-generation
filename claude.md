@@ -232,6 +232,11 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `messages.md` for message banners (info, warning, etc.)
 - `tabs.md` for tab bars
 
+### Dynamic Form Generation
+- When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
+- Read `/dynamic-behavior-guidelines/mock-interface.md` section on "Dynamic Form Fields with forEach" before implementing
+- NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
+
 ### Special Rules
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
 - When not setting a label on a component, explicitly set labelPosition to "COLLAPSED" so that space is not reserved for the label (for more reliable alignment)
@@ -447,7 +452,32 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Checkbox and radio button labels can only accept plain text, not rich text
 - choiceValues CANNOT be null or empty strings (“”)
 
-## 🛑 MANDATORY VALIDATION DELEGATION CHECKLIST
+## 🛑 MANDATORY DELEGATION CHECKLIST
+
+### 🔄 Converting Mock to Functional Interface:
+**WHEN user requests converting a static/mock interface to use real record data:**
+
+**Trigger keywords:**
+- "convert to functional interface"
+- "make this dynamic" / "connect to real data" / "connect to records"
+- "use actual data from [record type]"
+- "transform [mockup] into functional interface"
+
+**REQUIRED ACTION:**
+- [ ] **ALWAYS invoke sail-dynamic-converter agent** - DO NOT attempt conversion manually
+  - Agent reads `/context/data-model-context.md` for correct UUIDs and field references
+  - Agent performs complete conversion with mandatory validation steps
+  - Agent ensures 100% complete conversion (ALL steps, sections, fields)
+  - Use Task tool: `subagent_type: "sail-dynamic-converter"`
+
+**❌ NEVER:**
+- Attempt conversion yourself without invoking the agent
+- Make up UUIDs or field references
+- Read functional-interface.md and convert manually
+
+---
+
+### ✅ Validating SAIL Expressions:
 👉 Always use tools to validate new expressions:
 - [ ] *IF* mcp__appian-mcp-server__validate_sail is available, always call it for efficient syntax validation
 - [ ] *OTHERWISE*, call these sub-agents (!!!ONLY!!! if mcp__appian-mcp-server__validate_sail is NOT available):
@@ -459,6 +489,12 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Read `/dynamic-behavior-guidelines/mock-interface.md` if using arrays, loops, null checking in mock data interfaces
 - [ ] Read `/dynamic-behavior-guidelines/functional-interface.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
+
+### Dynamic Form Field Validation:
+- [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
+- [ ] Parallel arrays initialized as {} for multiple fields per forEach item ‼️
+- [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in mock-interface.md)
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()
@@ -473,6 +509,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
+- [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
 
 ### Function Variable Validation:
 - [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
