@@ -6,39 +6,41 @@
 - **Lines 45-64**: Mandatory Foundation Rules
 - **Lines 65-121**: Record Type Reference Syntax (UUID usage)
 - **Lines 122-274**: Form Interface Data Patterns (ri! vs queries)
-- **Lines 754-914**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 1141-1677**: Data Querying Patterns (a!queryRecordType() and a!recordData())
-- **Lines 2106-2249**: One-to-Many Relationship Data Management
-- **Lines 2505-2630**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
+- **Lines 353-397**: Essential SAIL Structure (a!localVariables, variable scope)
+- **Lines 679-796**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 977-1513**: Data Querying Patterns (a!queryRecordType() and a!recordData())
+- **Lines 1554-1603**: Short-Circuit Evaluation Rules (if() vs and()/or())
+- **Lines 1922-2065**: One-to-Many Relationship Data Management
+- **Lines 2321-2446**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
 
 ### By Task Type:
 - **Building a form/wizard that creates or updates records** → Lines 122-274 (Form Interface Data Patterns)
-- **Displaying data in grids or charts** → Lines 1141-1677 (Data Querying Patterns)
-- **Managing one-to-many relationships in forms** → Lines 2106-2249 (One-to-Many Relationship Data Management)
-- **Creating dropdown choices from record data** → Lines 1141-1677 (Data Querying Patterns)
-- **Implementing record actions** → Lines 2874-2944 (Record Actions)
-- **Working with dates and times** → Lines 2505-2630 (Date/Time Critical Rules)
-- **Building charts and visualizations** → Lines 2631-2873 (Chart Configuration and Components)
-- **Accessing related record data** → Lines 2250-2504 (Related Record Field References)
-- **Implementing role-based access control** → Lines 915-1140 (Group-Based Access Control Pattern)
+- **Displaying data in grids or charts** → Lines 977-1513 (Data Querying Patterns)
+- **Managing one-to-many relationships in forms** → Lines 1922-2065 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 977-1513 (Data Querying Patterns)
+- **Implementing record actions** → Lines 2690-2741 (Record Actions)
+- **Working with dates and times** → Lines 2321-2446 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 2447-2658 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 2066-2320 (Related Record Field References)
+- **Implementing role-based access control** → Lines 797-841 (Group-Based Access Control Pattern)
 
 ### By Error Type:
 - **"Variable not defined" errors** → Lines 45-64 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 754-914 (Null Safety Implementation)
-- **"Function does not exist" errors** → Lines 2945-3029 (Essential Functions Reference)
-- **Invalid function parameters** → Lines 1678-1717 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 1718-1815 (Short-Circuit Evaluation Rules)
+- **Null reference errors** → Lines 679-796 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 2781-2838 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 1514-1553 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 1554-1603 (Short-Circuit Evaluation Rules)
 - **Record type reference errors** → Lines 65-121 (Record Type Reference Syntax)
-- **Query returning only primary key (missing fields parameter)** → Lines 1141-1677 (Data Querying Patterns)
-- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1141-1677 (Data Querying Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2505-2630 (Date/Time Type Matching)
-- **Query filter errors with rule inputs** → Lines 968-1052 (Protecting Query Filters)
-- **Relationship navigation errors** → Lines 2106-2249 (One-to-Many Relationships), Lines 2250-2504 (Related Record References)
-- **Button/wizard configuration errors** → Lines 1816-1917 (Button/Wizard Parameters)
+- **Query returning only primary key (missing fields parameter)** → Lines 977-1513 (Data Querying Patterns)
+- **Query .totalCount is null (missing fetchTotalCount)** → Lines 977-1513 (Data Querying Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 2321-2446 (Date/Time Type Matching)
+- **Query filter errors with rule inputs** → Lines 842-927 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 1922-2065 (One-to-Many Relationships), Lines 2066-2320 (Related Record References)
+- **Button/wizard configuration errors** → Lines 650-677 (Button/Wizard Parameters)
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 3030-3105 (Syntax Validation Checklist)
-- **Common error troubleshooting** → Lines 634-753 (Common Critical Errors)
+- **Common error troubleshooting** → Lines 2848-2967 (Common Critical Errors)
+- **Final validation checklist** → Lines 2968-3100 (Syntax Validation Checklist)
 
 ---
 
@@ -350,6 +352,52 @@ value: condition ? trueValue : falseValue
 - ❌ Java/C# syntax: `public void`, `private static`
 - ✅ Always use Appian SAIL function syntax: `functionName(parameters)`
 
+## Essential SAIL Structure
+
+```sail
+a!localVariables(
+  /* Variable definitions first - ALL must be declared */
+  local!userName: "John Doe",
+  local!selectedStatus,  /* No initial value - declare by name only */
+  local!isVisible: true(),
+
+  /* Interface expression last */
+  a!formLayout(
+    contents: {
+      /* Interface components */
+    }
+  )
+)
+```
+
+- **With initial values**: `local!variable: value`
+- **Without initial values**: `local!variable` (no null/empty placeholders)
+- **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
+- **For booleans**: Always explicit: `true()` or `false()`
+
+🚨 CRITICAL: Local Variable Scope in Nested Contexts
+- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
+- **Cannot declare variables inline within expressions**
+
+```sail
+/* ❌ WRONG - Cannot declare variables inline */
+a!forEach(
+  items: data,
+  expression: local!temp: someValue, /* Invalid syntax */
+  otherExpression
+)
+
+/* ✅ CORRECT - Use nested a!localVariables() */
+a!forEach(
+  items: data,
+  expression: a!localVariables(
+    local!temp: someValue,
+    /* Use local!temp in expression here */
+    someExpression
+  )
+)
+```
+
 ## 🚨 CRITICAL: Relationship Field Navigation Syntax
 
 **CORRECT Syntax:**
@@ -613,7 +661,6 @@ a!buttonArrayLayout(
 
 **✅ Validation Placement:**
 - **Form validations**: On `a!formLayout()` validations parameter
-- **Button validations**: On `a!buttonWidget()` → ✅ `validations` parameter exists
 - **Field validations**: On individual field components
 
 ## ⚠️ a!wizardLayout() Parameters
@@ -630,126 +677,6 @@ a!buttonArrayLayout(
 **✅ Validation Placement for Wizards:**
 - **Form-level validations**: Place on individual `a!buttonWidget()` in `primaryButtons`
 - **Field validations**: Place on individual field components within steps
-
-## Common Critical Errors
-
-These errors cause immediate interface failures and violate core SAIL patterns:
-
-### Error 1:
-**Error 1: Initialized Dropdown Variables with Record Data**
-- **Problem**: `local!filter: "All"` when choiceValues come from records
-- **Solution**: `local!filter,` (uninitialized) + `placeholder: "All"`
-
-### Error 2:
-**Error 2: Query Results in Grid/Chart Data**
-- **Problem**: `data: local!queryResults`
-- **Solution**: `data: a!recordData(...)`
-
-### Error 3:
-**Error 3: Data Type Mismatches in Query Filters**
-- **Problem**: DateTime field + Date value
-- **Solution**: Use matching data type functions
-
-### Error 4:
-**Error 4: Invalid Chart Patterns**
-- **Problem 1**: `categories: {...}, series: {...}` with record data
-- **Solution 1**: `data: a!recordData(...), config: a!columnChartConfig(...)`
-- **Problem 2**: `interval: "MONTH"` or `interval: "WEEK"` in a!grouping()
-- **Solution 2**: Use valid intervals: "MONTH_SHORT_TEXT", "DATE_SHORT_TEXT", etc.
-- **Problem 3**: `stacking: "NORMAL"` in chart config
-- **Solution 3**: Place `stacking` on chart field, not in config
-
-### Error 5:
-**Error 5: Non-existent Functions**
-- **Problem**: Using `a!decimalField()`, `a!dateTimeValue()`
-- **Solution**: Use `a!floatingPointField()`, `dateTime()` respectively
-
-### Error 6:
-**Error 6: Invalid Parameters on Components**
-- **Problem**: `validations` parameter on `a!wizardLayout()`
-- **Solution**: Place validations on `a!buttonWidget()` or field components
-
-### Error 7:
-**Error 7: Python/JavaScript Syntax in SAIL**
-- **Problem**: `condition ? trueValue : falseValue`
-- **Solution**: `if(condition, trueValue, falseValue)`
-
-### Error 8:
-**Error 8: Passing Null to Functions That Reject It**
-- **Problem**: `text(a!defaultValue(dateField, null), "format")` or `user(a!defaultValue(userId, null), "firstName")`
-- **Solution**: Check for null with if() BEFORE calling these functions
-```sail
-if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–")
-```
-
-### Error 9:
-**Error 9: Using .totalCount for KPI Metrics**
-- **Problem**: `local!caseCount: a!queryRecordType(..., fetchTotalCount: true).totalCount`
-- **Solution**: Use aggregations for ALL KPIs with correct data extraction pattern
-```sail
-local!caseCountQuery: a!queryRecordType(
-  fields: a!aggregationFields(
-    groupings: {},  /* No groupings = single row result */
-    measures: {a!measure(function: "COUNT", field: 'recordType!Case.fields.id', alias: "count")}
-  )
-),
-/* For aggregations with NO groupings, use direct property access */
-local!caseCount: a!defaultValue(
-  local!caseCountQuery.data.count,  /* Direct access, not index() */
-  0
-)
-```
-
-### Error 10:
-**Error 10: Incorrect Array and Data Manipulation Functions**
-- **Problem 1**: Using `append(map, array)` - append only works with arrays of compatible types
-- **Solution 1**: Use `a!update(data: array, index: 1, value: map)` to insert at beginning
-- **Problem 2**: Using `wherecontains()` incorrectly
-- **Solution 2**: See "Array Manipulation Patterns" section (mock data guidelines)
-- **Problem 3**: Using `append()` to add single item to beginning of array
-- **Solution 3**: Use `a!update()` or `insert()` for positional insertion
-```sail
-/* ❌ WRONG - append() expects compatible types */
-local!combined: append(local!singleMap, local!arrayOfMaps)  /* ERROR */
-
-/* ✅ RIGHT - Use a!update() to insert at position */
-local!combined: a!update(data: local!arrayOfMaps, index: 1, value: local!singleMap)
-```
-
-### Error 11:
-**Error 11: Incorrect Query Data Extraction Pattern**
-- **Problem 1**: Using array indexing on aggregations with no groupings
-- **Solution 1**: Use direct property access for aggregations with `groupings: {}`
-```sail
-/* ❌ WRONG - Over-complicated for aggregations with no groupings */
-local!kpiQuery: a!queryRecordType(
-  fields: a!aggregationFields(groupings: {}, measures: {a!measure(...)})
-),
-local!value: index(index(local!kpiQuery.data, 1, {}).alias, 1, null)
-
-/* ✅ RIGHT - Direct property access */
-local!value: a!defaultValue(local!kpiQuery.data.alias, 0)
-```
-
-- **Problem 2**: Missing array indexing on regular field queries
-- **Solution 2**: Use `[1]` to access first row of regular query results
-```sail
-/* ❌ WRONG - Missing array index for regular query */
-local!userQuery: a!queryRecordType(
-  fields: {'recordType!User.fields.name'}
-).data,
-local!name: local!userQuery['recordType!User.fields.name']  /* ERROR - Query returns array */
-
-/* ✅ RIGHT - Index into first row */
-local!name: a!defaultValue(
-  local!userQuery[1]['recordType!User.fields.name'],
-  ""
-)
-```
-
-**Key Rule**:
-- Aggregations with `groupings: {}` → Direct access: `query.data.alias`
-- Regular queries with `fields: {...}` → Array indexing: `query[1]['field']`
 
 ## 🚨 MANDATORY: Null Safety Implementation
 
@@ -1018,52 +945,6 @@ When making assumptions about:
 - **Data structure** - Note any inferred patterns from context
 
 **Format:** "ASSUMPTION: [what you're assuming] - REASON: [why you're assuming this]"
-
-## Essential SAIL Structure
-
-```sail
-a!localVariables(
-  /* Variable definitions first - ALL must be declared */
-  local!userName: "John Doe",
-  local!selectedStatus,  /* No initial value - declare by name only */
-  local!isVisible: true(),
-
-  /* Interface expression last */
-  a!formLayout(
-    contents: {
-      /* Interface components */
-    }
-  )
-)
-```
-
-- **With initial values**: `local!variable: value`
-- **Without initial values**: `local!variable` (no null/empty placeholders)
-- **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
-- **For booleans**: Always explicit: `true()` or `false()`
-
-🚨 CRITICAL: Local Variable Scope in Nested Contexts
-- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
-- **Cannot declare variables inline within expressions**
-
-```sail
-/* ❌ WRONG - Cannot declare variables inline */
-a!forEach(
-  items: data,
-  expression: local!temp: someValue, /* Invalid syntax */
-  otherExpression
-)
-
-/* ✅ CORRECT - Use nested a!localVariables() */
-a!forEach(
-  items: data,
-  expression: a!localVariables(
-    local!temp: someValue,
-    /* Use local!temp in expression here */
-    someExpression
-  )
-)
-```
 
 ## Audit Fields Management
 
@@ -1723,26 +1604,6 @@ if(
 | `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching with multiple conditions |
 
 ## Component Usage Patterns
-
-Button Widget Rules
-**CRITICAL**: `a!buttonWidget` does NOT have a `validations` parameter.
-
-```sail
-/* ❌ WRONG - Button widgets don't support validations */
-a!buttonWidget(
-  label: "Submit",
-  validations: {...}  /* This parameter doesn't exist */
-)
-
-/* ✅ CORRECT - Use form-level validations */
-a!formLayout(
-  contents: {...},
-  buttons: a!buttonWidget(label: "Submit"),
-  validations: {
-    /* Form validations go here */
-  }
-)
-```
 
 User and Group Field Components
 **CRITICAL**: When using record fields of type User or Group in forms, use the appropriate picker components.
@@ -2935,7 +2796,22 @@ Preferred Functions
 - **Array Operations**: `append()`, `a!update()` for immutable operations
 - **Audit Functions**: `loggedInUser()`, `now()` for audit fields
 
-JSON Functions
+### Quick Function Reference by Category
+
+| Category | Functions |
+|----------|-----------|
+| Array | `a!flatten()`, `append()`, `index()`, `length()`, `where()`, `wherecontains()` |
+| Logical | `and()`, `or()`, `not()`, `if()`, `a!match()` |
+| Null Checking | `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()` |
+| Looping | `a!forEach()`, `filter()`, `reduce()`, `merge()` |
+| Text | `concat()`, `find()`, `left()`, `len()`, `substitute()`, `upper()`, `lower()` |
+| Date/Time | `today()`, `now()`, `dateTime()`, `a!addDateTime()`, `a!subtractDateTime()` |
+| JSON | `a!toJson()`, `a!fromJson()`, `a!jsonPath()` |
+| User/System | `loggedInUser()`, `user()` |
+| Query | `a!queryRecordType()`, `a!recordData()`, `a!queryFilter()`, `a!pagingInfo()`, `a!aggregationFields()` |
+
+### JSON Functions Usage
+
 ```sail
 /* Convert to JSON */
 a!toJson(
@@ -2950,7 +2826,8 @@ a!fromJson('{"name":"John","age":30}')
 a!jsonPath(json: local!data, expression: "$.employees[0].name")
 ```
 
-contains() Usage
+### contains() Usage
+
 ```sail
 /* Arrays */
 contains({"id", "title"}, "title")  /* Returns true */
@@ -2962,20 +2839,6 @@ contains(
 )
 ```
 
-## Quick Function Reference
-
-| Category | Functions |
-|----------|-----------|
-| Array | `a!flatten()`, `append()`, `index()`, `length()`, `where()`, `wherecontains()` |
-| Logical | `and()`, `or()`, `not()`, `if()`, `a!match()` |
-| Null Checking | `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()` |
-| Looping | `a!forEach()`, `filter()`, `reduce()`, `merge()` |
-| Text | `concat()`, `find()`, `left()`, `len()`, `substitute()`, `upper()`, `lower()` |
-| Date/Time | `today()`, `now()`, `dateTime()`, `a!addDateTime()`, `a!subtractDateTime()` |
-| JSON | `a!toJson()`, `a!fromJson()`, `a!jsonPath()` |
-| User/System | `loggedInUser()`, `user()` |
-| Query | `a!queryRecordType()`, `a!recordData()`, `a!queryFilter()`, `a!pagingInfo()`, `a!aggregationFields()` |
-
 ## 🔧 Quick Troubleshooting
 
 If your interface fails to load, check:
@@ -2983,6 +2846,126 @@ If your interface fails to load, check:
 2. **Data patterns** - a!recordData() only in grids/charts (see Data Querying Patterns - CRITICAL USAGE RULES)
 3. **Null handling** - All rule inputs protected (see MANDATORY: Null Safety Implementation)
 4. **Relationships** - Single continuous path, no double brackets (see Relationship Navigation Syntax)
+
+## Common Critical Errors
+
+These errors cause immediate interface failures and violate core SAIL patterns:
+
+### Error 1:
+**Error 1: Initialized Dropdown Variables with Record Data**
+- **Problem**: `local!filter: "All"` when choiceValues come from records
+- **Solution**: `local!filter,` (uninitialized) + `placeholder: "All"`
+
+### Error 2:
+**Error 2: Query Results in Grid/Chart Data**
+- **Problem**: `data: local!queryResults`
+- **Solution**: `data: a!recordData(...)`
+
+### Error 3:
+**Error 3: Data Type Mismatches in Query Filters**
+- **Problem**: DateTime field + Date value
+- **Solution**: Use matching data type functions
+
+### Error 4:
+**Error 4: Invalid Chart Patterns**
+- **Problem 1**: `categories: {...}, series: {...}` with record data
+- **Solution 1**: `data: a!recordData(...), config: a!columnChartConfig(...)`
+- **Problem 2**: `interval: "MONTH"` or `interval: "WEEK"` in a!grouping()
+- **Solution 2**: Use valid intervals: "MONTH_SHORT_TEXT", "DATE_SHORT_TEXT", etc.
+- **Problem 3**: `stacking: "NORMAL"` in chart config
+- **Solution 3**: Place `stacking` on chart field, not in config
+
+### Error 5:
+**Error 5: Non-existent Functions**
+- **Problem**: Using `a!decimalField()`, `a!dateTimeValue()`
+- **Solution**: Use `a!floatingPointField()`, `dateTime()` respectively
+
+### Error 6:
+**Error 6: Invalid Parameters on Components**
+- **Problem**: `validations` parameter on `a!wizardLayout()`
+- **Solution**: Place validations on `a!buttonWidget()` or field components
+
+### Error 7:
+**Error 7: Python/JavaScript Syntax in SAIL**
+- **Problem**: `condition ? trueValue : falseValue`
+- **Solution**: `if(condition, trueValue, falseValue)`
+
+### Error 8:
+**Error 8: Passing Null to Functions That Reject It**
+- **Problem**: `text(a!defaultValue(dateField, null), "format")` or `user(a!defaultValue(userId, null), "firstName")`
+- **Solution**: Check for null with if() BEFORE calling these functions
+```sail
+if(a!isNotNullOrEmpty(a!defaultValue(field, null)), text(field, "format"), "–")
+```
+
+### Error 9:
+**Error 9: Using .totalCount for KPI Metrics**
+- **Problem**: `local!caseCount: a!queryRecordType(..., fetchTotalCount: true).totalCount`
+- **Solution**: Use aggregations for ALL KPIs with correct data extraction pattern
+```sail
+local!caseCountQuery: a!queryRecordType(
+  fields: a!aggregationFields(
+    groupings: {},  /* No groupings = single row result */
+    measures: {a!measure(function: "COUNT", field: 'recordType!Case.fields.id', alias: "count")}
+  )
+),
+/* For aggregations with NO groupings, use direct property access */
+local!caseCount: a!defaultValue(
+  local!caseCountQuery.data.count,  /* Direct access, not index() */
+  0
+)
+```
+
+### Error 10:
+**Error 10: Incorrect Array and Data Manipulation Functions**
+- **Problem 1**: Using `append(map, array)` - append only works with arrays of compatible types
+- **Solution 1**: Use `a!update(data: array, index: 1, value: map)` to insert at beginning
+- **Problem 2**: Using `wherecontains()` incorrectly
+- **Solution 2**: See "Array Manipulation Patterns" section (mock data guidelines)
+- **Problem 3**: Using `append()` to add single item to beginning of array
+- **Solution 3**: Use `a!update()` or `insert()` for positional insertion
+```sail
+/* ❌ WRONG - append() expects compatible types */
+local!combined: append(local!singleMap, local!arrayOfMaps)  /* ERROR */
+
+/* ✅ RIGHT - Use a!update() to insert at position */
+local!combined: a!update(data: local!arrayOfMaps, index: 1, value: local!singleMap)
+```
+
+### Error 11:
+**Error 11: Incorrect Query Data Extraction Pattern**
+- **Problem 1**: Using array indexing on aggregations with no groupings
+- **Solution 1**: Use direct property access for aggregations with `groupings: {}`
+```sail
+/* ❌ WRONG - Over-complicated for aggregations with no groupings */
+local!kpiQuery: a!queryRecordType(
+  fields: a!aggregationFields(groupings: {}, measures: {a!measure(...)})
+),
+local!value: index(index(local!kpiQuery.data, 1, {}).alias, 1, null)
+
+/* ✅ RIGHT - Direct property access */
+local!value: a!defaultValue(local!kpiQuery.data.alias, 0)
+```
+
+- **Problem 2**: Missing array indexing on regular field queries
+- **Solution 2**: Use `[1]` to access first row of regular query results
+```sail
+/* ❌ WRONG - Missing array index for regular query */
+local!userQuery: a!queryRecordType(
+  fields: {'recordType!User.fields.name'}
+).data,
+local!name: local!userQuery['recordType!User.fields.name']  /* ERROR - Query returns array */
+
+/* ✅ RIGHT - Index into first row */
+local!name: a!defaultValue(
+  local!userQuery[1]['recordType!User.fields.name'],
+  ""
+)
+```
+
+**Key Rule**:
+- Aggregations with `groupings: {}` → Direct access: `query.data.alias`
+- Regular queries with `fields: {...}` → Array indexing: `query[1]['field']`
 
 ## Syntax Validation Checklist
 
