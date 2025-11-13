@@ -115,7 +115,9 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 ## 🔄 DYNAMIC SAIL EXPRESSIONS
 
-**When working with dynamic data (arrays, loops, conditionals), ALWAYS read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` FIRST.**
+**When working with dynamic data (arrays, loops, conditionals), ALWAYS read the appropriate guidelines FIRST:**
+- For **mock data interfaces** (local variables, no record types): Read `/dynamic-behavior-guidelines/mock-interface.md`
+- For **functional interfaces** (with record types and queries): Read `/dynamic-behavior-guidelines/functional-interface.md`
 
 ### When to Read Dynamic Guidelines:
 - ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
@@ -123,8 +125,11 @@ If you violate any of these rules, STOP and reconsider your approach.
 - ✅ Before accessing properties on dynamic data
 - ✅ Before concatenating variables (type safety)
 - ✅ Before implementing conditional logic with data
+- ✅ Before using `a!checkboxField()` - for proper variable initialization (null vs false)
+- ✅ Before using variables in `required` parameter - for null-safe conditional logic
 
 **THIS IS NOT OPTIONAL for dynamic code. Static forms may skip this.**
+**THIS IS NOT OPTIONAL when using checkboxes or conditional `required` parameters.**
 
 ## INITIAL REQUEST CATEGORIZATION
 
@@ -451,7 +456,8 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
     - [ ] 3. **sail-code-reviewer** - Validates structure, syntax, and best practices
 
 ### Before Writing Dynamic Code:
-- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, data operations, or null checking
+- [ ] Read `/dynamic-behavior-guidelines/mock-interface.md` if using arrays, loops, null checking in mock data interfaces
+- [ ] Read `/dynamic-behavior-guidelines/functional-interface.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
 
 ### Syntax Validation:

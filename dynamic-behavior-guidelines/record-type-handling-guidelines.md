@@ -2,7 +2,7 @@
 
 This document provides the specific record type definitions for use when creating SAIL expressions.
 
-> **Note:** For detailed explanation of UUID syntax and Appian autocomplete usage, see the "Record Type Reference Syntax" section in `dynamic-sail-expression-guidelines.md`.
+> **Note:** For detailed explanation of UUID syntax and Appian autocomplete usage, see the "Record Type Reference Syntax" section in `functional-interface.md` (lines 65-121).
 
 <quick_reference>
 ## Quick Reference
@@ -49,7 +49,7 @@ Remember:
 
 Example: `'recordType!CaseNote'(...)` NOT `a!map(...)`
 
-> **See:** "Creating New Record Instances" section in `dynamic-sail-expression-guidelines.md` for complete syntax and patterns.
+> **See:** "Creating New Record Instances" section in `functional-interface.md` (lines 461-521) for complete syntax and patterns.
 </rule_6>
 </critical_rules>
 
@@ -57,7 +57,7 @@ Example: `'recordType!CaseNote'(...)` NOT `a!map(...)`
 ## ❌ Critical Errors to Avoid
 
 ❌ **Double brackets**: `[relationship][field]` → ✅ **Single path**: `[relationship.fields.field]`
-❌ **Sort on relationships** → ✅ **Sort on fields only** (see "Grid Column Sorting Rules" in `dynamic-sail-expression-guidelines.md`)
+❌ **Sort on relationships** → ✅ **Sort on fields only** (see "Grid Column Sorting Rules" in `functional-interface.md` lines 426-460)
 ❌ **User fields with dropdown** → ✅ **Use `a!pickerFieldUsers()`**
 ❌ **Group fields with dropdown** → ✅ **Use `a!pickerFieldGroups()`**
 </critical_errors>
@@ -69,7 +69,7 @@ Example: `'recordType!CaseNote'(...)` NOT `a!map(...)`
 **one-to-many**: Cannot sort, use length() or a!forEach()
 **one-to-one**: Like many-to-one
 
-> **For detailed patterns on managing one-to-many relationships in forms**, see the "One-to-Many Relationship Data Management in Forms" section in `dynamic-sail-expression-guidelines.md`.
+> **For detailed patterns on managing one-to-many relationships in forms**, see the "One-to-Many Relationship Data Management in Forms" section in `functional-interface.md` (lines 1922-2065).
 </relationship_types>
 
 <field_mapping_strategies>
@@ -152,5 +152,5 @@ ri!case['recordType!Case.relationships.client.fields.firstName']
 ri!case['recordType!Case.relationships.client']['recordType!Client.fields.firstName']
 ```
 
-> **See Also:** The "Relationship Field Navigation Syntax" section in `dynamic-sail-expression-guidelines.md` for complete examples and additional context.
+> **See Also:** The "Relationship Field Navigation Syntax" section in `functional-interface.md` (lines 399-425) for complete examples and additional context.
 </field_mapping_strategies>
