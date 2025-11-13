@@ -62,7 +62,14 @@ Because this project isn't running in Appian and we don't yet have a tool call f
 Claude Code will use one of two different approaches for validating its generated SAIL expressions depending on whether you're connected to the Appian VPN:
 
 1. *Not connected to VPN:* Claude Code uses a series of code review sub-agents to check for errors
-2. *Connected to VPN:* Claude Code calls a SAIL validation MCP server, hosted on an Appian instance, to check for errors
+2. *Connected to VPN (Recommmended):* Claude Code calls a SAIL validation MCP server, hosted on an Appian instance, to check for errors
+
+### Verify MCP Server Connected
+Claude Code is sensitive to being connected to VPN when it first launches. If the MCP server is not reachable, you may need to kill and relaunch your Claude Code/VS Code instance.
+
+To check the MCP server status, type `/MCP Status` in your Claude Code chat. You should see:
+
+> appian-mcp-server [Connected]
 
 ### Suppress MCP Permissions Prompts
 To stop Claude Code from asking for your permission each time it calls the SAIL validation MCP server, add the following to your `.claude/settings.local.json` file. *Note:* replace with your actual local repo path.
