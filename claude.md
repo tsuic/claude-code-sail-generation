@@ -5,9 +5,10 @@
 - Write generated output to a .sail file in the /output folder
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling
-- Don't worry about querying live data, just hard-code sample content
+- Don't worry about querying live data, just hard-code sample content using local variables and a!map
+- Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don’t assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/validation/sail-api-schema.json`
+- ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -24,7 +25,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 **ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
 **Two-tier documentation structure:**
-1. **Schema Reference** - `/validation/sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
+1. **Schema Reference** - `/ui-guidelines/0-sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
 
 ### Schema Structure:
 ```json
@@ -33,7 +34,6 @@ If you violate any of these rules, STOP and reconsider your approach.
     "a!componentName": {
       "description": "What it does",
       "category": "layout|input|display|chart|helper|...",
-      "inherits": ["visibility", "margins", ...],
       "parameters": {
         "paramName": {
           "type": "Text|Integer|Boolean|...",
@@ -60,7 +60,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 ### Available Documentation Files:
 
 **Core Reference (use for ALL components):**
-- `0-sail-component-reference.md` - Complete parameter reference for all SAIL components
+- `0-sail-api-schema.json` - Complete parameter reference for all SAIL components (JSON schema)
 
 **Expression Grammar & Variables:**
 - `1-expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
@@ -89,15 +89,15 @@ If you violate any of these rules, STOP and reconsider your approach.
 **Icons:**
 - `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
 
-**All other components** (textField, dropdownField, etc.) are documented in `/validation/sail-api-schema.json` only.
+**All other components** (textField, dropdownField, etc.) are documented in `/ui-guidelines/0-sail-api-schema.json` only.
 
 ### Documentation Lookup Process:
 
 1. **Check if a dedicated instruction file exists** for the component (see list above)
    - If YES → Read the dedicated file for templates, patterns, and detailed rules
-   - If NO → Use `/validation/sail-api-schema.json` for parameters and values
+   - If NO → Use `/ui-guidelines/0-sail-api-schema.json` for parameters and values
 
-2. **For unfamiliar components** - Read the component entry in `/validation/sail-api-schema.json` first to understand basic parameters
+2. **For unfamiliar components** - Read the component entry in `/ui-guidelines/0-sail-api-schema.json` first to understand basic parameters
 
 ### ❌ NEVER:
 - Use parameters that aren't explicitly documented in either the reference or instruction files
@@ -105,7 +105,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - Skip reading documentation because "it seems straightforward"
 
 ### ✅ ALWAYS:
-- Start with `/validation/sail-api-schema.json` for parameter validation
+- Start with `/ui-guidelines/0-sail-api-schema.json` for parameter validation
 - Read dedicated instruction files when available for templates and patterns
 - Follow templates exactly from instruction files
 - Verify against validation checklists
@@ -215,7 +215,7 @@ When designing a full page, follow these planning steps (not necessary if user r
 
 ### Decorative Data Display
 - `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `4-stamp-field-instructions.md`if using.
-- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `0-sail-component-reference.md` if using.
+- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `0-sail-api-schema.json` if using.
 - Use `richTextDisplayField` to show styled text and icons. Read `4-rich-text-instructions.md` if using.
 
 ### Common Patterns
@@ -242,7 +242,7 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - #F5F6F8: page background color
 - #1C2C44: (optional) page header bar background color
 - #FFFFFF: content card background color
-- #FF7F50: accent color (primary buttons, etc.)
+- `ACCENT`: themed accent color (primary buttons, etc.)
 - #262626: text and heading color
 
 ## SYNTAX REQUIREMENTS
@@ -444,7 +444,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 ## 🛑 MANDATORY VALIDATION DELEGATION CHECKLIST
 👉 Always use tools to validate new expressions:
 - [ ] *IF* mcp__appian-mcp-server__validate_sail is available, always call it for efficient syntax validation
-- [ ] *OTHERWISE*, call these sub-agents:
+- [ ] *OTHERWISE*, call these sub-agents (!!!ONLY!!! if mcp__appian-mcp-server__validate_sail is NOT available):
     - [ ] 1. **sail-schema-validator** - Validates function syntax
     - [ ] 2. **sail-icon-validator** - Checks for valid icon names
     - [ ] 3. **sail-code-reviewer** - Validates structure, syntax, and best practices

@@ -4869,7 +4869,7 @@ a!textField(
 
 ## Essential Functions Reference
 
-⚠️ **CRITICAL: Verify ALL functions exist in `/validation/sail-api-schema.json` before use**
+⚠️ **CRITICAL: Verify ALL functions exist in `/ui-guidelines/0-sail-api-schema.json` before use**
 
 Common functions that DO NOT exist:
 - `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click

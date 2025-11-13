@@ -6,9 +6,6 @@
     "a!formLayout": {
       "description": "Top-level form layout with optional header, contents, and buttons",
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "titleBar": {
           "type": "Text|CardLayout|HeaderTemplate",
@@ -55,9 +52,6 @@
     "a!headerContentLayout": {
       "description": "General purpose page layout with header (optional) and content sections",
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "header": {
           "type": "Any Type",
@@ -100,9 +94,6 @@
     },
     "a!paneLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "panes": {
           "type": "List of a!pane",
@@ -113,13 +104,11 @@
           "required": false
         }
       },
+      "specialNote": "At least one pane must have width: \"AUTO\" for fluid layout",
       "description": "2-3 full-height vertical panes with independent scrolling"
     },
     "a!pane": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "contents": {
           "type": "Any Type",
@@ -165,9 +154,6 @@
     },
     "a!wizardLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "titleBar": {
           "type": "Text|CardLayout|HeaderTemplate",
@@ -238,9 +224,6 @@
     },
     "a!wizardStep": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -271,10 +254,6 @@
     },
     "a!boxLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -346,10 +325,6 @@
     },
     "a!columnsLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "columns": {
           "type": "List of columnLayout",
@@ -418,13 +393,11 @@
           ]
         }
       },
+      "specialNote": "At least one column must have width: \"AUTO\" for proper layout distribution",
       "description": "Horizontal column arrangement"
     },
     "a!columnLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "contents": {
           "type": "Any Type",
@@ -463,10 +436,6 @@
     },
     "a!sideBySideLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "items": {
           "type": "List of sideBySideItem",
@@ -520,13 +489,11 @@
           ]
         }
       },
+      "specialNote": "NEVER nest sideBySideLayouts inside sideBySideItems. NEVER put arrays of components or layout components in sideBySideItems - only single components allowed",
       "description": "Side-by-side component arrangement (like flex)"
     },
     "a!sideBySideItem": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "item": {
           "type": "Single component",
@@ -555,15 +522,11 @@
           "required": false
         }
       },
+      "specialNote": "Can ONLY contain single components - NEVER arrays of components or layout components (columnsLayout, cardLayout, sideBySideLayout, etc.)",
       "description": "Item within side-by-side layout"
     },
     "a!cardLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "contents": {
           "type": "Any Type",
@@ -705,11 +668,6 @@
     },
     "a!cardGroupLayout": {
       "category": "layout",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "cards": {
           "type": "Any Type",
@@ -813,11 +771,6 @@
     },
     "a!sectionLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -901,11 +854,6 @@
     },
     "a!billboardLayout": {
       "category": "layout",
-      "inherits": [
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "backgroundMedia": {
           "type": "Any Type",
@@ -973,9 +921,6 @@
     },
     "a!fullOverlay": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "alignVertical": {
           "type": "Text",
@@ -1022,9 +967,6 @@
     },
     "a!barOverlay": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "position": {
           "type": "Text",
@@ -1071,9 +1013,6 @@
     },
     "a!columnOverlay": {
       "category": "layout",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "alignVertical": {
           "type": "Text",
@@ -1138,14 +1077,6 @@
     },
     "a!textField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Text",
@@ -1284,14 +1215,6 @@
     },
     "a!paragraphField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Text",
@@ -1401,14 +1324,6 @@
     },
     "a!integerField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Integer",
@@ -1505,14 +1420,6 @@
     },
     "a!floatingPointField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Decimal",
@@ -1605,14 +1512,6 @@
     },
     "a!dateField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Date",
@@ -1705,13 +1604,6 @@
     },
     "a!dropdownField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "choiceLabels": {
           "type": "List of Text",
@@ -1814,13 +1706,6 @@
     },
     "a!radioButtonField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "choiceLabels": {
           "type": "List of Text",
@@ -1926,13 +1811,6 @@
     },
     "a!checkboxField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "choiceLabels": {
           "type": "List of Text",
@@ -2038,14 +1916,6 @@
     },
     "a!dateTimeField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Date and Time",
@@ -2138,14 +2008,6 @@
     },
     "a!timeField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Time",
@@ -2238,14 +2100,6 @@
     },
     "a!barcodeField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Text",
@@ -2359,14 +2213,6 @@
     },
     "a!pickerFieldUsers": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "maxSelections": {
           "type": "Integer",
@@ -2467,14 +2313,6 @@
     },
     "a!pickerFieldGroups": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "maxSelections": {
           "type": "Integer",
@@ -2575,14 +2413,6 @@
     },
     "a!pickerFieldUsersAndGroups": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "maxSelections": {
           "type": "Integer",
@@ -2683,13 +2513,6 @@
     },
     "a!cardChoiceField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "List of Variant",
@@ -2805,13 +2628,6 @@
     },
     "a!fileUploadField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "target": {
           "type": "Document/Folder",
@@ -2928,12 +2744,6 @@
     },
     "a!richTextDisplayField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Any Type",
@@ -3016,12 +2826,6 @@
     },
     "a!stampField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "icon": {
           "type": "Text",
@@ -3132,10 +2936,6 @@
     },
     "a!headingField": {
       "category": "display",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "text": {
           "type": "Text",
@@ -3219,12 +3019,6 @@
     },
     "a!progressBarField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "percentage": {
           "type": "Integer",
@@ -3312,12 +3106,6 @@
     },
     "a!tagField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "tags": {
           "type": "List of Variant",
@@ -3399,11 +3187,6 @@
     },
     "a!linkField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "links": {
           "type": "Any Type",
@@ -3453,10 +3236,6 @@
     },
     "a!recordActionField": {
       "category": "display",
-      "inherits": [
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "actions": {
           "type": "Any Type",
@@ -3506,12 +3285,6 @@
     },
     "a!imageField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "images": {
           "type": "Any Type",
@@ -3603,12 +3376,6 @@
     },
     "a!gaugeField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "percentage": {
           "type": "Decimal",
@@ -3701,12 +3468,6 @@
     },
     "a!milestoneField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "steps": {
           "type": "List of Text",
@@ -3803,10 +3564,6 @@
     },
     "a!horizontalLine": {
       "category": "display",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "color": {
           "type": "Text",
@@ -3869,12 +3626,6 @@
     },
     "a!documentViewerField": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "document": {
           "type": "Document",
@@ -3956,12 +3707,6 @@
     },
     "a!timeDisplay": {
       "category": "display",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Time",
@@ -4035,10 +3780,6 @@
     },
     "a!buttonWidget": {
       "category": "interactive",
-      "inherits": [
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -4130,10 +3871,6 @@
     },
     "a!buttonArrayLayout": {
       "category": "interactive",
-      "inherits": [
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "buttons": {
           "type": "List of ButtonWidget",
@@ -4169,14 +3906,11 @@
           "required": false
         }
       },
+      "specialNote": "Best practice: explicitly set marginBelow: \"NONE\" to improve vertical alignment by removing extra space below buttons",
       "description": "Button list for interfaces (not form submission)"
     },
     "a!buttonLayout": {
       "category": "interactive",
-      "inherits": [
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "primaryButtons": {
           "type": "List of ButtonWidget",
@@ -4199,13 +3933,6 @@
     },
     "a!gridField": {
       "category": "data",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "RecordType/List/DataSubset",
@@ -4381,10 +4108,6 @@
     },
     "a!gridColumn": {
       "category": "data",
-      "inherits": [
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -4461,11 +4184,6 @@
     },
     "a!columnChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "Any Type",
@@ -4567,11 +4285,6 @@
     },
     "a!pieChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "series": {
           "type": "List of PieChartSeries",
@@ -4656,11 +4369,6 @@
     },
     "a!lineChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "Any Type",
@@ -4749,11 +4457,6 @@
     },
     "a!barChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "Any Type",
@@ -4856,11 +4559,6 @@
     },
     "a!areaChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "Any Type",
@@ -4966,11 +4664,6 @@
     },
     "a!scatterChartField": {
       "category": "chart",
-      "inherits": [
-        "labeling",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "data": {
           "type": "Any Type",
@@ -5374,9 +5067,6 @@
     },
     "a!validationMessage": {
       "category": "utility",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "message": {
           "type": "Text",
@@ -5710,14 +5400,6 @@
     },
     "a!encryptedTextField": {
       "category": "input",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "margins",
-        "accessibility"
-      ],
       "parameters": {
         "value": {
           "type": "Encrypted Text",
@@ -5829,10 +5511,6 @@
     },
     "a!messageBanner": {
       "category": "display",
-      "inherits": [
-        "visibility",
-        "margins"
-      ],
       "parameters": {
         "primaryText": {
           "type": "Text",
@@ -6072,13 +5750,6 @@
     },
     "a!gridLayout": {
       "category": "data",
-      "inherits": [
-        "labeling",
-        "validation",
-        "interaction",
-        "visibility",
-        "accessibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -6230,9 +5901,6 @@
     },
     "a!gridLayoutHeaderCell": {
       "category": "helper",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "label": {
           "type": "Text",
@@ -6295,9 +5963,6 @@
     },
     "a!gridRowLayout": {
       "category": "helper",
-      "inherits": [
-        "visibility"
-      ],
       "parameters": {
         "contents": {
           "type": "List of Any Type",
