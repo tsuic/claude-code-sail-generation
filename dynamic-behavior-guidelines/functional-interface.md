@@ -2,43 +2,43 @@
 
 ## 📑 Quick Navigation Index
 
+### 🚨 Critical Sections (Read These First):
+- **Lines 45-64**: Mandatory Foundation Rules
+- **Lines 65-121**: Record Type Reference Syntax (UUID usage)
+- **Lines 122-274**: Form Interface Data Patterns (ri! vs queries)
+- **Lines 754-914**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 1141-1677**: Data Querying Patterns (a!queryRecordType() and a!recordData())
+- **Lines 2106-2249**: One-to-Many Relationship Data Management
+- **Lines 2505-2630**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
+
 ### By Task Type:
-- **Building a form/wizard that creates or updates records** → Form Interface Data Patterns
-- **Displaying data in grids or charts** → Data Querying Patterns
-- **Managing one-to-many relationships in forms** → One-to-Many Relationship Data Management
-- **Creating dropdown choices from record data** → Data Querying Patterns
-- **Implementing record actions** → Record Actions
-- **Working with dates and times** → Date/Time Critical Rules
-- **Building charts and visualizations** → Chart Configuration and Components
-- **Accessing related record data** → Related Record Field References and Patterns
-- **Implementing role-based access control** → Group-Based Access Control Pattern
+- **Building a form/wizard that creates or updates records** → Lines 122-274 (Form Interface Data Patterns)
+- **Displaying data in grids or charts** → Lines 1141-1677 (Data Querying Patterns)
+- **Managing one-to-many relationships in forms** → Lines 2106-2249 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 1141-1677 (Data Querying Patterns)
+- **Implementing record actions** → Lines 2874-2944 (Record Actions)
+- **Working with dates and times** → Lines 2505-2630 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 2631-2873 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 2250-2504 (Related Record Field References)
+- **Implementing role-based access control** → Lines 915-1140 (Group-Based Access Control Pattern)
 
 ### By Error Type:
-- **"Variable not defined" errors** → Mandatory Foundation Rules
-- **Null reference errors** → Null Safety Implementation
-- **"Function does not exist" errors** → Essential Functions Reference
-- **Invalid function parameters** → Function Parameter Validation
-- **Short-circuit evaluation errors (and/or vs if)** → Short-Circuit Evaluation Rules
-- **Record type reference errors** → Record Type Reference Syntax
-- **Query returning only primary key (missing fields parameter)** → Data Querying Patterns - Fields Parameter
-- **Query .totalCount is null (missing fetchTotalCount)** → Data Querying Patterns - fetchTotalCount
-- **DateTime vs Date type mismatch in filters** → Date/Time Type Matching
-- **Query filter errors with rule inputs** → Protecting Query Filters
-- **Relationship navigation errors** → One-to-Many Relationships, Related Record References
-- **Button/wizard configuration errors** → Button Parameters, Wizard Parameters
-
-### Critical Sections (Read These First):
-- 🚨 **Mandatory Foundation Rules**
-- 🚨 **Form Interface Data Patterns**
-- 🚨 **Null Safety Implementation**
-- 🚨 **a!queryRecordType() Fields Parameter (MUST specify all display fields)**
-- 🚨 **fetchTotalCount Parameter (REQUIRED for .totalCount access)**
-- 🚨 **One-to-Many Relationship Data Management**
-- 🚨 **Date/Time Type Matching (DateTime fields use now(), Date fields use today())**
+- **"Variable not defined" errors** → Lines 45-64 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 754-914 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 2945-3029 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 1678-1717 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 1718-1815 (Short-Circuit Evaluation Rules)
+- **Record type reference errors** → Lines 65-121 (Record Type Reference Syntax)
+- **Query returning only primary key (missing fields parameter)** → Lines 1141-1677 (Data Querying Patterns)
+- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1141-1677 (Data Querying Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 2505-2630 (Date/Time Type Matching)
+- **Query filter errors with rule inputs** → Lines 968-1052 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 2106-2249 (One-to-Many Relationships), Lines 2250-2504 (Related Record References)
+- **Button/wizard configuration errors** → Lines 1816-1917 (Button/Wizard Parameters)
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Syntax Validation Checklist
-- **Common error troubleshooting** → Common Critical Errors
+- **Final validation checklist** → Lines 3030-3105 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 634-753 (Common Critical Errors)
 
 ---
 
@@ -833,50 +833,15 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
 
-### 🚨 CRITICAL: Null Safety for Computed Variables and Short-Circuit Evaluation
+### 🚨 CRITICAL: Null Safety for Computed Variables
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-#### The Problem with and()
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 1718-1767).
 
-SAIL's `and()` and `or()` functions **DO NOT short-circuit** - they evaluate ALL arguments before returning a result. This means property access will always be evaluated, even when the variable is null/empty.
+#### Pattern for Null-Safe Property Access on Computed Variables
 
-```sail
-/* ❌ WRONG - and() evaluates ALL arguments */
-if(
-  and(
-    a!isNotNullOrEmpty(local!computedData),
-    local!computedData.field = "value"  /* ❌ ALWAYS evaluated, even when computedData is empty! */
-  ),
-  ...
-)
-```
-
-**Error you'll see:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'field' of type Text into type Null
-```
-
-#### ✅ CORRECT Solution: Nested if() for Short-Circuit Evaluation
-
-SAIL's `if()` function **DOES short-circuit** - it only evaluates the branch that will be returned.
-
-```sail
-/* ✅ CORRECT - Nested if() short-circuits */
-if(
-  if(
-    a!isNotNullOrEmpty(local!computedData),
-    local!computedData.field = "value",  /* ✅ Only evaluated when computedData is not empty */
-    false  /* Safe default when empty */
-  ),
-  /* Then branch - execute when condition is true */,
-  /* Else branch - execute when condition is false */
-)
-```
-
-#### Pattern for Null-Safe Property Access
-
-**Always use this nested if() pattern when accessing properties on computed variables:**
+**Always use nested if() pattern when accessing properties on computed variables:**
 
 ```sail
 if(
@@ -903,14 +868,6 @@ if(
 - Interface loads successfully even when data is empty
 - Conditional UI elements hide/show correctly
 - Professional user experience with no errors
-
-#### Quick Reference
-
-| Function | Short-Circuits? | Use For Null Safety? |
-|----------|-----------------|----------------------|
-| `if()` | ✅ YES | ✅ ALWAYS use for null-safe property access |
-| `and()` | ❌ NO | ❌ NEVER use for null checking before property access |
-| `or()` | ❌ NO | ❌ NEVER use for null checking before property access |
 
 ## Group-Based Access Control Pattern
 

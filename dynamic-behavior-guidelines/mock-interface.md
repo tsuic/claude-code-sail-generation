@@ -4,39 +4,39 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 
 ## 📑 Quick Navigation Index
 
+### 🚨 Critical Sections (Read These First):
+- **Lines 43-57**: Mandatory Foundation Rules
+- **Lines 59-103**: Essential SAIL Structure
+- **Lines 208-469**: a!forEach() Function Variables Reference
+- **Lines 788-925**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 1257-1427**: Single Checkbox Field Pattern (initialization and null checking)
+- **Lines 1429-1800**: Grid Selection Patterns (naming conventions and two-variable approach)
+- **Lines 1991-2044**: Date/Time Type Matching
+
 ### By Task Type:
-- **Working with arrays and loops** → Lines 162-423 (a!forEach() Reference), Lines 424-795 (Array Patterns)
-- **Managing grid selections (ID arrays + full data)** → Lines 1617-1871 (Grid Selection Implementation Pattern), Lines 1872-2137 (Grid Selection Anti-Patterns)
-- **Building charts with mock data** → Lines 2190-2328 (Chart Data Configuration)
-- **Working with dates and times** → Lines 2138-2189 (Date/Time Critical Rules)
-- **Understanding grid selection behavior** → Lines 1242-1508 (Grid Selection Behavior)
-- **Using checkboxes with proper initialization** → Lines 1308-1508 (Single Checkbox Field Pattern)
+- **Working with arrays and loops** → Lines 208-469 (a!forEach() Reference), Lines 470-787 (Array Patterns)
+- **Managing grid selections (ID arrays + full data)** → Lines 1429-1800 (Complete Grid Selection Guide)
+- **Building charts with mock data** → Lines 2045-2183 (Chart Data Configuration)
+- **Working with dates and times** → Lines 1991-2044 (Date/Time Critical Rules)
+- **Using checkboxes with proper initialization** → Lines 1257-1427 (Single Checkbox Field Pattern)
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 43-58 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 934-1109 (Null Safety Implementation)
-- **Invalid function parameters** → Lines 796-835 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 836-933 (Short-Circuit Evaluation Rules)
-- **Property access errors (property() function)** → Lines 426-668 (Dot Notation & Derived Data Patterns)
-- **Syntax errors (and/or, if statements)** → Lines 120-161 (Language-Specific Syntax Patterns)
-- **Grid selection not working** → Lines 1242-1508 (Grid Selection Behavior), Lines 1617-1871 (Implementation Pattern)
-- **Grid selection variable naming errors** → Lines 1509-1616 (Variable Naming Conventions for Grid Selections)
-- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 1872-2137 (Grid Selection Anti-Patterns)
-- **Type mismatch: Cannot index property into Integer/Text** → Lines 1872-2137 (Grid Selection Anti-Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2138-2189 (Date/Time Type Matching)
-- **Checkbox initialization errors (false vs null)** → Lines 1331-1429 (Variable Initialization for Pattern 2)
-- **Checkbox state checking errors (length vs null)** → Lines 1430-1508 (save!value Null Checking in Checkbox saveInto)
-
-### Critical Sections (Read These First):
-- 🚨 **Lines 43-58**: Mandatory Foundation Rules
-- 🚨 **Lines 162-423**: a!forEach() Function Variables Reference
-- 🚨 **Lines 934-1109**: Null Safety Implementation (including computed variables)
-- 🚨 **Lines 1308-1508**: Single Checkbox Field Pattern (initialization and null checking)
-- 🚨 **Lines 1617-1871**: Grid Selection Implementation Pattern (two-variable approach)
-- 🚨 **Lines 2138-2189**: Date/Time Type Matching
+- **"Variable not defined" errors** → Lines 43-57 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 788-1100 (Null Safety Implementation)
+- **Invalid function parameters** → Lines 750-787 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 828-925 (Short-Circuit Evaluation Rules)
+- **Property access errors (property() function)** → Lines 472-659 (Dot Notation & Derived Data Patterns)
+- **Syntax errors (and/or, if statements)** → Lines 166-207 (Language-Specific Syntax Patterns)
+- **Grid selection not working** → Lines 1191-1289 (Grid Selection Behavior), Lines 1537-1800 (Implementation Pattern)
+- **Grid selection variable naming errors** → Lines 1429-1536 (Variable Naming Conventions)
+- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 1801-2137 (Grid Selection Anti-Patterns)
+- **Type mismatch: Cannot index property into Integer/Text** → Lines 1801-2137 (Grid Selection Anti-Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 1991-2044 (Date/Time Type Matching)
+- **Checkbox initialization errors (false vs null)** → Lines 1280-1340 (Variable Initialization for Pattern 2)
+- **Checkbox state checking errors (length vs null)** → Lines 1365-1427 (Common Mistakes - save!value)
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 2329-2375 (Syntax Validation Checklist)
+- **Final validation checklist** → Lines 2184-2374 (Syntax Validation Checklist)
 
 ---
 
@@ -55,6 +55,52 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 7. **Single checkbox variables MUST be initialized to null, NOT false()** - See Single Checkbox Field Pattern for complete pattern
 8. **Local variables are ONLY for UI state** - Mock data, selections, transient state
 9. **Always try to use record types for read-only grids and charts** instead of mock data when possible
+
+## Essential SAIL Structure
+
+```sail
+a!localVariables(
+  /* Variable definitions first - ALL must be declared */
+  local!userName: "John Doe",
+  local!selectedStatus,  /* No initial value - declare by name only */
+  local!isVisible: true(),
+
+  /* Interface expression last */
+  a!formLayout(
+    contents: {
+      /* Interface components */
+    }
+  )
+)
+```
+
+- **With initial values**: `local!variable: value`
+- **Without initial values**: `local!variable` (no null/empty placeholders)
+- **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
+- **For booleans**: Always explicit: `true()` or `false()`
+
+🚨 CRITICAL: Local Variable Scope in Nested Contexts
+- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
+- **Cannot declare variables inline within expressions**
+
+```sail
+/* ❌ WRONG - Cannot declare variables inline */
+a!forEach(
+  items: data,
+  expression: local!temp: someValue, /* Invalid syntax */
+  otherExpression
+)
+
+/* ✅ CORRECT - Use nested a!localVariables() */
+a!forEach(
+  items: data,
+  expression: a!localVariables(
+    local!temp: someValue,
+    /* Use local!temp in expression here */
+    someExpression
+  )
+)
+```
 
 ## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects
 
@@ -657,14 +703,6 @@ a!forEach(
 )
 ```
 
-#### Key Points
-
-- **Always maintain two variables**: IDs array + computed full data array
-- **Grid `selectionValue` always stores IDs**, never full row data
-- **Computed variable updates automatically** when ID array changes
-- **Always null-check computed variable** before accessing properties (use nested `if()`)
-- **Pattern works for any ID → full object mapping**, not just grid selections
-
 ---
 
 ### Combining Different Data Types
@@ -745,52 +783,6 @@ local!color: index(
   "#000000"  /* Default color */
 )
 /* Returns: "#059669" (first element of colors array) */
-```
-
-## Essential SAIL Structure
-
-```sail
-a!localVariables(
-  /* Variable definitions first - ALL must be declared */
-  local!userName: "John Doe",
-  local!selectedStatus,  /* No initial value - declare by name only */
-  local!isVisible: true(),
-
-  /* Interface expression last */
-  a!formLayout(
-    contents: {
-      /* Interface components */
-    }
-  )
-)
-```
-
-- **With initial values**: `local!variable: value`
-- **Without initial values**: `local!variable` (no null/empty placeholders)
-- **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
-- **For booleans**: Always explicit: `true()` or `false()`
-
-🚨 CRITICAL: Local Variable Scope in Nested Contexts
-- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
-- **Cannot declare variables inline within expressions**
-
-```sail
-/* ❌ WRONG - Cannot declare variables inline */
-a!forEach(
-  items: data,
-  expression: local!temp: someValue, /* Invalid syntax */
-  otherExpression
-)
-
-/* ✅ CORRECT - Use nested a!localVariables() */
-a!forEach(
-  items: data,
-  expression: a!localVariables(
-    local!temp: someValue,
-    /* Use local!temp in expression here */
-    someExpression
-  )
-)
 ```
 
 ## ⚠️ Function Parameter Validation
@@ -987,50 +979,15 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
 
-### 🚨 CRITICAL: Null Safety for Computed Variables and Short-Circuit Evaluation
+### 🚨 CRITICAL: Null Safety for Computed Variables
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-#### The Problem with and()
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 836-933).
 
-SAIL's `and()` and `or()` functions **DO NOT short-circuit** - they evaluate ALL arguments before returning a result. This means property access will always be evaluated, even when the variable is null/empty.
+#### Pattern for Null-Safe Property Access on Computed Variables
 
-```sail
-/* ❌ WRONG - and() evaluates ALL arguments */
-if(
-  and(
-    a!isNotNullOrEmpty(local!computedData),
-    local!computedData.field = "value"  /* ❌ ALWAYS evaluated, even when computedData is empty! */
-  ),
-  ...
-)
-```
-
-**Error you'll see:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'field' of type Text into type Null
-```
-
-#### ✅ CORRECT Solution: Nested if() for Short-Circuit Evaluation
-
-SAIL's `if()` function **DOES short-circuit** - it only evaluates the branch that will be returned.
-
-```sail
-/* ✅ CORRECT - Nested if() short-circuits */
-if(
-  if(
-    a!isNotNullOrEmpty(local!computedData),
-    local!computedData.field = "value",  /* ✅ Only evaluated when computedData is not empty */
-    false  /* Safe default when empty */
-  ),
-  /* Then branch - execute when condition is true */,
-  /* Else branch - execute when condition is false */
-)
-```
-
-#### Pattern for Null-Safe Property Access
-
-**Always use this nested if() pattern when accessing properties on computed variables:**
+**Always use nested if() pattern when accessing properties on computed variables:**
 
 ```sail
 if(
@@ -1098,14 +1055,6 @@ if(
 - Interface loads successfully even when data is empty
 - Conditional UI elements hide/show correctly
 - Professional user experience with no errors
-
-#### Quick Reference
-
-| Function | Short-Circuits? | Use For Null Safety? |
-|----------|-----------------|----------------------|
-| `if()` | ✅ YES | ✅ ALWAYS use for null-safe property access |
-| `and()` | ❌ NO | ❌ NEVER use for null checking before property access |
-| `or()` | ❌ NO | ❌ NEVER use for null checking before property access |
 
 ## Component Usage Patterns
 
@@ -1275,14 +1224,14 @@ a!forEach(
 Expression evaluation error: Invalid index: Cannot index property 'name' of type Text into type Number (Integer)
 ```
 
-### Rule Summary
+### Quick Reference
+
+**Key Rules:**
 - Grid `selectionValue` contains **identifiers** (integers for static data, positions in array)
 - `selectionValue` does NOT contain full row objects with properties
 - Use `index(dataArray, identifier, defaultValue)` to retrieve full objects
-- Always check: "Am I iterating over a selectionValue? Then I need index()!"
 
-### Quick Decision Tree
-Before writing code with grid selections:
+**Before writing code with grid selections, ask:**
 1. "Is this variable from a grid's selectionValue?" → YES = need index() lookup
 2. "Am I accessing properties on fv!item?" → Must verify fv!item is an object, not an ID
 3. "Did I use index() to look up the full object first?" → If NO, you'll get a runtime error
@@ -1425,86 +1374,6 @@ saveInto: {
 ```
 
 **Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
-
-
-### 🚨 CRITICAL: save!value Null Checking in Checkbox saveInto
-
-**The Problem:**
-When a checkbox is **unchecked**, `save!value` is `null`, NOT an empty array `{}`. Using `length(save!value)` will cause runtime errors.
-
-```sail
-/* ❌ WRONG - length() fails on null */
-a!checkboxField(
-  choiceLabels: {"Case requires legal review"},
-  choiceValues: {true},
-  value: if(a!defaultValue(local!requiresLegalReview, false), {true}, {}),
-  saveInto: {
-    a!save(local!requiresLegalReview, if(length(save!value) > 0, true, null)),  /* ERROR when unchecked! */
-    a!save(local!legalReviewer, if(length(save!value) = 0, null, local!legalReviewer))  /* ERROR! */
-  }
-)
-
-/* ✅ CORRECT - Use a!isNotNullOrEmpty() for null safety */
-a!checkboxField(
-  choiceLabels: {"Case requires legal review"},
-  choiceValues: {true},
-  value: if(a!defaultValue(local!requiresLegalReview, false), {true}, {}),
-  saveInto: {
-    a!save(local!requiresLegalReview, if(a!isNotNullOrEmpty(save!value), true, null)),
-    a!save(local!legalReviewer, if(a!isNullOrEmpty(save!value), null, local!legalReviewer))
-  }
-)
-```
-
-**Key Rules:**
-- ✅ **Always use `a!isNotNullOrEmpty(save!value)` or `a!isNullOrEmpty(save!value)`** to check checkbox state
-- ❌ **Never use `length(save!value)`** - it fails when checkbox is unchecked (null state)
-- ✅ **Checked state**: `save!value = {true}` → `a!isNotNullOrEmpty(save!value)` returns `true`
-- ✅ **Unchecked state**: `save!value = null` → `a!isNullOrEmpty(save!value)` returns `true`
-
-**Multi-Checkbox Pattern:**
-For checkboxes with multiple values, STILL use null checking first:
-
-```sail
-/* ✅ CORRECT - Null-safe multi-checkbox saveInto */
-a!checkboxField(
-  label: "Case Categories",
-  choiceLabels: {"Financial", "Legal", "Technical", "Administrative"},
-  choiceValues: {"FINANCIAL", "LEGAL", "TECHNICAL", "ADMIN"},
-  value: a!flatten({
-    if(a!defaultValue(local!isFinancial, false), "FINANCIAL", null),
-    if(a!defaultValue(local!isLegal, false), "LEGAL", null),
-    if(a!defaultValue(local!isTechnical, false), "TECHNICAL", null),
-    if(a!defaultValue(local!isAdmin, false), "ADMIN", null)
-  }),
-  saveInto: {
-    /* Always check for null first, THEN use contains() */
-    a!save(local!isFinancial, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "FINANCIAL"), true, null), null)),
-    a!save(local!isLegal, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "LEGAL"), true, null), null)),
-    a!save(local!isTechnical, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "TECHNICAL"), true, null), null)),
-    a!save(local!isAdmin, if(a!isNotNullOrEmpty(save!value), if(contains(save!value, "ADMIN"), true, null), null))
-  }
-)
-```
-
-**Checkbox with Dependent Field Clearing:**
-When unchecking should clear dependent fields:
-
-```sail
-/* ✅ CORRECT - Clear multiple dependent fields when unchecked */
-a!checkboxField(
-  choiceLabels: {"Case is closed"},
-  choiceValues: {true},
-  value: if(a!defaultValue(local!caseClosed, false), {true}, {}),
-  saveInto: {
-    a!save(local!caseClosed, if(a!isNotNullOrEmpty(save!value), true, null)),
-    /* Clear dependent fields when checkbox is unchecked */
-    a!save(local!closureReason, if(a!isNullOrEmpty(save!value), null, local!closureReason)),
-    a!save(local!closureDate, if(a!isNullOrEmpty(save!value), null, local!closureDate)),
-    a!save(local!closureNotes, if(a!isNullOrEmpty(save!value), null, local!closureNotes))
-  }
-)
-```
 
 ## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections
 
@@ -1797,22 +1666,6 @@ a!buttonWidget(
     - [ ] Search code for ID variable name - verify NO property access attempted
     - [ ] Search code for computed variable name - verify ALL property access uses it
     - [ ] Verify naming convention followed consistently throughout interface
-
-### Why and() Doesn't Work for Null Safety
-```sail
-/* ❌ WRONG - and() evaluates ALL arguments */
-and(
-  a!isNotNullOrEmpty(local!selectedItems),
-  local!selectedItems.type = "value"  /* ❌ Still evaluated even when null! */
-)
-
-/* ✅ CORRECT - nested if() short-circuits */
-if(
-  a!isNotNullOrEmpty(local!selectedItems),
-  local!selectedItems.type = "value",  /* ✅ Only evaluated when not null */
-  false
-)
-```
 
 ### Complete Working Example
 ```sail
@@ -2137,7 +1990,9 @@ a!localVariables(
 
 ## Date/Time Critical Rules
 
-🚨 CRITICAL: Correct Date/Time Functions
+### Correct Date/Time Functions
+
+🚨 CRITICAL: Use the correct function for date/time creation
 ```sail
 /* ✅ CORRECT - Use dateTime() for specific date/time creation */
 dateTime(year(today()), month(today()), 1, 0, 0, 0)  /* Month to Date */
@@ -2146,10 +2001,9 @@ dateTime(year(today()), month(today()), 1, 0, 0, 0)  /* Month to Date */
 a!dateTimeValue(year: year(today()), month: month(today()), day: 1)
 ```
 
-## TYPE HANDLING FOR DATE/TIME CALCULATIONS
+### Type Casting with todate()
 
-### Always Cast Date Arithmetic with todate()
-When using date arithmetic in sample data, cast results to ensure consistent types:
+**Always cast date arithmetic in sample data to ensure consistent types:**
 
 **WRONG:**
 ```sail
@@ -2169,6 +2023,7 @@ local!data: {
 ```
 
 ### Date/DateTime Arithmetic Returns Intervals
+
 Subtracting dates or datetimes returns an **Interval** type, not a Number:
 - `now() - timestamp` → Interval (Day to Second)
 - `today() - dateValue` → Interval (Day to Day)
@@ -2182,7 +2037,7 @@ if(now() - fv!row.timestamp < 1, ...)  /* Error: Cannot compare Interval to Numb
 if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer first */
 ```
 
-### Key Functions
+### Key Date/Time Functions
 - `todate()` - Cast to Date type (use for all date arithmetic in sample data)
 - `tointeger()` - Convert interval to whole days as integer
 - `text(value, format)` - Format numbers/dates/intervals as text
