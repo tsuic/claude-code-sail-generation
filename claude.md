@@ -238,7 +238,7 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - [ ] Always wrapped in `a!buttonArrayLayout`
 
 ## STYLING
-### Default color scheme for generated SAIL UIs
+### Use this color scheme for generated SAIL UIs
 - #F5F6F8: page background color
 - #1C2C44: (optional) page header bar background color
 - #FFFFFF: content card background color
