@@ -272,10 +272,11 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
   - **WRONG:** `local!agreeToTerms: false()` with `choiceValues: {true()}`
   - **RIGHT:** `local!agreeToTerms,` (uninitialized = unchecked)
   - **RIGHT:** `local!agreeToTerms: true()` (pre-checked, if true() is in choiceValues)
-- **Always check for null/empty before comparing values** - SAIL cannot compare null to numbers/text
+- **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
-     - **RIGHT:** `showWhen: and(a!isNotNullOrEmpty(local!selectedId), local!selectedId = fv!item.id)`
-     - Common scenarios: selection states, conditional visibility, dynamic styling
+     - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
+     - See `/dynamic-behavior-guidelines/mock-interface.md` lines 1040-1136 for complete short-circuit evaluation rules
+     - Common scenarios: selection states, conditional visibility, dynamic styling, property access
      - Any local variable that starts as null and gets populated later needs null checking
 
 ### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
@@ -503,7 +504,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons - use `and(isNotNullOrEmpty(local!variable), local!variable = value)` ‼️
+- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see mock-interface.md lines 1040-1136) ‼️
 - [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
 - [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
