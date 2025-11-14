@@ -1598,10 +1598,10 @@ if(
 
 | Function | Short-Circuits? | Use For |
 |----------|----------------|---------|
-| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic |
-| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
-| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
-| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching with multiple conditions |
+| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic, binary conditions |
+| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
+| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
+| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching - single value against 3+ options (status, category, priority) |
 
 ## Component Usage Patterns
 

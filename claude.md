@@ -279,6 +279,56 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
      - Common scenarios: selection states, conditional visibility, dynamic styling, property access
      - Any local variable that starts as null and gets populated later needs null checking
 
+### Pattern Matching with a!match()
+Use `a!match()` for cleaner pattern matching when comparing a single value against multiple options (status codes, priority levels, categories).
+
+**Benefits:**
+- More readable than nested `if()` statements
+- Short-circuits (only evaluates matched branch)
+- Easier to maintain than parallel array lookups for simple mappings
+
+**Example - Status-Based Styling:**
+```sail
+/* ❌ VERBOSE - Nested if statements */
+backgroundColor: if(
+  local!priority = "Critical",
+  "#DC2626",
+  if(
+    local!priority = "High",
+    "#F59E0B",
+    if(
+      local!priority = "Medium",
+      "#3B82F6",
+      "#6B7280"
+    )
+  )
+)
+
+/* ✅ CLEAN - a!match() */
+backgroundColor: a!match(
+  value: local!priority,
+  equals: "Critical",
+  then: "#DC2626",
+  equals: "High",
+  then: "#F59E0B",
+  equals: "Medium",
+  then: "#3B82F6",
+  default: "#6B7280"
+)
+```
+
+**When to use:**
+- ✅ Single value compared against 3+ options
+- ✅ Status/category-based icons, colors, or content
+- ✅ Conditional styling in grids, stamps, or cards
+
+**When NOT to use:**
+- ❌ Simple true/false conditions (use `if()`)
+- ❌ Complex boolean logic with multiple variables (use nested `if()`)
+- ❌ When you need the arrays for other purposes (dropdowns, filters)
+
+See `/dynamic-behavior-guidelines/mock-interface.md` lines 1000-1103 for detailed examples.
+
 ### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
 
 Many SAIL functions cannot accept null parameters and will cause runtime errors. *ALWAYS* check for null/empty local variables (`local!`) and rule inputs (`ri!`) before passing to to these functions.

@@ -997,6 +997,111 @@ local!color: index(
 /* Returns: "#059669" (first element of colors array) */
 ```
 
+### Using a!match() for Status-Based Lookups
+
+**When to use `a!match()` instead of parallel arrays:**
+- Single value compared against multiple options (status, category, priority, etc.)
+- Cleaner and more maintainable than nested `if()` statements
+- Short-circuits like `if()` - safe for conditional logic
+
+**Pattern: Status to Icon/Color Mapping**
+```sail
+/* ❌ OLD PATTERN - Parallel arrays with wherecontains */
+local!statuses: {"Open", "In Progress", "Completed", "Cancelled"},
+local!icons: {"folder-open", "clock", "check-circle", "times-circle"},
+local!colors: {"#3B82F6", "#F59E0B", "#10B981", "#EF4444"},
+
+local!icon: index(
+  local!icons,
+  wherecontains(fv!item.status, local!statuses),
+  "file"
+)
+
+/* ✅ NEW PATTERN - a!match() (cleaner, more readable) */
+local!icon: a!match(
+  value: fv!item.status,
+  equals: "Open",
+  then: "folder-open",
+  equals: "In Progress",
+  then: "clock",
+  equals: "Completed",
+  then: "check-circle",
+  equals: "Cancelled",
+  then: "times-circle",
+  default: "file"
+)
+```
+
+**Pattern: Dynamic Styling with a!match()**
+```sail
+/* Stamp field with status-based colors */
+a!stampField(
+  icon: a!match(
+    value: fv!item.priority,
+    equals: "Critical",
+    then: "exclamation-triangle",
+    equals: "High",
+    then: "arrow-up",
+    equals: "Medium",
+    then: "minus",
+    equals: "Low",
+    then: "arrow-down",
+    default: "info-circle"
+  ),
+  backgroundColor: a!match(
+    value: fv!item.priority,
+    equals: "Critical",
+    then: "#DC2626",
+    equals: "High",
+    then: "#F59E0B",
+    equals: "Medium",
+    then: "#3B82F6",
+    equals: "Low",
+    then: "#6B7280",
+    default: "#9CA3AF"
+  ),
+  contentColor: "#FFFFFF",
+  size: "TINY",
+  shape: "ROUNDED",
+  labelPosition: "COLLAPSED"
+)
+```
+
+**Pattern: Grid Column Conditional Background Colors**
+```sail
+a!gridField(
+  data: local!tasks,
+  columns: {
+    a!gridColumn(
+      label: "Status",
+      value: fv!row.status,
+      backgroundColor: a!match(
+        value: fv!row.status,
+        equals: "Completed",
+        then: "#D1FAE5",
+        equals: "In Progress",
+        then: "#FEF3C7",
+        equals: "Blocked",
+        then: "#FEE2E2",
+        default: "TRANSPARENT"
+      )
+    )
+  }
+)
+```
+
+**When to Keep Parallel Arrays:**
+- Need to iterate over all statuses/options (e.g., generate filter options)
+- Building dropdown choices programmatically
+- Multiple lookups from the same set of values
+- Need the arrays themselves for other logic
+
+**When to Use a!match():**
+- Single value → result mapping in display logic
+- Conditional styling (colors, icons, visibility)
+- Replacing nested if() statements with 3+ conditions
+- Pattern matching scenarios where readability matters
+
 ## ⚠️ Function Parameter Validation
 
 Array Functions - EXACT Parameter Counts
@@ -1082,10 +1187,10 @@ if(
 
 | Function | Short-Circuits? | Use For |
 |----------|----------------|---------|
-| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic |
-| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
-| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only |
-| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching with multiple conditions |
+| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic, binary conditions |
+| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
+| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
+| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching - single value against 3+ options (status, category, priority) |
 
 #### Common Scenarios Requiring Nested if()
 
