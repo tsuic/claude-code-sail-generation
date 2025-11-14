@@ -275,171 +275,37 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
      - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
-     - See `/dynamic-behavior-guidelines/mock-interface.md` lines 1040-1136 for complete short-circuit evaluation rules
-     - Common scenarios: selection states, conditional visibility, dynamic styling, property access
-     - Any local variable that starts as null and gets populated later needs null checking
+     - See `/dynamic-behavior-guidelines/mock-interface.md` lines 1040-1188 for complete short-circuit evaluation rules and null safety patterns
 
 ### Pattern Matching with a!match()
-Use `a!match()` for cleaner pattern matching when comparing a single value against multiple options (status codes, priority levels, categories).
 
-**Benefits:**
-- More readable than nested `if()` statements
-- Short-circuits (only evaluates matched branch)
-- Easier to maintain than parallel array lookups for simple mappings
+For cleaner pattern matching (status codes, priority levels, categories), use `a!match()` instead of nested `if()` statements.
 
-**Example - Status-Based Styling:**
-```sail
-/* ❌ VERBOSE - Nested if statements */
-backgroundColor: if(
-  local!priority = "Critical",
-  "#DC2626",
-  if(
-    local!priority = "High",
-    "#F59E0B",
-    if(
-      local!priority = "Medium",
-      "#3B82F6",
-      "#6B7280"
-    )
-  )
-)
-
-/* ✅ CLEAN - a!match() */
-backgroundColor: a!match(
-  value: local!priority,
-  equals: "Critical",
-  then: "#DC2626",
-  equals: "High",
-  then: "#F59E0B",
-  equals: "Medium",
-  then: "#3B82F6",
-  default: "#6B7280"
-)
-```
-
-**When to use:**
-- ✅ Single value compared against 3+ options
-- ✅ Status/category-based icons, colors, or content
-- ✅ Conditional styling in grids, stamps, or cards
-
-**When NOT to use:**
-- ❌ Simple true/false conditions (use `if()`)
-- ❌ Complex boolean logic with multiple variables (use nested `if()`)
-- ❌ When you need the arrays for other purposes (dropdowns, filters)
-
-See `/dynamic-behavior-guidelines/mock-interface.md` lines 1000-1103 for detailed examples.
+See `/dynamic-behavior-guidelines/mock-interface.md` lines 1000-1103 for:
+- Pattern: Status to Icon/Color mapping (a!match() vs parallel arrays)
+- Pattern: Dynamic styling with stampField
+- Pattern: Grid column conditional background colors
+- Decision criteria: when to use a!match() vs when to use parallel arrays
 
 ### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
 
-Many SAIL functions cannot accept null parameters and will cause runtime errors. *ALWAYS* check for null/empty local variables (`local!`) and rule inputs (`ri!`) before passing to to these functions.
+Many SAIL functions cannot accept null parameters and will cause runtime errors.
 
-✅ Use `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, or `a!defaultValue` to prevent errors
-
-#### Functions That Cannot Accept Null:
-
-**String functions:**
-`text`, `len`, `concat`, etc. require null checks
-
-```sail
-❌ WRONG:
-text(fv!row.createdDate, "MMM d, yyyy")  /* Fails if createdDate is null */
-
-✅ RIGHT - Option 1 (if statement):
-if(
-  a!isNullOrEmpty(fv!row.createdDate),
-  "N/A",
-  text(fv!row.createdDate, "MMM d, yyyy")
-)
-
-✅ RIGHT - Option 2 (a!defaultValue):
-text(
-  a!defaultValue(fv!row.createdDate, today()),
-  "MMM d, yyyy"
-)
-```
-
-**Concatenation with null:**
-```sail
-❌ WRONG:
-text: "CASE-" & fv!row.caseId  /* Fails if caseId is null */
-
-✅ RIGHT:
-text: "CASE-" & a!defaultValue(fv!row.caseId, "")
-```
-
-**Array functions:**
-`length`, `append`, etc. require null checks
-
-**Common scenarios requiring null checks:**
-- ✅ **Record fields from database** - Can be null if not required or not populated
-- ✅ **Related record fields** - Can be null if relationship is not populated
-- ✅ **User-typed fields** - Text/Number/Date inputs can be null initially
-- ✅ **Calculated fields** - Results of operations can be null
-- ✅ **Date/Time formatting** - Always check before text(), datetext(), datetimetext()
-- ✅ **Mathematical operations** - Division, multiplication with null values
+See `/dynamic-behavior-guidelines/mock-interface.md`:
+- **Lines 1040-1188**: Short-circuit evaluation rules (if() vs and()/or())
+- **Lines 1138-1288**: Null safety with a!defaultValue() for all function types
+- **Lines 876-1013**: Complete null safety implementation patterns
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
 Function variables (fv!) are context-specific and ONLY available in certain SAIL functions.
 
-### Available Function Variables by Context
+**Most common mistake**: Using `fv!index` in grid columns (it doesn't exist - only `fv!row` is available)
 
-**In a!forEach():**
-- ✅ `fv!index` - Current iteration index (1-based)
-- ✅ `fv!item` - Current item value
-- ✅ `fv!isFirst` - Boolean, true on first iteration
-- ✅ `fv!isLast` - Boolean, true on last iteration
-
-**In a!gridField() columns:**
-- ✅ `fv!row` - Current row data (ONLY variable available!)
-- ❌ `fv!index` - NOT AVAILABLE in grid columns
-- ❌ `fv!item` - NOT AVAILABLE in grid columns
-
-**In a!wizardLayout():**
-- ✅ `fv!activeStepIndex` - Current step number
-- ✅ `fv!isFirstStep` - Boolean for first step
-- ✅ `fv!isLastStep` - Boolean for last step
-
-### ⚠️ MOST COMMON MISTAKE: Using fv!index in Grid Columns
-
-**❌ WRONG - This will cause an error:**
-```sail
-a!gridColumn(
-  label: "Name",
-  value: a!richTextItem(
-    text: fv!row.name,
-    link: a!dynamicLink(
-      value: fv!index,  /* ERROR: fv!index doesn't exist in grid columns! */
-      saveInto: local!selectedIndex
-    )
-  )
-)
-```
-
-**✅ RIGHT - Use grid's built-in selection:**
-```sail
-a!gridField(
-  data: local!items,
-  columns: {
-    a!gridColumn(
-      label: "Name",
-      value: fv!row.name  /* Only fv!row is available */
-    )
-  },
-  selectable: true,
-  selectionValue: local!selectedRows,  /* This is a LIST of selected row data */
-  selectionSaveInto: local!selectedRows,
-  maxSelections: 1
-)
-
-/* Access selected data (selectionValue is always a LIST): */
-local!firstSelected: index(local!selectedRows, 1, null)
-```
-
-### Key Points
-- Grid `selectionValue` is ALWAYS a list, even with `maxSelections: 1`
-- Use `index(local!selectedRows, 1, null)` to get the first selected item
-- Check length before accessing: `if(length(local!selectedRows) > 0, ...)`
+See `/dynamic-behavior-guidelines/mock-interface.md`:
+- **Lines 208-469**: Complete a!forEach() function variables reference
+- **Lines 1517-1888**: Complete grid selection patterns (two-variable approach)
+- **Lines 1279-1377**: Grid selection behavior and common mistakes
 
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
