@@ -275,13 +275,13 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
      - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
-     - See `/dynamic-behavior-guidelines/mock-interface.md` lines 1040-1188 for complete short-circuit evaluation rules and null safety patterns
+     - See `/dynamic-behavior-guidelines/mock-interface.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
 
 ### Pattern Matching with a!match()
 
 For cleaner pattern matching (status codes, priority levels, categories), use `a!match()` instead of nested `if()` statements.
 
-See `/dynamic-behavior-guidelines/mock-interface.md` lines 1000-1103 for:
+See `/dynamic-behavior-guidelines/mock-interface.md` - section "Using a!match() for Status-Based Lookups" for:
 - Pattern: Status to Icon/Color mapping (a!match() vs parallel arrays)
 - Pattern: Dynamic styling with stampField
 - Pattern: Grid column conditional background colors
@@ -292,9 +292,9 @@ See `/dynamic-behavior-guidelines/mock-interface.md` lines 1000-1103 for:
 Many SAIL functions cannot accept null parameters and will cause runtime errors.
 
 See `/dynamic-behavior-guidelines/mock-interface.md`:
-- **Lines 1040-1188**: Short-circuit evaluation rules (if() vs and()/or())
-- **Lines 1138-1288**: Null safety with a!defaultValue() for all function types
-- **Lines 876-1013**: Complete null safety implementation patterns
+- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for if() vs and()/or() usage
+- Section "Advanced: Functions That Reject Null" for a!defaultValue() patterns
+- Section "🚨 MANDATORY: Null Safety Implementation" for complete implementation patterns
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
@@ -303,9 +303,9 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 **Most common mistake**: Using `fv!index` in grid columns (it doesn't exist - only `fv!row` is available)
 
 See `/dynamic-behavior-guidelines/mock-interface.md`:
-- **Lines 208-469**: Complete a!forEach() function variables reference
-- **Lines 1517-1888**: Complete grid selection patterns (two-variable approach)
-- **Lines 1279-1377**: Grid selection behavior and common mistakes
+- Section "⚠️ Function Variables (fv!) Reference" for complete a!forEach() function variables
+- Section "Grid Selection Pattern: Two-Variable Approach" for complete grid selection patterns
+- Section "⚠️ CRITICAL: Grid Selection Behavior" for selection behavior and common mistakes
 
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
@@ -420,10 +420,11 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see mock-interface.md lines 1040-1136) ‼️
+- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see mock-interface.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
 - [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
 - [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
+- [ ] Null checks before not() - use `not(a!defaultValue(ri!var, false()))` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
