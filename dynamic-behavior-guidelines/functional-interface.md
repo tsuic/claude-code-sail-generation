@@ -6,7 +6,8 @@
 - **Lines 45-64**: Mandatory Foundation Rules
 - **Lines 65-121**: Record Type Reference Syntax (UUID usage)
 - **Lines 122-274**: Form Interface Data Patterns (ri! vs queries)
-- **Lines 353-397**: Essential SAIL Structure (a!localVariables, variable scope)
+- **Lines 353-399**: Essential SAIL Structure (a!localVariables, variable scope)
+- **Lines 401-471**: Documenting Unused Local Variables (when to keep vs remove)
 - **Lines 679-844**: Null Safety Implementation (including computed variables and short-circuit evaluation)
 - **Lines 1025-1561**: Data Querying Patterns (a!queryRecordType() and a!recordData())
 - **Lines 1680-1729**: Short-Circuit Evaluation Rules (if() vs and()/or())
@@ -16,13 +17,14 @@
 ### By Task Type:
 - **Building a form/wizard that creates or updates records** → Lines 122-274 (Form Interface Data Patterns)
 - **Displaying data in grids or charts** → Lines 1025-1561 (Data Querying Patterns)
+- **Managing many-to-one relationships in forms (dropdowns)** → Lines 1911-1991 (Record Foreign Key Selection Pattern)
 - **Managing one-to-many relationships in forms** → Lines 2119-2262 (One-to-Many Relationship Data Management)
-- **Creating dropdown choices from record data** → Lines 1025-1561 (Data Querying Patterns)
 - **Implementing record actions** → Lines 2887-2938 (Record Actions)
 - **Working with dates and times** → Lines 2518-2643 (Date/Time Critical Rules)
 - **Building charts and visualizations** → Lines 2644-2855 (Chart Configuration and Components)
 - **Accessing related record data** → Lines 2263-2517 (Related Record Field References)
 - **Implementing role-based access control** → Lines 845-889 (Group-Based Access Control Pattern)
+- **Documenting unused variables** → Lines 401-471 (Documenting Unused Local Variables)
 
 ### By Error Type:
 - **"Variable not defined" errors** → Lines 45-64 (Mandatory Foundation Rules)
@@ -397,6 +399,78 @@ a!forEach(
   )
 )
 ```
+
+## 📝 Documenting Unused Local Variables
+
+### Decision Tree
+
+```
+Is the variable unused?
+├─ YES → Is there a clear future use?
+│   ├─ YES → Document with UNUSED comment (see template below)
+│   └─ NO → REMOVE IT
+└─ NO → No action needed
+```
+
+### Template (One-Line Format)
+
+```sail
+/* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
+local!variable: value,
+```
+
+### Categories & Examples
+
+**Future Enhancement** - Feature planned but not built yet
+```sail
+/* UNUSED - caseTypes (Future): Text field used; picker planned for Phase 2 case type management */
+local!caseTypes: a!queryRecordType('recordType!{...}Case Type', ...).data,
+```
+
+**Deferred** - Feature postponed
+```sail
+/* UNUSED - advancedFilters (Deferred): Phase 1 basic search only per ticket #1234 */
+local!showAdvancedFilters: false,
+local!filterDateRange,
+```
+
+**Alternative** - Different approach available
+```sail
+/* UNUSED - weightedSLA (Alternative): Client chose flat SLA over priority-weighted */
+local!weightedSLA: sum(a!forEach(local!cases, expression: fv!item.hours * fv!item.weight)),
+```
+
+**Config** - Waiting for configuration system
+```sail
+/* UNUSED - pageSize (Config): User preferences not implemented; using default 25 */
+local!userPageSize: 50,
+```
+
+**Requirements Changed** - Was needed, temporarily disabled
+```sail
+/* UNUSED - emailValidation (ReqChanged): Disabled for 60-day migration period */
+local!isValidEmail: regexmatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", local!email),
+```
+
+### Performance Warning
+
+Add performance note if query >0.5s or >500 records:
+
+```sail
+/* UNUSED - allCases (Future): Pre-load for export feature | 5000 records, 3s load */
+local!allCases: a!queryRecordType(..., batchSize: 5000).data,
+```
+
+**Rule**: If >1s and no near-term use → REMOVE
+
+### Quick Reference
+
+| Keep & Document | Remove Immediately |
+|-----------------|-------------------|
+| ✅ Planned features | ❌ Debug/test code |
+| ✅ Deferred work | ❌ Dead refactors |
+| ✅ Alternative logic (with reason) | ❌ No clear purpose |
+| ✅ Awaiting config system | ❌ Duplicate functionality |
 
 ## 🚨 CRITICAL: Relationship Field Navigation Syntax
 
@@ -1833,6 +1907,88 @@ local!selectedId: index(
 /* ❌ WRONG - wherecontains() with index() for single values */
 wherecontains("text", array)  /* Returns [2, 5] not 2 */
 ```
+
+### Record Foreign Key Selection Pattern
+
+#### Efficient Dropdown Pattern (✅ PREFERRED)
+
+**Use Case:** Form dropdowns that select foreign key relationships (e.g., selecting a Case Type, Priority, Status, Department, etc.)
+
+```sail
+/* Query for reference data */
+local!caseTypes: a!queryRecordType(
+  recordType: 'recordType!Case_Type',
+  pagingInfo: a!pagingInfo(
+    startIndex: 1,
+    batchSize: 500  /* Adjust based on expected reference data size */
+  ),
+  fields: {
+    'recordType!Case_Type.fields.id',
+    'recordType!Case_Type.fields.name'
+  },
+  fetchTotalCount: true
+).data,
+
+/* ✅ CORRECT - Direct field access (most efficient) */
+a!dropdownField(
+  label: "Case Type",
+  choiceLabels: local!caseTypes['recordType!Case_Type.fields.name'],
+  choiceValues: local!caseTypes['recordType!Case_Type.fields.id'],
+  value: ri!case.caseTypeId,
+  saveInto: ri!case.caseTypeId,
+  placeholder: "Select a case type",
+  required: true
+)
+
+/* ❌ AVOID - forEach is less efficient and unnecessary */
+a!dropdownField(
+  label: "Case Type",
+  choiceLabels: a!forEach(
+    items: local!caseTypes,
+    expression: fv!item['recordType!Case_Type.fields.name']
+  ),
+  choiceValues: a!forEach(
+    items: local!caseTypes,
+    expression: fv!item['recordType!Case_Type.fields.id']
+  ),
+  value: ri!case.caseTypeId,
+  saveInto: ri!case.caseTypeId,
+  placeholder: "Select a case type"
+)
+```
+
+#### Key Points
+
+1. **pagingInfo is REQUIRED** in `a!queryRecordType()`
+   - Set appropriate `batchSize` for reference data (typically 100-1000)
+   - For large reference datasets, consider implementing search-as-you-type pattern
+
+2. **Direct field access is more efficient**
+   - `local!items['recordType!X.fields.name']` automatically extracts the field from all items
+   - No need for `a!forEach()` to iterate and extract
+
+3. **Works for both filtered and unfiltered queries**
+   - Same pattern applies whether filtering active records or querying all items
+
+4. **Sorting reference data**
+   - Use `sort` parameter in `a!pagingInfo()` for custom display order
+   - Common for priorities, statuses with display order fields
+
+#### When to Use This Pattern
+
+**✅ Use for ALL many-to-one relationships:**
+- Reference data: Status, Priority, Type, Category
+- Lookup tables: Department, Location, Region
+- Parent records: Organization, Customer, Project
+- ANY relationship where the form record points to ONE related record
+
+**Create vs Edit Mode:**
+- **Create mode**: Initialize foreign key field as `null`, show full dropdown list
+- **Edit mode**: Foreign key field contains existing ID, dropdown pre-selects current value
+
+**❌ NOT for one-to-many relationships:**
+- When parent manages multiple children (Case → Comments, Organization → Submissions)
+- Use direct relationship access instead (see "One-to-Many Relationship Data Management")
 
 Rich Text Display Field Structure
 **CRITICAL**: `a!richTextDisplayField()` value parameter takes arrays of rich text components.
