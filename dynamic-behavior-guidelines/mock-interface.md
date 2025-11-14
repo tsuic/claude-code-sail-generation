@@ -5,42 +5,47 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 ## 📑 Quick Navigation Index
 
 ### 🚨 Critical Sections (Read These First):
-- **Lines 43-57**: Mandatory Foundation Rules
-- **Lines 59-103**: Essential SAIL Structure
-- **Lines 208-469**: a!forEach() Function Variables Reference
-- **Lines 472-559**: Dynamic Form Fields with forEach (parallel array pattern for storing user input)
-- **Lines 876-1013**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 1405-1418**: Multi-Checkbox Pattern (single array variable - NOT separate booleans)
-- **Lines 1345-1515**: Single Checkbox Field Pattern (initialization and null checking)
-- **Lines 1517-1888**: Grid Selection Patterns (naming conventions and two-variable approach)
-- **Lines 2079-2132**: Date/Time Type Matching
+- **Lines 48-63**: Mandatory Foundation Rules
+- **Lines 65-84**: Rule Inputs in Mockups - Common Mistake (NEVER use ri! in mockups)
+- **Lines 86-130**: Essential SAIL Structure
+- **Lines 134-520**: Requirement-Driven Documentation Pattern (adding requirement comments to code)
+- **Lines 595-856**: a!forEach() Function Variables Reference
+- **Lines 859-946**: Dynamic Form Fields with forEach (parallel array pattern for storing user input)
+- **Lines 1263-1448**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 2177-2264**: Multi-Checkbox Pattern (single array variable - NOT separate booleans)
+- **Lines 2265-2385**: Single Checkbox Field Pattern (initialization and null checking)
+- **Lines 2386-2998**: Grid Selection Patterns (naming conventions and two-variable approach)
+- **Lines 2999-3052**: Date/Time Type Matching
 
 ### By Task Type:
-- **Working with arrays and loops** → Lines 208-469 (a!forEach() Reference), Lines 560-875 (Array Patterns)
-- **forEach generating input fields (textField, dateField, fileUploadField)** → Lines 472-559 (Dynamic Form Fields Pattern)
-- **Managing grid selections (ID arrays + full data)** → Lines 1517-1888 (Complete Grid Selection Guide)
-- **Building charts with mock data** → Lines 2133-2271 (Chart Data Configuration)
-- **Working with dates and times** → Lines 2079-2132 (Date/Time Critical Rules)
-- **Using single checkbox with proper initialization** → Lines 1345-1515 (Single Checkbox Field Pattern)
-- **Using multiple checkbox selections** → Lines 1405-1418 (Multi-Checkbox Pattern - single array variable)
+- **Documenting requirements in code** → Lines 134-520 (Requirement-Driven Documentation Pattern)
+- **Working with arrays and loops** → Lines 595-856 (a!forEach() Reference), Lines 947-1262 (Array Patterns)
+- **forEach generating input fields (textField, dateField, fileUploadField)** → Lines 859-946 (Dynamic Form Fields Pattern)
+- **Pattern matching (status codes, categories, priority levels)** → Lines 1603-1701 (✅ Best Practice: PREFER a!match() Over Nested if())
+- **Managing grid selections (ID arrays + full data)** → Lines 2386-2998 (Complete Grid Selection Guide)
+- **Building charts with mock data** → Lines 3053-3191 (Chart Data Configuration)
+- **Working with dates and times** → Lines 2999-3052 (Date/Time Critical Rules)
+- **Using single checkbox with proper initialization** → Lines 2265-2385 (Single Checkbox Field Pattern)
+- **Using multiple checkbox selections** → Lines 2177-2264 (Multi-Checkbox Pattern - single array variable)
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 43-57 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 876-1188 (Null Safety Implementation)
-- **Invalid function parameters** → Lines 838-875 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 916-1013 (Short-Circuit Evaluation Rules)
-- **Property access errors (property() function)** → Lines 560-747 (Dot Notation & Derived Data Patterns)
-- **Syntax errors (and/or, if statements)** → Lines 166-207 (Language-Specific Syntax Patterns)
-- **Grid selection not working** → Lines 1279-1377 (Grid Selection Behavior), Lines 1625-1888 (Implementation Pattern)
-- **Grid selection variable naming errors** → Lines 1517-1624 (Variable Naming Conventions)
-- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 1889-2225 (Grid Selection Anti-Patterns)
-- **Type mismatch: Cannot index property into Integer/Text** → Lines 1889-2225 (Grid Selection Anti-Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2079-2132 (Date/Time Type Matching)
-- **Checkbox initialization errors (false vs null)** → Lines 1368-1428 (Variable Initialization for Pattern 2)
-- **Checkbox state checking errors (length vs null)** → Lines 1453-1515 (Common Mistakes - save!value)
+- **"Variable not defined" errors** → Lines 48-63 (Mandatory Foundation Rules)
+- **"Rule input not defined" errors (ri!)** → Lines 65-84 (Rule Inputs in Mockups - NEVER use ri! in mockups)
+- **Null reference errors** → Lines 1263-1623 (Null Safety Implementation)
+- **Invalid function parameters** → Lines 1225-1262 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 1351-1448 (Short-Circuit Evaluation Rules)
+- **Property access errors (property() function)** → Lines 947-1134 (Dot Notation & Derived Data Patterns)
+- **Syntax errors (and/or, if statements)** → Lines 553-594 (Language-Specific Syntax Patterns)
+- **Grid selection not working** → Lines 2456-2554 (Grid Selection Behavior), Lines 2494-2998 (Implementation Pattern)
+- **Grid selection variable naming errors** → Lines 2386-2493 (Variable Naming Conventions)
+- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 2758-2998 (Grid Selection Anti-Patterns)
+- **Type mismatch: Cannot index property into Integer/Text** → Lines 2758-2998 (Grid Selection Anti-Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 2999-3052 (Date/Time Type Matching)
+- **Checkbox initialization errors (false vs null)** → Lines 2288-2348 (Variable Initialization for Pattern 2)
+- **Checkbox state checking errors (length vs null)** → Lines 2349-2385 (Common Mistakes - save!value)
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 2272-2317 (Syntax Validation Checklist)
+- **Final validation checklist** → Lines 3192-3237 (Syntax Validation Checklist)
 
 ---
 
@@ -57,8 +62,30 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 5. **Always validate for null values** - Use `a!isNullOrEmpty()` and `a!isNotNullOrEmpty()`
 6. **wherecontains()**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section for complete usage
 7. **Single checkbox variables MUST be initialized to null, NOT false()** - See Single Checkbox Field Pattern for complete pattern
-8. **Local variables are ONLY for UI state** - Mock data, selections, transient state
-9. **Always try to use record types for read-only grids and charts** instead of mock data when possible
+8. **MOCKUPS NEVER use rule inputs (ri!)** - Only local variables (local!) for self-contained demos
+9. **Local variables are ONLY for UI state** - Mock data, selections, transient state
+10. **Always try to use record types for read-only grids and charts** instead of mock data when possible
+
+## ❌ Rule Inputs in Mockups - Common Mistake
+
+**MOCKUPS = local variables ONLY**
+
+```sail
+/* ❌ WRONG - Don't use ri! in mockups */
+local!name: ri!record.name  /* ERROR: ri! doesn't exist in standalone mockup */
+
+/* ✅ CORRECT - Use local variables with mock data */
+local!name: "Sample Name"  /* Hardcoded sample data */
+
+/* ✅ CORRECT - Simulate edit mode with local toggle */
+local!isEditMode: false,  /* Toggle to test create vs edit */
+local!mockData: a!map(name: "Sample Name"),
+local!name: if(local!isEditMode, local!mockData.name, null)
+```
+
+**Why:** Mockups must be self-contained and pasteable directly into Interface Designer without dependencies.
+
+**When to use ri!:** Only in functional interfaces with record types, process models, or parent interfaces.
 
 ## Essential SAIL Structure
 
@@ -105,6 +132,393 @@ a!forEach(
   )
 )
 ```
+
+## 📋 Requirement-Driven Documentation Pattern
+
+When generating SAIL interfaces from requirements, add structured comments that capture business logic, validation rules, and design decisions. This creates self-documenting code that helps developers understand the "why" behind implementation choices.
+
+### Three-Tier Comment Structure
+
+**1. Interface-level header** - Overall purpose and key requirements
+**2. Section-level comments** - Business purpose + field requirements
+**3. Inline comments** - Complex logic explanation (validations, calculations, conditionals)
+
+### ✅ CORRECT Pattern - Documented Interface
+
+```sail
+a!localVariables(
+  /*
+   * BOARD/COMMITTEE SUBMISSION FORM
+   *
+   * Purpose: Capture partner memberships on external boards/committees
+   *
+   * Key Requirements:
+   * - Auto-populate partner info from logged-in user (read-only)
+   * - Validate end date > start date
+   * - Support create/edit modes with same interface
+   * - Position types sourced from reference data lookup
+   */
+
+  local!organizationName,
+  local!organizationType,
+  local!positionType,
+  local!startDate,
+  local!endDate,
+  local!partnerName: user(loggedinuser(), "displayName"),
+
+  a!formLayout(
+    contents: {
+      /*
+       * ORGANIZATION INFORMATION
+       * Requirement: Capture organization details where partner serves
+       * Fields:
+       * - Organization Name (required, manual entry)
+       * - Organization Type (optional, manual entry, examples: Non-Profit, For-Profit, Government)
+       * - Organization Description (optional, free text)
+       */
+      a!cardLayout(
+        contents: {
+          a!sectionLayout(
+            label: "Organization Information",
+            labelColor: "STANDARD",
+            contents: {
+              a!textField(
+                label: "Organization Name",
+                value: local!organizationName,
+                saveInto: local!organizationName,
+                required: true(),
+                placeholder: "Enter the organization name"
+              ),
+              a!textField(
+                label: "Organization Type",
+                value: local!organizationType,
+                saveInto: local!organizationType,
+                placeholder: "e.g., Non-Profit, For-Profit, Government, etc."
+              )
+            }
+          )
+        },
+        style: "#FFFFFF",
+        shape: "ROUNDED",
+        showBorder: true,
+        showShadow: false,
+        marginBelow: "STANDARD"
+      ),
+
+      /*
+       * MEMBERSHIP DETAILS
+       * Requirement: Track membership dates and validate date logic
+       * Fields:
+       * - Position/Role (required, dropdown from reference data)
+       * - Start Date (required, manual entry)
+       * - End Date (optional, must be after start date if provided)
+       * Validation: End date > start date
+       */
+      a!cardLayout(
+        contents: {
+          a!sectionLayout(
+            label: "Membership Details",
+            labelColor: "STANDARD",
+            contents: {
+              a!dropdownField(
+                label: "Position/Role on Board or Committee",
+                choiceLabels: {"Board Member", "Committee Chair", "Advisor"},
+                choiceValues: {"MEMBER", "CHAIR", "ADVISOR"},
+                value: local!positionType,
+                saveInto: local!positionType,
+                required: true(),
+                placeholder: "Select a position/role"
+              ),
+              a!dateField(
+                label: "Membership Start Date",
+                value: local!startDate,
+                saveInto: local!startDate,
+                required: true()
+              ),
+              a!dateField(
+                label: "Membership End Date",
+                value: local!endDate,
+                saveInto: local!endDate,
+                helpTooltip: "Leave blank if membership is still active",
+                /* Requirement: Validate end date > start date when both are provided */
+                validations: if(
+                  and(
+                    a!isNotNullOrEmpty(local!startDate),
+                    a!isNotNullOrEmpty(local!endDate),
+                    local!endDate <= local!startDate
+                  ),
+                  "Membership End Date must be after Membership Start Date",
+                  {}
+                )
+              )
+            }
+          )
+        },
+        style: "#FFFFFF",
+        shape: "ROUNDED",
+        showBorder: true,
+        showShadow: false,
+        marginBelow: "STANDARD"
+      ),
+
+      /*
+       * PARTNER INFORMATION
+       * Requirement: Auto-populate from logged-in user profile (all read-only)
+       * Fields:
+       * - Partner Name (displayName from user profile)
+       * - Partner ID (username from user profile)
+       * - Business Unit (from HR/Workday integration - placeholder for now)
+       */
+      a!cardLayout(
+        contents: {
+          a!sectionLayout(
+            label: "Partner Information",
+            labelColor: "STANDARD",
+            contents: {
+              a!textField(
+                label: "Partner Name",
+                /* Requirement: Auto-populate displayName from logged-in user */
+                value: user(loggedinuser(), "displayName"),
+                saveInto: {},
+                readOnly: true(),
+                helpTooltip: "Auto-populated from user profile"
+              ),
+              a!textField(
+                label: "Partner ID",
+                /* Requirement: Auto-populate username from logged-in user */
+                value: user(loggedinuser(), "username"),
+                saveInto: {},
+                readOnly: true(),
+                helpTooltip: "Auto-populated from user profile"
+              ),
+              a!textField(
+                label: "Group/Business Unit",
+                /* Requirement: Would be auto-populated from HR feed/Workday integration */
+                value: "Business Unit TBD",
+                saveInto: {},
+                readOnly: true(),
+                helpTooltip: "Auto-populated from HR system integration"
+              )
+            }
+          )
+        },
+        style: "#FFFFFF",
+        shape: "ROUNDED",
+        showBorder: true,
+        showShadow: false
+      )
+    },
+    buttons: a!buttonLayout(
+      primaryButtons: {
+        a!buttonWidget(
+          label: "Submit",
+          style: "SOLID",
+          color: "ACCENT",
+          submit: true()
+        )
+      },
+      secondaryButtons: {
+        a!buttonWidget(
+          label: "Cancel",
+          style: "LINK"
+        )
+      }
+    )
+  )
+)
+```
+
+### Benefits of Requirement Comments
+
+**1. Traceability**
+- Links implementation directly back to requirements
+- Easy to verify code matches business intent
+- Audit trail for compliance and review
+
+**2. Maintainability**
+- Future developers understand "why" decisions were made
+- Read-only fields documented with business justification
+- Validation logic tied to specific requirements
+
+**3. Onboarding**
+- New team members can understand interfaces quickly
+- Self-documenting code reduces questions
+- Clear examples of common patterns
+
+**4. Quality Assurance**
+- QA can verify implementation against documented requirements
+- Easier to catch scope drift or missing features
+- Validation rules documented inline for testing
+
+### Comment Format Guidelines
+
+**Interface-level header:**
+```sail
+/*
+ * [INTERFACE NAME/PURPOSE]
+ *
+ * Purpose: [Brief description of business purpose]
+ *
+ * Key Requirements:
+ * - [Requirement 1]
+ * - [Requirement 2]
+ * - [Requirement 3]
+ */
+```
+
+**Section-level comments:**
+```sail
+/*
+ * [SECTION NAME]
+ * Requirement: [Business purpose of this section]
+ * Fields:
+ * - Field 1 (attributes): Description
+ * - Field 2 (attributes): Description
+ * [Optional] Validation: [Validation rule description]
+ */
+```
+
+**Inline comments:**
+```sail
+/* Requirement: [Specific requirement this line/block implements] */
+value: someComplexLogic()
+```
+
+### Examples for Other Interface Types
+
+**Dashboard/Grid Example:**
+```sail
+a!localVariables(
+  /*
+   * SALES DASHBOARD - REGIONAL PERFORMANCE
+   *
+   * Purpose: Display real-time sales metrics by region with drill-down capability
+   *
+   * Key Requirements:
+   * - Show top 5 regions by revenue (query sorted descending)
+   * - Color-code performance: Green >$1M, Yellow $500K-$1M, Red <$500K
+   * - Filter by date range (default: current quarter)
+   * - Click region to drill into rep-level details
+   */
+
+  /* Requirement: Default to current quarter for date filter */
+  local!startDate: eomonth(today(), -3),
+  local!endDate: today(),
+
+  a!headerContentLayout(
+    header: {
+      /* KPI CARDS - Top-level metrics */
+      a!cardLayout(
+        contents: {
+          /* Requirement: Color-code based on performance thresholds */
+          a!gaugeField(
+            percentage: if(
+              local!revenue > 1000000,
+              /* Green: Above $1M */,
+              if(
+                local!revenue > 500000,
+                /* Yellow: $500K-$1M */,
+                /* Red: Below $500K */
+              )
+            )
+          )
+        }
+      )
+    }
+  )
+)
+```
+
+**Chart Example:**
+```sail
+/*
+ * REVENUE TREND CHART
+ * Requirement: Show monthly revenue trend for last 12 months
+ * Data Source: Sales record type aggregation by month
+ * Interaction: Clicking a month filters detail grid below
+ */
+a!columnChartField(
+  categories: local!monthLabels,
+  series: {
+    a!chartSeries(
+      label: "Revenue",
+      data: local!monthlyRevenue,
+      /* Requirement: Highlight months below target in red */
+      color: a!forEach(
+        items: local!monthlyRevenue,
+        expression: if(fv!item < 100000, "NEGATIVE", "ACCENT")
+      )
+    )
+  }
+)
+```
+
+### ❌ WRONG - No Documentation
+
+```sail
+a!localVariables(
+  local!organizationName,
+  local!startDate,
+  local!endDate,
+
+  a!formLayout(
+    contents: {
+      /* No context about why fields exist or their business purpose */
+      a!cardLayout(
+        contents: {
+          a!sectionLayout(
+            label: "Organization Information",
+            contents: {
+              a!textField(
+                label: "Organization Name",
+                value: local!organizationName,
+                saveInto: local!organizationName,
+                required: true()  /* Why required? No explanation */
+              )
+            }
+          )
+        }
+      ),
+      a!cardLayout(
+        contents: {
+          a!sectionLayout(
+            label: "Partner Information",
+            contents: {
+              a!textField(
+                label: "Partner Name",
+                value: user(loggedinuser(), "displayName"),
+                readOnly: true()  /* Why read-only? No explanation */
+              )
+            }
+          )
+        }
+      )
+    }
+  )
+)
+```
+
+**Problems with undocumented code:**
+- ❌ No explanation for read-only fields
+- ❌ Validation logic appears arbitrary
+- ❌ Cannot verify implementation matches requirements
+- ❌ Hard to onboard new developers
+- ❌ Difficult to maintain over time
+
+### When to Add Requirement Comments
+
+**Always add comments for:**
+- ✅ Read-only or disabled fields (explain why)
+- ✅ Complex validation logic (reference requirement)
+- ✅ Auto-populated fields (explain data source)
+- ✅ Conditional visibility (explain business rule)
+- ✅ Calculations and derived values (explain formula)
+- ✅ Non-obvious placeholder values (explain future integration)
+
+**Optional for:**
+- Simple, self-explanatory fields (name, email, etc.)
+- Standard UI patterns with no special logic
+- Obvious relationships (save button submits form)
 
 ## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects
 
@@ -208,6 +622,98 @@ sortField: local!computedValue,  /* INVALID */
 🚨 MANDATORY CHECKPOINT: For grids with mock data, consider:
 1. Could this use record data instead? (preferred for real data)
 2. If using mock data, ensure data structure is clear and well-documented
+
+## ⚠️ INTERNATIONALIZATION IN APPIAN INTERFACES
+
+### Appian's Built-In Internationalization
+
+Appian handles internationalization automatically through:
+- **Locale detection** from user preferences (no manual detection needed)
+- **Translation sets** containing strings in multiple languages
+- **Automatic language switching** based on user's configured locale
+
+### ❌ WRONG - Manual Language Toggle in Mockups
+
+**DO NOT implement manual language selection in mockups:**
+
+```sail
+/* ❌ DON'T DO THIS - Manual language switching */
+local!currentLanguage: "en",  /* Appian handles this automatically */
+
+a!buttonArrayLayout(
+  buttons: {
+    a!buttonWidget(
+      label: "English",
+      saveInto: a!save(local!currentLanguage, "en")  /* NOT NEEDED */
+    ),
+    a!buttonWidget(
+      label: "Español",
+      saveInto: a!save(local!currentLanguage, "es")  /* NOT NEEDED */
+    )
+  }
+)
+
+/* ❌ DON'T: Inline conditional translations */
+a!textField(
+  label: if(
+    local!currentLanguage = "es",
+    "Nombre",
+    "First Name"
+  ),  /* Creates code bloat and maintenance burden */
+  value: local!firstName,
+  saveInto: local!firstName
+)
+```
+
+**Problems with manual approach:**
+1. Code bloat - Every text label requires conditional logic
+2. Maintenance burden - Adding a language means updating every conditional
+3. No centralized translation management
+4. Inconsistent translations across the application
+5. Doesn't follow Appian best practices
+
+### ✅ CORRECT - Use English Text in Mockups
+
+**Write all UI text in English - production will use translation sets:**
+
+```sail
+/* ✅ DO THIS - English text only */
+a!textField(
+  label: "First Name",  /* TODO: Replace with translation set reference in production */
+  value: local!firstName,
+  saveInto: local!firstName
+)
+
+a!buttonWidget(
+  label: "Submit Application",  /* TODO: Use translation set in production */
+  style: "SOLID",
+  saveInto: {}
+)
+
+a!richTextDisplayField(
+  labelPosition: "COLLAPSED",
+  value: a!richTextItem(
+    text: "Welcome to the Dashboard",  /* TODO: Translation set reference needed */
+    size: "LARGE",
+    style: "STRONG"
+  )
+)
+```
+
+### Best Practices for Production-Ready Code
+
+In production implementations:
+1. **Reference translation sets** instead of hardcoded strings
+2. **Use the user's locale** (automatic - no code needed)
+3. **No language toggle buttons** required
+4. **Centralize translations** in translation set objects
+
+### Comment Pattern for Mockups
+
+```sail
+/* All user-facing text should include TODO comments */
+label: "Application Status",  /* TODO: Replace with translation set in production */
+```
 
 ## 🚨 CRITICAL: a!forEach() Function Variables Reference
 
@@ -1096,11 +1602,81 @@ a!gridField(
 - Multiple lookups from the same set of values
 - Need the arrays themselves for other logic
 
-**When to Use a!match():**
-- Single value → result mapping in display logic
-- Conditional styling (colors, icons, visibility)
-- Replacing nested if() statements with 3+ conditions
-- Pattern matching scenarios where readability matters
+### ✅ Best Practice: PREFER a!match() Over Nested if()
+
+**When you have a single value to compare against 3+ options, ALWAYS use `a!match()` instead of nested `if()` statements.**
+
+#### Comparison: Nested if() vs a!match()
+
+**❌ AVOID - Nested if() (Hard to Read, Error-Prone):**
+```sail
+backgroundColor: if(
+  statusCode = "INTEGRATED",
+  "POSITIVE",
+  if(
+    or(statusCode = "SUBMITTED", statusCode = "VALIDATED"),
+    "ACCENT",
+    if(
+      statusCode = "DRAFT",
+      "#F59E0B",
+      "SECONDARY"
+    )
+  )
+)
+```
+
+**Problems:**
+- Deeply nested parentheses (easy to mismatch)
+- Hard to scan visually
+- Difficult to add/remove cases
+- More error-prone during edits
+
+**✅ PREFER - a!match() (Clean, Maintainable):**
+```sail
+backgroundColor: a!match(
+  value: statusCode,
+  equals: "INTEGRATED", then: "POSITIVE",
+  equals: "SUBMITTED", then: "ACCENT",
+  equals: "VALIDATED", then: "ACCENT",
+  equals: "DRAFT", then: "#F59E0B",
+  default: "SECONDARY"
+)
+```
+
+**Benefits:**
+- Flat structure - no nesting hell
+- Clear value→result mapping
+- Easy to add/remove cases
+- Self-documenting code
+- Less error-prone
+
+#### When to Use a!match():
+- ✅ **Single variable** compared against 3+ possible values
+- ✅ **Enumerated values**: status codes, categories, priority levels, types
+- ✅ **Display logic**: colors, icons, labels based on a single field
+- ✅ **Anywhere nested if() would have 3+ levels**
+
+#### When Nested if() is Still Needed:
+- Multiple different variables in the condition
+- Complex boolean expressions (not just equality checks)
+- Computed logic that can't be reduced to pattern matching
+
+**Example - Multiple Variables (Use if()):**
+```sail
+showWhen: if(
+  and(local!userRole = "Manager", local!department = "Sales"),
+  local!salesAmount > 10000,
+  false
+)
+```
+This checks TWO variables with AND logic - can't use `a!match()`.
+
+#### MANDATORY: Use a!match() for These Common Cases:
+1. **Status-based colors/icons** (Open, Closed, Pending, etc.)
+2. **Priority levels** (Low, Medium, High, Critical)
+3. **Category mappings** (Type A→Icon 1, Type B→Icon 2, etc.)
+4. **Approval states** (Draft, Submitted, Approved, Rejected)
+5. **Any enumerated field with 3+ possible values**
 
 ## ⚠️ Function Parameter Validation
 
@@ -1280,6 +1856,7 @@ if(
 - `user(userId, property)`, `group(groupId, property)` - Cannot accept null ID
 - `text(value, format)` - Cannot format null dates/numbers
 - String manipulation: `upper()`, `lower()`, `left()`, `right()`, `find()` - Fail on null
+- **Logical operators**: `not()` - Cannot accept null value
 
 **Required Pattern:**
 ```sail
@@ -1295,6 +1872,34 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 ```
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
+
+#### Special Case: not() with Variables and Rule Inputs
+
+**The `not()` function cannot accept null. When using `not()` with variables or rule inputs that might be null, use `a!defaultValue()` to provide a fallback:**
+
+```sail
+/* ❌ WRONG - Direct use of not() with potentially null value */
+readOnly: not(ri!isEditable)  /* Fails if ri!isEditable is null */
+disabled: not(local!allowEdits)  /* Fails if local!allowEdits is null */
+
+/* ✅ CORRECT - Use a!defaultValue() to provide fallback */
+readOnly: not(a!defaultValue(ri!isEditable, false()))  /* Returns true if null */
+disabled: not(a!defaultValue(local!allowEdits, false()))  /* Returns true if null */
+
+/* ✅ ALTERNATIVE - Use if() to check for null first */
+readOnly: if(
+  a!isNullOrEmpty(ri!isEditable),
+  true(),  /* Default to read-only if null */
+  not(ri!isEditable)
+)
+```
+
+**Common scenarios requiring null protection:**
+- `readOnly: not(ri!isEditable)` → Use `not(a!defaultValue(ri!isEditable, false()))`
+- `disabled: not(local!allowEdits)` → Use `not(a!defaultValue(local!allowEdits, false()))`
+- `showWhen: not(local!isHidden)` → Use `not(a!defaultValue(local!isHidden, false()))`
+
+**Best Practice**: Always wrap rule inputs and variables in `a!defaultValue()` before passing to `not()`. Choose the default value (`true()` or `false()`) based on the desired behavior when the value is null.
 
 ### 🚨 CRITICAL: Null Safety for Computed Variables
 

@@ -7,40 +7,40 @@
 - **Lines 65-121**: Record Type Reference Syntax (UUID usage)
 - **Lines 122-274**: Form Interface Data Patterns (ri! vs queries)
 - **Lines 353-397**: Essential SAIL Structure (a!localVariables, variable scope)
-- **Lines 679-796**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 977-1513**: Data Querying Patterns (a!queryRecordType() and a!recordData())
-- **Lines 1554-1603**: Short-Circuit Evaluation Rules (if() vs and()/or())
-- **Lines 1922-2065**: One-to-Many Relationship Data Management
-- **Lines 2321-2446**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
+- **Lines 679-844**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 1025-1561**: Data Querying Patterns (a!queryRecordType() and a!recordData())
+- **Lines 1680-1729**: Short-Circuit Evaluation Rules (if() vs and()/or())
+- **Lines 2119-2262**: One-to-Many Relationship Data Management
+- **Lines 2518-2643**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
 
 ### By Task Type:
 - **Building a form/wizard that creates or updates records** → Lines 122-274 (Form Interface Data Patterns)
-- **Displaying data in grids or charts** → Lines 977-1513 (Data Querying Patterns)
-- **Managing one-to-many relationships in forms** → Lines 1922-2065 (One-to-Many Relationship Data Management)
-- **Creating dropdown choices from record data** → Lines 977-1513 (Data Querying Patterns)
-- **Implementing record actions** → Lines 2690-2741 (Record Actions)
-- **Working with dates and times** → Lines 2321-2446 (Date/Time Critical Rules)
-- **Building charts and visualizations** → Lines 2447-2658 (Chart Configuration and Components)
-- **Accessing related record data** → Lines 2066-2320 (Related Record Field References)
-- **Implementing role-based access control** → Lines 797-841 (Group-Based Access Control Pattern)
+- **Displaying data in grids or charts** → Lines 1025-1561 (Data Querying Patterns)
+- **Managing one-to-many relationships in forms** → Lines 2119-2262 (One-to-Many Relationship Data Management)
+- **Creating dropdown choices from record data** → Lines 1025-1561 (Data Querying Patterns)
+- **Implementing record actions** → Lines 2887-2938 (Record Actions)
+- **Working with dates and times** → Lines 2518-2643 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 2644-2855 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 2263-2517 (Related Record Field References)
+- **Implementing role-based access control** → Lines 845-889 (Group-Based Access Control Pattern)
 
 ### By Error Type:
 - **"Variable not defined" errors** → Lines 45-64 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 679-796 (Null Safety Implementation)
-- **"Function does not exist" errors** → Lines 2781-2838 (Essential Functions Reference)
-- **Invalid function parameters** → Lines 1514-1553 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 1554-1603 (Short-Circuit Evaluation Rules)
+- **Null reference errors** → Lines 679-844 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 2978-3035 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 1562-1601 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 1680-1729 (Short-Circuit Evaluation Rules)
 - **Record type reference errors** → Lines 65-121 (Record Type Reference Syntax)
-- **Query returning only primary key (missing fields parameter)** → Lines 977-1513 (Data Querying Patterns)
-- **Query .totalCount is null (missing fetchTotalCount)** → Lines 977-1513 (Data Querying Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2321-2446 (Date/Time Type Matching)
-- **Query filter errors with rule inputs** → Lines 842-927 (Protecting Query Filters)
-- **Relationship navigation errors** → Lines 1922-2065 (One-to-Many Relationships), Lines 2066-2320 (Related Record References)
-- **Button/wizard configuration errors** → Lines 650-677 (Button/Wizard Parameters)
+- **Query returning only primary key (missing fields parameter)** → Lines 1025-1561 (Data Querying Patterns)
+- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1025-1561 (Data Querying Patterns)
+- **DateTime vs Date type mismatch in filters** → Lines 2518-2643 (Date/Time Type Matching)
+- **Query filter errors with rule inputs** → Lines 890-975 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 2119-2262 (One-to-Many Relationships), Lines 2263-2517 (Related Record References)
+- **Button/wizard configuration errors** → Lines 698-725 (Button/Wizard Parameters)
 
 ### Validation & Troubleshooting:
-- **Common error troubleshooting** → Lines 2848-2967 (Common Critical Errors)
-- **Final validation checklist** → Lines 2968-3100 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 3045-3164 (Common Critical Errors)
+- **Final validation checklist** → Lines 3165-3195 (Syntax Validation Checklist)
 
 ---
 
@@ -744,6 +744,7 @@ a!buttonArrayLayout(
 - `user(userId, property)`, `group(groupId, property)` - Cannot accept null ID
 - `text(value, format)` - Cannot format null dates/numbers
 - String manipulation: `upper()`, `lower()`, `left()`, `right()`, `find()` - Fail on null
+- **Logical operators**: `not()` - Cannot accept null value
 
 **Required Pattern:**
 ```sail
@@ -759,6 +760,34 @@ functionThatRejectsNull(a!defaultValue(fieldValue, null), otherParams)
 ```
 
 **Rule**: When a function operates ON a value (transforms/formats it), check for null BEFORE calling. The `a!defaultValue()` wrapper alone is insufficient.
+
+#### Special Case: not() with Variables and Rule Inputs
+
+**The `not()` function cannot accept null. When using `not()` with variables or rule inputs that might be null, use `a!defaultValue()` to provide a fallback:**
+
+```sail
+/* ❌ WRONG - Direct use of not() with potentially null value */
+readOnly: not(ri!isEditable)  /* Fails if ri!isEditable is null */
+disabled: not(local!allowEdits)  /* Fails if local!allowEdits is null */
+
+/* ✅ CORRECT - Use a!defaultValue() to provide fallback */
+readOnly: not(a!defaultValue(ri!isEditable, false()))  /* Returns true if null */
+disabled: not(a!defaultValue(local!allowEdits, false()))  /* Returns true if null */
+
+/* ✅ ALTERNATIVE - Use if() to check for null first */
+readOnly: if(
+  a!isNullOrEmpty(ri!isEditable),
+  true(),  /* Default to read-only if null */
+  not(ri!isEditable)
+)
+```
+
+**Common scenarios requiring null protection:**
+- `readOnly: not(ri!isEditable)` → Use `not(a!defaultValue(ri!isEditable, false()))`
+- `disabled: not(local!allowEdits)` → Use `not(a!defaultValue(local!allowEdits, false()))`
+- `showWhen: not(local!isHidden)` → Use `not(a!defaultValue(local!isHidden, false()))`
+
+**Best Practice**: Always wrap rule inputs and variables in `a!defaultValue()` before passing to `not()`. Choose the default value (`true()` or `false()`) based on the desired behavior when the value is null.
 
 ### 🚨 CRITICAL: Null Safety for Computed Variables
 
@@ -1458,6 +1487,101 @@ filters: {
 filters: {a!queryLogicalExpression(...)}  /* Remove array wrapper */
 ```
 
+### ⚠️ CRITICAL: Nesting Query Logical Expressions
+
+**The `filters` parameter ONLY accepts `a!queryFilter()` - NOT nested `a!queryLogicalExpression()`**
+
+When combining AND + OR logic (e.g., "user = current AND (status = A OR status = B)"), use the `logicalExpressions` parameter.
+
+#### ❌ WRONG - Mixing Types in filters Parameter
+```sail
+/* This will cause a validation error! */
+filters: a!queryLogicalExpression(
+  operator: "AND",
+  filters: {
+    a!queryFilter(field: "user", operator: "=", value: loggedInUser()),
+    a!queryLogicalExpression(  /* ❌ ERROR: Cannot nest here! */
+      operator: "OR",
+      filters: {
+        a!queryFilter(field: "status", operator: "=", value: "SUBMITTED"),
+        a!queryFilter(field: "status", operator: "=", value: "VALIDATED")
+      }
+    )
+  }
+)
+```
+
+**Error Message:** "Expression evaluation error: Invalid type - expected a!queryFilter"
+
+#### ✅ CORRECT - Use logicalExpressions Parameter
+```sail
+filters: a!queryLogicalExpression(
+  operator: "AND",
+  filters: {
+    a!queryFilter(
+      field: 'recordType!Submission.fields.user',
+      operator: "=",
+      value: loggedInUser()
+    )
+  },
+  logicalExpressions: {  /* ✅ Nested expressions go here */
+    a!queryLogicalExpression(
+      operator: "OR",
+      filters: {
+        a!queryFilter(
+          field: 'recordType!Submission.relationships.status.fields.statusCode',
+          operator: "=",
+          value: "SUBMITTED"
+        ),
+        a!queryFilter(
+          field: 'recordType!Submission.relationships.status.fields.statusCode',
+          operator: "=",
+          value: "VALIDATED"
+        )
+      }
+    )
+  }
+)
+```
+
+#### Parameter Rules:
+| Parameter | Accepts | Purpose |
+|-----------|---------|---------|
+| `filters` | **ONLY** `a!queryFilter()` | Direct field comparisons |
+| `logicalExpressions` | **ONLY** `a!queryLogicalExpression()` | Nested AND/OR logic |
+| `operator` | `"AND"` or `"OR"` | How to combine filters/expressions |
+
+#### Common Patterns:
+
+**User Filter + Status OR:**
+```sail
+a!queryLogicalExpression(
+  operator: "AND",
+  filters: {a!queryFilter(field: "owner", ...)},
+  logicalExpressions: {
+    a!queryLogicalExpression(
+      operator: "OR",
+      filters: {
+        a!queryFilter(field: "status", operator: "=", value: "Active"),
+        a!queryFilter(field: "status", operator: "=", value: "Pending")
+      }
+    )
+  }
+)
+```
+
+**Multiple Nested ORs:**
+```sail
+a!queryLogicalExpression(
+  operator: "AND",
+  filters: {a!queryFilter(field: "department", ...)},
+  logicalExpressions: {
+    a!queryLogicalExpression(operator: "OR", filters: {...}),
+    a!queryLogicalExpression(operator: "OR", filters: {...})
+  }
+)
+```
+
 Aggregation Usage
 ```sail
 /* ✅ CORRECT - Use fields parameter with aggregationFields */
@@ -1920,6 +2044,77 @@ a!forEach(
 4. **Primary key fields are typically**: `id`, `caseId`, `orderId`, `employeeId`, etc.
 
 **Rule of Thumb**: If you're iterating with `a!forEach()` over query results and need record links, you MUST include the primary key field in your query and use it as the identifier.
+
+## Pattern Matching with Record Fields
+
+When displaying record data with conditional styling, **PREFER `a!match()` over nested `if()`** for cleaner code.
+
+### ✅ Best Practice: Status-Based Styling
+```sail
+a!gridColumn(
+  label: "Status",
+  value: a!tagField(
+    tags: a!tagItem(
+      text: a!defaultValue(
+        fv!row['recordType!Case.relationships.status.fields.statusName'],
+        ""
+      ),
+      backgroundColor: a!match(
+        value: a!defaultValue(
+          fv!row['recordType!Case.relationships.status.fields.statusCode'],
+          ""
+        ),
+        equals: "OPEN", then: "ACCENT",
+        equals: "IN_PROGRESS", then: "#3B82F6",
+        equals: "RESOLVED", then: "POSITIVE",
+        equals: "CLOSED", then: "SECONDARY",
+        default: "STANDARD"
+      )
+    ),
+    labelPosition: "COLLAPSED"
+  )
+)
+```
+
+**Key Points:**
+- Wrap `a!match()` value in `a!defaultValue()` for null safety
+- Use status codes (not display names) for reliable matching
+- Provide a sensible `default` for unexpected values
+- Much cleaner than nested `if()` statements
+
+**Why a!match() for Record Data:**
+```sail
+/* ❌ AVOID - Nested if() with long record field paths (hard to read) */
+backgroundColor: if(
+  a!defaultValue(fv!row['recordType!...statusCode'], "") = "INTEGRATED",
+  "POSITIVE",
+  if(
+    or(
+      a!defaultValue(fv!row['recordType!...statusCode'], "") = "SUBMITTED",
+      a!defaultValue(fv!row['recordType!...statusCode'], "") = "VALIDATED"
+    ),
+    "ACCENT",
+    "SECONDARY"
+  )
+)
+
+/* ✅ PREFER - a!match() with one value extraction (much cleaner) */
+a!match(
+  value: a!defaultValue(fv!row['recordType!...statusCode'], ""),
+  equals: "INTEGRATED", then: "POSITIVE",
+  equals: "SUBMITTED", then: "ACCENT",
+  equals: "VALIDATED", then: "ACCENT",
+  default: "SECONDARY"
+)
+```
+
+**Benefits with Record Fields:**
+- Long record field paths written once (in `value`), not repeated
+- Easier to update field references
+- Clearer mapping of status codes to colors/icons
+- Less error-prone when editing
+
+See `/dynamic-behavior-guidelines/mock-interface.md` lines 1191-1265 for complete `a!match()` guidance and decision criteria.
 
 ## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
 
