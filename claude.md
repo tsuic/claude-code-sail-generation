@@ -402,6 +402,29 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
     - [ ] 2. **sail-icon-validator** - Checks for valid icon names
     - [ ] 3. **sail-code-reviewer** - Validates structure, syntax, and best practices
 
+**Expected Validation Errors (Safe to Ignore):**
+
+When validating interfaces with rule inputs or environment-specific references, these errors are expected and can be safely ignored:
+
+1. **Rule Input Errors**: `"Could not find variable 'ri!...'"`
+   - Rule inputs (ri!) are defined at the interface/process level, not in the code itself
+   - ✅ Safe to ignore IF the rule input is properly documented in interface comments
+   - ✅ Safe to ignore IF the code follows the ri! pattern correctly (functional interface)
+
+2. **Record Type UUID Errors**: `"Could not find recordType '...'"`
+   - Record type UUIDs are environment-specific
+   - ✅ Safe to ignore IF UUIDs are sourced from data-model-context.md
+   - ✅ Safe to ignore IF code is intended for a specific Appian environment
+
+3. **Constant/Expression Rule Errors**: `"Could not find constant/rule 'cons!/rule!'"`
+   - Constants and expression rules exist in the target environment only
+   - ✅ Safe to ignore IF properly documented
+
+**Critical Errors (MUST Fix):**
+- ❌ Invalid function names or parameters
+- ❌ Syntax errors (mismatched braces, quotes)
+- ❌ Undefined local variables (local! not declared in a!localVariables)
+
 ### Before Writing Dynamic Code:
 - [ ] Read `/dynamic-behavior-guidelines/mock-interface.md` if using arrays, loops, null checking in mock data interfaces
 - [ ] Read `/dynamic-behavior-guidelines/functional-interface.md` if working with record types, queries, or relationships

@@ -3,46 +3,51 @@
 ## 📑 Quick Navigation Index
 
 ### 🚨 Critical Sections (Read These First):
-- **Lines 45-64**: Mandatory Foundation Rules
-- **Lines 65-121**: Record Type Reference Syntax (UUID usage)
-- **Lines 122-274**: Form Interface Data Patterns (ri! vs queries)
-- **Lines 353-399**: Essential SAIL Structure (a!localVariables, variable scope)
-- **Lines 401-471**: Documenting Unused Local Variables (when to keep vs remove)
-- **Lines 679-844**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 1025-1561**: Data Querying Patterns (a!queryRecordType() and a!recordData())
-- **Lines 1680-1729**: Short-Circuit Evaluation Rules (if() vs and()/or())
-- **Lines 2119-2262**: One-to-Many Relationship Data Management
-- **Lines 2518-2643**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
+- **Lines 45-68**: Mandatory Foundation Rules
+- **Lines 69-121**: Record Type Reference Syntax (UUID usage)
+- **Lines 122-349**: Form Interface Data Patterns (ri! vs queries, testing simulation variables)
+- **Lines 195-264**: Testing Simulation Variables (MUST BE REMOVED FOR PRODUCTION)
+- **Lines 428-474**: Essential SAIL Structure (a!localVariables, variable scope)
+- **Lines 476-546**: Documenting Unused Local Variables (when to keep vs remove)
+- **Lines 754-919**: Null Safety Implementation (including computed variables and short-circuit evaluation)
+- **Lines 1100-1680**: Data Querying Patterns (a!queryRecordType() and a!recordData())
+- **Lines 1128-1168**: Common Mistake - sorts Parameter (use sort inside pagingInfo)
+- **Lines 1799-1848**: Short-Circuit Evaluation Rules (if() vs and()/or())
+- **Lines 2238-2381**: One-to-Many Relationship Data Management
+- **Lines 2637-2762**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
 
 ### By Task Type:
-- **Building a form/wizard that creates or updates records** → Lines 122-274 (Form Interface Data Patterns)
-- **Displaying data in grids or charts** → Lines 1025-1561 (Data Querying Patterns)
-- **Managing many-to-one relationships in forms (dropdowns)** → Lines 1911-1991 (Record Foreign Key Selection Pattern)
-- **Managing one-to-many relationships in forms** → Lines 2119-2262 (One-to-Many Relationship Data Management)
-- **Implementing record actions** → Lines 2887-2938 (Record Actions)
-- **Working with dates and times** → Lines 2518-2643 (Date/Time Critical Rules)
-- **Building charts and visualizations** → Lines 2644-2855 (Chart Configuration and Components)
-- **Accessing related record data** → Lines 2263-2517 (Related Record Field References)
-- **Implementing role-based access control** → Lines 845-889 (Group-Based Access Control Pattern)
-- **Documenting unused variables** → Lines 401-471 (Documenting Unused Local Variables)
+- **Building a form/wizard that creates or updates records** → Lines 122-349 (Form Interface Data Patterns)
+- **Using testing simulation variables for development** → Lines 195-264 (Testing Simulation Variables)
+- **Displaying data in grids or charts** → Lines 1100-1680 (Data Querying Patterns)
+- **Managing many-to-one relationships in forms (dropdowns)** → Lines 2030-2110 (Record Foreign Key Selection Pattern)
+- **Managing one-to-many relationships in forms** → Lines 2238-2381 (One-to-Many Relationship Data Management)
+- **Implementing record actions** → Lines 3006-3057 (Record Actions)
+- **Working with dates and times** → Lines 2637-2762 (Date/Time Critical Rules)
+- **Building charts and visualizations** → Lines 2763-2974 (Chart Configuration and Components)
+- **Accessing related record data** → Lines 2382-2636 (Related Record Field References)
+- **Implementing role-based access control** → Lines 920-964 (Group-Based Access Control Pattern)
+- **Documenting unused variables** → Lines 476-546 (Documenting Unused Local Variables)
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 45-64 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 679-844 (Null Safety Implementation)
-- **"Function does not exist" errors** → Lines 2978-3035 (Essential Functions Reference)
-- **Invalid function parameters** → Lines 1562-1601 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 1680-1729 (Short-Circuit Evaluation Rules)
-- **Record type reference errors** → Lines 65-121 (Record Type Reference Syntax)
-- **Query returning only primary key (missing fields parameter)** → Lines 1025-1561 (Data Querying Patterns)
-- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1025-1561 (Data Querying Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2518-2643 (Date/Time Type Matching)
-- **Query filter errors with rule inputs** → Lines 890-975 (Protecting Query Filters)
-- **Relationship navigation errors** → Lines 2119-2262 (One-to-Many Relationships), Lines 2263-2517 (Related Record References)
-- **Button/wizard configuration errors** → Lines 698-725 (Button/Wizard Parameters)
+- **"Variable not defined" errors** → Lines 45-68 (Mandatory Foundation Rules)
+- **Null reference errors** → Lines 754-919 (Null Safety Implementation)
+- **"Function does not exist" errors** → Lines 3097-3154 (Essential Functions Reference)
+- **Invalid function parameters** → Lines 1681-1720 (Function Parameter Validation)
+- **Short-circuit evaluation errors (and/or vs if)** → Lines 1799-1848 (Short-Circuit Evaluation Rules)
+- **Record type reference errors** → Lines 69-121 (Record Type Reference Syntax)
+- **Query returning only primary key (missing fields parameter)** → Lines 1100-1680 (Data Querying Patterns)
+- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1100-1680 (Data Querying Patterns)
+- **Using sorts instead of sort in a!queryRecordType()** → Lines 1128-1168 (Common Mistake - sorts Parameter)
+- **Copying ri! to local variables (breaks data binding)** → Lines 195-264 (Testing Simulation Variables)
+- **DateTime vs Date type mismatch in filters** → Lines 2637-2762 (Date/Time Type Matching)
+- **Query filter errors with rule inputs** → Lines 965-1050 (Protecting Query Filters)
+- **Relationship navigation errors** → Lines 2238-2381 (One-to-Many Relationships), Lines 2382-2636 (Related Record References)
+- **Button/wizard configuration errors** → Lines 773-800 (Button/Wizard Parameters)
 
 ### Validation & Troubleshooting:
-- **Common error troubleshooting** → Lines 3045-3164 (Common Critical Errors)
-- **Final validation checklist** → Lines 3165-3195 (Syntax Validation Checklist)
+- **Common error troubleshooting** → Lines 3164-3283 (Common Critical Errors)
+- **Final validation checklist** → Lines 3436-3473 (Syntax Validation Checklist)
 
 ---
 
@@ -189,6 +194,79 @@ a!localVariables(
 - Form fields save directly to `ri!` (auto-persists to record)
 - Use `a!isNullOrEmpty()` for validation checks on rule inputs
 - Local variables used ONLY for transient UI state (selections, dynamic arrays, temporary data)
+- ❌ NEVER copy rule inputs to local variables - this breaks data binding to process models
+- ✅ Reference `ri!` directly throughout the interface (even in nested conditionals)
+
+### 🚨 Testing Simulation Variables - MUST BE REMOVED FOR PRODUCTION
+
+When creating standalone testable interfaces during development, you may use simulation variables to mock rule inputs. However, **these MUST be clearly marked and completely removed before production deployment.**
+
+**Pattern for Development/Testing:**
+```sail
+a!localVariables(
+  /* ============================================
+   * TESTING SIMULATION - REMOVE FOR PRODUCTION
+   * These simulate rule inputs for standalone testing
+   * ============================================ */
+  local!ri_submission: 'recordType!{uuid}Submission'(),  /* DELETE IN PRODUCTION */
+  local!ri_isUpdate: false(),                             /* DELETE IN PRODUCTION */
+
+  /* ❌ DO NOT create intermediate variables that copy ri! values */
+  /* local!isUpdateMode: local!ri_isUpdate,  <-- NEVER DO THIS */
+
+  /* ✅ Use simulated ri! directly throughout interface */
+  a!formLayout(
+    titleBar: if(
+      local!ri_isUpdate,  /* ✅ Direct reference to simulated ri! */
+      "Edit Submission",
+      "New Submission"
+    ),
+    contents: {
+      a!textField(
+        value: local!ri_submission['recordType!{uuid}Submission.fields.{uuid}title'],
+        saveInto: local!ri_submission['recordType!{uuid}Submission.fields.{uuid}title']
+      )
+    }
+  )
+)
+```
+
+**For Production Deployment:**
+```sail
+a!localVariables(
+  /* TESTING SIMULATION lines completely removed */
+
+  /* ✅ Use actual ri! throughout interface */
+  a!formLayout(
+    titleBar: if(
+      ri!isUpdate,  /* ✅ Now references actual rule input */
+      "Edit Submission",
+      "New Submission"
+    ),
+    contents: {
+      a!textField(
+        value: ri!submission['recordType!{uuid}Submission.fields.{uuid}title'],
+        saveInto: ri!submission['recordType!{uuid}Submission.fields.{uuid}title']
+      )
+    }
+  )
+)
+```
+
+**CRITICAL RULES:**
+1. ✅ Simulation variables MUST be clearly marked with "TESTING" or "SIMULATION" comments
+2. ✅ Use `local!ri_*` naming convention to distinguish from real `ri!` inputs
+3. ❌ NEVER create intermediate local variables that copy ri! values
+4. ❌ NEVER use `a!defaultValue()` or `if(isnull())` wrappers around ri! in the interface body
+5. ✅ Reference simulated `local!ri_*` (or real `ri!`) directly throughout the interface
+6. ✅ REMOVE all `local!ri_*` simulation variables before production deployment
+7. ✅ Do a find-replace: `local!ri_` → `ri!` when moving to production
+
+**Why This Matters:**
+- Copying `ri!` to local variables breaks the binding to the process model
+- Changes saved to local copies are NOT persisted to the record
+- The process model receives the original `ri!` values, not your local copies
+- This causes "data not saving" bugs that are hard to debug
 
 ### ❌ WRONG: Query Pattern (for Create/Update Forms)
 
@@ -1124,6 +1202,48 @@ local!employees: a!queryRecordType(
   fetchTotalCount: true
 ).data
 ```
+
+### ❌ COMMON MISTAKE: Using `sorts` as Top-Level Parameter
+
+**The `sorts` parameter does NOT exist in `a!queryRecordType()`.** Sorting is configured inside `pagingInfo` using the `sort` parameter (singular, not plural).
+
+**WRONG:**
+```sail
+/* ❌ ERROR: sorts doesn't exist as a parameter */
+local!positionTypes: a!queryRecordType(
+  recordType: 'recordType!{uuid}RBC Position Type',
+  fields: {...},
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100),
+  sorts: {  /* ❌ Invalid parameter */
+    a!sortInfo(
+      field: 'recordType!{uuid}RBC Position Type.fields.{uuid}displayOrder',
+      ascending: true
+    )
+  }
+).data
+```
+
+**CORRECT:**
+```sail
+/* ✅ Sort goes INSIDE pagingInfo, parameter name is 'sort' (singular) */
+local!positionTypes: a!queryRecordType(
+  recordType: 'recordType!{uuid}RBC Position Type',
+  fields: {...},
+  pagingInfo: a!pagingInfo(
+    startIndex: 1,
+    batchSize: 100,
+    sort: a!sortInfo(  /* ✅ Correct: inside pagingInfo, singular 'sort' */
+      field: 'recordType!{uuid}RBC Position Type.fields.{uuid}displayOrder',
+      ascending: true
+    )
+  )
+).data
+```
+
+**Key Points:**
+- Parameter name is `sort` (singular), not `sorts` (plural)
+- `sort` is a parameter of `a!pagingInfo()`, not `a!queryRecordType()`
+- `sort` accepts a single `a!sortInfo()`, not an array
 
 🚨 CRITICAL: a!queryRecordType() Fields Parameter - MUST SPECIFY ALL FIELDS
 
@@ -3326,6 +3446,9 @@ Before finalizing any SAIL interface, verify these critical items:
 - [ ] **Expression starts with `a!localVariables()`** (see MANDATORY FOUNDATION RULES)
 - [ ] **a!recordData() ONLY in grids/charts** (see Data Querying Patterns - CRITICAL USAGE RULES)
 - [ ] **Form data uses ri! pattern correctly** (see CRITICAL: Form Interface Data Patterns)
+- [ ] **NO local variable copies of ri! values** - ri! referenced directly throughout interface
+- [ ] **ALL testing simulation variables removed** - No `local!ri_*` variables in production code
+- [ ] **NO `sorts:` parameter in a!queryRecordType()** - Use `sort:` inside `pagingInfo` instead
 - [ ] **All functions verified in schema** - No a!isPageLoad(), property(), or assumed functions
 
 ### Null Safety & Short-Circuit Evaluation

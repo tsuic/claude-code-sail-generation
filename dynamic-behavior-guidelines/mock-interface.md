@@ -8,7 +8,8 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **Lines 48-63**: Mandatory Foundation Rules
 - **Lines 65-84**: Rule Inputs in Mockups - Common Mistake (NEVER use ri! in mockups)
 - **Lines 86-130**: Essential SAIL Structure
-- **Lines 134-520**: Requirement-Driven Documentation Pattern (adding requirement comments to code)
+- **Lines 136-142**: Unused Variables in Mockups (should NOT have unused variables)
+- **Lines 144-530**: Requirement-Driven Documentation Pattern (adding requirement comments to code)
 - **Lines 595-856**: a!forEach() Function Variables Reference
 - **Lines 859-946**: Dynamic Form Fields with forEach (parallel array pattern for storing user input)
 - **Lines 1263-1448**: Null Safety Implementation (including computed variables and short-circuit evaluation)
@@ -18,7 +19,8 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **Lines 2999-3052**: Date/Time Type Matching
 
 ### By Task Type:
-- **Documenting requirements in code** → Lines 134-520 (Requirement-Driven Documentation Pattern)
+- **Documenting requirements in code** → Lines 144-530 (Requirement-Driven Documentation Pattern)
+- **Handling unused variables** → Lines 136-142 (Unused Variables in Mockups)
 - **Working with arrays and loops** → Lines 595-856 (a!forEach() Reference), Lines 947-1262 (Array Patterns)
 - **forEach generating input fields (textField, dateField, fileUploadField)** → Lines 859-946 (Dynamic Form Fields Pattern)
 - **Pattern matching (status codes, categories, priority levels)** → Lines 1603-1701 (✅ Best Practice: PREFER a!match() Over Nested if())
@@ -132,6 +134,14 @@ a!forEach(
   )
 )
 ```
+
+## 📝 Unused Variables in Mockups
+
+❌ **Mockups should not have unused variables.** They should be lean and self-contained. If you have unused variables:
+- **Remove them** (they add confusion), or
+- **Use them** to demonstrate a pattern
+
+For production interfaces with justified unused variables, see the "Documenting Unused Local Variables" section in `functional-interface.md`.
 
 ## 📋 Requirement-Driven Documentation Pattern
 
