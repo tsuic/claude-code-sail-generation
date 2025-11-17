@@ -3163,6 +3163,9 @@ Common functions that DO NOT exist:
 - `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click
 - `property()` - Use dot notation instead: `object.field`
 
+Deprecated/Invalid Parameter Values:
+- `batchSize: -1` - Use `batchSize: 5000` (queries), `batchSize: 1` (single aggregations)
+
 Preferred Functions
 - **Null Checking**: `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()` over `isnull()`
 - **Logical**: `and()`, `or()`, `not()` over infix operators

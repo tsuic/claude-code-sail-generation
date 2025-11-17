@@ -68,6 +68,7 @@
 - **Copying ri! to local variables** → `"### 🚨 Testing Simulation Variables"`
 - **DateTime vs Date type mismatch** → `"## Date/Time Critical Rules"`
 - **Query filter errors with rule inputs** → `"## ⚠️ Protecting Query Filters That Use Rule Inputs"`
+- **Invalid operators for data types** → `"### Valid Operators by Data Type"`
 - **Relationship navigation errors** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
 - **Button/wizard configuration errors** → `"## ⚠️ a!buttonWidget() Parameter Rules"`
 - **not() with null values** → `"#### Special Case: not() with Variables"`
@@ -1220,7 +1221,7 @@ a!queryRecordType(
       )
     }
   ),
-  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: -1)
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 5000)
 )
 ```
 
@@ -1615,6 +1616,163 @@ local!totalApplications: a!defaultValue(
   0
 )
 ```
+
+---
+
+## Dashboard KPI Aggregation Patterns
+
+For dashboards and reports displaying KPIs, **ALWAYS prefer database aggregations over array processing** to avoid the 5,000 record limit and improve performance.
+
+### ❌ WRONG: Array Processing (Slow, Limited to 5,000 Records)
+
+```sail
+local!allSubmissions: a!queryRecordType(
+  recordType: 'recordType!Submission',
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 5000)  /* Hard limit! */
+).data,
+
+local!totalCount: count(local!allSubmissions),  /* Only counts up to 5,000 */
+local!pendingCount: count(
+  wherecontains("Pending", local!allSubmissions.status)
+)
+```
+
+**Problems:**
+- Fetches 5,000 rows (slow, memory-intensive)
+- Silent data truncation if total > 5,000
+- Client-side filtering/counting inefficient
+
+### ✅ RIGHT: Database Aggregation (Fast, Scalable)
+
+**Subsection 1: Single Aggregation (No Grouping)**
+
+Use when you need ONE aggregated value (total count, sum, average):
+
+```sail
+local!totalCountQuery: a!queryRecordType(
+  recordType: 'recordType!Submission',
+  fields: a!aggregationFields(
+    groupings: {},  /* NO groupings */
+    measures: {
+      a!measure(
+        function: "COUNT",
+        field: 'recordType!Submission.fields.id',
+        alias: "total"
+      )
+    }
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1)  /* Returns 1 row */
+),
+local!totalCount: a!defaultValue(
+  local!totalCountQuery.data.total,  /* ✅ Dot notation (property() does NOT exist!) */
+  0
+)
+```
+
+**Subsection 2: Grouped Aggregations**
+
+Use when counting/summing across categories (status, priority, etc.):
+
+```sail
+local!statusGroups: a!queryRecordType(
+  recordType: 'recordType!Submission',
+  fields: a!aggregationFields(
+    groupings: {
+      a!grouping(
+        field: 'recordType!Submission.fields.status',
+        alias: "status"
+      )
+    },
+    measures: {
+      a!measure(
+        function: "COUNT",
+        field: 'recordType!Submission.fields.id',
+        alias: "count"
+      )
+    }
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 5000)  /* Up to 5,000 groups */
+).data,
+
+/* Extract specific group counts */
+local!pendingCount: index(
+  index(
+    local!statusGroups,
+    wherecontains("Pending", local!statusGroups.status),
+    null
+  ),
+  1,
+  a!map(count: 0)
+).count  /* ✅ Use dot notation */
+```
+
+**Subsection 3: Multiple Measures**
+
+Use when computing multiple aggregations per group (count + sum, count + avg):
+
+```sail
+local!departmentStats: a!queryRecordType(
+  recordType: 'recordType!Submission',
+  fields: a!aggregationFields(
+    groupings: {
+      a!grouping(
+        field: 'recordType!Submission.relationships.department.fields.name',
+        alias: "department"
+      )
+    },
+    measures: {
+      a!measure(
+        function: "COUNT",
+        field: 'recordType!Submission.fields.id',
+        alias: "submission_count"
+      ),
+      a!measure(
+        function: "SUM",
+        field: 'recordType!Submission.fields.requestedAmount',
+        alias: "total_amount"
+      ),
+      a!measure(
+        function: "AVG",
+        field: 'recordType!Submission.fields.requestedAmount',
+        alias: "avg_amount"
+      )
+    }
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 5000)
+).data
+```
+
+**Subsection 4: Value Extraction Pattern**
+
+After querying aggregated data, extract values using this pattern:
+
+```sail
+/* For single aggregation (no grouping) */
+local!value: a!defaultValue(
+  local!queryResult.data.alias_name,  /* ✅ Direct dot notation */
+  0  /* Default value */
+)
+
+/* For grouped aggregations */
+local!value: index(
+  index(
+    local!queryResult,
+    wherecontains("Group Name", local!queryResult.group_alias),
+    null
+  ),
+  1,
+  a!map(measure_alias: 0)  /* Default map */
+).measure_alias  /* ✅ Dot notation */
+```
+
+**🚨 CRITICAL: The property() function does NOT exist in SAIL. Always use dot notation for property access.**
+
+**Batch Size Guidelines:**
+- **Grouped results**: `batchSize: 5000` (supports up to 5,000 unique groups)
+- **Single aggregation**: `batchSize: 1` (returns exactly 1 row)
+- **❌ NEVER**: `batchSize: -1` (deprecated/not supported)
+
+---
 
 **Pattern 2: Regular Queries Returning Rows**
 
@@ -2957,6 +3115,67 @@ a!queryFilter(
 - **Date fields**: Use `today()`, date arithmetic, `date()`
 - **Number fields**: Use `tointeger()`, `todecimal()`
 - **Text fields**: Use `totext()`
+
+**⚠️ WORKFLOW: Before Writing Date/DateTime Filters:**
+1. **Check data-model-context.md** for the actual field type
+2. **Date field** → Use `today()`, `todate()`, date arithmetic (e.g., `today() - 30`)
+3. **DateTime field** → Use `now()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`
+
+### Valid Operators by Data Type
+
+The following operators are valid for each data type in `a!queryFilter`:
+
+| Data Type | Valid Operators |
+|-----------|----------------|
+| **Text** | `=`, `<>`, `in`, `not in`, `starts with`, `not starts with`, `ends with`, `not ends with`, `includes`, `not includes`, `is null`, `not null`, `search` |
+| **Integer, Float, Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
+| **Date, Date and Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
+| **Boolean** | `=`, `<>`, `in`, `not in`, `is null`, `not null` |
+
+**Key Notes:**
+- `"between"` operator requires **two values** in an array: `value: {startValue, endValue}`
+- `"in"` and `"not in"` operators accept arrays of values
+- Text operators (`starts with`, `ends with`, `includes`, `search`) work ONLY with Text fields
+- Date/DateTime comparison operators (`>`, `>=`, `<`, `<=`) require proper type matching (see examples above)
+
+**Examples:**
+
+```sail
+/* ✅ Using "between" with Date field */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "between",
+  value: {today() - 30, today()}  /* Array of two dates */
+)
+
+/* ✅ Using "in" with Integer field */
+a!queryFilter(
+  field: recordType!Order.fields.statusId,
+  operator: "in",
+  value: {1, 2, 3}  /* Array of valid status IDs */
+)
+
+/* ✅ Using "starts with" with Text field */
+a!queryFilter(
+  field: recordType!Product.fields.productCode,
+  operator: "starts with",
+  value: "PROD-"
+)
+
+/* ❌ WRONG - "between" with single value */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "between",
+  value: today()  /* ERROR: between requires array of 2 values */
+)
+
+/* ❌ WRONG - Text operator on Date field */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "starts with",  /* ERROR: Invalid for Date fields */
+  value: "2024"
+)
+```
 
 🚨 CRITICAL: min()/max() Return Type Casting
 
