@@ -251,6 +251,10 @@ a!pieChartField(
 )
 ```
 
+**Grid Conversion Patterns**
+
+**Grid sortField Rule**: The `sortField` parameter is only allowed when the `data` parameter references a record type (e.g., `recordType!Case`) or uses `a!recordData()`. Remove `sortField` for all other data sources (aggregated queries, forEach transformations, local variables).
+
 **🚨 CRITICAL: Chart Pattern Refactoring**
 
 Before implementing any chart with `a!recordData()`, you MUST refactor from mockup pattern to record data pattern:
@@ -291,8 +295,7 @@ a!columnChartField(
 1. Remove top-level `category` parameter → Move to `config.primaryGrouping`
 2. Remove top-level `series` with `data` arrays → Move `a!measure()` to `config.measures`
 3. Remove top-level `grouping` parameter → Move to `config.primaryGrouping`
-4. Keep styling in `config.series` (color only, no data)
-5. Add `config: a!<chartType>Config()` wrapper
+4. Add `config: a!<chartType>Config()` wrapper
 
 **Chart Config Functions:**
 - `a!columnChartConfig()` - for column charts
@@ -303,13 +306,34 @@ a!columnChartField(
 
 Reference [4-chart-instructions.md](ui-guidelines/4-chart-instructions.md) lines 159-262 for complete config parameter documentation.
 
+**Interval Selection for Date/Time Grouping:**
+
+When using `a!grouping()` with `interval` parameter for date/time fields, prefer human-readable text formats:
+
+- **Monthly grouping** → Use `"MONTH_SHORT_TEXT"` (displays "Jun 2025", "Jul 2025")
+  - ❌ Avoid: `"MONTH"` or `"MONTH_OF_YEAR"` (displays numbers: 1, 2, 3...)
+  - ❌ Avoid: `"MONTH_TEXT"` (verbose: "January 2025")
+
+- **Daily grouping** → Use `"DATE_SHORT_TEXT"` (displays "6/15/25")
+  - Alternative: `"DATE_TEXT"` for long format ("June 15, 2025")
+
+- **Yearly grouping** → Use `"YEAR"` (displays "2025")
+
+**Why prefer _SHORT_TEXT variants:**
+- Includes year context (critical for multi-year charts)
+- Human-readable at a glance
+- Appropriate length for chart labels
+
 **🚨 MANDATORY PRE-CODE VERIFICATION** - Search guidelines BEFORE writing any code:
 
 Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.md`:
 
-- [ ] **STEP 0 - Read Navigation Index**: Read the "📑 Quick Navigation Index" at the top of the file
+**STEP 0 - Navigation & Planning**:
+- [ ] **Read Navigation Index**: Read the "📑 Quick Navigation Index" at the top of the file
   - Note the three main navigation categories: Critical Sections, By Task Type, By Error Type
   - Use this index to discover ALL relevant sections for the current conversion task
+
+**ALWAYS SEARCH (Every Conversion)** - Foundational rules for ALL interfaces:
 
 - [ ] **Form vs Display pattern**: Search for "🚨 CRITICAL: Form Interface Data Patterns"
   - Confirms: CREATE/UPDATE forms use ri! pattern, READ-ONLY uses queries
@@ -319,11 +343,9 @@ Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.m
   - Confirms: Grids/charts use a!recordData(), other components use a!queryRecordType()
   - Confirms: ALL queries need `fields` parameter listing all fields to display
   - Confirms: ALL queries need `fetchTotalCount: true` for KPI metrics
-
-- [ ] **Chart pattern refactoring**: Search for "Two Different Data Approaches" in 4-chart-instructions.md
-  - Confirms: Mockups use `categories` + `series`, record data uses `data` + `config`
-  - Confirms: Must use `a!<chartType>Config()` wrapper for record-based charts
-  - Confirms: Chart config functions: columnChartConfig, lineChartConfig, barChartConfig, areaChartConfig, pieChartConfig
+  - **ALSO search for "Common Mistake - sorts Parameter"**
+  - Confirms: sorts parameter does NOT exist - use sort (singular) inside a!pagingInfo()
+  - Confirms: sort accepts array of a!sortInfo() despite being singular
 
 - [ ] **Query logical expression nesting**: Search for "Nesting Query Logical Expressions"
   - Confirms: `filters` parameter accepts ONLY a!queryFilter()
@@ -338,7 +360,12 @@ Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.m
 - [ ] **Date/Time type matching**: Search for "Date/Time Critical Rules"
   - Confirms: DateTime fields use now(), Date fields use today()
   - Confirms: Type mismatches cause interface failures
-  - **ACTION REQUIRED**: Before writing any a!queryFilter with date/datetime fields, verify field type in data-model-context.md and use matching value type
+  - **ALSO search for "⚠️ WORKFLOW: Before Writing Date/DateTime Filters"**
+  - **MANDATORY WORKFLOW - Execute BEFORE writing ANY a!queryFilter() on date/time fields:**
+    - Step 1: Identify the field being filtered
+    - Step 2: Look up field type in data-model-context.md
+    - Step 3: Apply the correct function based on field type (Date → today(), DateTime → now())
+    - Step 4: Cross-validate with functional-interface.md
 
 - [ ] **Query filter operators**: Search for "Valid Operators by Data Type"
   - Confirms: Valid null operators are "is null" and "not null" (NOT "is not null")
@@ -355,10 +382,82 @@ Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.m
   - Confirms: Use a!match() for single value compared against 3+ options (status codes, categories, date ranges)
   - Confirms: Nested if() only for complex conditional logic, not pattern matching
 
-- [ ] **Final code cleanup**: Before completing conversion, verify all local variables are used
+**CONDITIONALLY SEARCH - Based on Interface Type**:
+
+- [ ] **IF interface is a dashboard or contains KPI metrics** → Search for "Dashboard KPI Aggregation Patterns"
+  - 🚨 CRITICAL: This section is MANDATORY for any interface displaying KPIs, counts, sums, or averages
+  - Confirms: ALWAYS use a!aggregationFields() with a!measure() for dashboard KPIs
+  - Confirms: Subsection 1 (single aggregation with no grouping) - use for total counts
+  - Confirms: Subsection 2 (grouped aggregations) - use for counts by category/status
+  - Confirms: Subsection 3 (multiple measures) - use for count + sum + avg per group
+  - Confirms: Subsection 4 (value extraction pattern) - use dot notation to access results
+  - Confirms: NEVER fetch 5,000 rows for counting/summing - use database aggregation
+  - Confirms: property() function does NOT exist - always use dot notation
+  - **ALSO search for "🚨 CRITICAL: Use Aggregations for KPI Calculations"**
+  - Confirms: ALWAYS use a!aggregationFields() with a!measure() for KPIs
+  - Confirms: NEVER use .totalCount for metrics
+  - Confirms: Access aggregated values with .data.alias_name (not property())
+  - Confirms: For aggregation queries with NO groupings, access field directly from .data
+
+- [ ] **IF interface is a complex multi-record-type scenario** → Search for "🔥 Complex Scenario Handling"
+  - Confirms: Identify primary record type first in multi-record interfaces
+  - Confirms: Map all relationships before implementation
+  - Confirms: Use relationship navigation instead of separate queries where possible
+  - Confirms: Consolidate filters at primary record level
+
+- [ ] **IF data model doesn't match requirements** → Search for "Field Mapping Strategies"
+  - Strategy 1: Use available fields with different structure (document the mapping decision)
+  - Strategy 2: Local variables for hardcoded reference data (document data source)
+  - Confirms: Single bracket for entire relationship path
+
+- [ ] **IF making assumptions about data model or business logic** → Search for "📝 REQUIRED ASSUMPTION TRACKING"
+  - Format: "ASSUMPTION: [what you're assuming] - REASON: [why you're assuming this]"
+  - Document assumptions about: record relationships, business logic, user intent, data structure
+
+- [ ] **IF form creates or updates records** → Search for "Audit Fields Management"
+  - Confirms: Set createdBy/createdOn/modifiedBy/modifiedOn on create
+  - Confirms: Set modifiedBy/modifiedOn on update
+  - Confirms: Use loggedInUser() and now() functions
+
+- [ ] **IF query filters use rule inputs (ri!)** → Search for "⚠️ Protecting Query Filters That Use Rule Inputs"
+  - Confirms: Use applyWhen parameter to protect null rule input filters
+  - Confirms: Pattern: applyWhen: a!isNotNullOrEmpty(ri!filterValue)
+  - Confirms: Prevents query errors when rule inputs are null
+
+- [ ] **IF form creates different record types based on selection** → Search for "Multi-Type Form Entry Pattern"
+  - Confirms: Use type selection dropdown to control which fields display
+  - Confirms: Use record type constructors for each type option
+  - Confirms: Validate required fields based on selected type
+
+- [ ] **IF implementing role-based access or permissions** → Search for "Group-Based Access Control Pattern"
+  - Confirms: Use a!isUserMemberOfGroup() for role checks
+  - Confirms: Conditional display with showWhen parameter
+  - Confirms: Button visibility based on user groups
+
+**CONDITIONALLY SEARCH - Based on Components Used**:
+
+- [ ] **IF using charts** → Search for "Two Different Data Approaches" in 4-chart-instructions.md
+  - Confirms: Mockups use `categories` + `series`, record data uses `data` + `config`
+  - Confirms: Must use `a!<chartType>Config()` wrapper for record-based charts
+  - Confirms: Chart config functions: columnChartConfig, lineChartConfig, barChartConfig, areaChartConfig, pieChartConfig
+
+- [ ] **IF using buttons** → Search for "⚠️ a!buttonWidget() Parameter Rules"
+  - Confirms: submit is Boolean (true/false), NOT "ALWAYS" or "NEVER"
+  - Confirms: validate is Boolean
+  - Confirms: skipValidation is Boolean
+
+- [ ] **IF using wizardLayout** → Search for "⚠️ a!wizardLayout() Parameters"
+  - Confirms: steps parameter structure
+  - Confirms: onSave for final submission
+  - Confirms: Navigation button patterns
+
+**FINAL VERIFICATION**:
+
+- [ ] **Document unused variables**: Before completing conversion, search for "📝 Documenting Unused Local Variables"
   - Check each local! variable is referenced at least twice (definition + usage)
   - If unused with no clear future purpose → Remove it
   - If unused but planned for future → Document with /* UNUSED - [Name] ([Category]): [Why] | [Future use] */
+  - Categories: Future Enhancement, Deferred, Alternative, Config, Requirements Changed
 
 - [ ] **Check Navigation Index for additional relevant sections**: Based on interface components and error patterns
   - Reference "By Task Type" to find sections specific to what you're building
@@ -520,6 +619,9 @@ If critical errors found: Fix them and re-validate until clean.
 - Ensure no layout nesting violations were introduced
 - Validate all parameters use only documented values
 - Confirm proper use of `and()`, `or()`, `not()` instead of operators
+- **Verify grid sortField usage**
+  - Grid `sortField` only present when data references recordType or uses a!recordData()
+  - Grid `sortField` removed if data uses groupings/forEach
 - **Verify all local variables are used**
   - Check each local! variable is referenced at least twice (definition + usage)
   - If unused with no clear future purpose → Remove it
