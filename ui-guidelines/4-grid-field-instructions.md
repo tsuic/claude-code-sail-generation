@@ -3,6 +3,47 @@
 ## Overview
 GridField displays tabular data with built-in sorting, paging, selection, and search capabilities. It's optimized for read-only data presentation with rich formatting options for each column, including text, links, tags, buttons, and progress bars.
 
+## ⚠️ CRITICAL: Record-Only Parameters
+
+**These parameters ONLY work with record data sources and will cause errors with local data:**
+
+- `showSearchBox` - ❌ **NEVER use with local data (a!map arrays)**
+- `showRefreshButton` - ❌ **NEVER use with local data (a!map arrays)**
+- `recordActions` - ❌ **NEVER use with local data (a!map arrays)**
+
+### ❌ WRONG - Using record-only parameters with local data:
+```sail
+a!gridField(
+  data: local!employees,  /* Local a!map array */
+  columns: {...},
+  showSearchBox: true,      /* ❌ ERROR: Only works with record data! */
+  showRefreshButton: true   /* ❌ ERROR: Only works with record data! */
+)
+```
+
+**Error:** These parameters require a record type data source and will fail at runtime when used with local variables.
+
+### ✅ CORRECT - Omit these parameters for local data:
+```sail
+a!gridField(
+  data: local!employees,  /* Local a!map array */
+  columns: {...}
+  /* ✅ Do NOT include showSearchBox or showRefreshButton */
+)
+```
+
+### ✅ CORRECT - Use these parameters ONLY with record data:
+```sail
+a!gridField(
+  data: recordType!Employee,  /* Record type data source */
+  columns: {...},
+  showSearchBox: true,         /* ✅ OK with record data */
+  showRefreshButton: true      /* ✅ OK with record data */
+)
+```
+
+**Key Takeaway:** If your grid uses `data: local!variableName` with a!map arrays, **NEVER** include `showSearchBox`, `showRefreshButton`, or `recordActions` parameters.
+
 ## ⚠️ CRITICAL: Function Variables in Grid Columns
 
 **ONLY `fv!row` is available in grid columns!**
@@ -700,6 +741,25 @@ a!gridField(
 
 ## Common Validation Issues
 
+### ❌ WRONG - Using record-only parameters with local data:
+```sail
+a!gridField(
+  data: local!topOrgs,  /* ❌ Local data, not record data */
+  columns: {...},
+  showSearchBox: false,       /* ❌ ERROR: Don't use with local data */
+  showRefreshButton: false    /* ❌ ERROR: Don't use with local data */
+)
+```
+
+### ✅ CORRECT - Omit record-only parameters:
+```sail
+a!gridField(
+  data: local!topOrgs,
+  columns: {...}
+  /* ✅ No showSearchBox or showRefreshButton */
+)
+```
+
 ### ❌ WRONG - Using sideBySideLayout in grid column:
 ```sail
 a!gridColumn(
@@ -728,9 +788,15 @@ a!gridColumn(
 
 ## ⚠️ CRITICAL VALIDATION CHECKLIST
 
+### Grid Parameters Validation:
+- [ ] ❌ If using local data (`data: local!variable`), **NO** `showSearchBox` parameter ‼️
+- [ ] ❌ If using local data (`data: local!variable`), **NO** `showRefreshButton` parameter ‼️
+- [ ] ❌ If using local data (`data: local!variable`), **NO** `recordActions` parameter ‼️
+- [ ] ✅ Record-only parameters used ONLY with `recordType!` or `a!recordData()` ‼️
+
 ### Grid Column Content Validation:
 - [ ] ❌ **NO sideBySideLayouts** in any grid column
-- [ ] ❌ **NO columnsLayouts** in any grid column  
+- [ ] ❌ **NO columnsLayouts** in any grid column
 - [ ] ❌ **NO cardLayouts** in any grid column
 - [ ] ❌ **NO arrays of components** in any grid column
 - [ ] ✅ **ONLY** single components: richTextDisplayField, tagField, buttonArrayLayout, etc.
