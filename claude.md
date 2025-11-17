@@ -9,6 +9,7 @@
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
+- When converting mock to functional, refactor code structure as needed to accommodate record queries (e.g., chart patterns) and changes to logic, but preserve visual design
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -116,8 +117,36 @@ If you violate any of these rules, STOP and reconsider your approach.
 ## 🔄 DYNAMIC SAIL EXPRESSIONS
 
 **When working with dynamic data (arrays, loops, conditionals), ALWAYS read the appropriate guidelines FIRST:**
-- For **mock data interfaces** (local variables, no record types): Read `/dynamic-behavior-guidelines/mock-interface.md`
-- For **functional interfaces** (with record types and queries): Read `/dynamic-behavior-guidelines/functional-interface.md`
+
+### **FOUNDATIONAL SAIL SYNTAX (Required for ALL Interfaces)**
+**Read:** `/dynamic-behavior-guidelines/mock-interface.md`
+
+**Contains:** Universal SAIL syntax rules that apply to **both mock and functional interfaces:**
+- ✅ **Language-specific syntax** (and/or/if functions, NOT JavaScript operators)
+- ✅ **Null safety and short-circuit evaluation** patterns
+- ✅ **Function parameter validation** (wherecontains, index, a!forEach, etc.)
+- ✅ **Array manipulation, loops, property access**
+- ✅ **Grid selection patterns** (two-variable approach, naming conventions)
+- ✅ **Checkbox patterns** (initialization, multi-select vs single)
+- ✅ **Chart data configuration**
+- ✅ **Date/time type handling**
+- ✅ **Pattern matching with a!match()**
+- ✅ **Dynamic form field patterns**
+
+**⚠️ Important:** Despite the "mock" in the filename, this file contains **FOUNDATIONAL rules for ALL SAIL code** (not just mockups).
+
+### **RECORD TYPE INTEGRATION (When Using Record Data)**
+**Read:** `/dynamic-behavior-guidelines/functional-interface.md`
+
+**Contains:** Record-specific patterns built **ON TOP of mock-interface.md:**
+- ✅ **Record type reference syntax** (UUID usage)
+- ✅ **Form interface data patterns** (ri! vs queries decision tree)
+- ✅ **Query construction** (a!queryRecordType, a!recordData)
+- ✅ **Relationship navigation** (one-to-many, many-to-one)
+- ✅ **Record type constructors** vs a!map()
+- ✅ **Testing simulation variables**
+
+**⚠️ Critical:** Functional interfaces use **ALL rules from mock-interface.md PLUS** record-specific rules from this file.
 
 ### When to Read Dynamic Guidelines:
 - ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
@@ -127,6 +156,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - ✅ Before implementing conditional logic with data
 - ✅ Before using `a!checkboxField()` - for proper variable initialization (null vs false)
 - ✅ Before using variables in `required` parameter - for null-safe conditional logic
+- ✅ **Remember:** SAIL doesn't support regex
 
 **THIS IS NOT OPTIONAL for dynamic code. Static forms may skip this.**
 **THIS IS NOT OPTIONAL when using checkboxes or conditional `required` parameters.**
@@ -391,6 +421,10 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Attempt conversion yourself without invoking the agent
 - Make up UUIDs or field references
 - Read functional-interface.md and convert manually
+
+**✅ AGENT MUST:**
+- Refactor code structure when required for record data (chart patterns, field references) and logic
+- Preserve visual design and layout (colors, spacing, styling)
 
 ---
 

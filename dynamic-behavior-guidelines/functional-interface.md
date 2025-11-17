@@ -2,52 +2,82 @@
 
 ## 📑 Quick Navigation Index
 
+**How to use this index:**
+1. Find the topic you need below
+2. Copy the search keyword (shown after →)
+3. Use Grep tool or Ctrl+F to find the section in this file
+
 ### 🚨 Critical Sections (Read These First):
-- **Lines 45-68**: Mandatory Foundation Rules
-- **Lines 69-121**: Record Type Reference Syntax (UUID usage)
-- **Lines 122-349**: Form Interface Data Patterns (ri! vs queries, testing simulation variables)
-- **Lines 195-264**: Testing Simulation Variables (MUST BE REMOVED FOR PRODUCTION)
-- **Lines 428-474**: Essential SAIL Structure (a!localVariables, variable scope)
-- **Lines 476-546**: Documenting Unused Local Variables (when to keep vs remove)
-- **Lines 754-919**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 1100-1680**: Data Querying Patterns (a!queryRecordType() and a!recordData())
-- **Lines 1128-1168**: Common Mistake - sorts Parameter (use sort inside pagingInfo)
-- **Lines 1799-1848**: Short-Circuit Evaluation Rules (if() vs and()/or())
-- **Lines 2238-2381**: One-to-Many Relationship Data Management
-- **Lines 2637-2762**: Date/Time Type Matching (DateTime fields use now(), Date fields use today())
+- **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **Record Type Reference Syntax** → `"## ⚠️ Record Type Reference Syntax"`
+- **Form Interface Data Patterns** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
+- **Testing Simulation Variables** → `"### 🚨 Testing Simulation Variables"`
+- **Handling Non-Existent Constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Essential SAIL Structure** → `"## Essential SAIL Structure"`
+- **Documenting Unused Local Variables** → `"## 📝 Documenting Unused Local Variables"`
+- **Relationship Field Navigation Syntax** → `"## 🚨 CRITICAL: Relationship Field Navigation Syntax"`
+- **Creating New Record Instances** → `"## Creating New Record Instances"`
+- **Null Safety Implementation** → `"## 🚨 MANDATORY: Null Safety Implementation"`
+- **Data Querying Patterns** → `"## Data Querying Patterns"`
+- **sorts Parameter Common Mistake** → `"### Common Mistake - sorts Parameter"`
+- **Short-Circuit Evaluation Rules** → `"### 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
+- **One-to-Many Relationship Management** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
+- **Date/Time Type Matching** → `"## Date/Time Critical Rules"`
 
 ### By Task Type:
-- **Building a form/wizard that creates or updates records** → Lines 122-349 (Form Interface Data Patterns)
-- **Using testing simulation variables for development** → Lines 195-264 (Testing Simulation Variables)
-- **Displaying data in grids or charts** → Lines 1100-1680 (Data Querying Patterns)
-- **Managing many-to-one relationships in forms (dropdowns)** → Lines 2030-2110 (Record Foreign Key Selection Pattern)
-- **Managing one-to-many relationships in forms** → Lines 2238-2381 (One-to-Many Relationship Data Management)
-- **Implementing record actions** → Lines 3006-3057 (Record Actions)
-- **Working with dates and times** → Lines 2637-2762 (Date/Time Critical Rules)
-- **Building charts and visualizations** → Lines 2763-2974 (Chart Configuration and Components)
-- **Accessing related record data** → Lines 2382-2636 (Related Record Field References)
-- **Implementing role-based access control** → Lines 920-964 (Group-Based Access Control Pattern)
-- **Documenting unused variables** → Lines 476-546 (Documenting Unused Local Variables)
+- **Building a form/wizard (create/update records)** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
+- **Using testing simulation variables** → `"### 🚨 Testing Simulation Variables"`
+- **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Creating new record instances** → `"## Creating New Record Instances"`
+- **Handling data model mismatches** → `"## Field Mapping Strategies"`
+- **Multi-type form entry patterns** → `"## Multi-Type Form Entry Pattern"`
+- **Displaying data in grids or charts** → `"## Data Querying Patterns"`
+- **Nesting query logical expressions** → `"## Nesting Query Logical Expressions"`
+- **Managing many-to-one relationships (dropdowns)** → `"### Record Foreign Key Selection in Dropdowns"`
+- **Managing one-to-many relationships in forms** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
+- **Accessing related record data** → `"## Related Record Field References"`
+- **Accessing related data in forms** → `"## Accessing Related Record Data in Forms"`
+- **User/Group fields in forms** → `"## User/Group Fields vs Relationships"`
+- **Pattern matching with record fields** → `"## Pattern Matching with Record Fields"`
+- **Record links and identifiers** → `"## Record Links and Identifiers"`
+- **Working with dates and times** → `"## Date/Time Critical Rules"`
+- **Building charts and visualizations** → `"## Chart Data Configuration"`
+- **KPI and performance calculations** → `"## KPI and Performance Calculations"`
+- **Implementing record actions** → `"## Record Actions"`
+- **Create/Update scenarios** → `"## Create/Update Scenarios"`
+- **JSON functions usage** → `"### JSON Functions Usage"`
+- **Using contains() correctly** → `"### contains() Usage"`
+- **Implementing role-based access control** → `"## Group-Based Access Control Pattern"`
+- **Documenting unused variables** → `"## 📝 Documenting Unused Local Variables"`
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 45-68 (Mandatory Foundation Rules)
-- **Null reference errors** → Lines 754-919 (Null Safety Implementation)
-- **"Function does not exist" errors** → Lines 3097-3154 (Essential Functions Reference)
-- **Invalid function parameters** → Lines 1681-1720 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 1799-1848 (Short-Circuit Evaluation Rules)
-- **Record type reference errors** → Lines 69-121 (Record Type Reference Syntax)
-- **Query returning only primary key (missing fields parameter)** → Lines 1100-1680 (Data Querying Patterns)
-- **Query .totalCount is null (missing fetchTotalCount)** → Lines 1100-1680 (Data Querying Patterns)
-- **Using sorts instead of sort in a!queryRecordType()** → Lines 1128-1168 (Common Mistake - sorts Parameter)
-- **Copying ri! to local variables (breaks data binding)** → Lines 195-264 (Testing Simulation Variables)
-- **DateTime vs Date type mismatch in filters** → Lines 2637-2762 (Date/Time Type Matching)
-- **Query filter errors with rule inputs** → Lines 965-1050 (Protecting Query Filters)
-- **Relationship navigation errors** → Lines 2238-2381 (One-to-Many Relationships), Lines 2382-2636 (Related Record References)
-- **Button/wizard configuration errors** → Lines 773-800 (Button/Wizard Parameters)
+- **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
+- **"Function does not exist"** → `"## Essential Functions Reference"`
+- **Invalid function parameters** → `"### ⚠️ Function Parameter Validation"`
+- **Short-circuit evaluation errors** → `"### 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
+- **Record type reference errors** → `"## ⚠️ Record Type Reference Syntax"`
+- **Relationship field navigation errors** → `"## 🚨 CRITICAL: Relationship Field Navigation Syntax"`
+- **Grid column sorting errors** → `"## 🚨 CRITICAL: Grid Column Sorting Rules"`
+- **Using a!map() instead of record constructor** → `"## Creating New Record Instances"`
+- **Query returning only primary key** → `"## Data Querying Patterns"` (search for "fields parameter")
+- **Query .totalCount is null** → `"## Data Querying Patterns"` (search for "fetchTotalCount")
+- **Using sorts instead of sort** → `"### Common Mistake - sorts Parameter"`
+- **Query filter nesting errors** → `"## Nesting Query Logical Expressions"`
+- **Copying ri! to local variables** → `"### 🚨 Testing Simulation Variables"`
+- **DateTime vs Date type mismatch** → `"## Date/Time Critical Rules"`
+- **Query filter errors with rule inputs** → `"## ⚠️ Protecting Query Filters That Use Rule Inputs"`
+- **Relationship navigation errors** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
+- **Button/wizard configuration errors** → `"## ⚠️ a!buttonWidget() Parameter Rules"`
+- **not() with null values** → `"#### Special Case: not() with Variables"`
 
 ### Validation & Troubleshooting:
-- **Common error troubleshooting** → Lines 3164-3283 (Common Critical Errors)
-- **Final validation checklist** → Lines 3436-3473 (Syntax Validation Checklist)
+- **Quick troubleshooting guide** → `"## 🔧 Quick Troubleshooting"`
+- **Common critical errors** → `"## Common Critical Errors"`
+- **Final validation checklist** → `"## Syntax Validation Checklist"`
+- **Essential functions reference** → `"## Essential Functions Reference"`
+- **Functions by category** → `"### Quick Function Reference by Category"`
 
 ---
 
@@ -72,6 +102,20 @@
     - ✅ Always null-check: `a!isNotNullOrEmpty(ri!param)` or `a!defaultValue(ri!param, default)`
 
 ## ⚠️ Record Type Reference Syntax
+
+### Quick Reference
+
+**Record Type Pattern**: `'recordType!RecordTypeName'`
+**Field Pattern**: `'recordType!RecordTypeName.fields.fieldName'`
+**Relationship Pattern**: `'recordType!RecordTypeName.relationships.relationshipName'`
+**Related Field Pattern**: `'recordType!RecordTypeName.relationships.relationshipName.fields.fieldName'`
+
+**Key Rules**:
+- Always use the FULL reference string exactly as shown
+- Relationships are for navigation, fields are for values
+- Use single continuous path for related fields - ONLY ONE bracket for the entire path
+
+---
 
 **In these guidelines, record types are shown with clean semantic names for readability:**
 
@@ -194,6 +238,7 @@ a!localVariables(
 - Form fields save directly to `ri!` (auto-persists to record)
 - Use `a!isNullOrEmpty()` for validation checks on rule inputs
 - Local variables used ONLY for transient UI state (selections, dynamic arrays, temporary data)
+- **Exception: Local variables ARE appropriate for reference/lookup data** (dropdown options, status lists, priority levels - see "Field Mapping Strategy 2", lines 724-752)
 - ❌ NEVER copy rule inputs to local variables - this breaks data binding to process models
 - ✅ Reference `ri!` directly throughout the interface (even in nested conditionals)
 
@@ -257,7 +302,9 @@ a!localVariables(
 1. ✅ Simulation variables MUST be clearly marked with "TESTING" or "SIMULATION" comments
 2. ✅ Use `local!ri_*` naming convention to distinguish from real `ri!` inputs
 3. ❌ NEVER create intermediate local variables that copy ri! values
-4. ❌ NEVER use `a!defaultValue()` or `if(isnull())` wrappers around ri! in the interface body
+4. ❌ NEVER wrap entire ri! variables in `a!defaultValue()` - Always use for specific field access instead
+   - ❌ Wrong: `a!defaultValue(ri!submission, {})` - wrapping entire rule input
+   - ✅ Right: `a!defaultValue(ri!submission['recordType!Type.fields.name'], "")` - wrapping field access
 5. ✅ Reference simulated `local!ri_*` (or real `ri!`) directly throughout the interface
 6. ✅ REMOVE all `local!ri_*` simulation variables before production deployment
 7. ✅ Do a find-replace: `local!ri_` → `ri!` when moving to production
@@ -331,6 +378,7 @@ a!localVariables(
 3. **Mixing patterns inappropriately**
    - ❌ Wrong: Using ri! for reference data that shouldn't be edited
    - ✅ Right: Use ri! for main record, queries for reference/lookup data
+   - ✅ Alternative: Use local variables with hardcoded lists for missing reference tables (see "Field Mapping Strategy 2", lines 724-752)
 
 4. **Using a!map() or {} for record instances**
    - ❌ Wrong: Using `a!map()` or empty `{}` to create record instances
@@ -348,7 +396,7 @@ a!localVariables(
 - [ ] If NO (display only) → Use query/a!recordData pattern
 - [ ] Main record data binds to ri!, NOT local variables
 - [ ] NO a!queryRecordType() for the record being created/updated
-- [ ] Local variables used ONLY for transient UI state (not main record fields)
+- [ ] Local variables used ONLY for transient UI state OR reference/lookup data (not main record fields)
 - [ ] Form validation checks ri! values, not local variables
 - [ ] All record instances created with record type constructor syntax `'recordType!RecordTypeName'(...)`, not `a!map()` or `{}`
 - [ ] All one-to-many relationships use typed records when appending
@@ -605,7 +653,7 @@ sortField: 'recordType!Case.relationships.priority',  /* Relationship - INVALID 
 - **For one-to-many relationships** - Use main record type's relationships rather than new variables
 - **NEVER confuse relationships with fields** - Relationships navigate, fields display values
 - **KPI Metrics** - ALWAYS use `a!aggregationFields()` with `a!measure()` for dashboard KPIs and metrics. Only use `.totalCount` for pagination display ("Showing X of Y") or simple conditional checks. See Error 9 and KPI Aggregation Pattern sections for details.
-- **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When using record data in charts, always use the `data` + `config` approach, never `categories` + `series`.
+- **Use a!recordData() directly in grid and chart components** - When dealing with record data, avoid using local variables and instead use `a!recordData` directly in these components. When connecting charts to **live record types**, always use the `data` + `config` approach, never `categories` + `series`. For static mockups with hardcoded data, use `categories` + `series` instead.
 
 🚨 MANDATORY CHECKPOINT: For grids with record data, ALWAYS check for and prefer:
 1. User filters (userFilters parameter) over custom dropdowns
@@ -672,6 +720,84 @@ append(
 - Typed instances are required for record relationships to work correctly
 - Type checking happens at save time, catching errors earlier
 
+## Field Mapping Strategies for Data Model Mismatches
+
+When data model fields don't match interface requirements, use these strategies:
+
+### Strategy 1: Use Available Fields
+**When to use:** Minor semantic differences (e.g., `firstName` + `lastName` vs `fullName`)
+
+**How it works:**
+- Use existing fields with different structure
+- Add comment explaining the mapping decision
+- Document in interface header
+
+**Example:**
+```sail
+/* NOTE: Using firstName + lastName fields from Client instead of fullName */
+
+a!textField(
+  label: "First Name",
+  value: a!defaultValue(
+    ri!case['recordType!Case.relationships.client.fields.firstName'],
+    ""
+  ),
+  saveInto: ri!case['recordType!Case.relationships.client.fields.firstName']
+),
+a!textField(
+  label: "Last Name",
+  value: a!defaultValue(
+    ri!case['recordType!Case.relationships.client.fields.lastName'],
+    ""
+  ),
+  saveInto: ri!case['recordType!Case.relationships.client.fields.lastName']
+)
+```
+
+### Strategy 2: Local Variables for Reference Data
+**When to use:** Missing reference tables (e.g., Case Status, Priority Levels, Case Types)
+
+**How it works:**
+- Define local variable with hardcoded list
+- Use for dropdown choice labels and values
+- Document data source in comment
+
+**Example:**
+```sail
+a!localVariables(
+  /* Case priorities reference data - used for dropdown options */
+  local!casePriorities: {
+    a!map(id: 1, label: "Low", value: "LOW"),
+    a!map(id: 2, label: "Medium", value: "MEDIUM"),
+    a!map(id: 3, label: "High", value: "HIGH"),
+    a!map(id: 4, label: "Critical", value: "CRITICAL")
+  },
+
+  {
+    a!dropdownField(
+      label: "Priority",
+      choiceLabels: local!casePriorities.label,
+      choiceValues: local!casePriorities.value,
+      value: ri!case['recordType!Case.fields.priority'],
+      saveInto: ri!case['recordType!Case.fields.priority']
+    )
+  }
+)
+```
+
+### Key Principle: Relationship-Based Data Access
+
+**IMPORTANT:** In Appian, you can ONLY access related record types via defined relationships. You CANNOT perform SQL-style joins.
+
+**✅ CORRECT - Single bracket for entire path:**
+```sail
+ri!case['recordType!Case.relationships.client.fields.firstName']
+```
+
+**❌ INCORRECT - Multiple brackets (invalid syntax):**
+```sail
+ri!case['recordType!Case.relationships.client']['recordType!Client.fields.firstName']
+```
 
 ## Multi-Type Form Entry Pattern
 
@@ -1203,9 +1329,9 @@ local!employees: a!queryRecordType(
 ).data
 ```
 
-### ❌ COMMON MISTAKE: Using `sorts` as Top-Level Parameter
+### ❌ COMMON MISTAKE: Using `sorts` (plural) as Parameter Name in a!queryRecordType()
 
-**The `sorts` parameter does NOT exist in `a!queryRecordType()`.** Sorting is configured inside `pagingInfo` using the `sort` parameter (singular, not plural).
+**The `sorts` parameter does NOT exist in `a!queryRecordType()`.** Sorting is configured inside `a!pagingInfo()` using the `sort` parameter (singular, not plural). Note that `a!pagingInfo()`'s `sort` parameter accepts an **array** of `a!sortInfo()` functions, but the parameter name is still `sort` (singular).
 
 **WRONG:**
 ```sail
@@ -1243,7 +1369,7 @@ local!positionTypes: a!queryRecordType(
 **Key Points:**
 - Parameter name is `sort` (singular), not `sorts` (plural)
 - `sort` is a parameter of `a!pagingInfo()`, not `a!queryRecordType()`
-- `sort` accepts a single `a!sortInfo()`, not an array
+- `sort` accepts an array of `a!sortInfo()` (despite being singular, it takes multiple sort criteria)
 
 🚨 CRITICAL: a!queryRecordType() Fields Parameter - MUST SPECIFY ALL FIELDS
 

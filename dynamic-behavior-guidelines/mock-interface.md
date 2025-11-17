@@ -4,50 +4,67 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 
 ## 📑 Quick Navigation Index
 
+**How to use this index:**
+1. Find the topic you need below
+2. Copy the search keyword (shown after →)
+3. Use Grep tool or Ctrl+F to find the section in this file
+
 ### 🚨 Critical Sections (Read These First):
-- **Lines 48-63**: Mandatory Foundation Rules
-- **Lines 65-84**: Rule Inputs in Mockups - Common Mistake (NEVER use ri! in mockups)
-- **Lines 86-130**: Essential SAIL Structure
-- **Lines 136-142**: Unused Variables in Mockups (should NOT have unused variables)
-- **Lines 144-530**: Requirement-Driven Documentation Pattern (adding requirement comments to code)
-- **Lines 595-856**: a!forEach() Function Variables Reference
-- **Lines 859-946**: Dynamic Form Fields with forEach (parallel array pattern for storing user input)
-- **Lines 1263-1448**: Null Safety Implementation (including computed variables and short-circuit evaluation)
-- **Lines 2177-2264**: Multi-Checkbox Pattern (single array variable - NOT separate booleans)
-- **Lines 2265-2385**: Single Checkbox Field Pattern (initialization and null checking)
-- **Lines 2386-2998**: Grid Selection Patterns (naming conventions and two-variable approach)
-- **Lines 2999-3052**: Date/Time Type Matching
+- **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **Rule Inputs in Mockups** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
+- **Essential SAIL Structure** → `"## Essential SAIL Structure"`
+- **Unused Variables in Mockups** → `"## 📝 Unused Variables in Mockups"`
+- **Requirement-Driven Documentation** → `"## 📋 Requirement-Driven Documentation Pattern"`
+- **a!forEach() Function Variables** → `"## 🚨 CRITICAL: a!forEach() Function Variables Reference"`
+- **Dynamic Form Fields with forEach** → `"## Dynamic Form Fields with forEach - Parallel Array Pattern"`
+- **Null Safety Implementation** → `"## 🚨 MANDATORY: Null Safety Implementation"`
+- **Multi-Checkbox Pattern** → `"## ⚠️ CRITICAL: Multi-Checkbox Field Pattern"`
+- **Single Checkbox Field Pattern** → `"## Single Checkbox Field Pattern"`
+- **Grid Selection Patterns** → `"## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections"`
+- **Date/Time Type Matching** → `"## Date/Time Critical Rules"`
 
 ### By Task Type:
-- **Documenting requirements in code** → Lines 144-530 (Requirement-Driven Documentation Pattern)
-- **Handling unused variables** → Lines 136-142 (Unused Variables in Mockups)
-- **Working with arrays and loops** → Lines 595-856 (a!forEach() Reference), Lines 947-1262 (Array Patterns)
-- **forEach generating input fields (textField, dateField, fileUploadField)** → Lines 859-946 (Dynamic Form Fields Pattern)
-- **Pattern matching (status codes, categories, priority levels)** → Lines 1603-1701 (✅ Best Practice: PREFER a!match() Over Nested if())
-- **Managing grid selections (ID arrays + full data)** → Lines 2386-2998 (Complete Grid Selection Guide)
-- **Building charts with mock data** → Lines 3053-3191 (Chart Data Configuration)
-- **Working with dates and times** → Lines 2999-3052 (Date/Time Critical Rules)
-- **Using single checkbox with proper initialization** → Lines 2265-2385 (Single Checkbox Field Pattern)
-- **Using multiple checkbox selections** → Lines 2177-2264 (Multi-Checkbox Pattern - single array variable)
+- **Documenting requirements in code** → `"## 📋 Requirement-Driven Documentation Pattern"`
+- **Handling unused variables** → `"## 📝 Unused Variables in Mockups"`
+- **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Internationalization considerations** → `"## ⚠️ INTERNATIONALIZATION IN APPIAN INTERFACES"`
+- **Working with arrays and loops** → `"## 🚨 CRITICAL: a!forEach() Function Variables Reference"`
+- **forEach generating input fields** → `"## Dynamic Form Fields with forEach - Parallel Array Pattern"`
+- **Direct property saving in forEach** → `"## ⚠️ CRITICAL: Direct Property Saving in forEach"`
+- **Dot notation and derived data patterns** → `"### Dot Notation & Derived Data Patterns"`
+- **Using wherecontains() correctly** → `"### Using wherecontains() Correctly"`
+- **Pattern matching (status codes, categories)** → `"### ✅ Best Practice: PREFER a!match() Over Nested if()"`
+- **Managing grid selections (ID arrays + full data)** → `"## 🚨 CRITICAL: Grid Selection Implementation Pattern"`
+- **Building charts with mock data** → `"## Chart Data Configuration"`
+- **Chart components usage** → `"## Chart Components Usage"`
+- **Working with dates and times** → `"## Date/Time Critical Rules"`
+- **Single checkbox initialization** → `"## Single Checkbox Field Pattern"`
+- **Multiple checkbox selections** → `"## ⚠️ CRITICAL: Multi-Checkbox Field Pattern"`
 
 ### By Error Type:
-- **"Variable not defined" errors** → Lines 48-63 (Mandatory Foundation Rules)
-- **"Rule input not defined" errors (ri!)** → Lines 65-84 (Rule Inputs in Mockups - NEVER use ri! in mockups)
-- **Null reference errors** → Lines 1263-1623 (Null Safety Implementation)
-- **Invalid function parameters** → Lines 1225-1262 (Function Parameter Validation)
-- **Short-circuit evaluation errors (and/or vs if)** → Lines 1351-1448 (Short-Circuit Evaluation Rules)
-- **Property access errors (property() function)** → Lines 947-1134 (Dot Notation & Derived Data Patterns)
-- **Syntax errors (and/or, if statements)** → Lines 553-594 (Language-Specific Syntax Patterns)
-- **Grid selection not working** → Lines 2456-2554 (Grid Selection Behavior), Lines 2494-2998 (Implementation Pattern)
-- **Grid selection variable naming errors** → Lines 2386-2493 (Variable Naming Conventions)
-- **Property access on grid selectionValue (trying to access .field on ID array)** → Lines 2758-2998 (Grid Selection Anti-Patterns)
-- **Type mismatch: Cannot index property into Integer/Text** → Lines 2758-2998 (Grid Selection Anti-Patterns)
-- **DateTime vs Date type mismatch in filters** → Lines 2999-3052 (Date/Time Type Matching)
-- **Checkbox initialization errors (false vs null)** → Lines 2288-2348 (Variable Initialization for Pattern 2)
-- **Checkbox state checking errors (length vs null)** → Lines 2349-2385 (Common Mistakes - save!value)
+- **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **"Rule input not defined (ri!)"** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
+- **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
+- **Invalid function parameters** → `"## ⚠️ Function Parameter Validation"`
+- **Short-circuit evaluation errors** → `"## 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
+- **Property access errors** → `"### Dot Notation & Derived Data Patterns"`
+- **Syntax errors (and/or, if)** → `"## ⚠️ Language-Specific Syntax Patterns"`
+- **wherecontains() parameter errors** → `"### Using wherecontains() Correctly"`
+- **forEach item removal errors** → `"#### Critical Pattern: Removing Items from Arrays"`
+- **Direct property saving errors** → `"## ⚠️ CRITICAL: Direct Property Saving in forEach"`
+- **Grid selection not working** → `"## 🚨 CRITICAL: Grid Selection Implementation Pattern"`
+- **Grid selection variable naming errors** → `"## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections"`
+- **Property access on grid selectionValue** → `"### Anti-Pattern 1: Property Access on ID Array Variable"`
+- **Type mismatch: Cannot index property** → `"## 🚨 CRITICAL ANTI-PATTERNS - DO NOT DO THIS"`
+- **DateTime vs Date type mismatch** → `"## Date/Time Critical Rules"`
+- **Checkbox initialization errors** → `"## Single Checkbox Field Pattern"`
+- **Checkbox state checking errors** → `"### Common Mistakes - save!value"`
 
 ### Validation & Troubleshooting:
-- **Final validation checklist** → Lines 3192-3237 (Syntax Validation Checklist)
+- **Quick troubleshooting guide** → `"## 🔧 Quick Troubleshooting"`
+- **Final validation checklist** → `"## Syntax Validation Checklist"`
+- **Essential functions reference** → `"## Essential Functions Reference"`
 
 ---
 
