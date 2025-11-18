@@ -1657,6 +1657,10 @@
           "type": "Boolean",
           "required": false
         },
+        "disabled": {
+          "type": "Boolean",
+          "required": false
+        },
         "requiredMessage": {
           "type": "Text",
           "required": false
