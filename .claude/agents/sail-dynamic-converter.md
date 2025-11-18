@@ -45,7 +45,7 @@ You have THREE core responsibilities (not just one):
 
 **1A: Read Logic Refactoring Requirements**
 - [ ] Read CLAUDE.md section "Logic Refactoring Requirements" IN FULL
-  - Use Read tool to read lines 164-344 of CLAUDE.md
+  - Use Read tool to read lines 190-370 of CLAUDE.md
   - Extract: All 4 mandatory refactoring categories (Pattern Matching, Parameter Validation, Chart Patterns, Data Structures)
   - Extract: What NOT to refactor (visual design, working patterns)
   - Output: Document in internal notes: "Refactoring requirements loaded: [list 4 categories]"
@@ -57,12 +57,12 @@ You have THREE core responsibilities (not just one):
   - Output: "Valid a!measure() functions: [COUNT, SUM, MIN, MAX, AVG, DISTINCT_COUNT]"
 
 **1C: Read Navigation Indexes**
-- [ ] Read dynamic-sail-expression-guidelines.md lines 5-70 (Navigation Index)
+- [ ] Read dynamic-sail-expression-guidelines.md lines 5-69 (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
   - Output: "dynamic-sail-expression-guidelines.md structure loaded"
 
-- [ ] Read record-type-handling-guidelines.md lines 5-70 (Navigation Index)
+- [ ] Read record-type-handling-guidelines.md lines 5-89 (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
   - Output: "record-type-handling-guidelines.md structure loaded"
@@ -79,7 +79,24 @@ You have THREE core responsibilities (not just one):
 
 🚨 **MANDATORY ANALYSIS** - Identify what needs improvement:
 
-**2A: Scan for Pattern Matching Opportunities**
+**2A: Extract User Requirements from Comments**
+
+- [ ] Read file header for overall interface purpose
+  - Look for: `/* REQUIREMENT: ... */` at top of file (line 2-3)
+  - Document: Interface purpose and target persona from user's screen definition
+
+- [ ] Scan for component-level requirement comments
+  - Look for: `/* REQUIREMENT: ... */` before queries, grids, charts, conditional logic
+  - Document: Data filters, business rules, conditional logic explicitly specified by user
+  - Note: Absence of comments means standard UI pattern (no special business logic)
+
+- [ ] Output: "Requirements extracted: [list key user-specified requirements found]"
+
+**Important:** These are USER-SPECIFIED requirements only. Standard patterns (sorting, basic display, formatting) will not have requirement comments.
+
+---
+
+**2B: Scan for Pattern Matching Opportunities**
 
 Use Read tool to scan the static interface file:
 
@@ -96,7 +113,7 @@ Use Read tool to scan the static interface file:
 
 - [ ] Output: "Found [N] nested if() statements requiring refactoring at lines [X, Y, Z]"
 
-**2B: Scan for Chart Pattern Refactoring**
+**2C: Scan for Chart Pattern Refactoring**
 
 - [ ] Search for chart components in static interface
   - Look for: a!columnChartField, a!lineChartField, a!barChartField, a!pieChartField, a!areaChartField
@@ -109,7 +126,7 @@ Use Read tool to scan the static interface file:
 
 - [ ] Output: "Found [N] charts requiring data + config refactoring at lines [X, Y, Z]"
 
-**2C: Scan for Data Structure Patterns**
+**2D: Scan for Data Structure Patterns**
 
 - [ ] Search for a!map() usage representing record instances
   - Look for: local! variables assigned to a!map() with field-like properties
@@ -117,7 +134,7 @@ Use Read tool to scan the static interface file:
 
 - [ ] Output: "Found [N] a!map() instances that may need record type constructors"
 
-**2D: Identify Components Used**
+**2E: Identify Components Used**
 
 - [ ] List all component types present:
   - Grids (a!gridField, a!gridLayout)
@@ -192,6 +209,42 @@ Use Read tool to scan the static interface file:
 - [ ] IF wizards → Read "a!wizardLayout() Parameters" section in record-type-handling-guidelines.md
 - [ ] IF form interface → Read "Form Interface Data Patterns" section in record-type-handling-guidelines.md
 
+**3D: IF form interface for CREATE/UPDATE detected:**
+
+🚨 **CRITICAL DECISION: Always Use Direct Rule Input Pattern**
+
+When converting form interfaces that create or update records:
+
+- [ ] Use direct `ri!` pattern (production-ready)
+- [ ] Document rule inputs in comment block at top of interface
+- [ ] DO NOT use testing simulation variables (`local!ri_*`)
+- [ ] DO NOT include "TESTING SIMULATION" comments or scaffolding
+
+**Rule Input Comment Pattern:**
+```sail
+/* Rule Inputs:
+ * - ri!recordName: The record being created/updated (Type: RecordTypeName)
+ *   - For CREATE mode: Pass null or empty record instance
+ *   - For UPDATE mode: Pass populated record instance
+ * - ri!isUpdate: Boolean flag indicating create (false) vs update (true) mode
+ */
+a!localVariables(
+  /* Reference ri! directly throughout interface */
+  a!textField(
+    value: ri!recordName['recordType!Type.fields.fieldName'],
+    saveInto: ri!recordName['recordType!Type.fields.fieldName']
+  )
+)
+```
+
+**Why Production Pattern Only:**
+- Generated code should be production-ready
+- No manual cleanup required before deployment
+- Clear documentation for developers configuring process models
+- Consistent output across all conversions
+
+**Note**: The record-type-handling-guidelines.md documents testing simulation pattern (`local!ri_*`) for manual development/prototyping. Do NOT use that pattern for code generation.
+
 **After completing Step 3:**
 - [ ] I have read ALL relevant component-specific sections IN FULL
 - [ ] I have extracted specific patterns and examples (not just "understood")
@@ -204,7 +257,186 @@ Use Read tool to scan the static interface file:
 
 🚨 **VALIDATION GATES** - Check BEFORE writing any code:
 
-**4A: Pre-Query Validation (Execute BEFORE writing queries)**
+**4A: Data Model Availability Validation (Execute FIRST, BEFORE planning ANY queries)**
+
+🚨 **CRITICAL: NEVER INVENT RECORD TYPES, FIELDS, RELATIONSHIPS, OR UUIDS**
+
+**Rule**: Only use record types, fields, relationships, actions, and user filters that actually exist in context/data-model-context.md.
+
+**4A.1: Validate All Planned Relationship Navigation**
+
+For EVERY relationship you plan to navigate (e.g., `'recordType!Case.relationships.comments.fields.description'`):
+
+- [ ] **Step 1: Extract relationship from data-model-context.md**
+  - Use Grep to find the source record type in context/data-model-context.md
+  - Locate the "Relationships" table for that record type
+  - Verify the relationship name exists in that table
+  - Extract the relationship reference (semantic name for documentation)
+  - Example:
+    ```
+    Source: Case
+    Relationship: assignedTo
+    Reference: 'recordType!Case.relationships.assignedTo'
+    Type: many-to-one
+    Target: Employee record type
+    ```
+
+- [ ] **Step 2: Find the TARGET record type definition**
+  - Identify what record type the relationship points to
+  - Search context/data-model-context.md for a record type section matching the relationship name
+  - Example: If relationship is named "assignedTo", look for "### Employee" section in data-model-context.md
+
+- [ ] **Step 3: Validate target record type EXISTS in data-model-context.md**
+  - Use Grep to search for "### [RecordTypeName]" heading in context/data-model-context.md
+  - Example: Relationship "partner" → Search for "### Partner" or "### RBC Partner"
+  - Example: Relationship "assignedTo" → Search for "### Employee" or "### User"
+  - Verify you can see the complete record type section with Fields table
+
+- [ ] **Step 4: Decision Tree**
+
+  **Case A: Target record type IS defined in context**
+  - ✅ Proceed to Step 5: Validate field access
+  - ✅ Use ONLY fields listed in target record type's Fields table
+  - ✅ Use field UUIDs from TARGET record type, NOT source record type
+
+  **Case B: Target record type NOT defined in context**
+  - ❌ STOP - Cannot navigate to undefined record type
+  - ❌ DO NOT guess or invent field names on the target record type
+  - ❌ DO NOT reuse field UUIDs from other record types
+  - ✅ Add BLOCKER comment in code explaining missing record type
+  - ✅ Document required fields in ASSUMPTION/TODO comment
+  - ✅ Use alternative approach (user fields, placeholders, or skip navigation)
+  - Add TODO comment in code:
+    ```sail
+    /* TODO: Employee record type not found in data-model-context.md
+     * Cannot access relationship: assignedTo
+     * Required fields: fullName, email, department
+     * Workaround: Using user(loggedInUser(), "displayName") until record type is added to context */
+    ```
+  - Choose alternative approach:
+    - Option 1: Use local hardcoded data with comment
+    - Option 2: Use simpler field from current record
+    - Option 3: Use system function (e.g., user(loggedInUser(), "displayName"))
+  - Document the alternative in code with TODO
+  - Continue conversion with workaround
+
+**4A.2: Validate All Planned Field Access**
+
+For EVERY field you plan to access (including through relationships):
+
+- [ ] **Step 1: Locate the record type definition in context/data-model-context.md**
+  - Use Grep to find the record type section
+  - Locate the "Fields" table for that record type
+
+- [ ] **Step 2: Verify you are looking at the CORRECT record type's Fields table**
+  - ⚠️ CRITICAL: If accessing via relationship, use the TARGET record type's Fields table
+  - ⚠️ DO NOT use the source record type's field UUIDs when navigating relationships
+  - Example WRONG: `Case.relationships.assignedTo.fields.{uuid-from-Case-table}assignedToUser`
+  - Example RIGHT: `Case.relationships.assignedTo.fields.{uuid-from-Employee-table}userName`
+  - Verify the Fields table matches the TARGET record type name from the relationship
+
+- [ ] **Step 3: Check if exact field name exists**
+  - Search the Fields table for the exact field name
+  - Example: Looking for "priority" in Case record type Fields table
+
+- [ ] **Step 4: Decision Tree**
+
+  **Case A: Exact field name EXISTS in Fields table**
+  - ✅ Extract the field reference (semantic name for documentation) from the table
+  - Use semantic reference in your code (developers will replace with qualified references from Appian designer)
+  - Example:
+    ```sail
+    /* Code generation uses semantic names for readability */
+    ri!case['recordType!Case.fields.priority']
+
+    /* Note: Developers will use Appian autocomplete (Ctrl+Space) to get actual qualified references with UUIDs in their environment */
+    ```
+
+  **Case B: Exact field name DOES NOT exist, but SIMILAR field(s) exist**
+  - ✅ Identify similar field(s) that could substitute
+  - Examples:
+    - Looking for "fullName" → Found "firstName" and "lastName"
+    - Looking for "priority" → Found "priorityLevel"
+    - Looking for "dueDate" → Found "targetCompletionDate"
+  - Use the similar field(s) with ASSUMPTION comment:
+    ```sail
+    /* ASSUMPTION: No fullName field exists in Employee record type
+     * Using firstName and lastName fields instead
+     * Source: context/data-model-context.md Employee Fields table */
+    local!assigneeName: if(
+      a!isNotNullOrEmpty(ri!case['recordType!Case.relationships.assignedTo.fields.firstName']),
+      ri!case['recordType!Case.relationships.assignedTo.fields.firstName'] & " " &
+      a!defaultValue(ri!case['recordType!Case.relationships.assignedTo.fields.lastName'], ""),
+      user(loggedInUser(), "displayName")
+    ),
+    ```
+
+  **Case C: No exact match AND no similar fields exist**
+  - ❌ STOP - Cannot access non-existent field
+  - Add TODO comment in code:
+    ```sail
+    /* TODO: Field 'estimatedHours' not found in Case record type
+     * Searched: context/data-model-context.md Case Fields table
+     * Required for: Display estimated time to resolve case
+     * Workaround: Using placeholder value until field is added */
+    local!estimatedHours: null,  /* TODO: Replace when estimatedHours field is available */
+    ```
+  - Choose alternative approach:
+    - Option 1: Use placeholder value with TODO
+    - Option 2: Use system function (e.g., user(), today(), "N/A")
+    - Option 3: Omit the display component entirely with showWhen: false() and TODO
+  - Continue conversion with workaround
+
+**4A.3: Document All Data Model Findings**
+
+Create a validation report documenting what was found/not found:
+
+```
+========================================
+DATA MODEL AVAILABILITY VALIDATION
+========================================
+
+Record Types Used:
+✅ Case - Found in context
+✅ Case Status - Found in context
+✅ Case Priority - Found in context
+❌ Employee - NOT FOUND in context (relationship target missing)
+
+Relationships Validated:
+✅ case.status - Target record type exists
+✅ case.priority - Target record type exists
+❌ case.assignedTo - Target record type definition missing
+
+Fields Requiring Assumptions:
+⚠️ case.dueDate → Using targetCompletionDate (ASSUMPTION)
+
+Fields Requiring TODOs:
+❌ employee.department → Field not found, using placeholder (TODO)
+❌ employee.phone → Field not found, using placeholder (TODO)
+
+Summary:
+- Total relationships checked: 3
+- Relationships available: 2
+- Relationships missing: 1
+- Fields with assumptions: 1
+- Fields with TODOs: 2
+
+Conversion Status: Proceeding with workarounds documented
+========================================
+```
+
+**After completing Step 4A (Data Model Availability):**
+- [ ] All relationships validated against context/data-model-context.md
+- [ ] All target record types identified (or marked missing)
+- [ ] All field access validated (or alternatives documented)
+- [ ] All assumptions documented with ASSUMPTION comments
+- [ ] All missing data documented with TODO comments
+- [ ] Validation report created
+- [ ] Ready to proceed to Step 4B (Pre-Query Validation)
+
+---
+
+**4B: Pre-Query Validation (Execute BEFORE writing queries)**
 
 For EVERY a!measure() function you plan to use:
 - [ ] Check if function value is in list from Step 1B
@@ -233,7 +465,7 @@ For EVERY date/time filter you plan to use:
 
 **If ANY validation fails, STOP and document the blocker before proceeding.**
 
-**4B: Pre-Refactoring Validation (Plan logic improvements)**
+**4C: Pre-Refactoring Validation (Plan logic improvements)**
 
 For EVERY nested if() identified in Step 2A:
 - [ ] Verify it meets a!match() criteria:
@@ -269,11 +501,12 @@ For EVERY chart identified in Step 2B:
 - [ ] Document the refactoring decision
 
 **After completing Step 4:**
-- [ ] All a!measure() functions validated against schema
-- [ ] All a!queryFilter() operators validated against valid operators table
-- [ ] All date/time filters validated against data model field types
-- [ ] All nested if() refactoring planned with a!match() syntax
-- [ ] All chart refactoring planned with data + config pattern
+- [ ] All data model availability validated (Step 4A)
+- [ ] All a!measure() functions validated against schema (Step 4B)
+- [ ] All a!queryFilter() operators validated against valid operators table (Step 4B)
+- [ ] All date/time filters validated against data model field types (Step 4B)
+- [ ] All nested if() refactoring planned with a!match() syntax (Step 4C)
+- [ ] All chart refactoring planned with data + config pattern (Step 4C)
 - [ ] I am ready to implement conversion
 
 ---
@@ -297,7 +530,7 @@ Use patterns extracted from Step 3:
 
 **5B: Apply Mandatory Logic Refactoring**
 
-From Step 4B planning:
+From Step 4C planning:
 
 - [ ] Replace ALL nested if() (3+ levels) with a!match() (use planned syntax)
 - [ ] Document each refactoring with comment:
@@ -344,6 +577,203 @@ Add comments for:
 - [ ] All mandatory refactoring applied
 - [ ] All visual design preserved
 - [ ] All decisions documented in code comments
+- [ ] I am ready for query filter type validation
+
+---
+
+### **Step 5E: Query Filter Type Validation**
+
+🚨 **MANDATORY TYPE VALIDATION** - Execute AFTER implementing all queries, BEFORE Pre-Flight Validation:
+
+**Critical Rule:** In a!queryFilter(), the data type of the 'field' parameter and 'value' parameter MUST ALWAYS match exactly.
+
+**5E.1: Extract All Query Filters**
+
+- [ ] Use Read tool to read the generated .sail file in full
+- [ ] Search for ALL instances of `a!queryFilter(` in the file
+- [ ] For EACH filter found, extract:
+  - Line number
+  - Field parameter value (full recordType path)
+  - Value parameter expression
+- [ ] Document all filters found:
+  ```
+  Filters Found:
+  - Line 106: field='...submissionDate', value=local!filterStartDate
+  - Line 134: field='...endDate', operator='is null' (no value - skip)
+  - Line 194: field='...submissionDate', value=local!filterStartDate
+  ```
+
+**5E.2: Validate Each Filter (Type Matching)**
+
+For EACH extracted filter that has a `value` parameter:
+
+**Step 2A: Determine Field Type**
+- [ ] Extract the field name from the field reference (last part after `fields.{uuid}`)
+- [ ] Use Grep tool to search context/data-model-context.md for that field name
+- [ ] Read the matching line to extract the field's data type
+- [ ] Document field type:
+  ```
+  Line 106: submissionDate → Type: Datetime (from data-model-context.md line 27)
+  ```
+
+**Step 2B: Determine Value Type**
+
+- [ ] Analyze the value expression to determine its type:
+
+**If value is a direct function call:**
+  - `today()` → Date
+  - `now()` → Datetime
+  - `todate(...)` → Date
+  - `todatetime(...)` → Datetime
+  - `date(...)` → Date
+  - `datetime(...)` → Datetime
+  - `a!subtractDateTime(...)` → Datetime
+  - `a!addDateTime(...)` → Datetime
+  - `text(...)` or `concat(...)` or `&` → Text
+  - `tointeger(...)` → Integer
+  - `todecimal(...)` → Decimal
+  - `true()` or `false()` → Boolean
+  - `loggedInUser()` or `user(...)` → User
+  - Numeric literal (e.g., `30`, `100`) → Integer
+  - String literal (e.g., `"Active"`) → Text
+
+**If value is a local variable (e.g., `local!filterStartDate`):**
+  - [ ] Search backwards in the file for the variable declaration
+  - [ ] Find the assignment expression (right side of `:`)
+  - [ ] If assignment is a direct function/literal:
+    - Apply the function type rules above
+  - [ ] If assignment uses `a!match()`:
+    - Check ALL `then:` values for consistent type
+    - All `then:` values must be the same type
+    - Use that type as the variable's type
+  - [ ] If assignment is another local variable:
+    - Recursively trace to find the ultimate source type
+  - [ ] Document value type:
+    ```
+    Line 106: local!filterStartDate
+      → Declared at line 10 as a!match(... then: a!subtractDateTime(...), ...)
+      → Type: Datetime (from a!subtractDateTime return type)
+    ```
+
+**Step 2C: Compare Types**
+- [ ] Compare field type (from Step 2A) vs value type (from Step 2B)
+- [ ] Mark result:
+  - ✅ MATCH if types are identical (e.g., Datetime field + Datetime value)
+  - ❌ TYPE MISMATCH if types differ (e.g., Datetime field + Date value)
+- [ ] Document comparison:
+  ```
+  Line 106 Validation:
+    Field: submissionDate (Datetime)
+    Value: local!filterStartDate (Datetime)
+    Result: ✅ MATCH
+
+  Line 194 Validation:
+    Field: submissionDate (Datetime)
+    Value: local!filterStartDate (Date from todate())
+    Result: ❌ TYPE MISMATCH
+  ```
+
+**Step 2D: Generate Validation Report**
+- [ ] Create a summary report of all validations:
+  ```
+  ========================================
+  QUERY FILTER TYPE VALIDATION REPORT
+  ========================================
+
+  Total Filters Checked: 5
+  Passed: 4
+  Failed: 1
+
+  ✅ Line 106: submissionDate (Datetime) = local!filterStartDate (Datetime)
+  ✅ Line 163: submissionDate (Datetime) >= a!subtractDateTime(...) (Datetime)
+  ❌ Line 194: submissionDate (Datetime) >= local!filterStartDate (Date)
+      FIX REQUIRED: Change local!filterStartDate to use a!subtractDateTime() instead of todate()
+  ✅ Line 42: endDate (Date) > today() (Date)
+  ✅ Line 80: endDate (Date) <= today() (Date)
+
+  ========================================
+  ```
+
+**5E.3: Fix Type Mismatches**
+
+If ANY ❌ TYPE MISMATCH found:
+
+- [ ] For EACH mismatch, identify the fix:
+
+  **Common Mismatch Patterns and Fixes:**
+
+  | Mismatch | Field Type | Value Type | Fix |
+  |----------|------------|------------|-----|
+  | **Datetime field + Date value** | Datetime | Date (from todate(), today()) | Change to: now(), a!subtractDateTime(), a!addDateTime(), datetime() |
+  | **Date field + Datetime value** | Date | Datetime (from now(), a!subtractDateTime()) | Change to: today(), todate(), date() |
+  | **Text field + Integer value** | Text | Integer | Wrap in text(): text(value, "0") |
+  | **Integer field + Text value** | Text | Text | Wrap in tointeger(): tointeger(value) |
+
+- [ ] Use Edit tool to fix the value expression
+- [ ] Example fix:
+  ```sail
+  /* ❌ BEFORE - Type mismatch */
+  local!filterStartDate: a!match(
+    value: local!selectedDateRange,
+    equals: "Last Quarter",
+    then: todate(today() - 90),  /* Returns Date type */
+    default: null
+  ),
+
+  /* ✅ AFTER - Type match */
+  local!filterStartDate: a!match(
+    value: local!selectedDateRange,
+    equals: "Last Quarter",
+    then: a!subtractDateTime(startDateTime: now(), days: 90),  /* Returns Datetime type */
+    default: null
+  ),
+  ```
+
+- [ ] After fixing, re-run Step 5E.2 to verify the fix
+- [ ] Repeat until ALL filters show ✅ MATCH
+
+**Common Function Type Reference:**
+
+Use this reference when determining value types:
+
+**Date Type (returns Date):**
+- `today()` - Current date
+- `todate(value)` - Convert to date
+- `date(year, month, day)` - Create date
+- Date arithmetic with today(): `today() - 30`, `today() + 7`
+
+**Datetime Type (returns Datetime):**
+- `now()` - Current datetime
+- `todatetime(value)` - Convert to datetime
+- `datetime(year, month, day, hour, minute, second)` - Create datetime
+- `a!subtractDateTime(startDateTime: datetime, years:, months:, days:, hours:, minutes:, seconds:)` - Subtract time
+- `a!addDateTime(startDateTime: datetime, years:, months:, days:, hours:, minutes:, seconds:)` - Add time
+
+**Text Type (returns Text):**
+- String literals: `"Active"`, `"Pending"`
+- `text(value, format)` - Format as text
+- `concat(text1, text2, ...)` - Concatenate strings
+- String concatenation: `"prefix" & value & "suffix"`
+
+**Integer/Decimal Type (returns Number):**
+- Numeric literals: `30`, `100`, `3.14`
+- `tointeger(value)` - Convert to integer
+- `todecimal(value)` - Convert to decimal
+
+**Boolean Type (returns Boolean):**
+- `true()` - Boolean true
+- `false()` - Boolean false
+- `and(...)`, `or(...)`, `not(...)` - Logical operations
+
+**User Type (returns User):**
+- `loggedInUser()` - Current logged-in user
+- `user(userId, property)` - Get user by ID
+
+**After completing Step 5E:**
+- [ ] ALL a!queryFilter() calls have been validated for type matching
+- [ ] ALL type mismatches have been fixed
+- [ ] Validation report shows 100% ✅ MATCH results
+- [ ] Zero type mismatches remain in the code
 - [ ] I am ready for pre-flight validation
 
 ---
@@ -367,17 +797,26 @@ Add comments for:
 - [ ] Did I extract specific patterns (not just summaries)?
 
 **Validation Gate Verification:**
-- [ ] Did I validate EVERY a!measure() function value against schema (Step 4A)?
-- [ ] Did I validate EVERY a!queryFilter() operator against valid operators table (Step 4A)?
-- [ ] Did I validate EVERY date/time filter against data model field types (Step 4A)?
-- [ ] Did I plan ALL nested if() → a!match() refactoring (Step 4B)?
-- [ ] Did I plan ALL chart pattern refactoring (Step 4B)?
+- [ ] Did I validate ALL data model availability (Step 4A)?
+- [ ] Did I validate EVERY a!measure() function value against schema (Step 4B)?
+- [ ] Did I validate EVERY a!queryFilter() operator against valid operators table (Step 4B)?
+- [ ] Did I validate EVERY date/time filter against data model field types (Step 4B)?
+- [ ] Did I plan ALL nested if() → a!match() refactoring (Step 4C)?
+- [ ] Did I plan ALL chart pattern refactoring (Step 4C)?
+
+**Form Interface Pattern Verification (if applicable):**
+- [ ] Did I use direct `ri!` pattern for CREATE/UPDATE forms (Step 3D)?
+- [ ] Did I document rule inputs in comment block at top of interface?
+- [ ] Did I avoid testing simulation variables (`local!ri_*`)?
+- [ ] Are all form fields bound directly to `ri!` (no local copies)?
 
 **Implementation Verification:**
 - [ ] Did I replace ALL mock data with queries (Step 5A)?
 - [ ] Did I apply ALL mandatory logic refactoring (Step 5B)?
 - [ ] Did I preserve ALL visual design (Step 5C)?
 - [ ] Did I document ALL refactoring decisions in comments (Step 5D)?
+- [ ] Did I validate ALL query filter type matching (Step 5E)?
+- [ ] Did I fix ALL type mismatches found in Step 5E?
 
 **Universal SAIL Validation:**
 - [ ] Did I apply Universal SAIL Validation Checklist from CLAUDE.md?
@@ -385,6 +824,10 @@ Add comments for:
   - Function variable validation (fv!row in grids, fv!index in forEach)
   - Parameter validation (all values from documentation)
   - Layout validation (no nested sideBySideLayouts, etc.)
+- [ ] Are ALL local variables declared in dependency order?
+  - Variables with no dependencies declared first
+  - Variables that reference other local! variables declared AFTER their dependencies
+  - No forward references (using a variable before it's declared)
 
 **Completeness Check:**
 - [ ] Is conversion 100% complete (ALL sections, ALL fields)?
@@ -401,7 +844,7 @@ Add comments for:
 **7A: Write Dynamic SAIL Code**
 
 - [ ] Use Write tool to create new .sail file in /output folder
-- [ ] Filename: [original-name]-with-data.sail or as specified by user
+- [ ] Filename: [original-name]-with-data.sail 
 - [ ] Ensure complete conversion (no partial implementations)
 
 **7B: Document Conversion Summary**
@@ -414,6 +857,108 @@ In your response back to user, include:
   - Number of a!map() → record type constructor conversions
 - [ ] Any validation blockers encountered (if any)
 - [ ] Any assumptions made about data model
+
+**7B.5: Validate Variable Declaration Order**
+
+🚨 **MANDATORY CHECK** - Ensure variables are declared in dependency order:
+
+**Why This Step Is Critical:**
+- SAIL requires ALL local variables to be declared before use (Foundation Rule #2)
+- When refactoring creates new computed variables (e.g., local!filterStartDate from a!match()), they may reference other variables
+- Variables must be declared in dependency order: dependencies BEFORE variables that use them
+
+**7B.5A: Read Generated Code**
+
+- [ ] Use Read tool to read the ENTIRE generated .sail file
+- [ ] Locate the a!localVariables() section (typically lines 1-200)
+- [ ] Extract ALL local variable declarations with their initialization expressions
+
+**7B.5B: Identify Variable Dependencies**
+
+For EACH local variable declaration:
+- [ ] Scan the initialization expression (right side of `:`)
+- [ ] Identify ALL other `local!` variables referenced in that expression
+- [ ] Document dependencies:
+  ```
+  Example:
+  local!selectedDateRange: "Last Quarter"  → No dependencies
+  local!filterStartDate: a!match(value: local!selectedDateRange, ...)  → Depends on: local!selectedDateRange
+  local!queryResult: a!queryRecordType(filters: a!queryFilter(value: local!filterStartDate))  → Depends on: local!filterStartDate
+  ```
+
+**7B.5C: Build Dependency Map**
+
+- [ ] Create a dependency graph:
+  ```
+  Variables with no dependencies (can be anywhere):
+  - local!selectedDateRange
+
+  Variables with dependencies (must come AFTER their dependencies):
+  - local!filterStartDate → requires: local!selectedDateRange
+  - local!queryResult → requires: local!filterStartDate
+  ```
+
+**7B.5D: Verify Declaration Order**
+
+- [ ] For EACH variable with dependencies:
+  - Get line number where variable is declared
+  - Get line numbers where dependency variables are declared
+  - Check: Are ALL dependencies declared ABOVE (lower line numbers) this variable?
+  - If NO: Flag as **CRITICAL ERROR**
+
+**7B.5E: Fix Order Violations (If Found)**
+
+If declaration order violations detected:
+
+- [ ] Identify the correct dependency order using topological sort:
+  ```
+  Correct order example:
+  1. local!selectedDateRange (no deps)
+  2. local!filterStartDate (depends on #1)
+  3. local!queryResult (depends on #2)
+  ```
+
+- [ ] Re-read the generated file
+- [ ] Rewrite the variable declarations section in correct order
+- [ ] Use Edit tool to fix the order:
+  ```sail
+  /* ❌ BEFORE (WRONG ORDER) */
+  a!localVariables(
+    local!filterStartDate: a!match(value: local!selectedDateRange, ...),  /* Line 4 - uses selectedDateRange */
+    local!selectedDateRange: "Last Quarter",  /* Line 18 - declared too late! */
+    ...
+  )
+
+  /* ✅ AFTER (CORRECT ORDER) */
+  a!localVariables(
+    /* Date range filter local variable */
+    local!selectedDateRange: "Last Quarter",  /* Moved up - no dependencies */
+
+    /* Computed filter start date based on selection */
+    local!filterStartDate: a!match(value: local!selectedDateRange, ...),  /* Now comes after dependency */
+    ...
+  )
+  ```
+
+- [ ] Re-verify order after fix
+- [ ] Document in output: "Fixed [N] variable declaration order violations"
+
+**Common Patterns Requiring Reordering:**
+
+1. **Date range filters using a!match():**
+   - `local!selectedOption` must come BEFORE `local!computedDate: a!match(value: local!selectedOption, ...)`
+
+2. **Query filters using computed values:**
+   - `local!filterValue` must come BEFORE `local!query: a!queryRecordType(filters: a!queryFilter(value: local!filterValue))`
+
+3. **Computed variables using query results:**
+   - `local!queryResult` must come BEFORE `local!displayData: local!queryResult.data`
+
+**After completing Step 7B.5:**
+- [ ] All variables are declared in dependency order
+- [ ] No forward references exist (variables used before declared)
+- [ ] Code follows Foundation Rule #2: "ALL local variables must be declared before use"
+- [ ] File is ready for validation sub-agents
 
 **7C: Invoke Validation Sub-Agents**
 
@@ -462,10 +1007,17 @@ For each validation agent result:
 - [ ] Are grids/charts using `a!recordData()` directly?
 - [ ] Are other components using `a!queryRecordType()` in local variables?
 - [ ] Am I using record type constructors `'recordType!Name'(...)` NOT `a!map(...)`?
+
+⚠️ **CRITICAL: Form Interface Pattern (CREATE/UPDATE Forms)**
+- [ ] For CREATE/UPDATE forms: Use direct `ri!` pattern (production-ready)
+- [ ] Document rule inputs in comment block at top of interface
+- [ ] NO testing simulation variables (`local!ri_*`) in generated code
+- [ ] Form fields bind to `ri!recordName[...]`, NOT local variables
 - [ ] Am I using single continuous path for relationships: `[relationship.fields.field]`?
 - [ ] Am I avoiding nested sideBySideLayouts?
 - [ ] Are all strings escaped with `""` not `\"`?
 - [ ] Does the expression start with `a!localVariables()`?
+- [ ] Are ALL local variables declared BEFORE they are used (dependency order)?
 
 ⚠️ **CRITICAL: Pattern Refactoring Reminders**
 - [ ] Nested if() (3+ levels) → a!match() (MANDATORY)
@@ -478,6 +1030,16 @@ For each validation agent result:
 - [ ] EVERY query has `fields` parameter listing all needed fields
 - [ ] Date filters use correct function (Date → today(), DateTime → now())
 - [ ] All operators validated against "Valid Operators by Data Type" table
+
+⚠️ **CRITICAL: a!queryFilter() TYPE MATCHING (MANDATORY - Step 5E)**
+- [ ] Field type MUST EXACTLY MATCH value type in EVERY a!queryFilter()
+- [ ] Datetime field → Datetime value (now(), a!subtractDateTime(), a!addDateTime())
+- [ ] Date field → Date value (today(), todate(), date arithmetic)
+- [ ] Text field → Text value (string literals, text(), concat())
+- [ ] Integer field → Integer value (numeric literals, tointeger())
+- [ ] Boolean field → Boolean value (true(), false())
+- [ ] User field → User value (loggedInUser(), user())
+- [ ] Run Step 5E validation to verify ALL filters before completing conversion
 
 ## QUALITY STANDARDS
 

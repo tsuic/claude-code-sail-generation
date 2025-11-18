@@ -284,3 +284,25 @@ The MCP server additionally validates:
 - ✅ SAIL expression evaluation
 - ✅ Runtime type checking
 - ✅ More nuanced syntax errors
+
+## 📌 Important Notes for Contributors
+
+### Line Number Cross-References
+
+**This project is under active development** and documentation changes are expected and encouraged. However, several files contain cross-references to specific line numbers in other files to help agents navigate efficiently.
+
+**Files with line number cross-references:**
+- `.claude/agents/sail-dynamic-converter.md` - References CLAUDE.md, dynamic-sail-expression-guidelines.md, record-type-handling-guidelines.md, and ui-guidelines files
+- `CLAUDE.md` - References dynamic-sail-expression-guidelines.md and record-type-handling-guidelines.md navigation indexes
+- `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - Internal cross-references to its own sections
+- `dynamic-behavior-guidelines/record-type-handling-guidelines.md` - Internal cross-references to its own sections
+
+**⚠️ After editing these files:**
+
+If you make substantial changes (adding/removing sections, restructuring content) to any of the files listed above, **ask Claude to update all line number references** before committing:
+
+> "I just updated [filename]. Can you check and update any line number references in the project that might have changed?"
+
+Claude will search for references like `lines 190-370` or `line 1748` across the project and verify they still point to the correct sections.
+
+**Why this matters:** Agents use these line references to efficiently read specific documentation sections. Outdated references can cause agents to read wrong sections, leading to code generation errors.

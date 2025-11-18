@@ -1932,7 +1932,7 @@ readOnly: if(
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 836-933).
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 1748-1845).
 
 #### Pattern for Null-Safe Property Access on Computed Variables
 

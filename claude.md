@@ -9,7 +9,7 @@
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
-- When converting mock to functional, refactor code structure as needed to accommodate record queries (e.g., chart patterns) and changes to logic, but preserve visual design
+- When converting mock to functional, apply ALL "Logic Refactoring Requirements" (see dedicated section below), refactor code structure for record queries (e.g., chart patterns), but preserve visual design
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -119,7 +119,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 **When working with dynamic data (arrays, loops, conditionals), ALWAYS read the appropriate guidelines FIRST:**
 
 ### **FOUNDATIONAL SAIL SYNTAX (Required for ALL Interfaces)**
-**Read:** `/dynamic-behavior-guidelines/mock-interface.md`
+**Read:** `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`
 
 **Contains:** Universal SAIL syntax rules that apply to **both mock and functional interfaces:**
 - ✅ **Language-specific syntax** (and/or/if functions, NOT JavaScript operators)
@@ -133,12 +133,12 @@ If you violate any of these rules, STOP and reconsider your approach.
 - ✅ **Pattern matching with a!match()**
 - ✅ **Dynamic form field patterns**
 
-**⚠️ Important:** Despite the "mock" in the filename, this file contains **FOUNDATIONAL rules for ALL SAIL code** (not just mockups).
+**⚠️ Important:** This file contains **FOUNDATIONAL rules for ALL SAIL code** (both mock and dynamic interfaces).
 
 ### **RECORD TYPE INTEGRATION (When Using Record Data)**
-**Read:** `/dynamic-behavior-guidelines/functional-interface.md`
+**Read:** `/dynamic-behavior-guidelines/record-type-handling-guidelines.md`
 
-**Contains:** Record-specific patterns built **ON TOP of mock-interface.md:**
+**Contains:** Record-specific patterns built **ON TOP of dynamic-sail-expression-guidelines.md:**
 - ✅ **Record type reference syntax** (UUID usage)
 - ✅ **Form interface data patterns** (ri! vs queries decision tree)
 - ✅ **Query construction** (a!queryRecordType, a!recordData)
@@ -146,7 +146,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - ✅ **Record type constructors** vs a!map()
 - ✅ **Testing simulation variables**
 
-**⚠️ Critical:** Functional interfaces use **ALL rules from mock-interface.md PLUS** record-specific rules from this file.
+**⚠️ Critical:** Functional interfaces with record types and data use **ALL rules from dynamic-sail-expression-guidelines.md PLUS** record-specific rules from this file.
 
 ### When to Read Dynamic Guidelines:
 - ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
@@ -160,6 +160,213 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 **THIS IS NOT OPTIONAL for dynamic code. Static forms may skip this.**
 **THIS IS NOT OPTIONAL when using checkboxes or conditional `required` parameters.**
+
+### **Rule Input Pattern for Functional Interfaces**
+
+When converting mockups to functional interfaces (CREATE/UPDATE forms):
+
+**Pattern to Use:**
+- ✅ Direct `ri!` pattern (production-ready)
+- ✅ Document rule inputs in comment block
+- ❌ NO testing simulation variables (`local!ri_*`)
+
+**Example:**
+```sail
+/* Rule Inputs:
+ * - ri!submission: The record being created/updated (null for create, populated for update)
+ * - ri!isUpdate: Boolean flag for create vs update mode
+ */
+a!localVariables(
+  /* Use ri! directly throughout */
+  a!textField(
+    value: ri!submission['recordType!Type.fields.name'],
+    saveInto: ri!submission['recordType!Type.fields.name']
+  )
+)
+```
+
+**Why**: Testing simulation variables (`local!ri_*`) are for manual development in Appian Designer. Generated code should be production-ready.
+
+## 🔄 LOGIC REFACTORING REQUIREMENTS (Mockup or dynamic to Functional with Record Data Conversion)
+
+**When converting mock interfaces to functional interfaces, the following logic improvements are MANDATORY:**
+
+### **1. Pattern Matching Improvements**
+
+**MANDATORY REFACTORING:**
+- ✅ Replace nested if() (3+ levels) with a!match() for enumerated value comparisons
+- ✅ Decision criteria: Single variable compared against 3+ distinct values
+- ✅ See dynamic-sail-expression-guidelines.md section "Using a!match() for Status-Based Lookups"
+
+**When to Apply:**
+- Pattern: `if(var = "A", ..., if(var = "B", ..., if(var = "C", ...)))`
+- Examples: Status codes, priority levels, categories, types, date ranges
+
+**Example:**
+```sail
+/* ❌ BEFORE (nested if) - OUTDATED PATTERN */
+if(status = "Open", "folder-open",
+  if(status = "Closed", "check-circle",
+    if(status = "Pending", "clock", "file")))
+
+/* ✅ AFTER (a!match) - MODERN PATTERN */
+a!match(
+  value: status,
+  equals: "Open",
+  then: "folder-open",
+  equals: "Closed",
+  then: "check-circle",
+  equals: "Pending",
+  then: "clock",
+  default: "file"
+)
+```
+
+**Benefits:**
+- Cleaner, more maintainable code
+- Short-circuits like if() - safe for conditional logic
+- Follows Appian best practices
+- Easier to extend with new values
+
+### **2. Parameter Validation**
+
+**MANDATORY VALIDATION:**
+- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` lines 5276-5288
+- ✅ ALL a!queryFilter() operators MUST exist in record-type-handling-guidelines.md "Valid Operators by Data Type"
+- ✅ ALL component parameters MUST be verified against `/ui-guidelines/0-sail-api-schema.json`
+- ✅ NO invented functions, parameters, or values
+
+**Valid a!measure() function values (ONLY these):**
+- `"COUNT"` - Count records
+- `"SUM"` - Sum numeric field
+- `"MIN"` - Minimum value
+- `"MAX"` - Maximum value
+- `"AVG"` - Average numeric field
+- `"DISTINCT_COUNT"` - Count distinct values
+
+**Workflow:**
+1. Identify function/parameter to use
+2. Read schema/documentation for valid values
+3. Verify value is in list
+4. If NOT in list → Use alternative approach OR document blocker
+
+**Example:**
+```sail
+/* ❌ WRONG - TOTAL_SUM doesn't exist (invented function) */
+a!measure(
+  function: "TOTAL_SUM",  /* Invalid! Not in schema */
+  field: 'recordType!Order.fields.amount',
+  alias: "totalRevenue"
+)
+
+/* ✅ RIGHT - Use valid function */
+a!measure(
+  function: "SUM",  /* Valid function from schema */
+  field: 'recordType!Order.fields.amount',
+  alias: "totalRevenue"
+)
+
+/* ✅ ALSO RIGHT - Use DISTINCT_COUNT for unique values */
+a!measure(
+  function: "DISTINCT_COUNT",  /* Valid function for counting distinct values */
+  field: 'recordType!Case.fields.clientId',
+  alias: "uniqueClients"
+)
+```
+
+### **3. Chart Pattern Refactoring**
+
+**MANDATORY REFACTORING for charts using record data:**
+- ✅ Convert mockup pattern (`categories` + `series`) → record data pattern (`data` + `config`)
+- ✅ See `/ui-guidelines/4-chart-instructions.md` section "Two Different Data Approaches" (lines 6-36)
+- ✅ Use appropriate chart config function
+
+**Chart Config Functions:**
+- `a!columnChartConfig()` - for column charts
+- `a!lineChartConfig()` - for line charts
+- `a!barChartConfig()` - for bar charts
+- `a!areaChartConfig()` - for area charts
+- `a!pieChartConfig()` - for pie charts
+
+**Example:**
+```sail
+/* ❌ BEFORE (mockup pattern) - INVALID for record data */
+a!columnChartField(
+  categories: {"Q1", "Q2", "Q3"},
+  series: {
+    a!chartSeries(label: "Sales", data: {100, 120, 115}, color: "#3B82F6")
+  }
+)
+
+/* ✅ AFTER (record data pattern) - CORRECT */
+a!columnChartField(
+  data: a!recordData(recordType: 'recordType!Order'),
+  config: a!columnChartConfig(
+    primaryGrouping: a!grouping(
+      field: 'recordType!Order.fields.orderDate',
+      interval: "MONTH_SHORT_TEXT"
+    ),
+    measures: {
+      a!measure(
+        label: "Sales",
+        function: "SUM",
+        field: 'recordType!Order.fields.amount'
+      )
+    }
+  )
+)
+```
+
+**Key Differences:**
+1. Remove top-level `categories` parameter → Move to `config.primaryGrouping`
+2. Remove top-level `series` with `data` arrays → Move `a!measure()` to `config.measures`
+3. Remove top-level `grouping` parameter → Move to `config.primaryGrouping`
+4. Add `config: a!<chartType>Config()` wrapper
+
+### **4. Data Structure Refactoring**
+
+**MANDATORY for functional interfaces:**
+- ✅ Convert a!map() → record type constructors where creating/updating record instances
+- ✅ See record-type-handling-guidelines.md section "Record Type Constructors vs a!map()"
+- ✅ Use relationship navigation instead of separate queries where possible
+
+**When to Apply:**
+- Creating new record instances
+- Updating existing record instances
+- Form interfaces that save to records
+
+**Example:**
+```sail
+/* ❌ BEFORE (a!map) - INCORRECT for record instances */
+local!newCase: a!map(
+  title: "New Case",
+  status: "Open",
+  assignedTo: loggedInUser()
+)
+
+/* ✅ AFTER (record type constructor) - CORRECT */
+local!newCase: 'recordType!{uuid}Case'(
+  title: "New Case",
+  status: "Open",
+  assignedTo: loggedInUser()
+)
+```
+
+### **What NOT to Refactor:**
+
+❌ **Do NOT modify:**
+- Visual design (colors, spacing, padding, margins, heights, widths, fonts, styling parameters)
+- Business logic intent (preserve calculations and validation rules)
+- Working null-safety patterns (if already correct using if()/a!isNotNullOrEmpty(), don't change)
+- Valid syntax patterns (and/or/if functions, a!forEach usage, proper comments, etc.)
+- Layout structure (if layout nesting is valid, don't reorganize)
+
+✅ **DO preserve:**
+- Color schemes and visual styling
+- Component arrangement and spacing
+- User experience flow
+- Existing null-safety checks that work correctly
+- Proper SAIL syntax (and/or/if functions, comment style, etc.)
 
 ## INITIAL REQUEST CATEGORIZATION
 
@@ -186,6 +393,47 @@ Determine if the user wants a full page or just a component.
   - ✅ "Create a dashboard that..." → Generate headerContentLayout with multiple sections
   - ✅ "Build a project management page..." → Generate full page structure
   - ✅ "Design an interface for..." → Generate full page structure
+
+## CAPTURING USER REQUIREMENTS IN GENERATED CODE
+
+When generating mockups, capture user-specified requirements as comments. **ONLY use requirements explicitly provided by the user - DO NOT invent or assume requirements.**
+
+**File Header Comment Pattern:**
+```sail
+a!localVariables(
+  /* REQUIREMENT: [Interface Purpose from user's screen definition]
+   * Example: Case List View - Displays active cases assigned to current user with filtering */
+```
+
+**Query/Component-Level Comment Pattern:**
+Before each data query or significant business logic component, ONLY if user specified the requirement:
+```sail
+  /* REQUIREMENT: [Specific data/logic requirement from user specification]
+   * Example: Display cases where status is "Open" or "In Progress" and assignedTo equals current user */
+  local!activeCasesQuery: a!queryRecordType(...)
+```
+
+**Grid Column Comment Pattern:**
+For calculated/conditional columns, ONLY if user specified the business rule:
+```sail
+  a!gridColumn(
+    label: "Priority",
+    /* REQUIREMENT: [User-specified business rule]
+     * Example: High priority cases (priority = 1) show in red, medium (priority = 2) in yellow, low (priority = 3) in gray */
+    value: a!tagField(...)
+  )
+```
+
+**Critical Rules:**
+- ✅ ONLY capture requirements explicitly stated by the user
+- ❌ DO NOT add requirement comments for standard UI patterns (sorting, formatting, basic display)
+- ❌ DO NOT invent business rules or make assumptions about data logic
+- ❌ DO NOT add comments for: standard formatting (dates, numbers, currency), basic sorting, default UI behaviors, standard SAIL patterns
+
+**These comments serve as:**
+- Documentation for developers
+- Context for sail-dynamic-converter agent during conversion
+- Traceability back to user requirements
 
 ## PAGE UI DESIGN PLANNING STEPS
 When designing a full page, follow these planning steps (not necessary if user requests a single component):
@@ -264,7 +512,7 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 
 ### Dynamic Form Generation
 - When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
-- Read `/dynamic-behavior-guidelines/mock-interface.md` section on "Dynamic Form Fields with forEach" before implementing
+- Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
 - NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
 
 ### Special Rules
@@ -305,13 +553,13 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
      - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
      - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
-     - See `/dynamic-behavior-guidelines/mock-interface.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
+     - See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
 
 ### Pattern Matching with a!match()
 
 For cleaner pattern matching (status codes, priority levels, categories), use `a!match()` instead of nested `if()` statements.
 
-See `/dynamic-behavior-guidelines/mock-interface.md` - section "Using a!match() for Status-Based Lookups" for:
+See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "Using a!match() for Status-Based Lookups" for:
 - Pattern: Status to Icon/Color mapping (a!match() vs parallel arrays)
 - Pattern: Dynamic styling with stampField
 - Pattern: Grid column conditional background colors
@@ -321,7 +569,7 @@ See `/dynamic-behavior-guidelines/mock-interface.md` - section "Using a!match() 
 
 Many SAIL functions cannot accept null parameters and will cause runtime errors.
 
-See `/dynamic-behavior-guidelines/mock-interface.md`:
+See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
 - Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for if() vs and()/or() usage
 - Section "Advanced: Functions That Reject Null" for a!defaultValue() patterns
 - Section "🚨 MANDATORY: Null Safety Implementation" for complete implementation patterns
@@ -332,7 +580,7 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 
 **Most common mistake**: Using `fv!index` in grid columns (it doesn't exist - only `fv!row` is available)
 
-See `/dynamic-behavior-guidelines/mock-interface.md`:
+See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
 - Section "⚠️ Function Variables (fv!) Reference" for complete a!forEach() function variables
 - Section "Grid Selection Pattern: Two-Variable Approach" for complete grid selection patterns
 - Section "⚠️ CRITICAL: Grid Selection Behavior" for selection behavior and common mistakes
@@ -391,13 +639,13 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 ## PARAMETER RESTRICTIONS
 - Only use parameters explicitly defined in the documentation
 - For parameters with listed valid values, only use those specific values
-- Color values must use 6-character hex codes (#RRGGBB) or documented enumeration values (like "ACCENT"). 
+- Color values must use 6-character hex codes (#RRGGBB) or documented enumeration values (like "ACCENT").
   - Allowed color enumeration values vary across components. Only use values specified in the documentation for that component.
   - HTML color names like "RED" are invalid
 - Icons must reference valid aliases (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
 - RichTextItem align parameter allowed values are "LEFT", "CENTER", or "RIGHT", do not use "START" or "END"!
 - Checkbox and radio button labels can only accept plain text, not rich text
-- choiceValues CANNOT be null or empty strings (“”)
+- choiceValues CANNOT be null or empty strings ("")
 
 ## 🛑 MANDATORY DELEGATION CHECKLIST
 
@@ -420,11 +668,14 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 **❌ NEVER:**
 - Attempt conversion yourself without invoking the agent
 - Make up UUIDs or field references
-- Read functional-interface.md and convert manually
+- Read record-type-handling-guidelines.md and convert manually
 
 **✅ AGENT MUST:**
-- Refactor code structure when required for record data (chart patterns, field references) and logic
-- Preserve visual design and layout (colors, spacing, styling)
+1. **Read CLAUDE.md "Logic Refactoring Requirements" section** before conversion (MANDATORY)
+2. **Apply ALL mandatory refactoring** (pattern matching, parameter validation, chart patterns, data structures)
+3. **Refactor code structure** when required for record data (chart patterns, field references)
+4. **Preserve visual design** and layout (colors, spacing, styling)
+5. **Document refactoring decisions** in code comments with section references
 
 ---
 
@@ -459,16 +710,33 @@ When validating interfaces with rule inputs or environment-specific references, 
 - ❌ Syntax errors (mismatched braces, quotes)
 - ❌ Undefined local variables (local! not declared in a!localVariables)
 
+---
+
+## 🚨 UNIVERSAL SAIL VALIDATION CHECKLIST
+
+**This checklist applies to BOTH mock generation AND functional conversion.**
+
+Use this checklist:
+- ✅ When generating new mockup interfaces (primary agent)
+- ✅ When converting mockups to functional (sail-dynamic-converter agent)
+- ✅ Before calling validation sub-agents
+
 ### Before Writing Dynamic Code:
-- [ ] Read `/dynamic-behavior-guidelines/mock-interface.md` if using arrays, loops, null checking in mock data interfaces
-- [ ] Read `/dynamic-behavior-guidelines/functional-interface.md` if working with record types, queries, or relationships
+- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
+- [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
 
 ### Dynamic Form Field Validation:
 - [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
 - [ ] Parallel arrays initialized as {} for multiple fields per forEach item ‼️
 - [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
-- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in mock-interface.md)
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in dynamic-sail-expression-guidelines.md)
+
+### Form Interface Pattern (Functional Interfaces with CREATE/UPDATE):
+- [ ] Uses direct `ri!` pattern (NOT `local!ri_*` testing simulation) ‼️
+- [ ] Rule inputs documented in comment block at top ‼️
+- [ ] NO testing simulation scaffolding ‼️
+- [ ] Form fields bind directly to `ri!` (no intermediate copies) ‼️
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()
@@ -477,7 +745,7 @@ When validating interfaces with rule inputs or environment-specific references, 
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see mock-interface.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
+- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see dynamic-sail-expression-guidelines.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
 - [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
 - [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
@@ -485,6 +753,7 @@ When validating interfaces with rule inputs or environment-specific references, 
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
+- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see record-type-handling-guidelines.md "Query Result Data Structures")
 
 ### Function Variable Validation:
 - [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
@@ -495,6 +764,8 @@ When validating interfaces with rule inputs or environment-specific references, 
 
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
+- [ ] For functional interfaces: ALL a!measure() functions validated against 0-sail-api-schema.json
+- [ ] For functional interfaces: ALL a!queryFilter() operators validated against record-type-handling-guidelines.md
 
 ### Layout Validation:
 - [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
@@ -503,3 +774,54 @@ When validating interfaces with rule inputs or environment-specific references, 
 - [ ] Only richTextItems or richTextIcons in richTextDisplayField
 - [ ] At least one AUTO width column in each columnsLayout
 - [ ] ❌ DON'T USE `less` or `more` for `spacing`!
+
+### Logic Pattern Validation (Functional Interfaces Only):
+- [ ] All nested if() (3+ levels) refactored to a!match() where appropriate
+- [ ] All charts using record data refactored to data + config pattern
+- [ ] All record instances using record type constructors (not a!map)
+- [ ] All refactoring decisions documented in code comments
+
+---
+
+## 📖 DOCUMENTATION CROSS-REFERENCE
+
+**This project uses a multi-file documentation structure. Here's how they work together:**
+
+### **For Primary Agent (generating mockups):**
+- **Read:** CLAUDE.md (this file) for all UI generation instructions
+- **Read:** dynamic-sail-expression-guidelines.md for dynamic behavior patterns (arrays, loops, null safety, a!match())
+- **Read:** ui-guidelines/* for component-specific templates and parameters
+- **DO NOT read:** record-type-handling-guidelines.md (that's for conversions only)
+
+### **For sail-dynamic-converter Agent (mock → functional):**
+- **Read:** CLAUDE.md section "Logic Refactoring Requirements" (MANDATORY)
+- **Read:** CLAUDE.md section "Universal SAIL Validation Checklist" (MANDATORY)
+- **Read:** dynamic-sail-expression-guidelines.md for patterns to preserve/improve (via Navigation Index)
+- **Read:** record-type-handling-guidelines.md for record query patterns (via Navigation Index)
+- **Read:** ui-guidelines/0-sail-api-schema.json for parameter validation (MANDATORY)
+- **Read:** context/data-model-context.md for field types and relationships (MANDATORY)
+
+### **Validation applies to both:**
+- Both agents must follow Universal SAIL Validation Checklist
+- Both agents must read component docs before using components
+- Both agents must validate parameters against schemas
+
+### **How to Navigate Documentation:**
+
+**Use Navigation Indexes:**
+- dynamic-sail-expression-guidelines.md lines 5-69: Complete navigation index with search keywords
+- record-type-handling-guidelines.md lines 5-89: Complete navigation index with search keywords
+
+**Navigation Categories:**
+1. **Critical Sections** - Must-read foundational rules
+2. **By Task Type** - Find sections based on what you're building
+3. **By Error Type** - Troubleshoot validation errors
+
+**When to use which file:**
+- Building a form with arrays/loops? → dynamic-sail-expression-guidelines.md "By Task Type"
+- Converting to use record data? → record-type-handling-guidelines.md "By Task Type"
+- Got a validation error? → Both files have "By Error Type" sections
+- Using a specific component? → ui-guidelines/* for that component
+- Need valid parameter values? → ui-guidelines/0-sail-api-schema.json
+
+**If you're unsure which doc to read, check the Navigation Indexes first - they're designed to guide you to the right section.**

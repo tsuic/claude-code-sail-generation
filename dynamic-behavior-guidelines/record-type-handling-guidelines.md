@@ -9,6 +9,7 @@
 
 ### 🚨 Critical Sections (Read These First):
 - **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **Query Result Data Structures** → `"## 🚨 CRITICAL: Query Result Data Structures"`
 - **Record Type Reference Syntax** → `"## ⚠️ Record Type Reference Syntax"`
 - **Form Interface Data Patterns** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
 - **Testing Simulation Variables** → `"### 🚨 Testing Simulation Variables"`
@@ -25,6 +26,8 @@
 - **Date/Time Type Matching** → `"## Date/Time Critical Rules"`
 
 ### By Task Type:
+- **Using query results in any component (dropdown, checkbox, forEach, etc.)** → `"## 🚨 CRITICAL: Query Result Data Structures"`
+- **Accessing properties on queried data** → `"## 🚨 CRITICAL: Query Result Data Structures"`
 - **Building a form/wizard (create/update records)** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
 - **Using testing simulation variables** → `"### 🚨 Testing Simulation Variables"`
 - **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
@@ -33,7 +36,7 @@
 - **Multi-type form entry patterns** → `"## Multi-Type Form Entry Pattern"`
 - **Displaying data in grids or charts** → `"## Data Querying Patterns"`
 - **Nesting query logical expressions** → `"## Nesting Query Logical Expressions"`
-- **Managing many-to-one relationships (dropdowns)** → `"### Record Foreign Key Selection in Dropdowns"`
+- **Managing many-to-one relationships (dropdowns)** → `"## 🚨 CRITICAL: Query Result Data Structures"`
 - **Managing one-to-many relationships in forms** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
 - **Accessing related record data** → `"## Related Record Field References"`
 - **Accessing related data in forms** → `"## Accessing Related Record Data in Forms"`
@@ -51,6 +54,9 @@
 - **Documenting unused variables** → `"## 📝 Documenting Unused Local Variables"`
 
 ### By Error Type:
+- **"Property not found" on query results** → `"## 🚨 CRITICAL: Query Result Data Structures"`
+- **Empty dropdown/checkbox choices from queries** → `"## 🚨 CRITICAL: Query Result Data Structures"`
+- **forEach showing blank data** → `"## 🚨 CRITICAL: Query Result Data Structures"`
 - **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
 - **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
 - **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
@@ -95,12 +101,175 @@
 5. **Always validate for null values** - Use `a!isNullOrEmpty()` and `a!isNotNullOrEmpty()`
 6. **Set audit fields on create/update** - createdBy, createdOn, modifiedBy, modifiedOn
 7. **Never use `append()` with record data in dropdown choices - use placeholders**
-8. **For dropdowns with record data**: Use record IDs as choiceValues and record text fields as choiceLabels - NO value-to-ID translation needed
+8. **Query result data structure determines property access method**:
+   - **Regular field queries** (`fields: {record field references}`) → Returns array of **record instances**
+     - Access properties using **full record field references**: `'recordType!Type.fields.fieldName'`
+     - Examples: `index(array, 'recordType!Type.fields.name', {})`, `fv!item['recordType!Type.fields.id']`
+   - **Aggregation queries** (`a!aggregationFields(groupings, measures)`) → Returns array of **maps**
+     - Access properties using **text alias** from query: `"aliasName"`
+     - Examples: `index(array, "statusAlias", {})`, `fv!item.countAlias`, `array.groupingAlias`
+   - **This applies to ALL components**: dropdowns, checkboxes, radio buttons, forEach loops, grids, charts, etc.
 9. **Always try to use record types for populating read-only grids (`a!gridField()`) and charts** - instead of using mock data.
 10. **Rule inputs (ri!) are interface parameters, NOT local variables** - Never initialize ri! inside the interface
     - ❌ `ri!isUpdate: false()` - WRONG: Cannot initialize parameters
     - ✅ `/* ri!isUpdate (Boolean) */` - RIGHT: Document in comments only
     - ✅ Always null-check: `a!isNotNullOrEmpty(ri!param)` or `a!defaultValue(ri!param, default)`
+
+## 🚨 CRITICAL: Query Result Data Structures
+
+### Universal Rule: Query Type Determines Property Access
+
+**This principle applies to ALL components that use query results: dropdowns, checkboxes, radio buttons, forEach loops, grids, dynamic displays, etc.**
+
+#### Pattern 1: Regular Field Queries → Record Instances
+
+**Query Structure:**
+```sail
+a!queryRecordType(
+  recordType: 'recordType!{uuid}Type',
+  fields: {
+    'recordType!{uuid}Type.fields.{uuid}field1',
+    'recordType!{uuid}Type.fields.{uuid}field2'
+  }
+).data
+```
+
+**Returns:** Array of **record instances** (typed objects)
+
+**Property Access:** Use **full record field references**
+
+**Examples:**
+```sail
+/* Dropdown choices */
+choiceLabels: index(local!queryData, 'recordType!Type.fields.name', {})
+
+/* Checkbox choices */
+choiceLabels: index(local!queryData, 'recordType!Type.fields.label', {})
+
+/* Radio button choices */
+choiceLabels: index(local!queryData, 'recordType!Type.fields.displayName', {})
+
+/* forEach loop accessing properties */
+a!forEach(
+  items: local!queryData,
+  expression: a!cardLayout(
+    contents: {
+      a!textField(
+        value: fv!item['recordType!Type.fields.title']
+      ),
+      a!textField(
+        value: fv!item['recordType!Type.fields.description']
+      )
+    }
+  )
+)
+
+/* Grid column (when not using a!recordData) */
+a!gridColumn(
+  value: fv!row['recordType!Type.fields.status']
+)
+```
+
+#### Pattern 2: Aggregation Queries → Maps
+
+**Query Structure:**
+```sail
+a!queryRecordType(
+  recordType: 'recordType!{uuid}Type',
+  fields: a!aggregationFields(
+    groupings: {
+      a!grouping(field: 'recordType!Type.fields.category', alias: "categoryName")
+    },
+    measures: {
+      a!measure(function: "COUNT", alias: "itemCount")
+    }
+  )
+).data
+```
+
+**Returns:** Array of **maps** (untyped dictionaries with alias keys)
+
+**Property Access:** Use **text alias** from query definition
+
+**Examples:**
+```sail
+/* Dropdown choices */
+choiceLabels: index(local!aggregationData, "categoryName", {})
+
+/* forEach loop accessing aggregation results */
+a!forEach(
+  items: local!aggregationData,
+  expression: a!cardLayout(
+    contents: {
+      a!textField(
+        value: fv!item.categoryName  /* Dot notation works too */
+      ),
+      a!integerField(
+        value: fv!item.itemCount
+      )
+    }
+  )
+)
+
+/* Direct property access */
+local!firstCategory: local!aggregationData[1].categoryName
+```
+
+#### Quick Decision Guide
+
+**Ask yourself: What type of query am I using?**
+
+1. **Does my query use `fields: {record field references}`?**
+   - ✅ YES → You have **record instances**
+   - → Use: `'recordType!Type.fields.fieldName'` everywhere
+
+2. **Does my query use `a!aggregationFields(groupings, measures)`?**
+   - ✅ YES → You have **maps**
+   - → Use: `"aliasName"` (the alias from your query)
+
+**Apply this same logic to:**
+- ✅ Dropdown `choiceLabels`/`choiceValues`
+- ✅ Checkbox `choiceLabels`/`choiceValues`
+- ✅ Radio button `choiceLabels`/`choiceValues`
+- ✅ `a!forEach()` accessing `fv!item` properties
+- ✅ Grid columns accessing data (when not using `a!recordData`)
+- ✅ Any property access on query results
+
+#### Common Mistake
+
+❌ **WRONG: Using text property names on record instances**
+```sail
+local!users: a!queryRecordType(
+  fields: {'recordType!User.fields.username'}
+).data,
+
+/* These will ALL fail: */
+choiceLabels: index(local!users, "username", {}),           /* ❌ Dropdown */
+choiceValues: index(local!users, "userId", {}),             /* ❌ Checkbox */
+a!forEach(items: local!users, expression: fv!item.username) /* ❌ forEach */
+```
+
+✅ **RIGHT: Using record field references on record instances**
+```sail
+/* These will ALL work: */
+choiceLabels: index(local!users, 'recordType!User.fields.username', {}),
+choiceValues: index(local!users, 'recordType!User.fields.userId', {}),
+a!forEach(
+  items: local!users,
+  expression: fv!item['recordType!User.fields.username']
+)
+```
+
+#### Why This Matters
+
+**Record instances** are strongly typed objects that preserve the full record structure. They require explicit field paths to maintain type safety and relationship integrity.
+
+**Maps** are simple key-value dictionaries created from aggregations. The aliases you define become the property names.
+
+Using the wrong property access method causes:
+- Empty/blank displays (properties not found)
+- Runtime errors (invalid property access)
+- Data binding failures (saves don't persist)
 
 ## ⚠️ Record Type Reference Syntax
 
@@ -239,13 +408,29 @@ a!localVariables(
 - Form fields save directly to `ri!` (auto-persists to record)
 - Use `a!isNullOrEmpty()` for validation checks on rule inputs
 - Local variables used ONLY for transient UI state (selections, dynamic arrays, temporary data)
-- **Exception: Local variables ARE appropriate for reference/lookup data** (dropdown options, status lists, priority levels - see "Field Mapping Strategy 2", lines 724-752)
+- **Exception: Local variables ARE appropriate for reference/lookup data** (dropdown options, status lists, priority levels for missing reference tables)
 - ❌ NEVER copy rule inputs to local variables - this breaks data binding to process models
 - ✅ Reference `ri!` directly throughout the interface (even in nested conditionals)
 
-### 🚨 Testing Simulation Variables - MUST BE REMOVED FOR PRODUCTION
+### 🚨 Testing Simulation Variables - FOR MANUAL DEVELOPMENT ONLY
 
-When creating standalone testable interfaces during development, you may use simulation variables to mock rule inputs. However, **these MUST be clearly marked and completely removed before production deployment.**
+⚠️ **IMPORTANT: This pattern is for manual development in Appian Designer, NOT for code generation.**
+
+**When to use this pattern:**
+- ✅ You are manually writing/testing an interface in Appian Designer
+- ✅ You want to test the interface standalone (without a process model)
+- ✅ You will find-replace `local!ri_` → `ri!` before production deployment
+
+**When NOT to use this pattern:**
+- ❌ You are generating code programmatically
+- ❌ You are using the sail-dynamic-converter agent
+- ❌ You want production-ready code immediately
+
+**For Code Generation**: Use the direct `ri!` pattern shown in "✅ CORRECT: Rule Input Pattern" section above (lines 369-415). Skip the testing simulation entirely.
+
+---
+
+When creating standalone testable interfaces during **manual development**, you may use simulation variables to mock rule inputs. However, **these MUST be clearly marked and completely removed before production deployment.**
 
 **Pattern for Development/Testing:**
 ```sail
@@ -379,7 +564,7 @@ a!localVariables(
 3. **Mixing patterns inappropriately**
    - ❌ Wrong: Using ri! for reference data that shouldn't be edited
    - ✅ Right: Use ri! for main record, queries for reference/lookup data
-   - ✅ Alternative: Use local variables with hardcoded lists for missing reference tables (see "Field Mapping Strategy 2", lines 724-752)
+   - ✅ Alternative: Use local variables with hardcoded lists for missing reference tables
 
 4. **Using a!map() or {} for record instances**
    - ❌ Wrong: Using `a!map()` or empty `{}` to create record instances
@@ -1072,7 +1257,7 @@ readOnly: if(
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 1718-1767).
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 2343-2392).
 
 #### Pattern for Null-Safe Property Access on Computed Variables
 
@@ -3782,6 +3967,47 @@ local!name: a!defaultValue(
 **Key Rule**:
 - Aggregations with `groupings: {}` → Direct access: `query.data.alias`
 - Regular queries with `fields: {...}` → Array indexing: `query[1]['field']`
+
+### Error 12:
+**Error 12: Using Text Property Names on Record Instances**
+
+**Symptoms:** Empty choices, blank displays, "property not found" errors
+
+**Cause:** Using `"textPropertyName"` on field query results (record instances)
+
+**Incorrect Code:**
+```sail
+local!positions: a!queryRecordType(
+  fields: {
+    'recordType!Position.fields.name',
+    'recordType!Position.fields.id'
+  }
+).data,
+
+/* ❌ WRONG - Text property names don't work on record instances */
+choiceLabels: index(local!positions, "name", {}),
+choiceValues: index(local!positions, "id", {}),
+a!forEach(
+  items: local!positions,
+  expression: fv!item.name  /* Also fails */
+)
+```
+
+**Correct Code:**
+```sail
+/* ✅ RIGHT - Use full record field references */
+choiceLabels: index(local!positions, 'recordType!Position.fields.name', {}),
+choiceValues: index(local!positions, 'recordType!Position.fields.id', {}),
+a!forEach(
+  items: local!positions,
+  expression: fv!item['recordType!Position.fields.name']
+)
+```
+
+**Decision Rule:**
+- If query uses `fields: {...}` → Use record field references everywhere
+- If query uses `a!aggregationFields()` → Use text alias from query
+- See "Query Result Data Structures" section for complete patterns
 
 ## Syntax Validation Checklist
 
