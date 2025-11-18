@@ -451,6 +451,12 @@ Use the Grep tool to search `/dynamic-behavior-guidelines/functional-interface.m
   - Confirms: onSave for final submission
   - Confirms: Navigation button patterns
 
+- [ ] **IF using grids** → Search for "🚨 CRITICAL: Grid Column Sorting Rules"
+  - Confirms: sortField ONLY references fields (must end with .fields.{uuid}fieldName)
+  - Confirms: NEVER sort on relationships (cannot end with .relationships.{uuid}relName)
+  - Confirms: Many-to-one can sort on related fields (relationship.fields.field)
+  - Confirms: One-to-many relationships cannot be used for sorting
+
 **FINAL VERIFICATION**:
 
 - [ ] **Document unused variables**: Before completing conversion, search for "📝 Documenting Unused Local Variables"
@@ -622,6 +628,8 @@ If critical errors found: Fix them and re-validate until clean.
 - **Verify grid sortField usage**
   - Grid `sortField` only present when data references recordType or uses a!recordData()
   - Grid `sortField` removed if data uses groupings/forEach
+  - **Grid `sortField` MUST end with .fields.{uuid}fieldName (NOT .relationships.{uuid}relName)**
+  - Verify relationship type: many-to-one can sort on related fields, one-to-many cannot sort
 - **Verify all local variables are used**
   - Check each local! variable is referenced at least twice (definition + usage)
   - If unused with no clear future purpose → Remove it
