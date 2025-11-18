@@ -31,6 +31,7 @@ Validate SAIL code against the structured API schema:
 2. ✅ Parameters exist for those functions
 3. ✅ Parameter values match allowed enumerations
 4. ✅ Color values use correct format (hex or enumeration)
+5. ✅ **Record-only parameters are NOT used with local data** ‼️
 
 **You do NOT check:** nesting, structure, fv! context, or icon names (other agents handle these)
 
@@ -38,7 +39,7 @@ Validate SAIL code against the structured API schema:
 
 ## VALIDATION PROCESS
 
-Load schema → Extract functions → Validate each parameter with validValues → Log every check
+Load schema → Extract functions → Validate each parameter with validValues → Check record-only parameters → Log every check
 
 ### Quick Reference: Validation Steps
 
@@ -50,8 +51,11 @@ Load schema → Extract functions → Validate each parameter with validValues �
    - If not, check if acceptsHexColors is true and value is valid hex
    - Log every single check with result
    - Report error if invalid
+5. **For a!gridField specifically:** Check for record-only parameters with local data
+   - If `data` parameter uses `local!` → Flag any `showSearchBox`, `showRefreshButton`, or `recordActions` as errors
+   - These parameters ONLY work with record data (`recordType!` or `a!recordData()`)
 
-### Validation Example
+### Validation Example 1: Invalid Enumeration Value
 
 ```sail
 a!tagField(size: "MEDIUM")  /* Line 135 */
@@ -65,11 +69,36 @@ a!tagField(size: "MEDIUM")  /* Line 135 */
   Final: ❌ INVALID
 ```
 
+### Validation Example 2: Record-Only Parameter with Local Data
+
+```sail
+a!gridField(
+  data: local!employees,       /* Line 210 - Uses local data */
+  columns: {...},
+  showSearchBox: false,        /* Line 212 - Record-only parameter! */
+  showRefreshButton: false     /* Line 213 - Record-only parameter! */
+)
+```
+
+**Validation log:**
+```
+❌ Line 212 | a!gridField | showSearchBox: false
+  Data source: local!employees (LOCAL DATA)
+  Result: ❌ RECORD-ONLY PARAMETER WITH LOCAL DATA
+  Final: ❌ INVALID - Remove this parameter
+
+❌ Line 213 | a!gridField | showRefreshButton: false
+  Data source: local!employees (LOCAL DATA)
+  Result: ❌ RECORD-ONLY PARAMETER WITH LOCAL DATA
+  Final: ❌ INVALID - Remove this parameter
+```
+
 **Common mistakes to avoid:**
 - Skipping parameters that "look reasonable"
 - Using memory instead of checking actual schema
 - Sampling instead of checking ALL parameters
 - Not logging every single check
+- Missing record-only parameter violations in a!gridField
 
 ---
 
@@ -126,6 +155,23 @@ paramName: "VALID1"  /* Changed from "INVALID_VALUE" */
 ```
 ```
 
+```
+## ❌ ERROR [n]: Record-Only Parameter with Local Data
+
+**Location:** Line X | **Function:** `a!gridField` | **Parameter:** `showSearchBox` or `showRefreshButton`
+**Data Source:** `local!variableName` (LOCAL DATA)
+**Issue:** This parameter ONLY works with record data (`recordType!` or `a!recordData()`), NOT local variables
+
+**Fix:**
+```sail
+a!gridField(
+  data: local!employees,
+  columns: {...}
+  /* ✅ Removed showSearchBox and showRefreshButton */
+)
+```
+```
+
 ---
 
 ## VALIDATION ALGORITHM
@@ -148,6 +194,24 @@ paramName: "VALID1"  /* Changed from "INVALID_VALUE" */
 
      parameters = extractParameters(function, sailCode)
      schemaParams = schema.components[function].parameters
+
+     // 🆕 CRITICAL: Check for record-only parameters in a!gridField
+     if function == "a!gridField":
+       dataParam = parameters["data"]
+       recordOnlyParams = ["showSearchBox", "showRefreshButton", "recordActions"]
+
+       // Check if using local data
+       if dataParam && dataParam.startsWith("local!"):
+         for each recordOnlyParam in recordOnlyParams:
+           if recordOnlyParam in parameters:
+             errors.push({
+               type: "record_only_parameter_with_local_data",
+               function: function,
+               param: recordOnlyParam,
+               dataSource: dataParam,
+               lineNumber: getLineNumber(recordOnlyParam),
+               message: "Parameter '" + recordOnlyParam + "' ONLY works with record data (recordType! or a!recordData()), not local variables"
+             })
 
      for each param in parameters:
        if param not in schemaParams:
