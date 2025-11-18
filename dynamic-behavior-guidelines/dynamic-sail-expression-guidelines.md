@@ -158,7 +158,7 @@ a!forEach(
 - **Remove them** (they add confusion), or
 - **Use them** to demonstrate a pattern
 
-For production interfaces with justified unused variables, see the "Documenting Unused Local Variables" section in `functional-interface.md`.
+For production interfaces with justified unused variables, see the "Documenting Unused Local Variables" section in `record-type-handling-guidelines.md`.
 
 ## 📋 Requirement-Driven Documentation Pattern
 

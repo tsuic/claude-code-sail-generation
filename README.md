@@ -32,11 +32,11 @@ This project uses a hierarchical documentation approach:
   - Core topics: Syntax requirements, component selection, layout patterns
 
 ### Comprehensive Guides
-- **`/dynamic-behavior-guidelines/mock-interface.md`** - Complete guide for SAIL expressions with mock data
-  - Use this for: Arrays, loops, null safety, grid selection, dynamic forms
-  - **This is the authoritative source** for all dynamic SAIL patterns
+- **`/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`** - Complete guide for foundational SAIL expression patterns
+  - Use this for: Arrays, loops, null safety, grid selection, dynamic forms, conditional logic
+  - **This is the authoritative source** for all dynamic SAIL patterns (both mock and functional interfaces)
 
-- **`/dynamic-behavior-guidelines/functional-interface.md`** - Complete guide for SAIL with record types
+- **`/dynamic-behavior-guidelines/record-type-handling-guidelines.md`** - Complete guide for SAIL with record types
   - Use this for: Record queries, relationships, form patterns with ri!, data management
 
 ### Component Documentation
@@ -47,10 +47,10 @@ This project uses a hierarchical documentation approach:
   - `/patterns/` - Ready-to-use UI patterns (KPIs, cards, tabs, messages)
 
 ### Key Concepts
-- **Single Source of Truth**: mock-interface.md is the authoritative guide; claude.md points to it
+- **Single Source of Truth**: dynamic-sail-expression-guidelines.md is the authoritative guide; claude.md points to it
 - **Read Before Writing**: Always check component docs before using unfamiliar components
-- **Pattern Matching**: Use `a!match()` for status/category lookups (see mock-interface.md lines 1000-1103)
-- **Null Safety**: SAIL's `and()`/`or()` don't short-circuit; use `if()` for null checks (see mock-interface.md lines 1040-1188)
+- **Pattern Matching**: Use `a!match()` for status/category lookups (see dynamic-sail-expression-guidelines.md section "Using a!match() for Status-Based Lookups")
+- **Null Safety**: SAIL's `and()`/`or()` don't short-circuit; use `if()` for null checks (see dynamic-sail-expression-guidelines.md section "Short-Circuit Evaluation Rules")
 
 ## Generating a SAIL Mockup
 
@@ -120,7 +120,7 @@ Or generate and convert in one request:
 The `sail-dynamic-converter` agent:
 1. **Reads** your static SAIL mockup
 2. **Consults** `/context/data-model-context.md` for record type UUIDs and field references
-3. **Applies** patterns from `functional-interface.md`:
+3. **Applies** patterns from `record-type-handling-guidelines.md`:
    - Replaces `local!` arrays with `a!queryRecordType()` or `a!recordData()`
    - Converts form fields to use `ri!` rule input pattern
    - Adds null-safe field access patterns
@@ -229,8 +229,8 @@ local!selectedTasks: a!forEach(  /* Full task data */
 → Check Date vs DateTime types, wrap date arithmetic in `todate()`
 
 For detailed troubleshooting, see:
-- Mock interfaces: `/dynamic-behavior-guidelines/mock-interface.md` lines 2477-2506
-- Functional interfaces: `/dynamic-behavior-guidelines/functional-interface.md` lines 2848-2967
+- Mock interfaces: `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section "Quick Troubleshooting" and "Syntax Validation Checklist"
+- Functional interfaces: `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` section "Quick Troubleshooting" and "Syntax Validation Checklist"
 
 ## Validation Approaches
 
