@@ -1,11 +1,12 @@
 # PROJECT INSTRUCTIONS - SAIL UI GENERATION
 
 ## PURPOSE AND GOALS
-- Given a request, generate an Appian SAIL UI
+- Given a request, generate an Appian SAIL UI mockup
 - Write generated output to a .sail file in the /output folder
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling
 - Don't worry about querying live data, just hard-code sample content using local variables and a!map
+- Don't use `ri!` or `recordtype!` references to live record data unless explicitly asked to
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
