@@ -56,6 +56,10 @@ You have THREE core responsibilities (not just one):
   - Extract: Complete list of valid function values
   - Output: "Valid a!measure() functions: [COUNT, SUM, MIN, MAX, AVG, DISTINCT_COUNT]"
 
+- [ ] Read ui-guidelines/0-sail-api-schema.json line 6495 (user() valid properties)
+  - Use Read tool to extract valid property list
+  - Output: "Valid user() properties: [firstName, lastName, email, username, displayName]"
+
 **1C: Read Navigation Indexes**
 - [ ] Read dynamic-sail-expression-guidelines.md lines 5-69 (Navigation Index)
   - Use Read tool
@@ -70,6 +74,7 @@ You have THREE core responsibilities (not just one):
 **After completing Step 1:**
 - [ ] I have read CLAUDE.md Logic Refactoring Requirements section
 - [ ] I have extracted the valid a!measure() function list
+- [ ] I have extracted the valid user() property list
 - [ ] I have loaded both Navigation Indexes
 - [ ] I am ready to analyze the interface
 
@@ -288,37 +293,244 @@ For EVERY relationship you plan to navigate (e.g., `'recordType!Case.relationshi
 
 - [ ] **Step 3: Validate target record type EXISTS in data-model-context.md**
   - Use Grep to search for "### [RecordTypeName]" heading in context/data-model-context.md
-  - Example: Relationship "partner" → Search for "### Partner" or "### RBC Partner"
+  - Example: Relationship "caseStatus" → Search for "### Case Status" or "### Status"
   - Example: Relationship "assignedTo" → Search for "### Employee" or "### User"
   - Verify you can see the complete record type section with Fields table
+
+- [ ] **Step 3A: Check for Foreign Key ID Field Fallback (For any missing relationship target)**
+
+  🚨 **CRITICAL: When relationship target record type is NOT found in context**
+
+  If Step 3 fails (target record type NOT found in data-model-context.md):
+
+  - [ ] **Step 3A.1: Check source record type for foreign key ID field**
+    - Go back to source record type's Fields table in context/data-model-context.md
+    - Look for ID field that corresponds to the relationship
+    - Common naming patterns:
+      - Relationship: `caseType` → Look for: `caseTypeId` (Integer)
+      - Relationship: `assignedTo` → Look for: `assignedToId` (Integer) or `assignedToUser` (User)
+      - Relationship: `department` → Look for: `departmentId` (Integer)
+      - Relationship: `createdByUser` → Look for: `createdBy` (User)
+      - Relationship: `caseStatus` → Look for: `caseStatusId` (Integer)
+
+  - [ ] **Step 3A.2: Validate ID field exists and extract reference**
+    - Search source record type's Fields table for the ID field
+    - Extract the field reference from the Fields table
+    - Note the field's data type (Integer, User, Text, etc.)
+
+  - [ ] **Step 3A.3: Decision Tree**
+
+    **Case A: Foreign key ID field EXISTS in source record**
+    - ✅ Use the DIRECT ID FIELD instead of navigating the relationship
+    - ✅ Extract field reference from source record type's Fields table
+    - ✅ Add TODO comment explaining the limitation
+    - ✅ Document that relationship navigation is blocked until target record type is added
+    - Example for Integer ID field:
+      ```sail
+      /* TODO: Target record type for relationship 'caseType' not found in data-model-context.md
+       * Cannot navigate: Case.relationships.caseType.fields.typeName
+       * WORKAROUND: Using foreign key ID field 'caseTypeId' instead
+       * When target record type is added to context, replace with:
+       *   local!case['recordType!Case.relationships.caseType.fields.typeName']
+       * Source: context/data-model-context.md Case Fields table */
+      local!typeId: local!case['recordType!Case.fields.caseTypeId'],
+
+      /* Display ID value as text until relationship navigation is available */
+      value: if(
+        a!isNullOrEmpty(local!typeId),
+        "[Not available - case type record type missing]",
+        "Type ID: " & local!typeId
+      )
+      ```
+    - Example for User field:
+      ```sail
+      /* TODO: Target record type for relationship 'assignedTo' not found in data-model-context.md
+       * Cannot navigate: Case.relationships.assignedTo.fields.fullName
+       * WORKAROUND: Using direct User field 'assignedToUser' instead of relationship
+       * This field contains the User value directly - no navigation needed
+       * Source: context/data-model-context.md Case Fields table */
+      local!assignedUser: local!case['recordType!Case.fields.assignedToUser'],
+
+      /* Can use Appian user functions on User type fields */
+      value: if(
+        a!isNullOrEmpty(local!assignedUser),
+        "[Not assigned]",
+        user(local!assignedUser, "displayName")
+      )
+      ```
+    - ✅ Proceed with conversion using direct ID field
+    - ✅ Document in validation report: "Used foreign key ID field - relationship target missing"
+
+    **Case B: No foreign key ID field found**
+    - ❌ Cannot navigate relationship (target undefined)
+    - ❌ No direct ID field alternative available
+    - ❌ Add TODO with placeholder approach
+    - Example:
+      ```sail
+      /* TODO: Cannot access relationship 'relatedCases' - target record type not found
+       * No foreign key ID field found in source record type
+       * Required fields from relationship: caseNumber, subject, priority
+       * WORKAROUND: Using placeholder until target record type added to context
+       * When available, replace with relationship navigation */
+      value: "[Data not available - related record type missing from context]"
+      ```
+    - ✅ Use placeholder value with clear TODO
+    - ✅ Document in validation report: "Relationship blocked - no fallback available"
+
+  - [ ] Output: "Relationship [name] target not found, ID field fallback: [FOUND: fieldName (Type)] or [NOT FOUND]"
 
 - [ ] **Step 4: Decision Tree**
 
   **Case A: Target record type IS defined in context**
-  - ✅ Proceed to Step 5: Validate field access
+  - ✅ Proceed to Step 4A.2: Validate field access
   - ✅ Use ONLY fields listed in target record type's Fields table
   - ✅ Use field UUIDs from TARGET record type, NOT source record type
 
   **Case B: Target record type NOT defined in context**
+  - ⚠️ FIRST: Verify Step 3A fallback check was completed
   - ❌ STOP - Cannot navigate to undefined record type
   - ❌ DO NOT guess or invent field names on the target record type
   - ❌ DO NOT reuse field UUIDs from other record types
-  - ✅ Add BLOCKER comment in code explaining missing record type
-  - ✅ Document required fields in ASSUMPTION/TODO comment
-  - ✅ Use alternative approach (user fields, placeholders, or skip navigation)
+  - ❌ DO NOT assume fields exist on the undefined target record type
+  - ❌ DO NOT invent relationship navigation syntax when target is missing
+  - ✅ If Step 3A found ID field → Use direct ID field with TODO (documented in Step 3A Case A)
+  - ✅ If no ID field found → Use placeholder with TODO (documented in Step 3A Case B)
+
+  **Additional fallback approaches (if ID field not suitable):**
   - Add TODO comment in code:
     ```sail
-    /* TODO: Employee record type not found in data-model-context.md
-     * Cannot access relationship: assignedTo
-     * Required fields: fullName, email, department
-     * Workaround: Using user(loggedInUser(), "displayName") until record type is added to context */
+    /* TODO: [TargetRecordType] record type not found in data-model-context.md
+     * Cannot access relationship: [relationshipName]
+     * Required fields from target: [list fields needed from target record type]
+     * Current workaround: [describe approach]
+     * When target record type is added, replace with relationship navigation */
     ```
-  - Choose alternative approach:
-    - Option 1: Use local hardcoded data with comment
-    - Option 2: Use simpler field from current record
-    - Option 3: Use system function (e.g., user(loggedInUser(), "displayName"))
-  - Document the alternative in code with TODO
-  - Continue conversion with workaround
+  - Choose appropriate fallback based on use case:
+    - **For display-only fields**: Use placeholder text indicating data unavailable
+    - **For User relationships**: Check if direct User field exists, use user() functions with ONLY valid properties
+      - ✅ Valid user() properties: "firstName", "lastName", "email", "username" (see 0-sail-api-schema.json line 6495)
+      - ❌ NEVER invent properties like "officeLocation", "department", "title" - they don't exist
+      - If mockup requires unavailable User data → Use placeholder "Not Available" with BLOCKER comment
+    - **For status/type lookups**: Use ID field value with explanatory text
+    - **For optional data**: Use showWhen: false() to hide component with TODO
+  - Document the workaround in code with detailed TODO
+  - Continue conversion with documented fallback
+
+**4B: Environment Object Validation Gate (Execute BEFORE writing ANY code)**
+
+🚨 **CRITICAL: Check for environment-specific references that may not exist**
+
+**Rule**: Never assume constants, groups, process models, folders, integrations, or expression rules exist in the target environment.
+
+**4B.1: Scan Your Planned Code for Environment References**
+
+Before writing ANY code, review your conversion plan and identify ALL references to:
+
+- [ ] **Constants** (`cons!*`)
+  - Common: `cons!FOLDER_NAME`, `cons!GROUP_NAME`, `cons!PROCESS_MODEL`
+  - Purpose: Configuration values, groups, folders, process models
+
+- [ ] **Process Models** (in `a!startProcess()`)
+  - Pattern: Any `processModel` parameter value
+
+- [ ] **Document Folders** (in `a!fileUploadField()`)
+  - Pattern: Any `target` parameter for file uploads
+
+- [ ] **Groups** (in `a!isUserMemberOfGroup()`)
+  - Pattern: Any `groups` parameter value
+
+- [ ] **Integration Objects** (in `a!integrationFields()`)
+  - Pattern: Integration references
+
+- [ ] **Expression Rules** (`rule!*`)
+  - Pattern: Any `rule!` reference (unless explicitly required by user)
+
+**4B.2: For EACH Environment Reference Found**
+
+- [ ] **Decision: Does this exist in the mockup or context?**
+
+  **Case A: Reference exists in mockup as simple pattern**
+  - ✅ PRESERVE the mockup's simple pattern
+  - ❌ DO NOT convert to production pattern with constants
+  - Example:
+    ```sail
+    /* Mockup had: local!userRole = "Partner" */
+    /* ✅ KEEP IT - Don't convert to a!isUserMemberOfGroup() with constants */
+    local!isPartner: local!userRole = "Partner",
+    ```
+
+  **Case B: Reference is needed but doesn't exist in mockup**
+  - ✅ Use `null` value with TODO comment
+  - ✅ Follow pattern from record-type-handling-guidelines.md lines 591-651
+  - ✅ Document what needs to be configured
+  - Example for groups:
+    ```sail
+    /* TODO: Configure group constant for Partners access control
+     * Create group constant in environment: cons!RBC_PARTNERS_GROUP
+     * Assign all partner users to this group */
+    local!isPartner: a!isUserMemberOfGroup(
+      username: loggedInUser(),
+      groups: null /* TODO: Add group constant for Partners */
+    ),
+    ```
+  - Example for constants:
+    ```sail
+    a!fileUploadField(
+      label: "Upload Supporting Document",
+      target: null, /* TODO: Add constant for document folder (cons!CASE_DOCUMENTS_FOLDER) */
+      value: local!documentUpload,
+      saveInto: local!documentUpload
+    )
+    ```
+
+**4B.3: Validation Checklist**
+
+Before proceeding to code generation, verify:
+
+- [ ] ❌ NO `cons!` references without corresponding `null` + TODO
+- [ ] ❌ NO assumed groups in `a!isUserMemberOfGroup()` without TODO
+- [ ] ❌ NO assumed process models without TODO
+- [ ] ❌ NO assumed folder references without TODO
+- [ ] ❌ NO assumed integration objects without TODO
+- [ ] ✅ ALL environment references have either:
+  - Preserved mockup pattern (simple variables/strings), OR
+  - `null` value with clear TODO comment
+
+**4B.4: Document Environment Objects Report**
+
+Create a report of all environment objects needed:
+
+```
+========================================
+ENVIRONMENT OBJECTS VALIDATION
+========================================
+
+Constants Required:
+❌ cons!RBC_PARTNERS_GROUP - Used: null + TODO (Group for Partners access)
+❌ cons!CASE_DOCUMENTS_FOLDER - Used: null + TODO (Folder for file uploads)
+
+Process Models Required:
+✅ None
+
+Groups Required:
+❌ RBC_PARTNERS_GROUP - Used: null + TODO
+❌ RBC_INDEPENDENCE_TEAM_GROUP - Used: null + TODO
+
+Mockup Patterns Preserved:
+✅ Role determination - Kept simple variable pattern from mockup
+
+Summary:
+- Total constants checked: 2
+- Constants with TODO: 2
+- Mockup patterns preserved: 1
+========================================
+```
+
+**After completing Step 4B:**
+- [ ] All environment references are accounted for
+- [ ] Using null + TODO for any new environment objects
+- [ ] Mockup patterns preserved where applicable
+- [ ] Ready to generate code
 
 **4A.2: Validate All Planned Field Access**
 
@@ -824,6 +1036,9 @@ Use this reference when determining value types:
   - Function variable validation (fv!row in grids, fv!index in forEach)
   - Parameter validation (all values from documentation)
   - Layout validation (no nested sideBySideLayouts, etc.)
+- [ ] All user() calls use ONLY valid properties (firstName, lastName, email, username)
+  - ❌ No invented properties (officeLocation, department, title, etc.)
+  - Reference: 0-sail-api-schema.json line 6495
 - [ ] Are ALL local variables declared in dependency order?
   - Variables with no dependencies declared first
   - Variables that reference other local! variables declared AFTER their dependencies

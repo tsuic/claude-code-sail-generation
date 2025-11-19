@@ -590,11 +590,19 @@ a!localVariables(
 
 ## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects
 
-**Never assume constants, process models, or environment-specific objects exist. Always use placeholders with TODO comments.**
+**Never assume constants, process models, groups, folders, integrations, or environment-specific objects exist. Always use placeholders with TODO comments.**
+
+**This applies to ALL generated code, including:**
+- Group constants in `a!isUserMemberOfGroup()`
+- Folder constants in `a!fileUploadField()`
+- Process model constants in `a!startProcess()`
+- Any `cons!` reference
+- Any `rule!` reference (unless explicitly specified by user)
 
 ### The Problem:
 Generated code often references objects that don't exist in the target environment:
-- Constants (`cons!FOLDER_NAME`, `cons!PROCESS_MODEL`)
+- Constants (`cons!FOLDER_NAME`, `cons!PROCESS_MODEL`, `cons!GROUP_NAME`)
+- Groups (in `a!isUserMemberOfGroup()`)
 - Process models (for `a!startProcess()`)
 - Document folders (for file upload targets)
 - Integration objects
@@ -603,6 +611,12 @@ Generated code often references objects that don't exist in the target environme
 ### ✅ CORRECT Pattern - Placeholder with TODO
 
 ```sail
+/* Group-based security checks */
+a!isUserMemberOfGroup(
+  username: loggedInUser(),
+  groups: null  /* TODO: Add group constant for case managers */
+)
+
 /* File upload fields */
 a!fileUploadField(
   label: "Upload Supporting Document",
@@ -625,6 +639,11 @@ a!startProcess(
 
 ```sail
 /* DON'T DO THIS */
+a!isUserMemberOfGroup(
+  username: loggedInUser(),
+  groups: cons!CASE_MANAGERS_GROUP  /* This constant may not exist! */
+)
+
 a!fileUploadField(
   target: cons!CASE_DOCUMENTS_FOLDER,  /* This constant may not exist! */
   ...
@@ -1954,7 +1973,7 @@ local!value: index(
 
 **Batch Size Guidelines:**
 - **Grouped results**: `batchSize: 5000` (supports up to 5,000 unique groups)
-- **Single aggregation**: `batchSize: 1` (returns exactly 1 row)
+- **Single aggregation with no grouping**: `batchSize: 1` (returns exactly 1 row)
 - **❌ NEVER**: `batchSize: -1` (deprecated/not supported)
 
 ---
