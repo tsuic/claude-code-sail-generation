@@ -46,7 +46,7 @@ You have THREE core responsibilities (not just one):
 
 **1A: Read Logic Refactoring Requirements**
 - [ ] Read CLAUDE.md section "Logic Refactoring Requirements" IN FULL
-  - Use Read tool to read lines 190-370 of CLAUDE.md
+  - Use Read tool to read lines 191-371 of CLAUDE.md
   - Extract: All 4 mandatory refactoring categories (Pattern Matching, Parameter Validation, Chart Patterns, Data Structures)
   - Extract: What NOT to refactor (visual design, working patterns)
   - Output: Document in internal notes: "Refactoring requirements loaded: [list 4 categories]"
@@ -462,7 +462,7 @@ Before writing ANY code, review your conversion plan and identify ALL references
 
   **Case B: Reference is needed but doesn't exist in mockup**
   - ✅ Use `null` value with TODO comment
-  - ✅ Follow pattern from record-type-handling-guidelines.md lines 591-651
+  - ✅ Follow pattern from record-type-handling-guidelines.md lines 593-672
   - ✅ Document what needs to be configured
   - Example for groups:
     ```sail
