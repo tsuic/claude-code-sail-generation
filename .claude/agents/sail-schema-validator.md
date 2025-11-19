@@ -33,7 +33,7 @@ Validate SAIL code against the structured API schema:
 4. ✅ Color values use correct format (hex or enumeration)
 5. ✅ **Record-only parameters are NOT used with local data** ‼️
 
-**You do NOT check:** syntax rules, nesting, structure, fv! context, or icon names (other agents handle these)
+**You do NOT check:** nesting, structure, fv! context, or icon names (other agents handle these)
 
 ---
 
