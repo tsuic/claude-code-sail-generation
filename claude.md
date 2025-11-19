@@ -747,6 +747,10 @@ Use this checklist:
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
 - [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see dynamic-sail-expression-guidelines.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
+- [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
+- [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
+- [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
+- [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
 - [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
 - [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
 - [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️

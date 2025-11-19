@@ -41,6 +41,8 @@
 - **Accessing related record data** → `"## Related Record Field References"`
 - **Accessing related data in forms** → `"## Accessing Related Record Data in Forms"`
 - **User/Group fields in forms** → `"## User/Group Fields vs Relationships"`
+- **Relationships vs fields type incompatibility** → `"### ⚠️ CRITICAL: Type Incompatibility - Relationships vs Fields"`
+- **Displaying user names from User fields** → `"### ⚠️ CRITICAL: Displaying User Names"`
 - **Pattern matching with record fields** → `"## Pattern Matching with Record Fields"`
 - **Record links and identifiers** → `"## Record Links and Identifiers"`
 - **Working with dates and times** → `"## Date/Time Critical Rules"`
@@ -3124,6 +3126,228 @@ a!gridColumn(
 - The **field** (e.g., `assignedTo`) stores the actual User value and is what you use for queries, displays, and forms
 - The **relationship** (e.g., `assignedToUser`) exists primarily for advanced relationship modeling and is rarely used in interfaces
 - The relationship may provide access to additional User record properties, but for standard use cases (displaying names, filtering by user, etc.), always use the field
+
+### ⚠️ CRITICAL: Type Incompatibility - Relationships vs Fields
+
+**Relationships are navigation paths, NOT scalar values:**
+
+- **Fields** return scalar types: `User`, `Text`, `Number`, `Date`, `Boolean`
+- **Relationships** return:
+  - **One-to-many**: Array of records (e.g., `Comment Record[]`)
+  - **Many-to-one or one-to-one**: Single record instance (e.g., `Customer Record`)
+
+**This causes TYPE MISMATCH errors when passing to most functions:**
+
+```sail
+/* ❌ WRONG - Type mismatch: user() expects User (scalar), not User Record (relationship) */
+user(
+  fv!row['recordType!Case.relationships.assignedToUser'],  /* Returns User Record */
+  "firstName"
+)
+
+/* ✅ CORRECT - Field returns User (scalar) */
+user(
+  fv!row['recordType!Case.fields.assignedTo'],  /* Returns User */
+  "firstName"
+)
+```
+
+**Valid uses of relationships:**
+
+1. **a!relatedRecordData()** - Query related record data in charts
+   ```sail
+   /* ✅ CORRECT - a!relatedRecordData() accepts relationships */
+   a!relatedRecordData(
+     relationship: 'recordType!Case.relationships.comments'
+   )
+   ```
+
+2. **Null checking functions** - Check for existence of related records
+   ```sail
+   /* ✅ CORRECT - Check if case has any comments (one-to-many) */
+   if(
+     a!isNullOrEmpty(
+       fv!row['recordType!Case.relationships.comments']  /* Returns Comment[] */
+     ),
+     "No comments",
+     "Has comments"
+   )
+
+   /* ✅ CORRECT - Check if case has an assigned customer (many-to-one) */
+   if(
+     a!isNotNullOrEmpty(
+       fv!row['recordType!Case.relationships.customer']  /* Returns Customer Record */
+     ),
+     "Customer assigned",
+     "No customer"
+   )
+   ```
+
+3. **Array manipulation functions** - Process one-to-many relationships
+   ```sail
+   /* ✅ CORRECT - a!forEach over one-to-many relationship (returns array) */
+   a!forEach(
+     items: ri!case['recordType!Case.relationships.comments'],  /* Returns Comment[] */
+     expression: a!cardLayout(
+       contents: {
+         a!richTextDisplayField(
+           value: {
+             a!richTextItem(
+               text: fv!item['recordType!Comment.fields.commentText']  /* Navigate to field */
+             )
+           }
+         )
+       }
+     )
+   )
+
+   /* ✅ CORRECT - length() counts related records in one-to-many */
+   a!richTextDisplayField(
+     value: {
+       a!richTextItem(
+         text: "Comments: " &
+           if(
+             a!isNullOrEmpty(ri!case['recordType!Case.relationships.comments']),
+             "0",
+             length(ri!case['recordType!Case.relationships.comments'])
+           )
+       )
+     }
+   )
+
+   /* ✅ CORRECT - wherecontains() filters relationship arrays */
+   wherecontains(
+     "High",
+     ri!case['recordType!Case.relationships.comments'].fields.priority
+   )
+   ```
+
+4. **Navigation to related record fields** - Access fields on the related record
+   ```sail
+   /* ✅ CORRECT - Navigate through many-to-one relationship to get related field */
+   fv!row['recordType!Case.relationships.customer.fields.companyName']
+
+   /* ✅ CORRECT - Navigate through one-to-one relationship */
+   fv!row['recordType!Case.relationships.resolution.fields.resolvedDate']
+   ```
+
+**Common type mismatch errors:**
+
+```sail
+/* ❌ WRONG - concat() expects Text fields, not relationship */
+concat(
+  fv!row['recordType!Case.relationships.customer'],  /* Returns Customer Record */
+  " - ",
+  fv!row['recordType!Case.fields.caseNumber']
+)
+
+/* ✅ CORRECT - Navigate to field on related record */
+concat(
+  fv!row['recordType!Case.relationships.customer.fields.companyName'],  /* Returns Text */
+  " - ",
+  fv!row['recordType!Case.fields.caseNumber']
+)
+
+/* ❌ WRONG - text() expects Date/Number field, not relationship */
+text(
+  fv!row['recordType!Case.relationships.priority'],  /* Returns Priority Record */
+  "MMM d, yyyy"
+)
+
+/* ✅ CORRECT - Navigate to field on related record */
+text(
+  fv!row['recordType!Case.relationships.priority.fields.dueDate'],  /* Returns Date */
+  "MMM d, yyyy"
+)
+
+/* ❌ WRONG - Arithmetic operators expect Number fields, not relationships */
+fv!row['recordType!Case.relationships.estimatedHours'] + 10  /* Type error */
+
+/* ✅ CORRECT - Use the Number field */
+fv!row['recordType!Case.fields.estimatedHours'] + 10
+
+/* ❌ WRONG - user() on many-to-one relationship instead of field */
+user(
+  fv!row['recordType!Case.relationships.assignedToUser'],  /* Returns User Record */
+  "firstName"
+)
+
+/* ✅ CORRECT - Use the User field directly */
+user(
+  fv!row['recordType!Case.fields.assignedTo'],  /* Returns User */
+  "firstName"
+)
+```
+
+**Validation rule:**
+
+| Function Category | Accepts Relationships? | Parameter Type Expected | Use Instead |
+|------------------|------------------------|-------------------------|-------------|
+| **a!relatedRecordData()** | ✅ YES | Relationship | Only function designed for relationships |
+| **a!isNullOrEmpty(), a!isNotNullOrEmpty()** | ✅ YES | Any type | Check existence of related records |
+| **Array functions** (a!forEach, length, wherecontains, index, etc.) | ✅ YES (one-to-many only) | Array | Iterate/manipulate relationship arrays |
+| **Navigation to fields** | ✅ YES | Relationship path | `relationships.{uuid}.fields.{uuid}fieldName` |
+| **user()** | ❌ NO | **User** or **Text** (field values) | Use `fields.{uuid}fieldName` (User type), NOT relationships |
+| **text(), concat()** | ❌ NO | Text/Number/Date (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
+| **Arithmetic (+, -, *, /)** | ❌ NO | Number (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
+| **Date functions (datetext, etc.)** | ❌ NO | Date/DateTime (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
+| **Comparison (=, <, >, etc.)** | ❌ NO | Scalar values | Use `fields.{uuid}fieldName` or navigate to related field |
+| **All other functions** | ❌ NO | Check schema for expected type | Use `fields.{uuid}fieldName` or navigate to related field |
+
+**Quick decision tree:**
+
+1. **Is it a!relatedRecordData()?** → ✅ Relationship OK
+2. **Is it a null check (a!isNullOrEmpty/a!isNotNullOrEmpty)?** → ✅ Relationship OK
+3. **Is it an array function (a!forEach, length, wherecontains) AND a one-to-many relationship?** → ✅ Relationship OK
+4. **Are you navigating further with `.fields.{uuid}fieldName`?** → ✅ Relationship OK (as path)
+5. **Passing relationship directly to any other function?** → ❌ WRONG - use the field instead
+
+**Remember:**
+- Many-to-one/one-to-one relationships return **single record instances** → Cannot use with array functions
+- One-to-many relationships return **arrays of records** → Can use with array functions (a!forEach, length, etc.)
+- When in doubt: **navigate to the field** on the related record instead of passing the relationship directly
+
+### ⚠️ CRITICAL: Displaying User Names
+
+**The user() function extracts display properties from User data:**
+
+```sail
+/* ❌ WRONG - Passing relationship (returns record instance, not User scalar) */
+user(fv!row['recordType!Case.relationships.assignedToUser'], "firstName")
+
+/* ✅ CORRECT - Use the User FIELD */
+user(fv!row['recordType!Case.fields.assignedTo'], "firstName")
+
+/* ✅ ALSO CORRECT - user() also accepts Text username */
+user("john.smith", "firstName")
+```
+
+**Valid user() properties:**
+- `"firstName"` - User's first name
+- `"lastName"` - User's last name
+- `"email"` - User's email address
+- `"username"` - User's username
+
+**Complete pattern for displaying user names:**
+```sail
+/* Display full name from User field */
+if(
+  a!isNotNullOrEmpty(fv!row['recordType!Case.fields.assignedTo']),
+  trim(
+    user(fv!row['recordType!Case.fields.assignedTo'], "firstName") & " " &
+    user(fv!row['recordType!Case.fields.assignedTo'], "lastName")
+  ),
+  "Unassigned"
+)
+```
+
+**What user() accepts:**
+- ✅ User field value: `user(userField, "firstName")`
+- ✅ Text username: `user("john.smith", "firstName")`
+- ❌ Relationship: `user(relationship, "firstName")` - **WRONG**
+
+**Key Rule:**
+Relationships return record instances, not User scalar values. Always use the User **FIELD**, not the relationship.
 
 ## Accessing Related Record Data in Forms
 
