@@ -27,6 +27,7 @@ You have THREE core responsibilities (not just one):
 3. **Preserve Visual Design**: Keep the UI looking identical
    - Preserve: colors, spacing, padding, margins, heights, widths, fonts, styling
    - Do NOT modify: layout structure, component arrangement, user experience flow
+   - **DO cleanup**: unused variables, redundant logic, outdated patterns from mockup
 
 ## YOUR WORKFLOW
 
@@ -789,6 +790,58 @@ Add comments for:
 - [ ] All mandatory refactoring applied
 - [ ] All visual design preserved
 - [ ] All decisions documented in code comments
+- [ ] I am ready to clean up unused variables
+
+---
+
+### **Step 5D.5: Clean Up Unused Variables**
+
+🚨 **MANDATORY CLEANUP** - Remove unused variables from mockup:
+
+**5D.5.1: Identify All Local Variable Declarations**
+
+- [ ] Use Read tool to read the generated .sail file
+- [ ] Locate the a!localVariables() section
+- [ ] Extract ALL local variable names (e.g., `local!dateRangeFilter`)
+
+**5D.5.2: Search for Variable Usage**
+
+For EACH local variable:
+- [ ] Use Grep tool to search the generated file for the variable name
+- [ ] Count occurrences (should be at least 2: declaration + usage)
+- [ ] If count = 1 (declaration only) → Variable is UNUSED
+
+**5D.5.3: Decision Tree for Unused Variables**
+
+For EACH unused variable found:
+
+**Case A: Variable has clear future use (documented in mockup or requirements)**
+- [ ] Add UNUSED comment following record-type-handling-guidelines.md template:
+  ```sail
+  /* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
+  local!variable: value,
+  ```
+
+**Case B: Variable has NO documented future use**
+- [ ] Remove the variable declaration entirely
+- [ ] Use Edit tool to delete the line
+- [ ] Document in output: "Removed [N] unused variables from mockup"
+
+**Common Unused Variables from Mockups:**
+- Filter variables that weren't implemented (e.g., `local!dateRangeFilter`)
+- UI state variables that weren't needed (e.g., `local!showAdvanced`)
+- Placeholder variables from templates
+
+**5D.5.4: Verification**
+
+After cleanup:
+- [ ] Re-run Grep searches to confirm variables are used or documented
+- [ ] Verify no orphaned variables remain
+- [ ] Document cleanup in conversion summary
+
+**After completing Step 5D.5:**
+- [ ] All unused variables removed or documented with UNUSED comments
+- [ ] Code follows record-type-handling-guidelines.md documentation standards
 - [ ] I am ready for query filter type validation
 
 ---
@@ -1027,6 +1080,8 @@ Use this reference when determining value types:
 - [ ] Did I apply ALL mandatory logic refactoring (Step 5B)?
 - [ ] Did I preserve ALL visual design (Step 5C)?
 - [ ] Did I document ALL refactoring decisions in comments (Step 5D)?
+- [ ] Did I clean up unused variables from mockup (Step 5D.5)?
+- [ ] Did I remove or document ALL unused variables per record-type-handling-guidelines.md?
 - [ ] Did I validate ALL query filter type matching (Step 5E)?
 - [ ] Did I fix ALL type mismatches found in Step 5E?
 
