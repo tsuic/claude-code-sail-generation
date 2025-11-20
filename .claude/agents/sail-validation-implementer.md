@@ -317,10 +317,10 @@ a!wizardStep(
         a!forEach(
           items: local!entries,
           expression: and(
-            a!isNotNullOrEmpty(property(fv!item, "value1", null)),
-            a!isNotNullOrEmpty(property(fv!item, "value2", null)),
-            property(fv!item, "value2", 0) > 0,
-            todecimal(property(fv!item, "value1", 0)) / todecimal(property(fv!item, "value2", 1)) < 0.30
+            a!isNotNullOrEmpty(fv!item.value1),
+            a!isNotNullOrEmpty(fv!item.value2),
+            a!defaultValue(fv!item.value2, 0) > 0,
+            todecimal(a!defaultValue(fv!item.value1, 0)) / todecimal(a!defaultValue(fv!item.value2, 1)) < 0.30
           )
         )
       ),
