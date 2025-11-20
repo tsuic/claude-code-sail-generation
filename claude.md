@@ -361,6 +361,7 @@ local!newCase: 'recordType!{uuid}Case'(
 - Working null-safety patterns (if already correct using if()/a!isNotNullOrEmpty(), don't change)
 - Valid syntax patterns (and/or/if functions, a!forEach usage, proper comments, etc.)
 - Layout structure (if layout nesting is valid, don't reorganize)
+- **UX flow and user-facing features** (preserve all views, tabs, sections, filters even if using sample data)
 
 ✅ **DO preserve:**
 - Color schemes and visual styling
@@ -368,6 +369,52 @@ local!newCase: 'recordType!{uuid}Case'(
 - User experience flow
 - Existing null-safety checks that work correctly
 - Proper SAIL syntax (and/or/if functions, comment style, etc.)
+- **All UI features from mockup** (use sample data fallback if live data unavailable)
+
+### **When Live Data Unavailable:**
+
+If a mockup feature cannot be implemented with live record data (e.g., relationship target record type missing):
+
+✅ **PRESERVE the feature** using mockup data pattern:
+- Revert to local variable with hardcoded sample data from original mockup
+- Add visual indicator in UI: "(Sample Data)" in labels, headings, or tooltips
+- Document with MOCKUP DATA comment explaining the limitation
+- Include TODO with upgrade path for when data model becomes available
+
+**Example - Missing Relationship Target:**
+```sail
+/* MOCKUP DATA - Client Profile View (Data Model Limitation):
+ * Client record type not available in context/data-model-context.md
+ * Cannot filter by: Case.relationships.client.fields.clientId (relationship target undefined)
+ * Using hardcoded sample data to preserve UX flow
+ *
+ * TODO: Add Client record type to data-model-context.md to enable live data
+ *   Required: Client record type with at minimum a clientId field
+ *   Then replace with live query using relationship navigation
+ *
+ * Alternative: If Client record type structure differs, adapt query accordingly
+ */
+local!clientCases: if(
+  local!viewMode = 3,
+  {
+    a!map(caseNumber: "CASE-001", subject: "Sample Case", status: "Open"),
+    a!map(caseNumber: "CASE-002", subject: "Another Sample", status: "Closed")
+  },
+  {}
+),
+
+/* Visual indicator in UI */
+a!richTextItem(
+  text: "Client Cases (" & length(local!clientCases) & " cases - sample data)",
+  size: "SMALL",
+  color: "#6B7280"
+)
+```
+
+❌ **NEVER:**
+- Remove UI features because data isn't available
+- Use placeholder UUIDs like `{uuid}fieldName` that cause errors
+- Leave features broken without fallback to working mockup data
 
 ## INITIAL REQUEST CATEGORIZATION
 

@@ -46,10 +46,11 @@ You have THREE core responsibilities (not just one):
 
 **1A: Read Logic Refactoring Requirements**
 - [ ] Read CLAUDE.md section "Logic Refactoring Requirements" IN FULL
-  - Use Read tool to read lines 191-371 of CLAUDE.md
+  - Use Read tool to read lines 191-418 of CLAUDE.md
   - Extract: All 4 mandatory refactoring categories (Pattern Matching, Parameter Validation, Chart Patterns, Data Structures)
-  - Extract: What NOT to refactor (visual design, working patterns)
-  - Output: Document in internal notes: "Refactoring requirements loaded: [list 4 categories]"
+  - Extract: What NOT to refactor (visual design, working patterns, UX preservation)
+  - Extract: When Live Data Unavailable guidance (mockup data fallback pattern)
+  - Output: Document in internal notes: "Refactoring requirements loaded: [list 4 categories + UX preservation rules]"
 
 **1B: Read Parameter Validation Sources**
 - [ ] Read ui-guidelines/0-sail-api-schema.json lines 5270-5300 (a!measure parameters)
@@ -365,18 +366,89 @@ For EVERY relationship you plan to navigate (e.g., `'recordType!Case.relationshi
     **Case B: No foreign key ID field found**
     - ❌ Cannot navigate relationship (target undefined)
     - ❌ No direct ID field alternative available
-    - ❌ Add TODO with placeholder approach
+    - ✅ **REVERT TO MOCKUP DATA PATTERN** to preserve UX flow
+    - ✅ Use local variable with hardcoded sample data (from original mockup)
+    - ✅ Add visual indicator: "(Sample Data)" in UI labels
+    - ✅ Add MOCKUP DATA comment with clear upgrade path
     - Example:
       ```sail
-      /* TODO: Cannot access relationship 'relatedCases' - target record type not found
-       * No foreign key ID field found in source record type
-       * Required fields from relationship: caseNumber, subject, priority
-       * WORKAROUND: Using placeholder until target record type added to context
-       * When available, replace with relationship navigation */
-      value: "[Data not available - related record type missing from context]"
+      /* MOCKUP DATA - Client Profile View (Data Model Limitation):
+       * Client record type not available in context/data-model-context.md
+       * Cannot filter by: Case.relationships.client.fields.clientId (relationship target undefined)
+       * Using hardcoded sample data to preserve UX flow
+       *
+       * TODO: Add Client record type to data-model-context.md to enable live data
+       *   Required: Client record type with at minimum a clientId field
+       *   Then replace this local variable with:
+       *   a!queryRecordType(
+       *     recordType: 'recordType!{uuid}Case',
+       *     filters: a!queryFilter(
+       *       field: 'recordType!{uuid}Case.relationships.{uuid}client.fields.{uuid}clientId',
+       *       operator: "=",
+       *       value: ri!clientId
+       *     )
+       *   )
+       *
+       * Alternative: If Client record type structure differs, adapt query accordingly
+       */
+      local!clientProfileData: if(
+        local!viewMode = 3,
+        {
+          /* Copy sample data structure from original mockup */
+          a!map(
+            caseNumber: "CASE-2024-001",
+            subject: "Contract Review",
+            priority: "High",
+            status: "Open",
+            assignedTo: "John Smith",
+            createdDate: todate(today() - 5)
+          ),
+          a!map(
+            caseNumber: "CASE-2024-015",
+            subject: "Policy Update",
+            priority: "Medium",
+            status: "Closed",
+            assignedTo: "Jane Doe",
+            createdDate: todate(today() - 30)
+          )
+        },
+        {}
+      ),
+
+      /* UI labels indicate sample data */
+      a!richTextDisplayField(
+        labelPosition: "COLLAPSED",
+        value: {
+          a!richTextIcon(icon: "user", size: "MEDIUM", color: "#3B82F6"),
+          "  ",
+          a!richTextItem(text: "Client Name", size: "MEDIUM", style: "STRONG"),
+          "  ",
+          a!richTextItem(text: "(Sample Data)", size: "SMALL", color: "#6B7280")
+        }
+      ),
+
+      /* Grid uses local data instead of a!recordData() */
+      a!gridField(
+        data: local!clientProfileData,
+        columns: {
+          /* Use fv!row.property pattern from mockup */
+          a!gridColumn(
+            label: "Case Number",
+            value: fv!row.caseNumber,
+            sortField: "caseNumber"
+          ),
+          a!gridColumn(
+            label: "Subject",
+            value: fv!row.subject,
+            sortField: "subject"
+          )
+          /* ... additional columns ... */
+        },
+        emptyGridMessage: "This client has no cases (sample data)."
+      )
       ```
-    - ✅ Use placeholder value with clear TODO
-    - ✅ Document in validation report: "Relationship blocked - no fallback available"
+    - ✅ Proceed with conversion using mockup data fallback
+    - ✅ Document in validation report: "Reverted to mockup data - relationship target missing, UX preserved"
 
   - [ ] Output: "Relationship [name] target not found, ID field fallback: [FOUND: fieldName (Type)] or [NOT FOUND]"
 
@@ -794,53 +866,76 @@ Add comments for:
 
 ---
 
-### **Step 5D.5: Clean Up Unused Variables**
+### **Step 5D.5: MANDATORY - Automated Unused Variable Detection**
 
-🚨 **MANDATORY CLEANUP** - Remove unused variables from mockup:
+🚨 **THIS STEP CANNOT BE SKIPPED** - Automated verification required before completion.
 
-**5D.5.1: Identify All Local Variable Declarations**
+**5D.5.1: Extract All Local Variables with Automated Count**
 
-- [ ] Use Read tool to read the generated .sail file
-- [ ] Locate the a!localVariables() section
-- [ ] Extract ALL local variable names (e.g., `local!dateRangeFilter`)
-
-**5D.5.2: Search for Variable Usage**
-
-For EACH local variable:
-- [ ] Use Grep tool to search the generated file for the variable name
-- [ ] Count occurrences (should be at least 2: declaration + usage)
-- [ ] If count = 1 (declaration only) → Variable is UNUSED
-
-**5D.5.3: Decision Tree for Unused Variables**
-
-For EACH unused variable found:
-
-**Case A: Variable has clear future use (documented in mockup or requirements)**
-- [ ] Add UNUSED comment following record-type-handling-guidelines.md template:
-  ```sail
-  /* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
-  local!variable: value,
+- [ ] Use Bash tool to extract all local variable names and their occurrence counts:
+  ```bash
+  grep -o 'local![a-zA-Z_]*' output/[filename].sail | sort | uniq -c | sort -rn
+  ```
+- [ ] Store the complete output showing each variable and its count
+- [ ] Example output format:
+  ```
+  12 local!viewMode
+   9 local!selectedSubmissionIds
+   8 local!submissionsQuery
+   1 local!dateRangeFilter          ← UNUSED (count = 1)
+   1 local!selectedSubmissions      ← UNUSED (count = 1)
   ```
 
-**Case B: Variable has NO documented future use**
-- [ ] Remove the variable declaration entirely
-- [ ] Use Edit tool to delete the line
-- [ ] Document in output: "Removed [N] unused variables from mockup"
+**5D.5.2: Identify Unused Variables (Count = 1)**
 
-**Common Unused Variables from Mockups:**
+For EACH variable with occurrence count = 1:
+- [ ] Variable appears ONLY in declaration → **UNUSED**
+- [ ] Apply decision tree from record-type-handling-guidelines.md (lines 736-807):
+  - **NO clear future use** → **REMOVE with Edit tool**
+  - **Has documented future use** → **ADD UNUSED comment** following template
+
+**UNUSED Comment Template** (if keeping variable):
+```sail
+/* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
+local!variable: value,
+```
+
+**Common Unused Variables from Mockups** (usually REMOVE these):
 - Filter variables that weren't implemented (e.g., `local!dateRangeFilter`)
 - UI state variables that weren't needed (e.g., `local!showAdvanced`)
+- Computed variables that aren't referenced (e.g., `local!selectedSubmissions`)
 - Placeholder variables from templates
 
-**5D.5.4: Verification**
+**5D.5.3: Remove Unused Variables**
 
-After cleanup:
-- [ ] Re-run Grep searches to confirm variables are used or documented
-- [ ] Verify no orphaned variables remain
-- [ ] Document cleanup in conversion summary
+For EACH unused variable (count = 1) with NO clear future use:
+- [ ] Use Edit tool to remove the variable declaration (entire line including comma)
+- [ ] Track removed variables for documentation: `[variableName1, variableName2, ...]`
+
+**5D.5.4: Mandatory Re-Verification**
+
+- [ ] Re-run the Bash command from Step 5D.5.1 to verify cleanup
+- [ ] Check output: ALL variables must now have count ≥ 2 (or be documented with UNUSED comment)
+- [ ] **If ANY count = 1 remains without UNUSED comment** → **STOP and fix before proceeding**
+- [ ] Document cleanup in conversion notes: "Removed [N] unused variables: [list names]"
+
+**🛑 BLOCKING REQUIREMENT - You CANNOT proceed to Step 5E until:**
+- [ ] Bash verification output shows NO variables with count = 1 (except those with UNUSED comments)
+- [ ] All unused variables are either:
+  - **Removed** (preferred for mockup carryovers), OR
+  - **Documented** with UNUSED comment (only if clear future use)
+- [ ] Cleanup is documented in your conversion summary
+- [ ] You can show the before/after Bash verification output proving cleanup
+
+**Why this is mandatory:**
+- Unused variables cause confusion during code review and violate SAIL best practices
+- They may trigger validation warnings in Appian Designer
+- They violate guidelines per dynamic-sail-expression-guidelines.md lines 157-161
+- Automated verification provides objective proof of cleanup (no interpretation needed)
 
 **After completing Step 5D.5:**
-- [ ] All unused variables removed or documented with UNUSED comments
+- [ ] Bash verification proves all variables have count ≥ 2 or UNUSED comments
+- [ ] Removed variables documented in conversion summary
 - [ ] Code follows record-type-handling-guidelines.md documentation standards
 - [ ] I am ready for query filter type validation
 
@@ -955,6 +1050,41 @@ For EACH extracted filter that has a `value` parameter:
       FIX REQUIRED: Change local!filterStartDate to use a!subtractDateTime() instead of todate()
   ✅ Line 42: endDate (Date) > today() (Date)
   ✅ Line 80: endDate (Date) <= today() (Date)
+
+  ========================================
+  DATA MODEL LIMITATIONS REPORT
+  ========================================
+
+  Features Using Mockup Data Fallback:
+
+  When relationship targets or record types are unavailable in the data model,
+  features are preserved using sample data from the original mockup:
+
+  ✅ Client Profile View:
+     - UX Flow: Preserved (3 view modes remain functional)
+     - Data Source: Mockup data (Client record type unavailable)
+     - Visual Indicator: "(Sample Data)" shown in UI labels
+     - Upgrade Path: Documented in TODO comment (lines 45-62)
+     - Blocker: Client record type not in context/data-model-context.md
+     - Recommendation: Add Client record type to enable live data
+
+  ⚠️ Advanced Filters Section:
+     - UX Flow: Preserved (filter inputs visible but not functional)
+     - Data Source: N/A (filter not applied to queries)
+     - Visual Indicator: None (appears functional)
+     - Blocker: FilterCriteria record type not in data model
+     - Recommendation: Either add FilterCriteria record type OR remove filter UI
+
+  Summary:
+  - Total features with mockup fallback: 2
+  - Features with visual indicators: 1/2
+  - Features documented with TODO: 2/2
+  - Unresolved placeholders: 0
+
+  Next Steps:
+  1. Review data-model-context.md completeness
+  2. Add missing record types to enable live data
+  3. Re-run conversion after data model updated
 
   ========================================
   ```
@@ -1080,8 +1210,10 @@ Use this reference when determining value types:
 - [ ] Did I apply ALL mandatory logic refactoring (Step 5B)?
 - [ ] Did I preserve ALL visual design (Step 5C)?
 - [ ] Did I document ALL refactoring decisions in comments (Step 5D)?
-- [ ] Did I clean up unused variables from mockup (Step 5D.5)?
-- [ ] Did I remove or document ALL unused variables per record-type-handling-guidelines.md?
+- [ ] Did I run automated unused variable detection (Step 5D.5.1)?
+- [ ] Do ALL variables have occurrence count ≥ 2 or UNUSED comments (Step 5D.5.4)?
+- [ ] Can I show the Bash verification output proving cleanup?
+- [ ] Did I document removed variables in conversion summary (Step 5D.5.4)?
 - [ ] Did I validate ALL query filter type matching (Step 5E)?
 - [ ] Did I fix ALL type mismatches found in Step 5E?
 
@@ -1128,7 +1260,79 @@ In your response back to user, include:
 - [ ] Any validation blockers encountered (if any)
 - [ ] Any assumptions made about data model
 
-**7B.5: Validate Variable Declaration Order**
+**7B.5: Final Placeholder and Fallback Detection**
+
+🚨 **MANDATORY: Scan generated code for unresolved placeholders and mockup fallbacks**
+
+This step MUST be completed BEFORE invoking validation sub-agents.
+
+**Before writing the final output file:**
+
+- [ ] **Step 7B.5A: Search for placeholder patterns (must be fixed)**
+  - Use Grep tool to search generated code for: `\{uuid\}[a-zA-Z]`
+  - Pattern explanation: `{uuid}` not followed by closing brace = UNRESOLVED PLACEHOLDER
+  - Example matches:
+    - ❌ `field: 'recordType!Case.fields.{uuid}fieldName'` (invalid - must be fixed)
+    - ✅ `recordType: 'recordType!{a1b2c3d4-...}Case'` (valid - complete UUID)
+
+- [ ] **Step 7B.5B: Search for mockup data fallbacks (should be documented)**
+  - Use Grep tool to search for: `MOCKUP DATA`
+  - Use Grep tool to search for: `sample data`
+  - Use Grep tool to search for: `Sample Data`
+
+- [ ] **Step 7B.5C: Validate each placeholder/fallback found**
+
+  For EACH `{uuid}` placeholder found:
+  - [ ] Read surrounding code context (10 lines before and after)
+  - [ ] Check if it has a MOCKUP DATA comment explaining the limitation
+  - [ ] Verify mockup data fallback is implemented (not just placeholder)
+  - [ ] If NO MOCKUP DATA comment → **CRITICAL ERROR** - must implement Case B fallback from Step 4A.1
+
+  For EACH `MOCKUP DATA` comment found:
+  - [ ] Verify it has TODO comment with upgrade path
+  - [ ] Verify UI shows visual indicator: "(Sample Data)" in label/heading/tooltip
+  - [ ] Verify local variable has hardcoded sample data (from mockup)
+  - [ ] Verify grid/component uses local data (not broken query)
+
+- [ ] **Step 7B.5D: Validation decision tree**
+
+  **RED FLAG PATTERNS (must be fixed before proceeding):**
+  - `field: '...{uuid}fieldName'` without MOCKUP DATA comment
+  - `recordType!{uuid}RecordType` without MOCKUP DATA comment
+  - ASSUMPTION comment without MOCKUP DATA fallback OR working implementation
+  - Any placeholder that causes query to fail
+
+  **Decision:**
+  - ❌ If ANY unresolved placeholders found → DO NOT PROCEED
+    - Return to Step 4A.1 and implement Case B fallback (mockup data pattern)
+    - Fix the placeholder with proper MOCKUP DATA comment and sample data
+    - Re-run this step after fixes
+
+  - ✅ If all placeholders are documented mockup fallbacks → PROCEED to Step 7B.6
+    - Continue to variable declaration order validation
+    - Document mockup fallbacks in validation report
+
+- [ ] **Output validation status:**
+  ```
+  Placeholder Detection Results:
+  - Unresolved {uuid} placeholders: [count] (must be 0 to proceed)
+  - MOCKUP DATA fallbacks: [count] (all documented: YES/NO)
+  - Visual indicators present: [count/total mockup fallbacks]
+  - TODO upgrade paths: [count/total mockup fallbacks]
+
+  Status: [PASS - ready for validation] OR [FAIL - must fix placeholders]
+  ```
+
+**After completing Step 7B.5:**
+- [ ] No unresolved `{uuid}` placeholders remain in code
+- [ ] All mockup data fallbacks are properly documented
+- [ ] All mockup features show "(Sample Data)" indicator
+- [ ] All mockup fallbacks have TODO with upgrade path
+- [ ] Ready to proceed to variable declaration validation
+
+---
+
+**7B.6: Validate Variable Declaration Order**
 
 🚨 **MANDATORY CHECK** - Ensure variables are declared in dependency order:
 
@@ -1137,13 +1341,13 @@ In your response back to user, include:
 - When refactoring creates new computed variables (e.g., local!filterStartDate from a!match()), they may reference other variables
 - Variables must be declared in dependency order: dependencies BEFORE variables that use them
 
-**7B.5A: Read Generated Code**
+**7B.6A: Read Generated Code**
 
 - [ ] Use Read tool to read the ENTIRE generated .sail file
 - [ ] Locate the a!localVariables() section (typically lines 1-200)
 - [ ] Extract ALL local variable declarations with their initialization expressions
 
-**7B.5B: Identify Variable Dependencies**
+**7B.6B: Identify Variable Dependencies**
 
 For EACH local variable declaration:
 - [ ] Scan the initialization expression (right side of `:`)
@@ -1156,7 +1360,7 @@ For EACH local variable declaration:
   local!queryResult: a!queryRecordType(filters: a!queryFilter(value: local!filterStartDate))  → Depends on: local!filterStartDate
   ```
 
-**7B.5C: Build Dependency Map**
+**7B.6C: Build Dependency Map**
 
 - [ ] Create a dependency graph:
   ```
@@ -1168,7 +1372,7 @@ For EACH local variable declaration:
   - local!queryResult → requires: local!filterStartDate
   ```
 
-**7B.5D: Verify Declaration Order**
+**7B.6D: Verify Declaration Order**
 
 - [ ] For EACH variable with dependencies:
   - Get line number where variable is declared
@@ -1176,7 +1380,7 @@ For EACH local variable declaration:
   - Check: Are ALL dependencies declared ABOVE (lower line numbers) this variable?
   - If NO: Flag as **CRITICAL ERROR**
 
-**7B.5E: Fix Order Violations (If Found)**
+**7B.6E: Fix Order Violations (If Found)**
 
 If declaration order violations detected:
 
@@ -1224,7 +1428,7 @@ If declaration order violations detected:
 3. **Computed variables using query results:**
    - `local!queryResult` must come BEFORE `local!displayData: local!queryResult.data`
 
-**After completing Step 7B.5:**
+**After completing Step 7B.6:**
 - [ ] All variables are declared in dependency order
 - [ ] No forward references exist (variables used before declared)
 - [ ] Code follows Foundation Rule #2: "ALL local variables must be declared before use"

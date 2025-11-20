@@ -287,6 +287,54 @@ The MCP server additionally validates:
 
 ## 📌 Important Notes for Contributors
 
+### Loading Full Project Context Before Making Changes
+
+Before making substantial changes to project instructions or agent workflows, load the complete project context so Claude understands the entire system architecture and cross-references.
+
+**Simple One-Line Request:**
+
+For most changes, this is sufficient:
+
+```
+I'm planning to modify [specific file/section]. Please load full project context and check for cross-references.
+```
+
+Claude will automatically:
+- Read CLAUDE.md (already loaded via Claude Code)
+- Identify which guideline files are relevant based on your changes
+- Search for cross-references to the section you're modifying
+- Check for line number references that might be affected
+
+**When You Need More Control:**
+
+If you want to verify a specific area before making changes:
+
+```
+Before I modify [section name], show me:
+1. All files that reference this section
+2. Any line number references that point here
+3. What might break if I add/remove content
+```
+
+**Example Workflow:**
+
+```
+User: I'm adding a new validation rule to the Universal SAIL Validation Checklist.
+      Please load full project context and check for cross-references.
+
+Claude: [Reads CLAUDE.md, searches for references to that section]
+        Found 1 cross-reference in sail-dynamic-converter.md line 49.
+        Ready to proceed. What validation rule are you adding?
+```
+
+**Pro Tip:** If unsure what might be affected, ask:
+
+```
+What would be impacted if I change [section/file name]?
+```
+
+---
+
 ### Line Number Cross-References
 
 **This project is under active development** and documentation changes are expected and encouraged. However, several files contain cross-references to specific line numbers in other files to help agents navigate efficiently.
