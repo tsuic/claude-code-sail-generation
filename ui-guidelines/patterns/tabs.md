@@ -250,10 +250,7 @@ a!localVariables(
 ```
 ## Horizontal Tab Bar Integrated into Page Header
 
-Use this pattern when:
-1. Designing a page using headerContentLayout
-2. The page should include a header
-3. The tabs are top-level and control page contents
+Use this pattern to incorporate tabs into the page header. Don't use if instructed to place tabs somewhere else on the page.
 
 ```sail
 a!localVariables(
