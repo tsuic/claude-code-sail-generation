@@ -8,6 +8,11 @@
 - Don't worry about querying live data, just hard-code sample content using local variables and a!map
 - Don't use `ri!` or `recordtype!` references to live record data unless explicitly asked to
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
+  - ❌ SAIL does not support inline function definitions or helper expressions stored in variables
+  - ❌ CANNOT create reusable logic: `local!calculateColor: rule!helper` (syntax error - rule references cannot be stored in variables)
+  - ❌ CANNOT define inline helper functions or lambdas: `local!helper: expression` (not supported in SAIL)
+  - ✅ Repeat logic inline wherever needed (even if duplicative across multiple columns/components)
+  - ✅ For complex repeated logic, use if()/a!match() patterns directly in each location
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
 - When converting mock to functional, apply ALL "Logic Refactoring Requirements" (see dedicated section below), refactor code structure for record queries (e.g., chart patterns), but preserve visual design
@@ -19,6 +24,7 @@
 4. ✅ ONLY richTextItems or richTextIcons are allowed inside richTextDisplayField
 5. ✅ Each columnsLayout must have at least one AUTO-width columnLayout
 6. ❌ choiceValues CANNOT be null or empty strings
+7. ⚠️ ALWAYS check for null before comparisons/property access - use if() NOT and() (see NULL SAFETY RULES section)
 
 If you violate any of these rules, STOP and reconsider your approach.
 
@@ -55,15 +61,15 @@ Use this checklist:
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see dynamic-sail-expression-guidelines.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
+- [ ] All null-unsafe operations protected (see "NULL SAFETY RULES" section) ‼️
+  - Comparisons wrapped in if() short-circuit pattern
+  - Property access checked before use
+  - Function parameters use a!defaultValue() where needed
+  - Grid selections use index(..., 1, null) pattern
 - [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
 - [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
 - [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
 - [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
-- [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
-- [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
-- [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
-- [ ] Null checks before not() - use `not(a!defaultValue(ri!var, false()))` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
@@ -642,6 +648,116 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `ACCENT`: themed accent color (primary buttons, etc.)
 - `STANDARD`: text and heading color
 
+## ⚠️ NULL SAFETY RULES (CRITICAL)
+
+SAIL cannot handle null values in most operations. **Check before using.**
+
+### The Core Problem
+- Comparing null values crashes: `local!id = fv!item.id` fails if `local!id` is null
+- Accessing properties on null crashes: `local!data.type` fails if `local!data` is null
+- Most functions reject null parameters: `text(null, "format")` fails
+
+### Universal Pattern: Use if() for Short-Circuit Evaluation
+
+✅ **RIGHT - if() short-circuits (safe):**
+```sail
+/* Pattern 1: Null-safe comparison */
+showWhen: if(a!isNotNullOrEmpty(local!selectedId),
+              local!selectedId = fv!item.id,
+              false())
+
+/* Pattern 2: Null-safe property access */
+if(a!isNotNullOrEmpty(local!data),
+   local!data.type = "Contract",
+   false())
+```
+
+❌ **WRONG - and() does NOT short-circuit (crashes):**
+```sail
+/* and() evaluates ALL parameters even if first is false */
+showWhen: and(a!isNotNullOrEmpty(local!data),
+              local!data.type = "Contract")  /* CRASHES if null! */
+```
+
+### Common Null Safety Patterns
+
+**1. Choice Field Initialization**
+```sail
+/* ✅ Uninitialized = unchecked/unselected (null state) */
+local!agreeToTerms,  /* NOT false() */
+
+/* ✅ Only initialize if pre-selected AND value exists in choiceValues */
+local!agreeToTerms: true(),  /* Only if true() is in choiceValues */
+
+/* ❌ NEVER use null/empty in choiceValues */
+choiceValues: {true()}  /* NOT: {true(), null} or {true(), ""} */
+```
+
+**2. Input Field Data Storage**
+```sail
+/* ❌ NEVER leave inputs orphaned */
+a!textField(value: null, saveInto: null)  /* User input goes nowhere! */
+
+/* ✅ Always store to variables */
+a!textField(value: local!name, saveInto: local!name)
+```
+
+**3. Functions That Reject Null**
+```sail
+/* Common functions that crash on null: text(), concat(), user(), not(), etc. */
+
+/* ✅ Use a!defaultValue() wrapper */
+text(a!defaultValue(fv!row.amount, 0), "$#,##0.00")
+concat(a!defaultValue(fv!row.firstName, ""), " ", a!defaultValue(fv!row.lastName, ""))
+not(a!defaultValue(ri!isActive, false()))
+
+/* ✅ OR use if() to provide fallback */
+if(a!isNullOrEmpty(fv!row.status), "N/A", text(fv!row.status, "format"))
+```
+
+**4. Grid Selection (Always Returns List)**
+```sail
+/* Grid selectionValue is ALWAYS a list, even for single-select */
+
+/* ✅ Use index() to access first item safely */
+local!selectedRow: index(local!selection, 1, null)  /* null if empty */
+
+/* ✅ Check before using */
+showWhen: if(a!isNotNullOrEmpty(local!selectedRow),
+             local!selectedRow.id > 0,
+             false())
+```
+
+**5. Relationship Field Access**
+```sail
+/* Relationships can be null or empty arrays */
+
+/* ✅ Check before accessing fields */
+if(a!isNotNullOrEmpty(fv!row['recordType!Case.relationships.assignedUser']),
+   fv!row['recordType!Case.relationships.assignedUser'].firstName,
+   "Unassigned")
+
+/* ✅ Use a!defaultValue() for direct field access */
+a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
+```
+
+### Quick Reference Table
+
+| Scenario | Pattern | Example |
+|----------|---------|---------|
+| Comparison with nullable | `if(isNotNull(var), comparison, false)` | `if(a!isNotNullOrEmpty(local!id), local!id = 5, false())` |
+| Property access | `if(isNotNull(obj), obj.prop, default)` | `if(a!isNotNullOrEmpty(data), data.type, "")` |
+| Function parameter | `function(a!defaultValue(var, default))` | `text(a!defaultValue(amount, 0), "$#,##0")` |
+| String concatenation | `a!defaultValue(field, "")` | `concat(a!defaultValue(first, ""), " ", a!defaultValue(last, ""))` |
+| Boolean operations | `not(a!defaultValue(var, false()))` | `not(a!defaultValue(ri!isActive, false()))` |
+| Grid selection | `index(selection, 1, null)` then check | `if(a!isNotNullOrEmpty(index(sel, 1, null)), ...)` |
+
+### Where to Learn More
+Comprehensive patterns in `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
+- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" - Why if() vs and()/or()
+- Section "Advanced: Functions That Reject Null" - Complete function list
+- Section "🚨 MANDATORY: Null Safety Implementation" - Advanced patterns
+
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
      - **WRONG:** `if(a and b, ...)`
@@ -659,24 +775,12 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
   - **WRONG:** `local!agreeToTerms: false()` with `choiceValues: {true()}`
   - **RIGHT:** `local!agreeToTerms,` (uninitialized = unchecked)
   - **RIGHT:** `local!agreeToTerms: true()` (pre-checked, if true() is in choiceValues)
-- **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
-     - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
-     - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
-     - See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
+- **Always check for null/empty before comparing values or accessing properties** - See "NULL SAFETY RULES" section above for complete patterns
 
 ### Dynamic Form Generation
 - When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
 - Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
-- NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
-
-### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
-
-Many SAIL functions cannot accept null parameters and will cause runtime errors.
-
-See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
-- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for if() vs and()/or() usage
-- Section "Advanced: Functions That Reject Null" for a!defaultValue() patterns
-- Section "🚨 MANDATORY: Null Safety Implementation" for complete implementation patterns
+- NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
