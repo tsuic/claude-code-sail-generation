@@ -776,7 +776,7 @@ Use this checklist:
 
 ### Dynamic Form Field Validation:
 - [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
-- [ ] Parallel arrays initialized as {} for multiple fields per forEach item ‼️
+- [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
 - [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
 - [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in dynamic-sail-expression-guidelines.md)
 
@@ -793,6 +793,10 @@ Use this checklist:
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
+- [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
+- [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
+- [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️
+- [ ] NO mixed-type appends that create List of Variant ‼️
 - [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see dynamic-sail-expression-guidelines.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
 - [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
 - [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
