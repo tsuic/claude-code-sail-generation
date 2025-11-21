@@ -798,14 +798,30 @@ Use this checklist:
 - [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
 - [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
 - [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
-- [ ] Null checks before text() formatting - use `if(isNullOrEmpty(value), "N/A", text(value, format))` ‼️
-- [ ] Null checks for record field access - wrap in `a!defaultValue()` or check with `a!isNullOrEmpty()` ‼️
-- [ ] Null checks before string concatenation - use `a!defaultValue(field, "")` ‼️
-- [ ] Null checks before not() - use `not(a!defaultValue(ri!var, false()))` ‼️
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
 - [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see record-type-handling-guidelines.md "Query Result Data Structures")
+
+### Null Safety (Quick Reference):
+- [ ] **user() calls**: Check null BEFORE calling - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+- [ ] **text() calls**: Check null BEFORE calling - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+- [ ] **String concatenation**: Use a!defaultValue() or if() - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+- [ ] **Date arithmetic**: Check null before arithmetic - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+- [ ] **a!queryFilter**: Use applyWhen for variable values - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+- [ ] **not() function**: Wrap with a!defaultValue(value, false()) - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
+
+### Form Input Validation:
+- [ ] Editable form fields (textField, dateField, dropdownField) use direct field binding in value/saveInto ‼️
+- [ ] NO a!defaultValue() wrapper on editable input value/saveInto parameters ‼️
+- [ ] dropdownField choiceLabels/choiceValues HAVE null checks (query results) ‼️
+- [ ] dropdownField value/saveInto DO NOT have null checks (direct binding) ‼️
+- [ ] Cross-field validations simplified (no redundant ri!submission checks) ‼️
+
+### For Functional Interfaces (Record Data):
+- [ ] **MANDATORY**: Run sail-dynamic-converter.md Step 5D.6 null safety detection and verification
+- [ ] All patterns must match standardized patterns in `/sail-guidelines/null-safety-quick-ref.md`
+- [ ] Document null safety fixes in conversion summary with counts
 
 ### Function Variable Validation:
 - [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️

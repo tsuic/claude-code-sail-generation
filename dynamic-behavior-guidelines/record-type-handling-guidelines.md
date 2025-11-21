@@ -1165,6 +1165,10 @@ a!buttonArrayLayout(
 
 ## 🚨 MANDATORY: Null Safety Implementation
 
+> **🔗 Quick Reference:** For fast pattern lookup, see `/sail-guidelines/null-safety-quick-ref.md`
+> **🔧 Enforcement:** For functional interfaces, see `sail-dynamic-converter.md` Step 5D.6
+> **📖 This section:** Explains WHY null safety matters and HOW the patterns work
+
 **CHECKPOINT: Before finalizing any SAIL expression, verify EVERY direct field reference uses a!defaultValue()**
 
 - ✅ `a!defaultValue(ri!record['recordType!Example.fields.field'], "")`

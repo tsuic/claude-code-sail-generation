@@ -1747,6 +1747,9 @@ and(
 
 ### 🚨 CRITICAL: Short-Circuit Evaluation Rules
 
+> **🔗 Quick Reference:** For nested if() patterns, see `/sail-guidelines/null-safety-quick-ref.md`
+> **📖 This section:** Explains WHY and() doesn't short-circuit and when to use nested if()
+
 **SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
 
 #### ❌ WRONG: Using and() for Null Safety

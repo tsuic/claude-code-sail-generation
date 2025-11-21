@@ -937,6 +937,262 @@ For EACH unused variable (count = 1) with NO clear future use:
 - [ ] Bash verification proves all variables have count ≥ 2 or UNUSED comments
 - [ ] Removed variables documented in conversion summary
 - [ ] Code follows record-type-handling-guidelines.md documentation standards
+- [ ] I am ready for null safety detection and enforcement
+
+---
+
+### **Step 5D.6: MANDATORY - Null Safety Detection & Enforcement**
+
+🚨 **THIS STEP CANNOT BE SKIPPED** - Automated detection and manual verification required.
+
+**Why this is critical:** Null reference errors cause complete interface failures. Users see error pages instead of functional interfaces. There is no graceful degradation - immediate crash.
+
+**5D.6.1: Run Automated Detection**
+
+Execute these Bash commands to find ALL potentially vulnerable patterns:
+
+```bash
+# Find all text() calls
+grep -n "text(" output/[filename].sail > /tmp/null_check_text.txt
+echo "Found $(wc -l < /tmp/null_check_text.txt) text() calls"
+
+# Find all user() calls
+grep -n "user(" output/[filename].sail > /tmp/null_check_user.txt
+echo "Found $(wc -l < /tmp/null_check_user.txt) user() calls"
+
+# Find all string concatenations with &
+grep -n " & " output/[filename].sail > /tmp/null_check_concat.txt
+echo "Found $(wc -l < /tmp/null_check_concat.txt) concatenation instances"
+
+# Find all todate() calls on fields
+grep -n "todate(fv!row\|todate(ri!" output/[filename].sail > /tmp/null_check_todate.txt
+echo "Found $(wc -l < /tmp/null_check_todate.txt) todate() calls on fields"
+
+# Find all queryFilters (check manually for applyWhen)
+grep -n "a!queryFilter(" output/[filename].sail > /tmp/null_check_filters.txt
+echo "Found $(wc -l < /tmp/null_check_filters.txt) queryFilter instances"
+```
+
+- [ ] Execute all 5 commands and note counts
+- [ ] Store output files for manual review
+
+**5D.6.2: Manual Review - Context-Aware Pattern Verification**
+
+**CRITICAL:** Not all field references need null safety. Distinguish between:
+1. **Display contexts** (grid columns, richText, read-only fields) → REQUIRE null safety
+2. **Editable input contexts** (form field `value`/`saveInto`) → NO null safety needed
+3. **Choice parameters** (dropdownField `choiceLabels`/`choiceValues`) → REQUIRE null safety
+
+**Review text() calls** (/tmp/null_check_text.txt):
+- [ ] Read each line from the file
+- [ ] **SKIP** if inside form input component (textField.value, dateField.value, etc.)
+- [ ] For display contexts (grid columns, richText): Verify wrapped in `if(a!isNotNullOrEmpty(...), text(...), "N/A")`
+- [ ] If NOT wrapped → Mark for correction
+- [ ] Document: "Reviewed [N] text() calls, [M] in display contexts, [P] need protection, [Q] skipped (form inputs)"
+
+**Review user() calls** (/tmp/null_check_user.txt):
+- [ ] Read each line from the file
+- [ ] **SKIP** if inside read-only form field showing current user (auto-populated fields)
+- [ ] For display contexts: Verify wrapped in `if(a!isNotNullOrEmpty(...), user(...), "N/A")`
+- [ ] If NOT wrapped → Mark for correction
+- [ ] Document: "Reviewed [N] user() calls, [M] in display contexts, [P] need protection, [Q] skipped (read-only user fields)"
+
+**Review concatenations** (/tmp/null_check_concat.txt):
+- [ ] Read each line from the file
+- [ ] **SKIP** if inside form input component value/saveInto
+- [ ] For display contexts:
+   - If concatenating with text(): Verify if() wrapping with "N/A" fallback
+   - If concatenating without text(): Verify a!defaultValue(field, "") wrapping
+- [ ] If NOT protected → Mark for correction
+- [ ] Document: "Reviewed [N] concatenations, [M] in display contexts, [P] need protection, [Q] skipped (form inputs)"
+
+**Review todate() calls** (/tmp/null_check_todate.txt):
+- [ ] Read each line from the file
+- [ ] **SKIP** if inside form dateField.value or dateField.saveInto
+- [ ] For display contexts:
+   - If used in arithmetic: Verify wrapped in if() before arithmetic
+   - If used in comparison: Verify nested if() pattern for short-circuit
+- [ ] If NOT protected → Mark for correction
+- [ ] Document: "Reviewed [N] todate() calls, [M] in display contexts, [P] need protection, [Q] skipped (form inputs)"
+
+**Review queryFilters** (/tmp/null_check_filters.txt):
+- [ ] Read each line from the file
+- [ ] For filters with variable values: Verify has `applyWhen: a!isNotNullOrEmpty(variable)`
+- [ ] For filters with constants/functions: No applyWhen needed
+- [ ] **NO SKIPPING** - all queryFilters with variables need applyWhen
+- [ ] Document: "Reviewed [N] queryFilters, [M] need applyWhen"
+
+**NEW: Review dropdownField choice parameters**
+
+Execute new detection command:
+```bash
+# Find all dropdownField instances
+grep -n "a!dropdownField(" output/[filename].sail > /tmp/null_check_dropdown.txt
+echo "Found $(wc -l < /tmp/null_check_dropdown.txt) dropdownField instances"
+```
+
+- [ ] For EACH dropdownField, verify:
+  - [ ] choiceLabels: Has if(a!isNotNullOrEmpty(queryResult), queryResult['field'], {})
+  - [ ] choiceValues: Has if(a!isNotNullOrEmpty(queryResult), queryResult['field'], {})
+  - [ ] value: Direct field binding (NO null check)
+  - [ ] saveInto: Direct field binding (NO null check)
+- [ ] Document: "Reviewed [N] dropdownFields, [M] choice params need protection, [P] value/saveInto correct (no null check)"
+
+**5D.6.3: Apply Corrections**
+
+For EACH instance marked for correction, apply the appropriate pattern from `/sail-guidelines/null-safety-quick-ref.md`:
+
+**Correcting text() calls:**
+```sail
+/* ❌ BEFORE */
+text: text(fv!row['recordType!...field'], "0000")
+
+/* ✅ AFTER - Apply pattern from quick-ref.md */
+text: if(
+  a!isNotNullOrEmpty(fv!row['recordType!...field']),
+  text(fv!row['recordType!...field'], "0000"),
+  "N/A"
+)
+```
+
+**Correcting user() calls:**
+```sail
+/* ❌ BEFORE */
+text: user(fv!row['recordType!...userId'], "username")
+
+/* ✅ AFTER - Apply pattern from quick-ref.md */
+text: if(
+  a!isNotNullOrEmpty(fv!row['recordType!...userId']),
+  user(fv!row['recordType!...userId'], "username"),
+  "N/A"
+)
+```
+
+**Correcting concatenation with text():**
+```sail
+/* ❌ BEFORE */
+text: "SUB-" & text(field, "0000")
+
+/* ✅ AFTER - Apply pattern from quick-ref.md */
+text: "SUB-" & if(
+  a!isNotNullOrEmpty(field),
+  text(field, "0000"),
+  "N/A"
+)
+```
+
+**Correcting date arithmetic:**
+```sail
+/* ❌ BEFORE */
+todate(fv!row['recordType!...startDate'] + 30)
+
+/* ✅ AFTER - Apply pattern from quick-ref.md */
+if(
+  a!isNotNullOrEmpty(fv!row['recordType!...startDate']),
+  todate(fv!row['recordType!...startDate'] + 30),
+  null
+)
+```
+
+**Correcting date comparisons (nested if() for short-circuit):**
+```sail
+/* ❌ BEFORE */
+color: if(
+  todate(fv!row['recordType!...startDate'] + 30) < today(),
+  "#DC2626",
+  "STANDARD"
+)
+
+/* ✅ AFTER - Apply nested if() pattern from quick-ref.md */
+color: if(
+  if(
+    a!isNotNullOrEmpty(fv!row['recordType!...startDate']),
+    todate(fv!row['recordType!...startDate'] + 30) < today(),
+    false
+  ),
+  "#DC2626",
+  "STANDARD"
+)
+```
+
+**Correcting a!queryFilter:**
+```sail
+/* ❌ BEFORE */
+a!queryFilter(
+  field: 'recordType!X.fields.name',
+  operator: "includes",
+  value: local!searchText
+)
+
+/* ✅ AFTER - Apply pattern from quick-ref.md */
+a!queryFilter(
+  field: 'recordType!X.fields.name',
+  operator: "includes",
+  value: local!searchText,
+  applyWhen: a!isNotNullOrEmpty(local!searchText)
+)
+```
+
+**Correcting form inputs (REMOVE over-defensive null checks):**
+
+For editable form input components (textField, dateField, dropdownField, paragraphField, etc.):
+- [ ] Remove a!defaultValue() wrapper from `value` parameter → Use direct field binding
+- [ ] Remove if(a!isNotNullOrEmpty(ri!submission)) wrapper from `saveInto` → Use direct field binding
+- [ ] Simplify cross-field validations → Remove redundant ri!submission checks
+- [ ] KEEP null checks for dropdownField `choiceLabels`/`choiceValues` (query results)
+- [ ] See `/sail-guidelines/null-safety-quick-ref.md` "Form Input Components - Special Rules" for detailed examples
+
+- [ ] Use Edit tool to apply each correction
+- [ ] Track corrections made: `[N text(), M user(), P concat, Q todate(), R queryFilter, S form inputs simplified]`
+
+**5D.6.4: Re-Verification**
+
+After applying all corrections, re-run detection to confirm:
+
+```bash
+# Re-run all detection commands
+grep -n "text(" output/[filename].sail > /tmp/null_check_text_v2.txt
+grep -n "user(" output/[filename].sail > /tmp/null_check_user_v2.txt
+grep -n " & " output/[filename].sail > /tmp/null_check_concat_v2.txt
+grep -n "todate(fv!row\|todate(ri!" output/[filename].sail > /tmp/null_check_todate_v2.txt
+grep -n "a!queryFilter(" output/[filename].sail > /tmp/null_check_filters_v2.txt
+
+# Compare counts
+echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp/null_check_text_v2.txt) text()"
+```
+
+- [ ] Manually review EACH instance in the v2 files
+- [ ] Verify ALL match protected patterns from quick-ref.md
+- [ ] Document findings:
+  ```
+  Null Safety Enforcement Summary:
+  - Protected [N] text() calls (all verified)
+  - Protected [M] user() calls (all verified)
+  - Protected [P] concatenations (all verified)
+  - Protected [Q] todate() calls (all verified)
+  - Added applyWhen to [R] queryFilters (all verified)
+  - Total corrections: [N+M+P+Q+R]
+  ```
+
+**🛑 BLOCKING REQUIREMENT - You CANNOT proceed to Step 5E until:**
+- [ ] All detection commands executed and counts documented
+- [ ] Manual review completed for ALL instances found
+- [ ] All corrections applied using patterns from `/sail-guidelines/null-safety-quick-ref.md`
+- [ ] Re-verification confirms 100% pattern compliance
+- [ ] Summary documented with counts showing before/after verification
+- [ ] You can demonstrate evidence of manual review (not just running commands)
+
+**Why this cannot be skipped:**
+- Null reference errors cause immediate interface crashes
+- No graceful degradation - users see error pages
+- Automated detection finds instances, but manual review ensures correct patterns
+- Re-verification proves enforcement, not just detection
+
+**After completing Step 5D.6:**
+- [ ] All vulnerable patterns detected, reviewed, and protected
+- [ ] All corrections use standardized patterns from quick-ref.md
+- [ ] Manual review evidence documented in summary
+- [ ] Re-verification proves 100% compliance
 - [ ] I am ready for query filter type validation
 
 ---
@@ -1214,6 +1470,21 @@ Use this reference when determining value types:
 - [ ] Do ALL variables have occurrence count ≥ 2 or UNUSED comments (Step 5D.5.4)?
 - [ ] Can I show the Bash verification output proving cleanup?
 - [ ] Did I document removed variables in conversion summary (Step 5D.5.4)?
+
+**Null Safety Verification (MANDATORY - Step 5D.6):**
+- [ ] Did I run automated null safety detection (Step 5D.6.1)?
+- [ ] Did I execute ALL 5 detection commands and document counts?
+- [ ] Did I manually review ALL text() calls and verify if() wrapping?
+- [ ] Did I manually review ALL user() calls and verify if() BEFORE calling?
+- [ ] Did I verify ALL string concatenations use proper null handling?
+- [ ] Did I verify ALL date arithmetic is protected with if() checks?
+- [ ] Did I verify ALL a!queryFilter with variables have applyWhen?
+- [ ] Did I apply corrections using patterns from /sail-guidelines/null-safety-quick-ref.md?
+- [ ] Did I re-run detection and verify 100% pattern compliance?
+- [ ] Can I show detection output + manual review notes proving coverage?
+- [ ] Did I document null safety fixes in conversion summary with counts?
+
+**Query Filter Type Validation:**
 - [ ] Did I validate ALL query filter type matching (Step 5E)?
 - [ ] Did I fix ALL type mismatches found in Step 5E?
 
