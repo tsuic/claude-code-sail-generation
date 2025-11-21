@@ -159,7 +159,7 @@ If you violate any of these rules, STOP and reconsider your approach.
 - ✅ Before using variables in `required` parameter - for null-safe conditional logic
 - ✅ **Remember:** SAIL doesn't support regex
 
-**THIS IS NOT OPTIONAL for dynamic code. Static forms may skip this.**
+**THIS IS NOT OPTIONAL for dynamic code. Static UIs may skip this.**
 **THIS IS NOT OPTIONAL when using checkboxes or conditional `required` parameters.**
 
 ### **Rule Input Pattern for Functional Interfaces**
@@ -233,7 +233,7 @@ a!match(
 
 **MANDATORY VALIDATION:**
 - ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` lines 5276-5288
-- ✅ ALL a!queryFilter() operators MUST exist in record-type-handling-guidelines.md "Valid Operators by Data Type"
+- ✅ ALL a!queryFilter() operators MUST exist in `dynamic-behavior-guidelines/record-type-handling-guidelines.md` "Valid Operators by Data Type"
 - ✅ ALL component parameters MUST be verified against `/ui-guidelines/0-sail-api-schema.json`
 - ✅ NO invented functions, parameters, or values
 
@@ -558,11 +558,6 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `messages.md` for message banners (info, warning, etc.)
 - `tabs.md` for tab bars
 
-### Dynamic Form Generation
-- When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
-- Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
-- NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
-
 ### Special Rules
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
 - When not setting a label on a component, explicitly set labelPosition to "COLLAPSED" so that space is not reserved for the label (for more reliable alignment)
@@ -603,6 +598,12 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
      - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
      - See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
 
+
+### Dynamic Form Generation
+- When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
+- Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
+- NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
+
 ### Pattern Matching with a!match()
 
 For cleaner pattern matching (status codes, priority levels, categories), use `a!match()` instead of nested `if()` statements.
@@ -611,7 +612,6 @@ See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - secti
 - Pattern: Status to Icon/Color mapping (a!match() vs parallel arrays)
 - Pattern: Dynamic styling with stampField
 - Pattern: Grid column conditional background colors
-- Decision criteria: when to use a!match() vs when to use parallel arrays
 
 ### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
 

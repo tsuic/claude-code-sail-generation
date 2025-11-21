@@ -1,8 +1,8 @@
 {
-  // "mcpServers": {
-  //   "appian-mcp-server": {
-  //     "type": "http",
-  //     "url": "http://appn-mcp.custom-ai.appian-internal.com:8000/mcp"
-  //   }
-  // }
+  "mcpServers": {
+    "appian-mcp-server": {
+      "type": "http",
+      "url": "http://appn-mcp.custom-ai.appian-internal.com:8000/mcp"
+    }
+  }
 }
