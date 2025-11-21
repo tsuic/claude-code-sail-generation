@@ -8,6 +8,11 @@
 - Don't worry about querying live data, just hard-code sample content using local variables and a!map
 - Don't use `ri!` or `recordtype!` references to live record data unless explicitly asked to
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
+  - ❌ SAIL does not support inline function definitions or helper expressions stored in variables
+  - ❌ CANNOT create reusable logic: `local!calculateColor: rule!helper` (syntax error - rule references cannot be stored in variables)
+  - ❌ CANNOT define inline helper functions or lambdas: `local!helper: expression` (not supported in SAIL)
+  - ✅ Repeat logic inline wherever needed (even if duplicative across multiple columns/components)
+  - ✅ For complex repeated logic, use if()/a!match() patterns directly in each location
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
 - ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
 - When converting mock to functional, apply ALL "Logic Refactoring Requirements" (see dedicated section below), refactor code structure for record queries (e.g., chart patterns), but preserve visual design
@@ -19,8 +24,86 @@
 4. ✅ ONLY richTextItems or richTextIcons are allowed inside richTextDisplayField
 5. ✅ Each columnsLayout must have at least one AUTO-width columnLayout
 6. ❌ choiceValues CANNOT be null or empty strings
+7. ⚠️ ALWAYS check for null before comparisons/property access - use if() NOT and() (see NULL SAFETY RULES section)
 
 If you violate any of these rules, STOP and reconsider your approach.
+
+## 🚨 UNIVERSAL SAIL VALIDATION CHECKLIST
+
+**This checklist applies to BOTH mock generation AND functional conversion.**
+
+Use this checklist:
+- ✅ When generating new mockup interfaces (primary agent)
+- ✅ When converting mockups to functional (sail-dynamic-converter agent)
+- ✅ Before calling validation sub-agents
+
+### Before Writing Dynamic Code:
+- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
+- [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
+- [ ] Remember that SAIL doesn't support regex
+
+### Dynamic Form Field Validation:
+- [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
+- [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
+- [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in dynamic-sail-expression-guidelines.md)
+
+### Form Interface Pattern (Functional Interfaces with CREATE/UPDATE):
+- [ ] Uses direct `ri!` pattern (NOT `local!ri_*` testing simulation) ‼️
+- [ ] Rule inputs documented in comment block at top ‼️
+- [ ] NO testing simulation scaffolding ‼️
+- [ ] Form fields bind directly to `ri!` (no intermediate copies) ‼️
+
+### Syntax Validation:
+- [ ] Starts with a!localVariables()
+- [ ] All braces/parentheses matched
+- [ ] All strings in double quotes
+- [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
+- [ ] Comments use /* */ not //
+- [ ] `or(a,b)` NOT `a or b` ‼️
+- [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
+- [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
+- [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️
+- [ ] NO mixed-type appends that create List of Variant ‼️
+- [ ] All null-unsafe operations protected (see "NULL SAFETY RULES" section) ‼️
+  - Comparisons wrapped in if() short-circuit pattern
+  - Property access checked before use
+  - Function parameters use a!defaultValue() where needed
+  - Grid selections use index(..., 1, null) pattern
+- [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
+- [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
+- [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
+- [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
+- [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
+- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
+- [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
+- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see record-type-handling-guidelines.md "Query Result Data Structures")
+
+### Function Variable Validation:
+- [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
+- [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
+- [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
+- [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
+- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️
+
+### Parameter Validation:
+- [ ] Check to see that every parameter and value is listed in documentation before using!
+- [ ] For functional interfaces: ALL a!measure() functions validated against 0-sail-api-schema.json
+- [ ] For functional interfaces: ALL a!queryFilter() operators validated against record-type-handling-guidelines.md
+
+### Layout Validation:
+- [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
+- [ ] No nested sideBySideLayouts
+- [ ] No columns or card layouts inside sideBySideItems
+- [ ] Only richTextItems or richTextIcons in richTextDisplayField
+- [ ] At least one AUTO width column in each columnsLayout
+- [ ] ❌ DON'T USE `less` or `more` for `spacing`!
+
+### Logic Pattern Validation (Functional Interfaces Only):
+- [ ] All nested if() (3+ levels) refactored to a!match() where appropriate
+- [ ] All charts using record data refactored to data + config pattern
+- [ ] All record instances using record type constructors (not a!map)
+- [ ] All refactoring decisions documented in code comments
 
 ## 📚 DOCUMENTATION REQUIREMENT
 
@@ -66,7 +149,6 @@ If you violate any of these rules, STOP and reconsider your approach.
 
 **Expression Grammar & Variables:**
 - `1-expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
-- `2-local-variables-instructions.md` - Local variable usage and patterns
 
 **Layout Components (3-*):**
 - `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
@@ -195,9 +277,9 @@ a!localVariables(
 ### **1. Pattern Matching Improvements**
 
 **MANDATORY REFACTORING:**
-- ✅ Replace nested if() (3+ levels) with a!match() for enumerated value comparisons
-- ✅ Decision criteria: Single variable compared against 3+ distinct values
-- ✅ See dynamic-sail-expression-guidelines.md section "Using a!match() for Status-Based Lookups"
+- ✅ Replace nested if() (3+ levels) with a!match() for value comparisons
+- ✅ Decision criteria: Single variable compared against 3+ distinct values OR ranges
+- ✅ See `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section "Using a!match() for Status-Based Lookups"
 
 **When to Apply:**
 - Pattern: `if(var = "A", ..., if(var = "B", ..., if(var = "C", ...)))`
@@ -222,12 +304,6 @@ a!match(
   default: "file"
 )
 ```
-
-**Benefits:**
-- Cleaner, more maintainable code
-- Short-circuits like if() - safe for conditional logic
-- Follows Appian best practices
-- Easier to extend with new values
 
 ### **2. Parameter Validation**
 
@@ -576,6 +652,116 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `ACCENT`: themed accent color (primary buttons, etc.)
 - `STANDARD`: text and heading color
 
+## ⚠️ NULL SAFETY RULES (CRITICAL)
+
+SAIL cannot handle null values in most operations. **Check before using.**
+
+### The Core Problem
+- Comparing null values crashes: `local!id = fv!item.id` fails if `local!id` is null
+- Accessing properties on null crashes: `local!data.type` fails if `local!data` is null
+- Most functions reject null parameters: `text(null, "format")` fails
+
+### Universal Pattern: Use if() for Short-Circuit Evaluation
+
+✅ **RIGHT - if() short-circuits (safe):**
+```sail
+/* Pattern 1: Null-safe comparison */
+showWhen: if(a!isNotNullOrEmpty(local!selectedId),
+              local!selectedId = fv!item.id,
+              false())
+
+/* Pattern 2: Null-safe property access */
+if(a!isNotNullOrEmpty(local!data),
+   local!data.type = "Contract",
+   false())
+```
+
+❌ **WRONG - and() does NOT short-circuit (crashes):**
+```sail
+/* and() evaluates ALL parameters even if first is false */
+showWhen: and(a!isNotNullOrEmpty(local!data),
+              local!data.type = "Contract")  /* CRASHES if null! */
+```
+
+### Common Null Safety Patterns
+
+**1. Choice Field Initialization**
+```sail
+/* ✅ Uninitialized = unchecked/unselected (null state) */
+local!agreeToTerms,  /* NOT false() */
+
+/* ✅ Only initialize if pre-selected AND value exists in choiceValues */
+local!agreeToTerms: true(),  /* Only if true() is in choiceValues */
+
+/* ❌ NEVER use null/empty in choiceValues */
+choiceValues: {true()}  /* NOT: {true(), null} or {true(), ""} */
+```
+
+**2. Input Field Data Storage**
+```sail
+/* ❌ NEVER leave inputs orphaned */
+a!textField(value: null, saveInto: null)  /* User input goes nowhere! */
+
+/* ✅ Always store to variables */
+a!textField(value: local!name, saveInto: local!name)
+```
+
+**3. Functions That Reject Null**
+```sail
+/* Common functions that crash on null: text(), concat(), user(), not(), etc. */
+
+/* ✅ Use a!defaultValue() wrapper */
+text(a!defaultValue(fv!row.amount, 0), "$#,##0.00")
+concat(a!defaultValue(fv!row.firstName, ""), " ", a!defaultValue(fv!row.lastName, ""))
+not(a!defaultValue(ri!isActive, false()))
+
+/* ✅ OR use if() to provide fallback */
+if(a!isNullOrEmpty(fv!row.status), "N/A", text(fv!row.status, "format"))
+```
+
+**4. Grid Selection (Always Returns List)**
+```sail
+/* Grid selectionValue is ALWAYS a list, even for single-select */
+
+/* ✅ Use index() to access first item safely */
+local!selectedRow: index(local!selection, 1, null)  /* null if empty */
+
+/* ✅ Check before using */
+showWhen: if(a!isNotNullOrEmpty(local!selectedRow),
+             local!selectedRow.id > 0,
+             false())
+```
+
+**5. Relationship Field Access**
+```sail
+/* Relationships can be null or empty arrays */
+
+/* ✅ Check before accessing fields */
+if(a!isNotNullOrEmpty(fv!row['recordType!Case.relationships.assignedUser']),
+   fv!row['recordType!Case.relationships.assignedUser'].firstName,
+   "Unassigned")
+
+/* ✅ Use a!defaultValue() for direct field access */
+a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
+```
+
+### Quick Reference Table
+
+| Scenario | Pattern | Example |
+|----------|---------|---------|
+| Comparison with nullable | `if(isNotNull(var), comparison, false)` | `if(a!isNotNullOrEmpty(local!id), local!id = 5, false())` |
+| Property access | `if(isNotNull(obj), obj.prop, default)` | `if(a!isNotNullOrEmpty(data), data.type, "")` |
+| Function parameter | `function(a!defaultValue(var, default))` | `text(a!defaultValue(amount, 0), "$#,##0")` |
+| String concatenation | `a!defaultValue(field, "")` | `concat(a!defaultValue(first, ""), " ", a!defaultValue(last, ""))` |
+| Boolean operations | `not(a!defaultValue(var, false()))` | `not(a!defaultValue(ri!isActive, false()))` |
+| Grid selection | `index(selection, 1, null)` then check | `if(a!isNotNullOrEmpty(index(sel, 1, null)), ...)` |
+
+### Where to Learn More
+Comprehensive patterns in `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
+- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" - Why if() vs and()/or()
+- Section "Advanced: Functions That Reject Null" - Complete function list
+- Section "🚨 MANDATORY: Null Safety Implementation" - Advanced patterns
+
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
      - **WRONG:** `if(a and b, ...)`
@@ -593,34 +779,12 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
   - **WRONG:** `local!agreeToTerms: false()` with `choiceValues: {true()}`
   - **RIGHT:** `local!agreeToTerms,` (uninitialized = unchecked)
   - **RIGHT:** `local!agreeToTerms: true()` (pre-checked, if true() is in choiceValues)
-- **Always check for null/empty before comparing values or accessing properties** - SAIL cannot handle null in comparisons or property access
-     - **WRONG:** `showWhen: local!selectedId = fv!item.id` (fails if selectedId is null)
-     - **WRONG:** `showWhen: and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")` (and() doesn't short-circuit!)
-     - See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for complete null safety patterns
-
+- **Always check for null/empty before comparing values or accessing properties** - See "NULL SAFETY RULES" section above for complete patterns
 
 ### Dynamic Form Generation
 - When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
 - Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
-- NEVER use `value: null, saveInto: null` in input fields - user input must be stored somewhere
-
-### Pattern Matching with a!match()
-
-For cleaner pattern matching (status codes, priority levels, categories), use `a!match()` instead of nested `if()` statements.
-
-See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - section "Using a!match() for Status-Based Lookups" for:
-- Pattern: Status to Icon/Color mapping (a!match() vs parallel arrays)
-- Pattern: Dynamic styling with stampField
-- Pattern: Grid column conditional background colors
-
-### ⚠️ NULL SAFETY FOR COMMON FUNCTIONS
-
-Many SAIL functions cannot accept null parameters and will cause runtime errors.
-
-See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
-- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" for if() vs and()/or() usage
-- Section "Advanced: Functions That Reject Null" for a!defaultValue() patterns
-- Section "🚨 MANDATORY: Null Safety Implementation" for complete implementation patterns
+- NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
@@ -725,8 +889,6 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 4. **Preserve visual design** and layout (colors, spacing, styling)
 5. **Document refactoring decisions** in code comments with section references
 
----
-
 ### ✅ Validating SAIL Expressions:
 👉 Always use tools to validate new expressions:
 - [ ] *IF* mcp__appian-mcp-server__validate_sail is available, always call it for efficient syntax validation
@@ -757,103 +919,6 @@ When validating interfaces with rule inputs or environment-specific references, 
 - ❌ Invalid function names or parameters
 - ❌ Syntax errors (mismatched braces, quotes)
 - ❌ Undefined local variables (local! not declared in a!localVariables)
-
----
-
-## 🚨 UNIVERSAL SAIL VALIDATION CHECKLIST
-
-**This checklist applies to BOTH mock generation AND functional conversion.**
-
-Use this checklist:
-- ✅ When generating new mockup interfaces (primary agent)
-- ✅ When converting mockups to functional (sail-dynamic-converter agent)
-- ✅ Before calling validation sub-agents
-
-### Before Writing Dynamic Code:
-- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
-- [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
-- [ ] Remember that SAIL doesn't support regex
-
-### Dynamic Form Field Validation:
-- [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
-- [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
-- [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
-- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in dynamic-sail-expression-guidelines.md)
-
-### Form Interface Pattern (Functional Interfaces with CREATE/UPDATE):
-- [ ] Uses direct `ri!` pattern (NOT `local!ri_*` testing simulation) ‼️
-- [ ] Rule inputs documented in comment block at top ‼️
-- [ ] NO testing simulation scaffolding ‼️
-- [ ] Form fields bind directly to `ri!` (no intermediate copies) ‼️
-
-### Syntax Validation:
-- [ ] Starts with a!localVariables()
-- [ ] All braces/parentheses matched
-- [ ] All strings in double quotes
-- [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
-- [ ] Comments use /* */ not //
-- [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
-- [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
-- [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️
-- [ ] NO mixed-type appends that create List of Variant ‼️
-- [ ] Null checks before comparisons/property access - use `if()` NOT `and()` (see dynamic-sail-expression-guidelines.md section "🚨 CRITICAL: Short-Circuit Evaluation Rules") ‼️
-- [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
-- [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
-- [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
-- [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
-- [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
-- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
-- [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
-- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see record-type-handling-guidelines.md "Query Result Data Structures")
-
-### Null Safety (Quick Reference):
-- [ ] **user() calls**: Check null BEFORE calling - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-- [ ] **text() calls**: Check null BEFORE calling - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-- [ ] **String concatenation**: Use a!defaultValue() or if() - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-- [ ] **Date arithmetic**: Check null before arithmetic - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-- [ ] **a!queryFilter**: Use applyWhen for variable values - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-- [ ] **not() function**: Wrap with a!defaultValue(value, false()) - see `/sail-guidelines/null-safety-quick-ref.md` ‼️
-
-### Form Input Validation:
-- [ ] Editable form fields (textField, dateField, dropdownField) use direct field binding in value/saveInto ‼️
-- [ ] NO a!defaultValue() wrapper on editable input value/saveInto parameters ‼️
-- [ ] dropdownField choiceLabels/choiceValues HAVE null checks (query results) ‼️
-- [ ] dropdownField value/saveInto DO NOT have null checks (direct binding) ‼️
-- [ ] Cross-field validations simplified (no redundant ri!submission checks) ‼️
-
-### For Functional Interfaces (Record Data):
-- [ ] **MANDATORY**: Run sail-dynamic-converter.md Step 5D.6 null safety detection and verification
-- [ ] All patterns must match standardized patterns in `/sail-guidelines/null-safety-quick-ref.md`
-- [ ] Document null safety fixes in conversion summary with counts
-
-### Function Variable Validation:
-- [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
-- [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
-- [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
-- [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
-- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️
-
-### Parameter Validation:
-- [ ] Check to see that every parameter and value is listed in documentation before using!
-- [ ] For functional interfaces: ALL a!measure() functions validated against 0-sail-api-schema.json
-- [ ] For functional interfaces: ALL a!queryFilter() operators validated against record-type-handling-guidelines.md
-
-### Layout Validation:
-- [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
-- [ ] No nested sideBySideLayouts
-- [ ] No columns or card layouts inside sideBySideItems
-- [ ] Only richTextItems or richTextIcons in richTextDisplayField
-- [ ] At least one AUTO width column in each columnsLayout
-- [ ] ❌ DON'T USE `less` or `more` for `spacing`!
-
-### Logic Pattern Validation (Functional Interfaces Only):
-- [ ] All nested if() (3+ levels) refactored to a!match() where appropriate
-- [ ] All charts using record data refactored to data + config pattern
-- [ ] All record instances using record type constructors (not a!map)
-- [ ] All refactoring decisions documented in code comments
-
----
 
 ## 📖 DOCUMENTATION CROSS-REFERENCE
 
