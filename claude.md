@@ -755,6 +755,9 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 | String concatenation | `a!defaultValue(field, "")` | `concat(a!defaultValue(first, ""), " ", a!defaultValue(last, ""))` |
 | Boolean operations | `not(a!defaultValue(var, false()))` | `not(a!defaultValue(ri!isActive, false()))` |
 | Grid selection | `index(selection, 1, null)` then check | `if(a!isNotNullOrEmpty(index(sel, 1, null)), ...)` |
+| Date field display | `if(isNotNull(field), text(todate(field), "MMM d, yyyy"), "N/A")` | Use `todate()` wrapper |
+| DateTime field display | `if(isNotNull(field), text(field, "MMM d, yyyy h:mm a"), "N/A")` | NO `todate()` wrapper |
+| Time field display | `if(isNotNull(field), text(field, "h:mm a"), "N/A")` | Use `text()` directly |
 
 ### Where to Learn More
 Comprehensive patterns in `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
