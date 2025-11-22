@@ -11,6 +11,7 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 
 ### 🚨 Critical Sections (Read These First):
 - **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
+- **Array Type Initialization** → See `/sail-guidelines/array-type-initialization-guidelines.md`
 - **Rule Inputs in Mockups** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
 - **Essential SAIL Structure** → `"## Essential SAIL Structure"`
 - **Unused Variables in Mockups** → `"## 📝 Unused Variables in Mockups"`
@@ -28,6 +29,7 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **Handling unused variables** → `"## 📝 Unused Variables in Mockups"`
 - **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
 - **Internationalization considerations** → `"## ⚠️ INTERNATIONALIZATION IN APPIAN INTERFACES"`
+- **Initializing empty arrays** → See `/sail-guidelines/array-type-initialization-guidelines.md`
 - **Working with arrays and loops** → `"## 🚨 CRITICAL: a!forEach() Function Variables Reference"`
 - **forEach generating input fields** → `"## Dynamic Form Fields with forEach - Parallel Array Pattern"`
 - **Direct property saving in forEach** → `"## ⚠️ CRITICAL: Direct Property Saving in forEach"`
@@ -45,6 +47,9 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
 - **"Rule input not defined (ri!)"** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
 - **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **"Type mismatch" with contains/wherecontains** → See `/sail-guidelines/array-type-initialization-guidelines.md`
+- **"List of Variant" errors** → See `/sail-guidelines/array-type-initialization-guidelines.md`
+- **"tostring() returned single string instead of array"** → Use `touniformstring()` instead (see `/sail-guidelines/array-type-initialization-guidelines.md`)
 - **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
 - **Invalid function parameters** → `"## ⚠️ Function Parameter Validation"`
 - **Short-circuit evaluation errors** → `"## 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
@@ -84,6 +89,18 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 8. **MOCKUPS NEVER use rule inputs (ri!)** - Only local variables (local!) for self-contained demos
 9. **Local variables are ONLY for UI state** - Mock data, selections, transient state
 10. **Always try to use record types for read-only grids and charts** instead of mock data when possible
+11. **Empty arrays MUST be type-initialized for primitive types** - Use type-casting functions to avoid Variant list errors
+    - `tointeger({})` for ID arrays, counts, numeric selections
+    - `touniformstring({})` for name arrays, labels, text selections ⚠️ NOT tostring()!
+    - `toboolean({})` for flag arrays, boolean selections
+    - `todate({})` for date arrays, date range filters
+    - `todatetime({})` for timestamp arrays
+    - `todecimal({})` for currency, percentages, precise numeric arrays
+    - `totime({})` for time-only values
+    - `touser({})` for user reference arrays
+    - `togroup({})` for group reference arrays
+    - **CRITICAL:** `tostring()` merges arrays to single string; use `touniformstring()` to preserve array structure
+    - See `/sail-guidelines/array-type-initialization-guidelines.md` for complete reference
 
 ## ❌ Rule Inputs in Mockups - Common Mistake
 
@@ -1746,6 +1763,9 @@ and(
 ```
 
 ### 🚨 CRITICAL: Short-Circuit Evaluation Rules
+
+> **🔗 Quick Reference:** For nested if() patterns, see `/sail-guidelines/null-safety-quick-ref.md`
+> **📖 This section:** Explains WHY and() doesn't short-circuit and when to use nested if()
 
 **SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
 
