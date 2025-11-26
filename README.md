@@ -6,9 +6,10 @@ This tool generates Appian SAIL UI expressions from natural language requests.
 ### Getting Started
 1. [Clone this repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 2. [Install and set up Claude Code](https://docs.claude.com/en/docs/claude-code/setup)
-3. Open a terminal window and navigate to the root folder for this repo
-4. Launch Claude Code by typing: `claude`
-5. Grant any permissions that Claude Code asks for
+3. For best performance, connect to the Appian VPN while using this project ([See why](#validation-approaches))
+4. Open a terminal window and navigate to the root folder for this repo
+5. Launch Claude Code by typing: `claude`
+6. Grant any permissions that Claude Code asks for
 
 ### (Optional + Recommended) Use with Visual Studio Code
 If you want to use an IDE instead of the command line:
@@ -21,7 +22,6 @@ If you want to use an IDE instead of the command line:
 
 ### Additional Tips
 1. To stay up-to-date with the latest project enhancements, pull from this repo
-2. For best performance, connect to the Appian VPN while using this project ([See why](#validation-approaches))
 
 ### Generating a SAIL Mockup
 
@@ -103,7 +103,7 @@ Claude Code validates generated SAIL expressions using different approaches:
 
 **Setup:**
 1. Connect to Appian VPN
-2. Add MCP server permissions to `.claude/settings.local.json`
+2. Add MCP server permissions to `.claude/settings.local.json` (Optional, suppresses permission prompts each time tool is called):
 
 ```json
 {
@@ -117,6 +117,8 @@ Claude Code validates generated SAIL expressions using different approaches:
   "enabledMcpjsonServers": ["appian-mcp-server"]
 }
 ```
+
+3. Issue the `/mcp status` command in Claude Code to make sure that the Appian server is connnected (if not, try quitting VSCode/Claude code and restarting after conecting to VPN).
 
 #### Without VPN Connection
 **Approach:** Uses specialized validation sub-agents
