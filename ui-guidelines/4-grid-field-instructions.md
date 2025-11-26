@@ -737,7 +737,7 @@ a!gridField(
 - **Dates**: Formatted text with consistent date format
 - **Status**: Tag fields with semantic colors
 - **Actions**: Button arrays with consistent styling
-- **Icons + Text**: Use rich text with `a!richTextIcon()` and `a!richTextItem()`
+- **Icons + Text**: Use `a!richTextDisplayField` with `a!richTextIcon()` and `a!richTextItem()`
 
 ## Common Validation Issues
 
@@ -800,6 +800,7 @@ a!gridColumn(
 - [ ] ❌ **NO cardLayouts** in any grid column
 - [ ] ❌ **NO arrays of components** in any grid column
 - [ ] ✅ **ONLY** single components: richTextDisplayField, tagField, buttonArrayLayout, etc.
+- [ ] ✅ richTextItem must be inside richTextDisplayField
 
 ### Alternative Solutions:
 - **Instead of sideBySideLayout**: Use `a!richTextDisplayField` with `a!richTextIcon()` and `a!richTextItem()`

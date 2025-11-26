@@ -480,10 +480,14 @@ local!clientCases: if(
 ),
 
 /* Visual indicator in UI */
-a!richTextItem(
-  text: "Client Cases (" & length(local!clientCases) & " cases - sample data)",
-  size: "SMALL",
-  color: "#6B7280"
+a!richTextDisplayField(
+  value: {
+    a!richTextItem(
+      text: "Client Cases (" & length(local!clientCases) & " cases - sample data)",
+      size: "SMALL",
+      color: "#6B7280"
+    )
+  }
 )
 ```
 
