@@ -269,16 +269,12 @@ a!localVariables(
           a!cardLayout(
             /* Page title and other header content wrapped in a borderless card to provide padding */
             contents: {
-              a!richTextDisplayField(
-                labelPosition: "COLLAPSED",
-                value: {
-                  a!richTextItem(
-                    text: "Project Dashboard",
-                    color: "#FFFFFF",
-                    size: "LARGE",
-                    style: "STRONG"
-                  )
-                },
+              a!headingField(
+                text: "Project Dashboard",
+                size: "LARGE",
+                headingTag: "H1",
+                fontWeight: "BOLD",
+                color: "#FFFFFF",
                 marginBelow: "STANDARD"
               )
             },

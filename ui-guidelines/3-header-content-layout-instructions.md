@@ -108,15 +108,12 @@ a!headerContentLayout(
   header: {
     a!cardLayout(
       contents: {
-        a!richTextDisplayField( /* Page Title */
-          labelPosition: "COLLAPSED",
-          value: {
-            a!richTextItem(
-              text: { "Page Title" },
-              size: "LARGE",
-              style: { "STRONG" }
-            )
-          }
+        a!headingField( /* Page Title */
+          text: "Page Title",
+          size: "LARGE",
+          headingTag: "H1",
+          fontWeight: "BOLD",
+          marginBelow: "NONE
         )
       },
       height: "AUTO",
@@ -209,15 +206,11 @@ If a boxy card header isn't needed, exclude the `header` parameter and put heade
 ```sail
 a!headerContentLayout(
   contents: {
-    a!richTextDisplayField( /* Page title included in page contents, not header */
-      labelPosition: "COLLAPSED",
-      value: {
-        a!richTextItem(
-          text: { "Page Title" },
-          size: "LARGE",
-          style: { "STRONG" }
-        )
-      },
+    a!headingField( /* Page title included in page contents, not header */
+      text: "Page Title",
+      size: "LARGE",
+      headingTag: "H1",
+      fontWeight: "BOLD",
       marginBelow: "MORE" /* Add space between title and page contents */
     ),
     a!cardLayout( /* Card wrapping main page contents */

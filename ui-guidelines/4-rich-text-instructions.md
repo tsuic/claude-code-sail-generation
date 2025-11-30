@@ -66,23 +66,11 @@ Individual styled text element within rich text displays.
 - **Complex labels** - When basic field labels aren't enough
 
 ### ❌ Use Alternatives Instead:
-- **Accessible headings** → `a!headingField()`
+- **Accessible section headings** → `a!headingField()`
 
 ## Common Rich Text Patterns
 
-### 1. Styled Section Headings
-```sail
-a!richTextDisplayField(
-  value: a!richTextItem(
-    text: "My Tasks",
-    size: "MEDIUM_PLUS",
-    style: "STRONG",
-    color: "STANDARD"
-  )
-)
-```
-
-### 2. Status Messages
+### 1. Status Messages
 ```sail
 a!richTextDisplayField(
   value: {
@@ -102,7 +90,7 @@ a!richTextDisplayField(
 )
 ```
 
-### 3. Icon with Text
+### 2. Icon with Text
 ```sail
 a!richTextDisplayField(
   value: {
@@ -125,7 +113,7 @@ a!richTextDisplayField(
 )
 ```
 
-### 4. Linked Text
+### 3. Linked Text
 ```sail
 a!richTextDisplayField(
   value: {
@@ -143,7 +131,7 @@ a!richTextDisplayField(
 )
 ```
 
-### 5. Multi-Level Information
+### 4. Multi-Level Information
 ```sail
 a!richTextDisplayField(
   value: {
@@ -171,7 +159,7 @@ a!richTextDisplayField(
 )
 ```
 
-### 6. Line Breaks and Spacing
+### 5. Line Breaks and Spacing
 ```sail
 a!richTextDisplayField(
   value: {

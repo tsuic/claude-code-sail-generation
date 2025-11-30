@@ -209,13 +209,12 @@ a!cardLayout(
           width: "MINIMIZE"
         ),
         a!sideBySideItem(
-          item: a!richTextDisplayField(
-            labelPosition: "COLLAPSED",
-            value: a!richTextItem(
-              text: "Student Information",
-              size: "LARGE",
-              style: "STRONG"
-            )
+          item: a!headingField(
+            text: "Student Information",
+            size: "MEDIUM_PLUS",
+            headingTag: "H1",
+            fontWeight: "SEMI_BOLD",
+            marginBelow: "NONE"
           )
         )
       },
@@ -252,9 +251,11 @@ a!headerContentLayout(
     /* DON'T: Card wrapping a cardGroupLayout */
     a!cardLayout(
       contents: {
-        a!richTextDisplayField( /* Secction title */
-          value: a!richTextItem(text: "Key Metrics", size: "MEDIUM_PLUS", style: "STRONG"),
-          labelPosition: "COLLAPSED",
+        a!headingField( /* Section title */
+          text: "Key Metrics",
+          size: "MEDIUM_PLUS",
+          headingTag: "H2",
+          fontWeight: "SEMI_BOLD",
           marginBelow: "STANDARD"
         ),
         a!cardGroupLayout( /* Set of KPI cards */
@@ -282,9 +283,11 @@ a!headerContentLayout(
 a!headerContentLayout(
   contents: {
     /* DO: Section title and cards directly on page background */
-    a!richTextDisplayField( /* Section title */
-      value: a!richTextItem(text: "Key Metrics", size: "MEDIUM_PLUS", style: "STRONG"),
-      labelPosition: "COLLAPSED",
+    a!headingField( /* Section title */
+      text: "Key Metrics",
+      size: "MEDIUM_PLUS",
+      headingTag: "H2",
+      fontWeight: "SEMI_BOLD",
       marginBelow: "STANDARD"
     ),
     a!cardGroupLayout(

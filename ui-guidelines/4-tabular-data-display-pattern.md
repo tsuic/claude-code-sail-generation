@@ -59,14 +59,11 @@ a!localVariables(
       /* Section Title */
       a!cardLayout(
         contents: {
-          a!richTextDisplayField(
-            value: a!richTextItem(
-              text: "Vendor Comparison Matrix",
-              size: "MEDIUM_PLUS",
-              style: "STRONG",
-              color: "STANDARD"
-            ),
-            labelPosition: "COLLAPSED",
+          a!headingField(
+            text: "Vendor Comparison Matrix",
+            size: "MEDIUM_PLUS",
+            headingTag: "H2",
+            fontWeight: "SEMI_BOLD",
             marginBelow: "EVEN_LESS"
           ),
           a!richTextDisplayField(

@@ -163,16 +163,13 @@ a!headerContentLayout(
   header: { /* Page title header bar */
     a!cardLayout(
       contents: {
-        a!richTextDisplayField(
-          labelPosition: "COLLAPSED",
-          value: {
-            a!richTextItem(
-              text: "Prerequisite Verification Review",
-              size: "LARGE",
-              style: "STRONG",
-              color: "#FFFFFF"
-            )
-          }
+        a!headingField(
+          text: "Prerequisite Verification Review",
+          size: "LARGE",
+          headingTag: "H1",
+          fontWeight: "BOLD",
+          color: "#FFFFFF",
+          marginBelow: "NONE"
         )
       },
       height: "AUTO",
