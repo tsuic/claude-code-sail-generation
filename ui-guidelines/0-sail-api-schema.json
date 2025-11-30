@@ -1322,6 +1322,138 @@
       },
       "description": "Multi-line text input"
     },
+    "a!styledTextEditorField": {
+      "description": "Rich text input with formatting toolbar - stores text with HTML formatting",
+      "category": "input",
+      "parameters": {
+        "label": {
+          "type": "Text",
+          "required": false
+        },
+        "labelPosition": {
+          "type": "Text",
+          "required": false,
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "instructions": {
+          "type": "Text",
+          "required": false
+        },
+        "helpTooltip": {
+          "type": "Text",
+          "required": false
+        },
+        "value": {
+          "type": "Text",
+          "required": false
+        },
+        "saveInto": {
+          "type": "List of Save",
+          "required": false
+        },
+        "readOnly": {
+          "type": "Boolean",
+          "required": false
+        },
+        "required": {
+          "type": "Boolean",
+          "required": false
+        },
+        "requiredMessage": {
+          "type": "Text",
+          "required": false
+        },
+        "disabled": {
+          "type": "Boolean",
+          "required": false
+        },
+        "validations": {
+          "type": "List of Text",
+          "required": false
+        },
+        "validationGroup": {
+          "type": "Text",
+          "required": false
+        },
+        "showWhen": {
+          "type": "Boolean",
+          "required": false
+        },
+        "accessibilityText": {
+          "type": "Text",
+          "required": false
+        },
+        "height": {
+          "type": "Text",
+          "required": false,
+          "validValues": [
+            "EXTRA_SHORT",
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL"
+          ]
+        },
+        "sizeLimit": {
+          "type": "Integer",
+          "required": false
+        },
+        "placeholder": {
+          "type": "Text",
+          "required": false
+        },
+        "allowedFormats": {
+          "type": "List of Text",
+          "required": false,
+          "validValues": [
+            "BOLD",
+            "ITALIC",
+            "UNDERLINE",
+            "STRIKETHROUGH",
+            "SUBSCRIPT",
+            "SUPERSCRIPT",
+            "LINK",
+            "TEXT_ALIGNMENT",
+            "NUMBERED_LIST",
+            "BULLETED_LIST",
+            "TABLE"
+          ]
+        },
+        "marginAbove": {
+          "type": "Text",
+          "required": false,
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "type": "Text",
+          "required": false,
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "Stores HTML-formatted text. Default allowedFormats: BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, LINK, NUMBERED_LIST, BULLETED_LIST (excludes SUBSCRIPT, SUPERSCRIPT, TEXT_ALIGNMENT, TABLE). To display styled text editor values in read-only mode, use a!styledTextEditorField with readOnly: true (NOT richTextDisplayField). For grid display, use stripHtml() on a separate database field."
+    },
     "a!integerField": {
       "category": "input",
       "parameters": {

@@ -618,6 +618,7 @@ When designing a full page, follow these planning steps (not necessary if user r
 - Use `radioButtonField` or `checkboxField` for short lists of options
 - Alternatively, use `cardChoiceField` to show short lists of options in a more visually interesting way
 - Use `dropdownField` for longer lists of options
+- Use `styledTextEditorField` to allow user to enter formatted text
 
 ### List Display
 - `gridField` is the simplest way to show tabular data, especially from records
