@@ -452,7 +452,42 @@ Use Read tool to scan the static interface file:
 
 **3D: IF form interface for CREATE/UPDATE detected:**
 
-🚨 **CRITICAL DECISION: Always Use Direct Rule Input Pattern**
+🚨 **CRITICAL DECISION: Detect Form Interface Type**
+
+**Step 3D.1: Scan Mockup for Form Indicators**
+
+Execute these detection steps IN ORDER:
+
+- [ ] **Check file header REQUIREMENT comment** (lines 1-5 of mockup)
+  - Use Read tool to read first 10 lines of the mockup file
+  - Look for keywords: "submit", "create", "add", "update", "edit", "register", "application"
+  - Example: `/* REQUIREMENT: Application Submission Form - Create new applications */`
+  - If found → Form interface detected, proceed to Step 3D.2
+
+- [ ] **Scan for form input components** (if REQUIREMENT unclear)
+  - Use Grep tool to search mockup for: `a!textField|a!dateField|a!dropdownField|a!checkboxField`
+  - Use Grep tool to search for: `a!fileUploadField|a!integerField|a!paragraphField`
+  - Count total matches found
+  - If count > 0 → Continue to button check
+
+- [ ] **Scan for submission buttons** (if inputs found)
+  - Use Grep tool to search mockup for button labels containing: `Submit|Save|Create|Update|Apply`
+  - Use Grep tool to search for: `submit: true`
+  - If submission button found → Form interface confirmed, proceed to Step 3D.2
+
+**Step 3D.2: Decision Tree**
+
+```
+Submission button found?
+├─ YES → What type?
+│  ├─ "Submit" or "Create" or "Add" → CREATE form → Use ri! pattern (Step 3D.3)
+│  ├─ "Update" or "Edit" or "Save" → UPDATE form → Use ri! pattern (Step 3D.3)
+│  └─ "Search" or "Filter" → Search form → Use query pattern (skip to Step 4)
+│
+└─ NO → Read-only interface → Use query pattern (skip to Step 4)
+```
+
+**Step 3D.3: Apply ri! Pattern (if CREATE or UPDATE detected)**
 
 When converting form interfaces that create or update records:
 
@@ -477,6 +512,27 @@ a!localVariables(
   )
 )
 ```
+
+**Record Type Variable Mapping:**
+
+Map user's mockup local variables to appropriate ri! names based on the record type being created/updated:
+
+**Example Mappings (adapt to your data model):**
+
+| Mockup Variable | ri! Name | Example Record Type |
+|----------------|----------|---------------------|
+| local!case | ri!case | Case |
+| local!customer | ri!customer | Customer |
+| local!order | ri!order | Order |
+| local!employee | ri!employee | Employee |
+| local!invoice | ri!invoice | Invoice |
+| local!ticket | ri!ticket | Support Ticket |
+| local!project | ri!project | Project |
+| local!task | ri!task | Task |
+| local!document | ri!document | Document |
+| local!comment | ri!comment | Comment |
+
+**Pattern:** Convert `local!{recordName}` → `ri!{recordName}` where {recordName} matches the primary record being created/updated.
 
 **Why Production Pattern Only:**
 - Generated code should be production-ready
