@@ -22,7 +22,7 @@ You have THREE core responsibilities (not just one):
    - Validate ALL parameters against schemas (no invented functions/values)
    - Refactor chart patterns (categories + series → data + config)
    - Convert a!map() to record type constructors where appropriate
-   - **Reference:** CLAUDE.md section "Logic Refactoring Requirements"
+   - **Reference:** See "MANDATORY LOGIC REFACTORING REQUIREMENTS" section above
 
 3. **Preserve Visual Design**: Keep the UI looking identical
    - Preserve: colors, spacing, padding, margins, heights, widths, fonts, styling
@@ -35,8 +35,243 @@ You have THREE core responsibilities (not just one):
 
 **Your job has THREE components:**
 1. **Replace mock data with live queries** (primary goal)
-2. **Apply mandatory logic refactoring** from CLAUDE.md "Logic Refactoring Requirements" section
+2. **Apply mandatory logic refactoring** (see "MANDATORY LOGIC REFACTORING REQUIREMENTS" section below)
 3. **Preserve visual design and working syntax patterns**
+
+DON'T call the `mcp__appian-mcp-server__validate_sail` validation tool after completing your work
+
+---
+
+## MANDATORY LOGIC REFACTORING REQUIREMENTS
+
+When converting mock interfaces to functional interfaces, the following logic improvements are MANDATORY:
+
+### **1. Pattern Matching Improvements**
+
+**MANDATORY REFACTORING:**
+- ✅ Replace nested if() (3+ levels) with a!match() for value comparisons
+- ✅ Decision criteria: Single variable compared against 3+ distinct values OR ranges
+- ✅ See `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section "Using a!match() for Status-Based Lookups"
+
+**When to Apply:**
+- Pattern: `if(var = "A", ..., if(var = "B", ..., if(var = "C", ...)))`
+- Examples: Status codes, priority levels, categories, types, date ranges
+
+**Example:**
+```sail
+/* ❌ BEFORE (nested if) - OUTDATED PATTERN */
+if(status = "Open", "folder-open",
+  if(status = "Closed", "check-circle",
+    if(status = "Pending", "clock", "file")))
+
+/* ✅ AFTER (a!match) - MODERN PATTERN */
+a!match(
+  value: status,
+  equals: "Open",
+  then: "folder-open",
+  equals: "Closed",
+  then: "check-circle",
+  equals: "Pending",
+  then: "clock",
+  default: "file"
+)
+```
+
+**When NOT to use a!match():**
+- Complex conditional logic with multiple variables
+- Null safety checks (use nested if() for short-circuit evaluation)
+- Computed variables with side effects
+
+### **2. Parameter Validation**
+
+**MANDATORY VALIDATION:**
+- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` (see lines 5276-5288)
+- ✅ ALL a!queryFilter() operators MUST exist in `dynamic-behavior-guidelines/record-type-handling-guidelines.md` "Valid Operators by Data Type"
+- ✅ ALL component parameters MUST be verified against `/ui-guidelines/0-sail-api-schema.json`
+- ✅ NO invented functions, parameters, or values
+
+**Valid a!measure() function values (ONLY these):**
+- `"COUNT"` - Count records
+- `"SUM"` - Sum numeric field
+- `"MIN"` - Minimum value
+- `"MAX"` - Maximum value
+- `"AVG"` - Average numeric field
+- `"DISTINCT_COUNT"` - Count distinct values
+
+**Workflow:**
+1. Identify function/parameter to use
+2. Read schema/documentation for valid values
+3. Verify value is in list
+4. If NOT in list → Use alternative approach OR document blocker
+
+**Example:**
+```sail
+/* ❌ WRONG - TOTAL_SUM doesn't exist (invented function) */
+a!measure(
+  function: "TOTAL_SUM",  /* Invalid! Not in schema */
+  field: 'recordType!Order.fields.amount',
+  alias: "totalRevenue"
+)
+
+/* ✅ RIGHT - Use valid function */
+a!measure(
+  function: "SUM",  /* Valid function from schema */
+  field: 'recordType!Order.fields.amount',
+  alias: "totalRevenue"
+)
+
+/* ✅ ALSO RIGHT - Use DISTINCT_COUNT for unique values */
+a!measure(
+  function: "DISTINCT_COUNT",  /* Valid function for counting distinct values */
+  field: 'recordType!Case.fields.clientId',
+  alias: "uniqueClients"
+)
+```
+
+### **3. Chart Pattern Refactoring**
+
+**MANDATORY REFACTORING for charts using record data:**
+- ✅ Convert mockup pattern (`categories` + `series`) → record data pattern (`data` + `config`)
+- ✅ See `/ui-guidelines/4-chart-instructions.md` section "Two Different Data Approaches" (lines 6-36)
+- ✅ Use appropriate chart config function
+
+**Chart Config Functions:**
+- `a!columnChartConfig()` - for column charts
+- `a!lineChartConfig()` - for line charts
+- `a!barChartConfig()` - for bar charts
+- `a!areaChartConfig()` - for area charts
+- `a!pieChartConfig()` - for pie charts
+
+**Example:**
+```sail
+/* ❌ BEFORE (mockup pattern) - INVALID for record data */
+a!columnChartField(
+  categories: {"Q1", "Q2", "Q3"},
+  series: {
+    a!chartSeries(label: "Sales", data: {100, 120, 115}, color: "#3B82F6")
+  }
+)
+
+/* ✅ AFTER (record data pattern) - CORRECT */
+a!columnChartField(
+  data: a!recordData(recordType: 'recordType!Order'),
+  config: a!columnChartConfig(
+    primaryGrouping: a!grouping(
+      field: 'recordType!Order.fields.orderDate',
+      interval: "MONTH_SHORT_TEXT"
+    ),
+    measures: {
+      a!measure(
+        label: "Sales",
+        function: "SUM",
+        field: 'recordType!Order.fields.amount'
+      )
+    }
+  )
+)
+```
+
+**Key Differences:**
+1. Remove top-level `categories` parameter → Move to `config.primaryGrouping`
+2. Remove top-level `series` with `data` arrays → Move `a!measure()` to `config.measures`
+3. Remove top-level `grouping` parameter → Move to `config.primaryGrouping`
+4. Add `config: a!<chartType>Config()` wrapper
+
+### **4. Data Structure Refactoring**
+
+**MANDATORY for functional interfaces:**
+- ✅ Convert a!map() → record type constructors where creating/updating record instances
+- ✅ See record-type-handling-guidelines.md section "Record Type Constructors vs a!map()"
+- ✅ Use relationship navigation instead of separate queries where possible
+
+**When to Apply:**
+- Creating new record instances
+- Updating existing record instances
+- Form interfaces that save to records
+
+**Example:**
+```sail
+/* ❌ BEFORE (a!map) - INCORRECT for record instances */
+local!newCase: a!map(
+  title: "New Case",
+  status: "Open",
+  assignedTo: loggedInUser()
+)
+
+/* ✅ AFTER (record type constructor) - CORRECT */
+local!newCase: 'recordType!{uuid}Case'(
+  title: "New Case",
+  status: "Open",
+  assignedTo: loggedInUser()
+)
+```
+
+### **What NOT to Refactor:**
+
+❌ **Do NOT modify:**
+- Visual design (colors, spacing, padding, margins, heights, widths, fonts, styling parameters)
+- Business logic intent (preserve calculations and validation rules)
+- Working null-safety patterns (if already correct using if()/a!isNotNullOrEmpty(), don't change)
+- Valid syntax patterns (and/or/if functions, a!forEach usage, proper comments, etc.)
+- Layout structure (if layout nesting is valid, don't reorganize)
+- **UX flow and user-facing features** (preserve all views, tabs, sections, filters even if using sample data)
+
+✅ **DO preserve:**
+- Color schemes and visual styling
+- Component arrangement and spacing
+- User experience flow
+- Existing null-safety checks that work correctly
+- Proper SAIL syntax (and/or/if functions, comment style, etc.)
+- **All UI features from mockup** (use sample data fallback if live data unavailable)
+
+### **When Live Data Unavailable:**
+
+If a mockup feature cannot be implemented with live record data (e.g., relationship target record type missing):
+
+✅ **PRESERVE the feature** using mockup data pattern:
+- Revert to local variable with hardcoded sample data from original mockup
+- Add visual indicator in UI: "(Sample Data)" in labels, headings, or tooltips
+- Document with MOCKUP DATA comment explaining the limitation
+- Include TODO with upgrade path for when data model becomes available
+
+**Example - Missing Relationship Target:**
+```sail
+/* MOCKUP DATA - Client Profile View (Data Model Limitation):
+ * Client record type not available in context/data-model-context.md
+ * Cannot filter by: Case.relationships.client.fields.clientId (relationship target undefined)
+ * Using hardcoded sample data to preserve UX flow
+ *
+ * TODO: Add Client record type to data-model-context.md to enable live data
+ *   Required: Client record type with at minimum a clientId field
+ *   Then replace with live query using relationship navigation
+ *
+ * Alternative: If Client record type structure differs, adapt query accordingly
+ */
+local!clientCases: if(
+  local!viewMode = 3,
+  {
+    a!map(caseNumber: "CASE-001", subject: "Sample Case", status: "Open"),
+    a!map(caseNumber: "CASE-002", subject: "Another Sample", status: "Closed")
+  },
+  {}
+),
+
+/* Visual indicator in UI */
+a!richTextDisplayField(
+  value: {
+    a!richTextItem(
+      text: "Client Cases (" & length(local!clientCases) & " cases - sample data)",
+      size: "SMALL",
+      color: "#6B7280"
+    )
+  }
+)
+```
+
+❌ **NEVER:**
+- Remove UI features because data isn't available
+- Use placeholder UUIDs like `{uuid}fieldName` that cause errors
+- Leave features broken without fallback to working mockup data
 
 ---
 
@@ -44,13 +279,12 @@ You have THREE core responsibilities (not just one):
 
 🚨 **MANDATORY FILE READS** - Execute BEFORE analyzing the interface:
 
-**1A: Read Logic Refactoring Requirements**
-- [ ] Read CLAUDE.md section "Logic Refactoring Requirements" IN FULL
-  - Use Read tool to read lines 191-418 of CLAUDE.md
-  - Extract: All 4 mandatory refactoring categories (Pattern Matching, Parameter Validation, Chart Patterns, Data Structures)
-  - Extract: What NOT to refactor (visual design, working patterns, UX preservation)
-  - Extract: When Live Data Unavailable guidance (mockup data fallback pattern)
-  - Output: Document in internal notes: "Refactoring requirements loaded: [list 4 categories + UX preservation rules]"
+**1A: Review Logic Refactoring Requirements**
+- [ ] Review "MANDATORY LOGIC REFACTORING REQUIREMENTS" section above
+  - Reminder: All 4 mandatory refactoring categories (Pattern Matching, Parameter Validation, Chart Patterns, Data Structures)
+  - Reminder: What NOT to refactor (visual design, working patterns, UX preservation)
+  - Reminder: When Live Data Unavailable guidance (mockup data fallback pattern)
+  - Output: Document in internal notes: "Refactoring requirements reviewed: [list 4 categories + UX preservation rules]"
 
 **1B: Read Parameter Validation Sources**
 - [ ] Read ui-guidelines/0-sail-api-schema.json lines 5270-5300 (a!measure parameters)
@@ -74,7 +308,7 @@ You have THREE core responsibilities (not just one):
   - Output: "record-type-handling-guidelines.md structure loaded"
 
 **After completing Step 1:**
-- [ ] I have read CLAUDE.md Logic Refactoring Requirements section
+- [ ] I have reviewed MANDATORY LOGIC REFACTORING REQUIREMENTS section
 - [ ] I have extracted the valid a!measure() function list
 - [ ] I have extracted the valid user() property list
 - [ ] I have loaded both Navigation Indexes
@@ -821,14 +1055,14 @@ From Step 4C planning:
 - [ ] Document each refactoring with comment:
   ```sail
   /* REFACTORED: Nested if() → a!match() for status-based icon selection
-     (CLAUDE.md Logic Refactoring Requirement #1) */
+     (Logic Refactoring Requirement #1: Pattern Matching) */
   local!statusIcon: a!match(...)
   ```
 
 - [ ] Refactor ALL charts to data + config pattern:
   ```sail
   /* REFACTORED: Chart mockup pattern → record data pattern
-     (CLAUDE.md Logic Refactoring Requirement #3) */
+     (Logic Refactoring Requirement #3: Chart Patterns) */
   a!columnChartField(
     data: a!recordData(...),
     config: a!columnChartConfig(...)
@@ -838,7 +1072,7 @@ From Step 4C planning:
 - [ ] Convert a!map() to record type constructors where creating/updating records:
   ```sail
   /* REFACTORED: a!map() → record type constructor
-     (CLAUDE.md Logic Refactoring Requirement #4) */
+     (Logic Refactoring Requirement #4: Data Structures) */
   local!newRecord: 'recordType!{uuid}RecordName'(...)
   ```
 
@@ -1434,7 +1668,7 @@ Use this reference when determining value types:
 🚨 **MANDATORY CHECKLIST** - Before writing output file:
 
 **Source Reading Verification:**
-- [ ] Did I read CLAUDE.md "Logic Refactoring Requirements" section (Step 1A)?
+- [ ] Did I review MANDATORY LOGIC REFACTORING REQUIREMENTS section (Step 1A)?
 - [ ] Did I extract valid a!measure() function list from schema (Step 1B)?
 - [ ] Did I load Navigation Indexes (Step 1C)?
 
