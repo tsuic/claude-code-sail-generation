@@ -1,8 +1,8 @@
 # Null Safety - Quick Pattern Lookup
 
 > **For comprehensive explanations, see:**
-> - `record-type-handling-guidelines.md` → "🚨 MANDATORY: Null Safety Implementation" (line 1166)
-> - `dynamic-sail-expression-guidelines.md` → "🚨 CRITICAL: Short-Circuit Evaluation Rules" (line 1748)
+> - `record-type-handling-guidelines.md` → "🚨 MANDATORY: Null Safety Implementation" (#null-safety-implementation)
+> - `dynamic-sail-expression-guidelines.md` → "🚨 CRITICAL: Short-Circuit Evaluation Rules" (#short-circuit-rules)
 > - `sail-dynamic-converter.md` → Step 5D.6 for enforcement workflow
 
 ## Detection Commands
@@ -265,7 +265,7 @@ a!queryFilter(
 - **DateTime fields:** `now()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`
 - **Time fields:** `time()`, `a!subtractTime()`, `a!addTime()`
 
-**Reference:** See `record-type-handling-guidelines.md` "🚨 CRITICAL: Correct Date/Time Functions" (line 3512)
+**Reference:** See `record-type-handling-guidelines.md` "🚨 CRITICAL: Correct Date/Time Functions" (#datetime-critical-rules)
 
 ## Fallback Value Rules
 

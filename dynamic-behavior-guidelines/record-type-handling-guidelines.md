@@ -1,92 +1,88 @@
 # FUNCTIONAL INTERFACE GUIDELINES - RECORD TYPES & QUERIES
 
-## 📑 Quick Navigation Index
+## 📑 Quick Navigation Index {#nav-index}
 
 **How to use this index:**
 1. Find the topic you need below
-2. Copy the search keyword (shown after →)
-3. Use Grep tool or Ctrl+F to find the section in this file
+2. For extracted files, read the file directly
+3. For inline sections, use Grep tool or Ctrl+F to find the section in this file
 
-### 🚨 Critical Sections (Read These First):
+### 📁 Extracted Topic Files (Read These for Detailed Patterns):
+
+**Shared Foundations (used by both mockup and functional interfaces):**
+- `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
+- `/sail-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
+- `/sail-guidelines/functions-reference.md` - Essential functions by category
+- `/sail-guidelines/datetime-handling.md` - Date/time type matching & operators
+
+**Record Type Patterns (functional interfaces):**
+- `/record-type-guidelines/query-result-structures.md` - Property access by query type
+- `/record-type-guidelines/form-interface-patterns.md` - ri! pattern, testing simulation
+- `/record-type-guidelines/one-to-many-management.md` - Relationship data in forms
+- `/record-type-guidelines/user-group-fields.md` - User/Group fields vs relationships
+- `/record-type-guidelines/query-filters-operators.md` - Filter patterns, nesting rules
+- `/record-type-guidelines/kpi-aggregation-patterns.md` - Dashboard aggregations
+
+### 🚨 Critical Sections in This File (Read These First):
 - **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
-- **Query Result Data Structures** → `"## 🚨 CRITICAL: Query Result Data Structures"`
 - **Record Type Reference Syntax** → `"## ⚠️ Record Type Reference Syntax"`
-- **Form Interface Data Patterns** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
-- **Testing Simulation Variables** → `"### 🚨 Testing Simulation Variables"`
 - **Handling Non-Existent Constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
 - **Essential SAIL Structure** → `"## Essential SAIL Structure"`
 - **Documenting Unused Local Variables** → `"## 📝 Documenting Unused Local Variables"`
 - **Relationship Field Navigation Syntax** → `"## 🚨 CRITICAL: Relationship Field Navigation Syntax"`
 - **Creating New Record Instances** → `"## Creating New Record Instances"`
-- **Null Safety Implementation** → `"## 🚨 MANDATORY: Null Safety Implementation"`
-- **Data Querying Patterns** → `"## Data Querying Patterns"`
-- **sorts Parameter Common Mistake** → `"### Common Mistake - sorts Parameter"`
-- **Short-Circuit Evaluation Rules** → `"### 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
-- **One-to-Many Relationship Management** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
-- **Date/Time Type Matching** → `"## Date/Time Critical Rules"`
+- **Grid Column Sorting Rules** → `"## 🚨 CRITICAL: Grid Column Sorting Rules"`
 
 ### By Task Type:
-- **Using query results in any component (dropdown, checkbox, forEach, etc.)** → `"## 🚨 CRITICAL: Query Result Data Structures"`
-- **Accessing properties on queried data** → `"## 🚨 CRITICAL: Query Result Data Structures"`
-- **Building a form/wizard (create/update records)** → `"## 🚨 CRITICAL: Form Interface Data Patterns"`
-- **Using testing simulation variables** → `"### 🚨 Testing Simulation Variables"`
-- **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Using query results in components** → `/record-type-guidelines/query-result-structures.md`
+- **Accessing properties on queried data** → `/record-type-guidelines/query-result-structures.md`
+- **Building a form/wizard (create/update)** → `/record-type-guidelines/form-interface-patterns.md`
+- **Testing simulation variables** → `/record-type-guidelines/form-interface-patterns.md`
+- **Handling non-existent constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
 - **Creating new record instances** → `"## Creating New Record Instances"`
 - **Handling data model mismatches** → `"## Field Mapping Strategies"`
 - **Multi-type form entry patterns** → `"## Multi-Type Form Entry Pattern"`
-- **Displaying data in grids or charts** → `"## Data Querying Patterns"`
-- **Nesting query logical expressions** → `"## Nesting Query Logical Expressions"`
-- **Managing many-to-one relationships (dropdowns)** → `"## 🚨 CRITICAL: Query Result Data Structures"`
-- **Managing one-to-many relationships in forms** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
-- **Accessing related record data** → `"## Related Record Field References"`
-- **Accessing related data in forms** → `"## Accessing Related Record Data in Forms"`
-- **User/Group fields in forms** → `"## User/Group Fields vs Relationships"`
-- **Relationships vs fields type incompatibility** → `"### ⚠️ CRITICAL: Type Incompatibility - Relationships vs Fields"`
-- **Displaying user names from User fields** → `"### ⚠️ CRITICAL: Displaying User Names"`
+- **Displaying data in grids or charts** → `/record-type-guidelines/query-filters-operators.md`
+- **Nesting query logical expressions** → `/record-type-guidelines/query-filters-operators.md`
+- **Managing one-to-many relationships** → `/record-type-guidelines/one-to-many-management.md`
+- **User/Group fields in forms** → `/record-type-guidelines/user-group-fields.md`
+- **Displaying user names** → `/record-type-guidelines/user-group-fields.md`
+- **Working with dates and times** → `/sail-guidelines/datetime-handling.md`
+- **KPI and aggregation calculations** → `/record-type-guidelines/kpi-aggregation-patterns.md`
 - **Pattern matching with record fields** → `"## Pattern Matching with Record Fields"`
 - **Record links and identifiers** → `"## Record Links and Identifiers"`
-- **Working with dates and times** → `"## Date/Time Critical Rules"`
-- **Building charts and visualizations** → `"## Chart Data Configuration"`
-- **KPI and performance calculations** → `"## KPI and Performance Calculations"`
 - **Implementing record actions** → `"## Record Actions"`
 - **Create/Update scenarios** → `"## Create/Update Scenarios"`
-- **JSON functions usage** → `"### JSON Functions Usage"`
-- **Using contains() correctly** → `"### contains() Usage"`
-- **Implementing role-based access control** → `"## Group-Based Access Control Pattern"`
-- **Documenting unused variables** → `"## 📝 Documenting Unused Local Variables"`
+- **Role-based access control** → `"## Group-Based Access Control Pattern"`
 
 ### By Error Type:
-- **"Property not found" on query results** → `"## 🚨 CRITICAL: Query Result Data Structures"`
-- **Empty dropdown/checkbox choices from queries** → `"## 🚨 CRITICAL: Query Result Data Structures"`
-- **forEach showing blank data** → `"## 🚨 CRITICAL: Query Result Data Structures"`
+- **"Property not found" on query results** → `/record-type-guidelines/query-result-structures.md`
+- **Empty dropdown/checkbox from queries** → `/record-type-guidelines/query-result-structures.md`
+- **forEach showing blank data** → `/record-type-guidelines/query-result-structures.md`
 - **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
-- **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
-- **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
-- **"Function does not exist"** → `"## Essential Functions Reference"`
-- **Invalid function parameters** → `"### ⚠️ Function Parameter Validation"`
-- **Short-circuit evaluation errors** → `"### 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
+- **"Constant not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Null reference errors** → `/sail-guidelines/null-safety-quick-ref.md`
+- **Short-circuit evaluation errors** → `/sail-guidelines/short-circuit-evaluation.md`
 - **Record type reference errors** → `"## ⚠️ Record Type Reference Syntax"`
-- **Relationship field navigation errors** → `"## 🚨 CRITICAL: Relationship Field Navigation Syntax"`
+- **Relationship navigation errors** → `/record-type-guidelines/user-group-fields.md`
 - **Grid column sorting errors** → `"## 🚨 CRITICAL: Grid Column Sorting Rules"`
 - **Using a!map() instead of record constructor** → `"## Creating New Record Instances"`
-- **Query returning only primary key** → `"## Data Querying Patterns"` (search for "fields parameter")
-- **Query .totalCount is null** → `"## Data Querying Patterns"` (search for "fetchTotalCount")
-- **Using sorts instead of sort** → `"### Common Mistake - sorts Parameter"`
-- **Query filter nesting errors** → `"## Nesting Query Logical Expressions"`
-- **Copying ri! to local variables** → `"### 🚨 Testing Simulation Variables"`
-- **DateTime vs Date type mismatch** → `"## Date/Time Critical Rules"`
-- **Query filter errors with rule inputs** → `"## ⚠️ Protecting Query Filters That Use Rule Inputs"`
-- **Invalid operators for data types** → `"### Valid Operators by Data Type"`
-- **Relationship navigation errors** → `"## 🚨 CRITICAL: One-to-Many Relationship Data Management"`
+- **Query returning only primary key** → `/record-type-guidelines/query-filters-operators.md`
+- **Query .totalCount is null** → `/record-type-guidelines/query-filters-operators.md`
+- **Using sorts instead of sort** → `/record-type-guidelines/query-filters-operators.md`
+- **Query filter nesting errors** → `/record-type-guidelines/query-filters-operators.md`
+- **Copying ri! to local variables** → `/record-type-guidelines/form-interface-patterns.md`
+- **DateTime vs Date type mismatch** → `/sail-guidelines/datetime-handling.md`
+- **Query filter errors with rule inputs** → `/record-type-guidelines/query-filters-operators.md`
+- **user() on relationship instead of field** → `/record-type-guidelines/user-group-fields.md`
 - **Button/wizard configuration errors** → `"## ⚠️ a!buttonWidget() Parameter Rules"`
-- **not() with null values** → `"#### Special Case: not() with Variables"`
+- **not() with null values** → `/sail-guidelines/null-safety-quick-ref.md`
 
 ### Validation & Troubleshooting:
 - **Quick troubleshooting guide** → `"## 🔧 Quick Troubleshooting"`
 - **Common critical errors** → `"## Common Critical Errors"`
 - **Final validation checklist** → `"## Syntax Validation Checklist"`
-- **Essential functions reference** → `"## Essential Functions Reference"`
-- **Functions by category** → `"### Quick Function Reference by Category"`
+- **Essential functions reference** → `/sail-guidelines/functions-reference.md`
 
 ---
 
@@ -368,7 +364,7 @@ Is this a static mockup? → Use local variables with hardcoded data
 - "edit page for [record]"
 - "interface used to create or update"
 
-### ✅ CORRECT: Rule Input Pattern (for Create/Update Forms)
+### ✅ CORRECT: Rule Input Pattern (for Create/Update Forms) {#rule-input-pattern}
 
 **When to use**: Interface will be used to create new records or update existing records
 
@@ -428,7 +424,7 @@ a!localVariables(
 - ❌ You are using the sail-dynamic-converter agent
 - ❌ You want production-ready code immediately
 
-**For Code Generation**: Use the direct `ri!` pattern shown in "✅ CORRECT: Rule Input Pattern" section above (lines 369-415). Skip the testing simulation entirely.
+**For Code Generation**: Use the direct `ri!` pattern shown in "✅ CORRECT: Rule Input Pattern" section above (#rule-input-pattern). Skip the testing simulation entirely.
 
 ---
 
@@ -590,7 +586,7 @@ a!localVariables(
 - [ ] All one-to-many relationships use typed records when appending
 - [ ] Type discrimination uses dedicated type ID fields, not null field checks
 
-## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects
+## ⚠️ IMPORTANT: Handling Non-Existent Constants and Environment Objects {#handling-non-existent-constants}
 
 **Never assume constants, process models, groups, folders, integrations, or environment-specific objects exist. Always use placeholders with TODO comments.**
 
@@ -733,7 +729,7 @@ a!forEach(
 )
 ```
 
-## 📝 Documenting Unused Local Variables
+## 📝 Documenting Unused Local Variables {#unused-variables-decision-tree}
 
 ### Decision Tree
 
@@ -1163,7 +1159,7 @@ a!buttonArrayLayout(
 - **Form-level validations**: Place on individual `a!buttonWidget()` in `primaryButtons`
 - **Field validations**: Place on individual field components within steps
 
-## 🚨 MANDATORY: Null Safety Implementation
+## 🚨 MANDATORY: Null Safety Implementation {#null-safety-implementation}
 
 > **🔗 Quick Reference:** For fast pattern lookup, see `/sail-guidelines/null-safety-quick-ref.md`
 > **🔧 Enforcement:** For functional interfaces, see `sail-dynamic-converter.md` Step 5D.6
@@ -1282,7 +1278,7 @@ readOnly: if(
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 2343-2392).
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (#short-circuit-rules).
 
 #### Pattern for Null-Safe Property Access on Computed Variables
 
@@ -2365,7 +2361,7 @@ and(
 )
 ```
 
-### 🚨 CRITICAL: Short-Circuit Evaluation Rules
+### 🚨 CRITICAL: Short-Circuit Evaluation Rules {#short-circuit-rules}
 
 **SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
 
@@ -3507,7 +3503,7 @@ a!sectionLayout(
 ### Key Principle:
 **One record type is the "owner" of the form → Make it the rule input → Access everything else through relationships**
 
-## Date/Time Critical Rules
+## Date/Time Critical Rules {#datetime-critical-rules}
 
 🚨 CRITICAL: Correct Date/Time Functions
 ```sail

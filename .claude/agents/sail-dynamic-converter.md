@@ -51,7 +51,7 @@ When converting mock interfaces to functional interfaces, the following logic im
 **MANDATORY REFACTORING:**
 - ✅ Replace nested if() (3+ levels) with a!match() for value comparisons
 - ✅ Decision criteria: Single variable compared against 3+ distinct values OR ranges
-- ✅ See `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section "Using a!match() for Status-Based Lookups"
+- ✅ See `/sail-guidelines/pattern-matching.md` for a!match() patterns
 
 **When to Apply:**
 - Pattern: `if(var = "A", ..., if(var = "B", ..., if(var = "C", ...)))`
@@ -85,8 +85,8 @@ a!match(
 ### **2. Parameter Validation**
 
 **MANDATORY VALIDATION:**
-- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` (see lines 5276-5288)
-- ✅ ALL a!queryFilter() operators MUST exist in `dynamic-behavior-guidelines/record-type-handling-guidelines.md` "Valid Operators by Data Type"
+- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` (path: `$.components["a!measure"].parameters.function.validValues`)
+- ✅ ALL a!queryFilter() operators MUST exist in `/record-type-guidelines/query-filters-operators.md`
 - ✅ ALL component parameters MUST be verified against `/ui-guidelines/0-sail-api-schema.json`
 - ✅ NO invented functions, parameters, or values
 
@@ -181,7 +181,7 @@ a!columnChartField(
 
 **MANDATORY for functional interfaces:**
 - ✅ Convert a!map() → record type constructors where creating/updating record instances
-- ✅ See record-type-handling-guidelines.md section "Record Type Constructors vs a!map()"
+- ✅ See `/record-type-guidelines/form-interface-patterns.md` for record type constructor patterns
 - ✅ Use relationship navigation instead of separate queries where possible
 
 **When to Apply:**
@@ -287,22 +287,23 @@ a!richTextDisplayField(
   - Output: Document in internal notes: "Refactoring requirements reviewed: [list 4 categories + UX preservation rules]"
 
 **1B: Read Parameter Validation Sources**
-- [ ] Read ui-guidelines/0-sail-api-schema.json lines 5270-5300 (a!measure parameters)
-  - Use Read tool with offset and limit parameters
-  - Extract: Complete list of valid function values
+- [ ] Read ui-guidelines/0-sail-api-schema.json (a!measure parameters)
+  - Use Grep tool to search for `"a!measure"` in the JSON file
+  - Extract: Complete list of valid function values from `parameters.function.validValues`
   - Output: "Valid a!measure() functions: [COUNT, SUM, MIN, MAX, AVG, DISTINCT_COUNT]"
 
-- [ ] Read ui-guidelines/0-sail-api-schema.json line 6495 (user() valid properties)
-  - Use Read tool to extract valid property list
+- [ ] Read ui-guidelines/0-sail-api-schema.json (user() valid properties)
+  - Use Grep tool to search for `"user"` in expressionFunctions section
+  - Extract: Valid property values from the function definition
   - Output: "Valid user() properties: [firstName, lastName, email, username, displayName]"
 
 **1C: Read Navigation Indexes**
-- [ ] Read dynamic-sail-expression-guidelines.md lines 5-69 (Navigation Index)
+- [ ] Read dynamic-sail-expression-guidelines.md #nav-index (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
   - Output: "dynamic-sail-expression-guidelines.md structure loaded"
 
-- [ ] Read record-type-handling-guidelines.md lines 5-89 (Navigation Index)
+- [ ] Read record-type-handling-guidelines.md #nav-index (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
   - Output: "record-type-handling-guidelines.md structure loaded"
@@ -412,14 +413,14 @@ Use Read tool to scan the static interface file:
   - Output: "Chart refactoring patterns extracted: [summarize key differences]"
 
 **3B: IF forEach detected:**
-- [ ] Use Grep tool to find section: "Dynamic Form Fields with forEach" in dynamic-sail-expression-guidelines.md
+- [ ] Read `/sail-guidelines/foreach-patterns.md` for forEach patterns
 - [ ] Read that ENTIRE section (typically 100-200 lines)
 - [ ] Extract: Parallel array pattern details
 - [ ] Extract: index() + a!update() usage patterns
 - [ ] Output: "forEach patterns extracted: [summarize key patterns]"
 
 **3C: IF dashboard or KPI metrics detected:**
-- [ ] Use Grep tool to find section: "Dashboard KPI Aggregation Patterns" in record-type-handling-guidelines.md
+- [ ] Read `/record-type-guidelines/kpi-aggregation-patterns.md` for KPI patterns
 - [ ] Read that ENTIRE section including all 4 subsections:
   - Subsection 1: Single aggregation with no grouping
   - Subsection 2: Grouped aggregations
@@ -430,15 +431,15 @@ Use Read tool to scan the static interface file:
 - [ ] Output: "KPI aggregation patterns extracted: [summarize patterns]"
 
 **3D: IF grids detected:**
-- [ ] Use Grep tool to find section: "Grid Column Sorting Rules" in record-type-handling-guidelines.md
+- [ ] Read `/record-type-guidelines/query-filters-operators.md` for grid sorting rules
 - [ ] Read that ENTIRE section
 - [ ] Extract: sortField validation rules (fields only, not relationships)
 - [ ] Extract: Relationship type sorting rules (many-to-one can sort, one-to-many cannot)
 - [ ] Output: "Grid sorting rules extracted"
 
 **3E: IF nested if() detected (from Step 2A):**
-- [ ] Use Grep tool to find section: "Using a!match() for Status-Based Lookups" in dynamic-sail-expression-guidelines.md
-- [ ] Read that ENTIRE section (typically lines 1533-1650)
+- [ ] Read `/sail-guidelines/pattern-matching.md` for a!match() patterns
+- [ ] Read that ENTIRE section (#amatch-status-lookups)
 - [ ] Extract: When to use a!match() vs parallel arrays
 - [ ] Extract: Complete syntax pattern with examples
 - [ ] Extract: Decision criteria for choosing between approaches
@@ -446,9 +447,9 @@ Use Read tool to scan the static interface file:
 
 **Additional conditional reading based on components:**
 
-- [ ] IF checkboxes → Read "Multi-Checkbox Pattern" section in dynamic-sail-expression-guidelines.md
-- [ ] IF wizards → Read "a!wizardLayout() Parameters" section in record-type-handling-guidelines.md
-- [ ] IF form interface → Read "Form Interface Data Patterns" section in record-type-handling-guidelines.md
+- [ ] IF checkboxes → Read `/sail-guidelines/checkbox-patterns.md`
+- [ ] IF wizards → Read `/ui-guidelines/3-wizard-layout-instructions.md`
+- [ ] IF form interface → Read `/record-type-guidelines/form-interface-patterns.md`
 
 **3D: IF form interface for CREATE/UPDATE detected:**
 
@@ -771,7 +772,7 @@ For EVERY relationship you plan to navigate (e.g., `'recordType!Case.relationshi
   - Choose appropriate fallback based on use case:
     - **For display-only fields**: Use placeholder text indicating data unavailable
     - **For User relationships**: Check if direct User field exists, use user() functions with ONLY valid properties
-      - ✅ Valid user() properties: "firstName", "lastName", "email", "username" (see 0-sail-api-schema.json line 6495)
+      - ✅ Valid user() properties: "firstName", "lastName", "email", "username" (see 0-sail-api-schema.json expressionFunctions.user)
       - ❌ NEVER invent properties like "officeLocation", "department", "title" - they don't exist
       - If mockup requires unavailable User data → Use placeholder "Not Available" with BLOCKER comment
     - **For status/type lookups**: Use ID field value with explanatory text
@@ -824,7 +825,7 @@ Before writing ANY code, review your conversion plan and identify ALL references
 
   **Case B: Reference is needed but doesn't exist in mockup**
   - ✅ Use `null` value with TODO comment
-  - ✅ Follow pattern from record-type-handling-guidelines.md lines 593-672
+  - ✅ Follow pattern from record-type-handling-guidelines.md #handling-non-existent-constants
   - ✅ Document what needs to be configured
   - Example for groups:
     ```sail
@@ -1023,7 +1024,7 @@ For EVERY a!measure() function you plan to use:
   - Document the alternative in code comments
 
 For EVERY a!queryFilter() operator you plan to use:
-- [ ] Use Grep tool to search record-type-handling-guidelines.md for "Valid Operators by Data Type"
+- [ ] Read `/record-type-guidelines/query-filters-operators.md` for valid operators
 - [ ] Read that table/section
 - [ ] Verify operator is valid for the field's data type
 - [ ] Common valid operators: "=", "not in", "is null", "not null", ">", ">=", "<", "<=", "between"
@@ -1036,7 +1037,7 @@ For EVERY date/time filter you plan to use:
 - [ ] Apply correct function:
   - IF field type = "Datetime" → Use now(), a!subtractDateTime(), a!addDateTime(), datetime()
   - IF field type = "Date" → Use today(), todate(), date arithmetic
-- [ ] Cross-validate with record-type-handling-guidelines.md section "Date/Time Critical Rules"
+- [ ] Cross-validate with `/sail-guidelines/datetime-handling.md` for date/time patterns
 
 **If ANY validation fails, STOP and document the blocker before proceeding.**
 
@@ -1180,7 +1181,7 @@ Add comments for:
 
 For EACH variable with occurrence count = 1:
 - [ ] Variable appears ONLY in declaration → **UNUSED**
-- [ ] Apply decision tree from record-type-handling-guidelines.md (lines 736-807):
+- [ ] Apply decision tree from record-type-handling-guidelines.md (#unused-variables-decision-tree):
   - **NO clear future use** → **REMOVE with Edit tool**
   - **Has documented future use** → **ADD UNUSED comment** following template
 
@@ -1220,13 +1221,13 @@ For EACH unused variable (count = 1) with NO clear future use:
 **Why this is mandatory:**
 - Unused variables cause confusion during code review and violate SAIL best practices
 - They may trigger validation warnings in Appian Designer
-- They violate guidelines per dynamic-sail-expression-guidelines.md lines 157-161
+- They violate guidelines per `/sail-guidelines/foreach-patterns.md`
 - Automated verification provides objective proof of cleanup (no interpretation needed)
 
 **After completing Step 5D.5:**
 - [ ] Bash verification proves all variables have count ≥ 2 or UNUSED comments
 - [ ] Removed variables documented in conversion summary
-- [ ] Code follows record-type-handling-guidelines.md documentation standards
+- [ ] Code follows record-type-handling-guidelines.md and record-type-guidelines documentation standards
 - [ ] I am ready for null safety detection and enforcement
 
 ---
@@ -1769,7 +1770,7 @@ Use this reference when determining value types:
 - [ ] Did I verify ALL string concatenations use proper null handling?
 - [ ] Did I verify ALL date arithmetic is protected with if() checks?
 - [ ] Did I verify ALL a!queryFilter with variables have applyWhen?
-- [ ] Did I apply corrections using patterns from /sail-guidelines/null-safety-quick-ref.md?
+- [ ] Did I apply corrections using patterns from `/sail-guidelines/null-safety-quick-ref.md`?
 - [ ] Did I re-run detection and verify 100% pattern compliance?
 - [ ] Can I show detection output + manual review notes proving coverage?
 - [ ] Did I document null safety fixes in conversion summary with counts?
@@ -1786,7 +1787,7 @@ Use this reference when determining value types:
   - Layout validation (no nested sideBySideLayouts, etc.)
 - [ ] All user() calls use ONLY valid properties (firstName, lastName, email, username)
   - ❌ No invented properties (officeLocation, department, title, etc.)
-  - Reference: 0-sail-api-schema.json line 6495
+  - Reference: 0-sail-api-schema.json expressionFunctions.user
 - [ ] Are ALL local variables declared in dependency order?
   - Variables with no dependencies declared first
   - Variables that reference other local! variables declared AFTER their dependencies
@@ -2085,7 +2086,7 @@ For each validation agent result:
   - Nested if() → a!match() for enumerated values (MANDATORY)
   - Chart mockup pattern → record data pattern (MANDATORY)
   - Parameter validation against schemas (MANDATORY)
-- **Record Integration**: Follow patterns from record-type-handling-guidelines.md
+- **Record Integration**: Follow patterns from record-type-handling-guidelines.md and `/record-type-guidelines/` folder
   - Form data patterns - ri! vs queries
   - Query patterns - a!recordData() and a!queryRecordType()
   - Relationship navigation - single continuous path

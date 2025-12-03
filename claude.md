@@ -46,7 +46,7 @@ Use this checklist:
 - [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
 - [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
 - [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
-- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see Multi-Checkbox Pattern in dynamic-sail-expression-guidelines.md)
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/sail-guidelines/checkbox-patterns.md`)
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()
@@ -71,7 +71,7 @@ Use this checklist:
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
-- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see record-type-handling-guidelines.md "Query Result Data Structures")
+- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see `/record-type-guidelines/query-result-structures.md`)
 
 ### Function Variable Validation:
 - [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
@@ -83,7 +83,7 @@ Use this checklist:
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
 - [ ] For functional interfaces: ALL a!measure() functions validated against 0-sail-api-schema.json
-- [ ] For functional interfaces: ALL a!queryFilter() operators validated against record-type-handling-guidelines.md
+- [ ] For functional interfaces: ALL a!queryFilter() operators validated against `/record-type-guidelines/query-filters-operators.md`
 
 ### Layout Validation:
 - [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
@@ -501,10 +501,13 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 | Time field display | `if(isNotNull(field), text(field, "h:mm a"), "N/A")` | Use `text()` directly |
 
 ### Where to Learn More
-Comprehensive patterns in `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
-- Section "🚨 CRITICAL: Short-Circuit Evaluation Rules" - Why if() vs and()/or()
-- Section "Advanced: Functions That Reject Null" - Complete function list
-- Section "🚨 MANDATORY: Null Safety Implementation" - Advanced patterns
+**Null Safety Topic Files (for detailed patterns):**
+- `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or()
+- `/sail-guidelines/null-safety-quick-ref.md` - Complete quick reference table
+- `/sail-guidelines/functions-reference.md` - Functions by category including null-rejecting functions
+
+**Master guidelines (for comprehensive rules):**
+- `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` #null-safety-implementation
 
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
@@ -527,7 +530,7 @@ Comprehensive patterns in `/dynamic-behavior-guidelines/dynamic-sail-expression-
 
 ### Dynamic Form Generation
 - When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
-- Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section on "Dynamic Form Fields with forEach" before implementing
+- Read `/sail-guidelines/foreach-patterns.md` for parallel array patterns before implementing
 - NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
@@ -536,10 +539,12 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 
 **Most common mistake**: Using `fv!index` in grid columns (it doesn't exist - only `fv!row` is available)
 
-See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`:
-- Section "⚠️ Function Variables (fv!) Reference" for complete a!forEach() function variables
-- Section "Grid Selection Pattern: Two-Variable Approach" for complete grid selection patterns
-- Section "⚠️ CRITICAL: Grid Selection Behavior" for selection behavior and common mistakes
+**Detailed Topic Files:**
+- `/sail-guidelines/foreach-patterns.md` - Complete a!forEach() function variables (fv!item, fv!index, etc.)
+- `/sail-guidelines/grid-selection-patterns.md` - Two-variable approach and selection behavior
+
+**Master guidelines:**
+- `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` for comprehensive patterns
 
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
