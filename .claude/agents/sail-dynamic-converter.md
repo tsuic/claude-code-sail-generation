@@ -500,10 +500,22 @@ When converting form interfaces that create or update records:
 **Rule Input Comment Pattern:**
 ```sail
 /* Rule Inputs:
- * - ri!recordName: The record being created/updated (Type: RecordTypeName)
+ * - ri!recordName (Type: RECORD_TYPE, Record Type: RecordTypeName)
+ *   Description: The record being created/updated
  *   - For CREATE mode: Pass null or empty record instance
  *   - For UPDATE mode: Pass populated record instance
- * - ri!isUpdate: Boolean flag indicating create (false) vs update (true) mode
+ * - ri!isUpdate (Type: BOOLEAN)
+ *   Description: Boolean flag indicating create (false) vs update (true) mode
+ * 
+ * Type Reference:
+ * - RECORD_TYPE: Record instance (specify record type name)
+ * - TEXT, LONG_TEXT, XL_TEXT: String values
+ * - INTEGER, DECIMAL: Numeric values
+ * - DATE, DATETIME: Date/time values
+ * - BOOLEAN: true/false values
+ * - USERNAME, GROUP: User/group identifiers
+ * - DOCUMENT: Document reference
+ * - CHOICE_LIST: List of choices
  */
 a!localVariables(
   /* Reference ri! directly throughout interface */
