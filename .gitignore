@@ -5,6 +5,3 @@
 
 # Local validation scripts
 validate_sail.py
-
-# Local context files (project-specific, not shared)
-context/data-model-context.md
