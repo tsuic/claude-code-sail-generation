@@ -5361,7 +5361,7 @@
         },
         "pagingInfo": {
           "type": "a!pagingInfo",
-          "required": false
+          "required": true
         },
         "fetchTotalCount": {
           "type": "Boolean",

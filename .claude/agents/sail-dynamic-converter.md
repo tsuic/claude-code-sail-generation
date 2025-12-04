@@ -2062,6 +2062,7 @@ For each validation agent result:
 - [ ] All parameters validated against documentation (MANDATORY)
 
 ⚠️ **CRITICAL: a!queryRecordType() REQUIREMENTS**
+- [ ] EVERY query has `pagingInfo: a!pagingInfo(startIndex: 1, batchSize: N)` (REQUIRED parameter)
 - [ ] EVERY query has `fetchTotalCount: true`
 - [ ] EVERY query has `fields` parameter listing all needed fields
 - [ ] Date filters use correct function (Date → today(), DateTime → now())
