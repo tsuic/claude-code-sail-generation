@@ -2,74 +2,73 @@
 
 This guide covers dynamic SAIL expressions using **local variables with hardcoded/mock data** - no record types required. For record type integration patterns, see the record-interface.md guide.
 
-## 📑 Quick Navigation Index
+## 📑 Quick Navigation Index {#nav-index}
 
 **How to use this index:**
 1. Find the topic you need below
-2. Copy the search keyword (shown after →)
-3. Use Grep tool or Ctrl+F to find the section in this file
+2. For extracted files, read the file directly
+3. For inline sections, use Grep tool or Ctrl+F to find the section in this file
 
-### 🚨 Critical Sections (Read These First):
+### 📁 Extracted Topic Files (Read These for Detailed Patterns):
+
+**Shared Foundations (used by both mockup and functional interfaces):**
+- `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
+- `/sail-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
+- `/sail-guidelines/functions-reference.md` - Essential functions by category
+- `/sail-guidelines/datetime-handling.md` - Date/time type matching & operators
+
+**Mockup Patterns (mock data interfaces):**
+- `/sail-guidelines/foreach-patterns.md` - fv! variables, parallel array pattern
+- `/sail-guidelines/grid-selection-patterns.md` - Two-variable approach, naming conventions
+- `/sail-guidelines/checkbox-patterns.md` - Multi-checkbox, single checkbox initialization
+- `/sail-guidelines/pattern-matching.md` - a!match() for status/category lookups
+- `/sail-guidelines/chart-configuration.md` - Chart components, mock data patterns
+- `/sail-guidelines/array-type-initialization-guidelines.md` - Type-casting empty arrays
+
+### 🚨 Critical Sections in This File (Read These First):
 - **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
-- **Array Type Initialization** → See `/sail-guidelines/array-type-initialization-guidelines.md`
 - **Rule Inputs in Mockups** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
 - **Essential SAIL Structure** → `"## Essential SAIL Structure"`
 - **Unused Variables in Mockups** → `"## 📝 Unused Variables in Mockups"`
 - **Requirement-Driven Documentation** → `"## 📋 Requirement-Driven Documentation Pattern"`
-- **a!forEach() Function Variables** → `"## 🚨 CRITICAL: a!forEach() Function Variables Reference"`
-- **Dynamic Form Fields with forEach** → `"## Dynamic Form Fields with forEach - Parallel Array Pattern"`
-- **Null Safety Implementation** → `"## 🚨 MANDATORY: Null Safety Implementation"`
-- **Multi-Checkbox Pattern** → `"## ⚠️ CRITICAL: Multi-Checkbox Field Pattern"`
-- **Single Checkbox Field Pattern** → `"## Single Checkbox Field Pattern"`
-- **Grid Selection Patterns** → `"## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections"`
-- **Date/Time Type Matching** → `"## Date/Time Critical Rules"`
 
 ### By Task Type:
 - **Documenting requirements in code** → `"## 📋 Requirement-Driven Documentation Pattern"`
 - **Handling unused variables** → `"## 📝 Unused Variables in Mockups"`
-- **Handling non-existent constants/environment objects** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
-- **Internationalization considerations** → `"## ⚠️ INTERNATIONALIZATION IN APPIAN INTERFACES"`
-- **Initializing empty arrays** → See `/sail-guidelines/array-type-initialization-guidelines.md`
-- **Working with arrays and loops** → `"## 🚨 CRITICAL: a!forEach() Function Variables Reference"`
-- **forEach generating input fields** → `"## Dynamic Form Fields with forEach - Parallel Array Pattern"`
-- **Direct property saving in forEach** → `"## ⚠️ CRITICAL: Direct Property Saving in forEach"`
-- **Dot notation and derived data patterns** → `"### Dot Notation & Derived Data Patterns"`
+- **Handling non-existent constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **Internationalization** → `"## ⚠️ INTERNATIONALIZATION IN APPIAN INTERFACES"`
+- **Initializing empty arrays** → `/sail-guidelines/array-type-initialization-guidelines.md`
+- **Working with arrays/loops** → `/sail-guidelines/foreach-patterns.md`
+- **forEach generating input fields** → `/sail-guidelines/foreach-patterns.md` (Parallel Array Pattern)
+- **Direct property saving in forEach** → `/sail-guidelines/foreach-patterns.md`
+- **Dot notation and derived data** → `"### Dot Notation & Derived Data Patterns"`
 - **Using wherecontains() correctly** → `"### Using wherecontains() Correctly"`
-- **Pattern matching (status codes, categories)** → `"### ✅ Best Practice: PREFER a!match() Over Nested if()"`
-- **Managing grid selections (ID arrays + full data)** → `"## 🚨 CRITICAL: Grid Selection Implementation Pattern"`
-- **Building charts with mock data** → `"## Chart Data Configuration"`
-- **Chart components usage** → `"## Chart Components Usage"`
-- **Working with dates and times** → `"## Date/Time Critical Rules"`
-- **Single checkbox initialization** → `"## Single Checkbox Field Pattern"`
-- **Multiple checkbox selections** → `"## ⚠️ CRITICAL: Multi-Checkbox Field Pattern"`
+- **Pattern matching (status, categories)** → `/sail-guidelines/pattern-matching.md`
+- **Managing grid selections** → `/sail-guidelines/grid-selection-patterns.md`
+- **Building charts with mock data** → `/sail-guidelines/chart-configuration.md`
+- **Working with dates and times** → `/sail-guidelines/datetime-handling.md`
+- **Single checkbox initialization** → `/sail-guidelines/checkbox-patterns.md`
+- **Multiple checkbox selections** → `/sail-guidelines/checkbox-patterns.md`
 
 ### By Error Type:
 - **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
 - **"Rule input not defined (ri!)"** → `"## ❌ Rule Inputs in Mockups - Common Mistake"`
-- **"Constant/environment object not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
-- **"Type mismatch" with contains/wherecontains** → See `/sail-guidelines/array-type-initialization-guidelines.md`
-- **"List of Variant" errors** → See `/sail-guidelines/array-type-initialization-guidelines.md`
-- **"tostring() returned single string instead of array"** → Use `touniformstring()` instead (see `/sail-guidelines/array-type-initialization-guidelines.md`)
-- **Null reference errors** → `"## 🚨 MANDATORY: Null Safety Implementation"`
-- **Invalid function parameters** → `"## ⚠️ Function Parameter Validation"`
-- **Short-circuit evaluation errors** → `"## 🚨 CRITICAL: Short-Circuit Evaluation Rules"`
-- **Property access errors** → `"### Dot Notation & Derived Data Patterns"`
+- **"Constant not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
+- **"Type mismatch" with contains/wherecontains** → `/sail-guidelines/array-type-initialization-guidelines.md`
+- **"List of Variant" errors** → `/sail-guidelines/array-type-initialization-guidelines.md`
+- **"tostring() returned single string"** → Use `touniformstring()` - see `/sail-guidelines/array-type-initialization-guidelines.md`
+- **Null reference errors** → `/sail-guidelines/null-safety-quick-ref.md`
+- **Short-circuit evaluation errors** → `/sail-guidelines/short-circuit-evaluation.md`
 - **Syntax errors (and/or, if)** → `"## ⚠️ Language-Specific Syntax Patterns"`
-- **wherecontains() parameter errors** → `"### Using wherecontains() Correctly"`
-- **forEach item removal errors** → `"#### Critical Pattern: Removing Items from Arrays"`
-- **Direct property saving errors** → `"## ⚠️ CRITICAL: Direct Property Saving in forEach"`
-- **Grid selection not working** → `"## 🚨 CRITICAL: Grid Selection Implementation Pattern"`
-- **Grid selection variable naming errors** → `"## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections"`
-- **Property access on grid selectionValue** → `"### Anti-Pattern 1: Property Access on ID Array Variable"`
-- **Type mismatch: Cannot index property** → `"## 🚨 CRITICAL ANTI-PATTERNS - DO NOT DO THIS"`
-- **DateTime vs Date type mismatch** → `"## Date/Time Critical Rules"`
-- **Checkbox initialization errors** → `"## Single Checkbox Field Pattern"`
-- **Checkbox state checking errors** → `"### Common Mistakes - save!value"`
+- **Grid selection not working** → `/sail-guidelines/grid-selection-patterns.md`
+- **Type mismatch: Cannot index property** → `/sail-guidelines/grid-selection-patterns.md` (Anti-Patterns)
+- **DateTime vs Date mismatch** → `/sail-guidelines/datetime-handling.md`
+- **Checkbox initialization errors** → `/sail-guidelines/checkbox-patterns.md`
 
 ### Validation & Troubleshooting:
 - **Quick troubleshooting guide** → `"## 🔧 Quick Troubleshooting"`
 - **Final validation checklist** → `"## Syntax Validation Checklist"`
-- **Essential functions reference** → `"## Essential Functions Reference"`
+- **Essential functions reference** → `/sail-guidelines/functions-reference.md`
 
 ---
 
@@ -146,7 +145,7 @@ a!localVariables(
 - **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
 - **For booleans**: Always explicit: `true()` or `false()`
 
-🚨 CRITICAL: Local Variable Scope in Nested Contexts
+🚨 CRITICAL: Local Variable Scope in Nested Contexts {#foreach-local-variables}
 - **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
 - **Cannot declare variables inline within expressions**
 
@@ -1547,7 +1546,7 @@ local!color: index(
 /* Returns: "#059669" (first element of colors array) */
 ```
 
-### Using a!match() for Status-Based Lookups
+### Using a!match() for Status-Based Lookups {#amatch-status-lookups}
 
 **When to use `a!match()` instead of parallel arrays:**
 - Single value compared against multiple options (status, category, priority, etc.)
@@ -1762,7 +1761,7 @@ and(
 )
 ```
 
-### 🚨 CRITICAL: Short-Circuit Evaluation Rules
+### 🚨 CRITICAL: Short-Circuit Evaluation Rules {#short-circuit-rules}
 
 > **🔗 Quick Reference:** For nested if() patterns, see `/sail-guidelines/null-safety-quick-ref.md`
 > **📖 This section:** Explains WHY and() doesn't short-circuit and when to use nested if()
@@ -1863,7 +1862,7 @@ if(
 )
 ```
 
-## 🚨 MANDATORY: Null Safety Implementation
+## 🚨 MANDATORY: Null Safety Implementation {#null-safety-implementation}
 
 **CHECKPOINT: Before finalizing any SAIL expression, verify EVERY direct field reference uses a!defaultValue()**
 
@@ -1952,7 +1951,7 @@ readOnly: if(
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (lines 1748-1845).
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation and examples of short-circuit evaluation, see the **"🚨 CRITICAL: Short-Circuit Evaluation Rules"** section (#short-circuit-rules).
 
 #### Pattern for Null-Safe Property Access on Computed Variables
 
