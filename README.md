@@ -130,71 +130,65 @@ Claude Code validates generated SAIL expressions using different approaches:
 
 **Note:** Sub-agent validation is thorough but not as reliable as MCP server validation.
 
+**This project uses named anchors** (`{#anchor-name}`) for cross-references between documentation files. This approach is more maintainable than line numbers because anchors remain stable when content is added or removed.
 
-## Instructors for Contributors (improve this tool)
-
-### Loading Full Project Context Before Making Changes
-
-Before making substantial changes to project instructions or agent workflows, load the complete project context so Claude understands the entire system architecture and cross-references.
-
-**Simple One-Line Request:**
-
-For most changes, this is sufficient:
-
-```
-I'm planning to modify [specific file/section]. Please load full project context and check for cross-references.
+**Anchor format:**
+```markdown
+## Section Title {#anchor-name}
 ```
 
-Claude will automatically:
-- Read CLAUDE.md (already loaded via Claude Code)
-- Identify which guideline files are relevant based on your changes
-- Search for cross-references to the section you're modifying
-- Check for line number references that might be affected
-
-**When You Need More Control:**
-
-If you want to verify a specific area before making changes:
-
-```
-Before I modify [section name], show me:
-1. All files that reference this section
-2. Any line number references that point here
-3. What might break if I add/remove content
+**Reference format:**
+```markdown
+See record-type-handling-guidelines.md #anchor-name
 ```
 
-**Example Workflow:**
+**Files with anchor-based cross-references:**
+- `.claude/agents/sail-dynamic-converter.md` - References guideline files using anchors
+- `sail-guidelines/null-safety-quick-ref.md` - References guideline sections
+- `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - Internal cross-references
+- `dynamic-behavior-guidelines/record-type-handling-guidelines.md` - Internal cross-references
 
+**Available anchors:**
+
+| File | Anchor | Section |
+|------|--------|---------|
+| dynamic-sail-expression-guidelines.md | `#nav-index` | Quick Navigation Index |
+| dynamic-sail-expression-guidelines.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
+| dynamic-sail-expression-guidelines.md | `#foreach-local-variables` | Local Variable Scope in Nested Contexts |
+| dynamic-sail-expression-guidelines.md | `#null-safety-implementation` | Null Safety Implementation |
+| record-type-handling-guidelines.md | `#nav-index` | Quick Navigation Index |
+| record-type-handling-guidelines.md | `#rule-input-pattern` | Rule Input Pattern |
+| record-type-handling-guidelines.md | `#handling-non-existent-constants` | Handling Non-Existent Constants |
+| record-type-handling-guidelines.md | `#unused-variables-decision-tree` | Documenting Unused Variables |
+| record-type-handling-guidelines.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
+| record-type-handling-guidelines.md | `#null-safety-implementation` | Null Safety Implementation |
+| record-type-handling-guidelines.md | `#datetime-critical-rules` | Date/Time Critical Rules |
+
+**Extracted Topic Files (smaller, focused documentation):**
+
+| Folder | File | Description |
+|--------|------|-------------|
+| sail-guidelines/ | `short-circuit-evaluation.md` | Why if() vs and()/or() for null safety |
+| sail-guidelines/ | `null-safety-quick-ref.md` | Quick pattern lookup table |
+| sail-guidelines/ | `null-safety-patterns.md` | Detailed null safety implementation examples |
+| sail-guidelines/ | `functions-reference.md` | Essential functions by category |
+| sail-guidelines/ | `datetime-handling.md` | Date/time type matching & operators |
+| sail-guidelines/ | `foreach-patterns.md` | fv! variables, parallel array pattern |
+| sail-guidelines/ | `grid-selection-patterns.md` | Two-variable approach, naming conventions |
+| sail-guidelines/ | `checkbox-patterns.md` | Multi-checkbox, single checkbox initialization |
+| sail-guidelines/ | `pattern-matching.md` | a!match() for status/category lookups |
+| sail-guidelines/ | `chart-configuration.md` | Chart components, mock data patterns |
+| record-type-guidelines/ | `query-result-structures.md` | Property access by query type |
+| record-type-guidelines/ | `form-interface-patterns.md` | ri! pattern, testing simulation |
+| record-type-guidelines/ | `one-to-many-management.md` | Relationship data in forms |
+| record-type-guidelines/ | `user-group-fields.md` | User/Group fields vs relationships |
+| record-type-guidelines/ | `query-filters-operators.md` | Filter patterns, nesting rules |
+| record-type-guidelines/ | `kpi-aggregation-patterns.md` | Dashboard aggregations |
+
+**Adding new anchors:**
+When creating a new section that may be referenced elsewhere, add an anchor:
+```markdown
+## New Important Section {#new-section-anchor}
 ```
-User: I'm adding a new validation rule to the Universal SAIL Validation Checklist.
-      Please load full project context and check for cross-references.
 
-Claude: [Reads CLAUDE.md, searches for references to that section]
-        Found 1 cross-reference in sail-dynamic-converter.md line 49.
-        Ready to proceed. What validation rule are you adding?
-```
-
-**Pro Tip:** If unsure what might be affected, ask:
-
-```
-What would be impacted if I change [section/file name]?
-```
-
-### Line Number Cross-References
-
-**This project is under active development** and documentation changes are expected and encouraged. However, several files contain cross-references to specific line numbers in other files to help agents navigate efficiently.
-
-**Files with line number cross-references:**
-- `.claude/agents/sail-dynamic-converter.md` - References CLAUDE.md, dynamic-sail-expression-guidelines.md, record-type-handling-guidelines.md, and ui-guidelines files
-- `CLAUDE.md` - References dynamic-sail-expression-guidelines.md and record-type-handling-guidelines.md navigation indexes
-- `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - Internal cross-references to its own sections
-- `dynamic-behavior-guidelines/record-type-handling-guidelines.md` - Internal cross-references to its own sections
-
-**⚠️ After editing these files:**
-
-If you make substantial changes (adding/removing sections, restructuring content) to any of the files listed above, **ask Claude to update all line number references** before committing:
-
-> "I just updated [filename]. Can you check and update any line number references in the project that might have changed?"
-
-Claude will search for references like `lines 190-370` or `line 1748` across the project and verify they still point to the correct sections.
-
-**Why this matters:** Agents use these line references to efficiently read specific documentation sections. Outdated references can cause agents to read wrong sections, leading to code generation errors.
+**Why this matters:** Agents use these anchors to efficiently navigate to specific documentation sections. Named anchors are stable across file edits, unlike line numbers which shift when content changes.
