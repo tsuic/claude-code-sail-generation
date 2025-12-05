@@ -493,26 +493,51 @@ Submission button found?
 When converting form interfaces that create or update records:
 
 - [ ] Use direct `ri!` pattern (production-ready)
-- [ ] Document rule inputs in comment block at top of interface
+- [ ] Document rule inputs using structured RULE INPUTS comment block at top of interface
+- [ ] For EACH rule input, write a clear description explaining:
+  - What the rule input represents
+  - How it should be populated (e.g., "Pass the record from the process model")
+  - Any mode-specific notes (CREATE vs UPDATE)
+  - Any constraints or valid values
 - [ ] DO NOT use testing simulation variables (`local!ri_*`)
 - [ ] DO NOT include "TESTING SIMULATION" comments or scaffolding
 
 **Rule Input Comment Pattern:**
+
+Use this structured format so rule inputs can be easily extracted by other tools:
+
 ```sail
-/* Rule Inputs:
- * - ri!recordName: The record being created/updated (Type: RecordTypeName)
- *   - For CREATE mode: Pass null or empty record instance
- *   - For UPDATE mode: Pass populated record instance
- * - ri!isUpdate: Boolean flag indicating create (false) vs update (true) mode
+/* ==========================================================================
+ * RULE INPUTS
+ * ==========================================================================
+ * Name: ri!case
+ * Type: Case
+ * Description: The case record being created or updated. For CREATE mode,
+ *              pass a new record instance. For UPDATE mode, pass the existing record.
+ * --------------------------------------------------------------------------
+ * Name: ri!isUpdate
+ * Type: Boolean
+ * Description: Flag indicating create (false) vs update (true) mode.
+ * --------------------------------------------------------------------------
+ * Name: ri!allowEdit
+ * Type: Boolean
+ * Description: Flag indicating if the current user has permission to edit this case.
+ * ==========================================================================
  */
 a!localVariables(
   /* Reference ri! directly throughout interface */
   a!textField(
-    value: ri!recordName['recordType!Type.fields.fieldName'],
-    saveInto: ri!recordName['recordType!Type.fields.fieldName']
+    value: ri!case['recordType!Case.fields.subject'],
+    saveInto: ri!case['recordType!Case.fields.subject']
   )
 )
 ```
+
+**Rule Input Format Requirements:**
+- Each rule input MUST have `Name:`, `Type:`, and `Description:` on separate lines
+- Use `----------` separator between rule inputs
+- Type should be the simple record type name (e.g., Case, Employee, Order) or primitive type (Boolean, Text, Integer)
+- Description should explain purpose, usage, and any mode-specific behavior
 
 **Record Type Variable Mapping:**
 
@@ -1748,7 +1773,8 @@ Use this reference when determining value types:
 
 **Form Interface Pattern Verification (if applicable):**
 - [ ] Did I use direct `ri!` pattern for CREATE/UPDATE forms (Step 3D)?
-- [ ] Did I document rule inputs in comment block at top of interface?
+- [ ] Did I use the structured RULE INPUTS comment format with Name/Type/Description for each ri!?
+- [ ] Does each rule input have a meaningful description (not just the type)?
 - [ ] Did I avoid testing simulation variables (`local!ri_*`)?
 - [ ] Are all form fields bound directly to `ri!` (no local copies)?
 
@@ -2046,7 +2072,8 @@ For each validation agent result:
 
 ⚠️ **CRITICAL: Form Interface Pattern (CREATE/UPDATE Forms)**
 - [ ] For CREATE/UPDATE forms: Use direct `ri!` pattern (production-ready)
-- [ ] Document rule inputs in comment block at top of interface
+- [ ] Use structured RULE INPUTS comment format with Name/Type/Description for each ri!
+- [ ] Each rule input has a meaningful description explaining purpose and usage
 - [ ] NO testing simulation variables (`local!ri_*`) in generated code
 - [ ] Form fields bind to `ri!recordName[...]`, NOT local variables
 - [ ] Am I using single continuous path for relationships: `[relationship.fields.field]`?
