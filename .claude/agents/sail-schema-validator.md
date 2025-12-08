@@ -43,7 +43,7 @@ Load schema → Extract functions → Validate each parameter with validValues �
 
 ### Quick Reference: Validation Steps
 
-1. **Load schema** from `/ui-guidelines/0-sail-api-schema.json`
+1. **Load schema** from `/ui-guidelines/reference/sail-api-schema.json`
 2. **For each function:** Verify it exists in `schema.components` or `schema.expressionFunctions`
 3. **For each parameter:** Check it exists in schema's parameter list
 4. **For each parameter with validValues:**
@@ -181,7 +181,7 @@ a!gridField(
 **Pseudo-code for reference:**
 
 ```
-1. schema = readJSON("/ui-guidelines/0-sail-api-schema.json")
+1. schema = readJSON("/ui-guidelines/reference/sail-api-schema.json")
 2. functions = extractFunctions(sailCode)
 3. errors = []
 4. validatedCount = 0  // Track how many parameters checked

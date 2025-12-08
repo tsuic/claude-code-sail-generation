@@ -4,13 +4,13 @@
 > - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
 > - `record-type-handling-guidelines.md` (record types & queries)
 >
-> **Full API Reference:** `/ui-guidelines/0-sail-api-schema.json`
+> **Full API Reference:** `/ui-guidelines/reference/sail-api-schema.json`
 
 ---
 
 ## Critical Validation Rule
 
-⚠️ **CRITICAL: Verify ALL functions exist in `/ui-guidelines/0-sail-api-schema.json` before use**
+⚠️ **CRITICAL: Verify ALL functions exist in `/ui-guidelines/reference/sail-api-schema.json` before use**
 
 ### Functions That DO NOT Exist:
 - `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click

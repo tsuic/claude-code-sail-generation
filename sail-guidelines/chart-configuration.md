@@ -4,7 +4,7 @@
 >
 > **Related:**
 > - `sail-guidelines/functions-reference.md` (function reference)
-> - `/ui-guidelines/4-chart-instructions.md` (detailed chart documentation)
+> - `/ui-guidelines/components/chart-instructions.md` (detailed chart documentation)
 
 ---
 

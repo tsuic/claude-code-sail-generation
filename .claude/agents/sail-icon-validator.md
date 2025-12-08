@@ -19,7 +19,7 @@ You are a SAIL icon validator. Your sole purpose is to verify that every icon na
 
 Validate that all icon names in SAIL code are valid aliases:
 1. ✅ Extract all rich text icon names from the code
-2. ✅ Use Grep to verify each icon exists in `/ui-guidelines/5-rich-text-icon-aliases.md`
+2. ✅ Use Grep to verify each icon exists in `/ui-guidelines/reference/rich-text-icon-aliases.md`
 3. ✅ Report any invalid icons with suggested alternatives
 
 **You do NOT check:** functions, parameters, syntax, structure, or anything else (that's other agents' jobs)
@@ -46,7 +46,7 @@ Line 102: icon: "chart-line"
 
 For EACH icon name found:
 
-1. **Use Grep tool with exact line matching** on `/ui-guidelines/5-rich-text-icon-aliases.md`
+1. **Use Grep tool with exact line matching** on `/ui-guidelines/reference/rich-text-icon-aliases.md`
    - Use `grep -x "icon-name"` for exact full-line matching
    - Example: if code has `"check-circle"`, use grep with `-x` flag: `grep -x "check-circle"`
    - The `-x` flag ensures you match the entire line exactly, not a substring
@@ -113,7 +113,7 @@ Use the output format below.
 - Line Z: "icon-name-3" ✅
 
 **Verification Method:**
-Used Grep to verify each icon against /ui-guidelines/5-rich-text-icon-aliases.md
+Used Grep to verify each icon against /ui-guidelines/reference/rich-text-icon-aliases.md
 
 **Summary:** All [count] icon names are valid aliases.
 ```
@@ -132,7 +132,7 @@ For EACH invalid icon, provide:
 icon: "invalid-icon-name"
 
 **Verification Method:**
-- Used Grep on /ui-guidelines/5-rich-text-icon-aliases.md
+- Used Grep on /ui-guidelines/reference/rich-text-icon-aliases.md
 - Pattern searched: "invalid-icon-name"
 - Result: 0 matches (icon does not exist)
 
@@ -162,7 +162,7 @@ icon: "valid-icon-1"
 icon: "chart-line"
 
 **Verification Method:**
-- Used Grep on /ui-guidelines/5-rich-text-icon-aliases.md
+- Used Grep on /ui-guidelines/reference/rich-text-icon-aliases.md
 - Pattern searched: "chart-line"
 - Result: 0 matches (icon does not exist)
 
@@ -187,7 +187,7 @@ icon: "line-chart"
 icon: "user-profile"
 
 **Verification Method:**
-- Used Grep on /ui-guidelines/5-rich-text-icon-aliases.md
+- Used Grep on /ui-guidelines/reference/rich-text-icon-aliases.md
 - Pattern searched: "user-profile"
 - Result: 0 matches (icon does not exist)
 
@@ -210,7 +210,7 @@ icon: "user-circle"
 Before completing, verify:
 
 - [ ] Extracted ALL icon names from the code (searched for `icon:` parameter)
-- [ ] Used Grep with `-x` flag on `/ui-guidelines/5-rich-text-icon-aliases.md` for EACH icon
+- [ ] Used Grep with `-x` flag on `/ui-guidelines/reference/rich-text-icon-aliases.md` for EACH icon
 - [ ] Used EXACT line match (`grep -x`) for initial validation
 - [ ] Did NOT accept partial/fuzzy matches as valid
 - [ ] Only used non-exact matching (without `-x`) AFTER exact match failed (for suggestions only)

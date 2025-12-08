@@ -85,9 +85,9 @@ a!match(
 ### **2. Parameter Validation**
 
 **MANDATORY VALIDATION:**
-- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/0-sail-api-schema.json` (path: `$.components["a!measure"].parameters.function.validValues`)
+- ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/reference/sail-api-schema.json` (path: `$.components["a!measure"].parameters.function.validValues`)
 - ✅ ALL a!queryFilter() operators MUST exist in `/record-type-guidelines/query-filters-operators.md`
-- ✅ ALL component parameters MUST be verified against `/ui-guidelines/0-sail-api-schema.json`
+- ✅ ALL component parameters MUST be verified against `/ui-guidelines/reference/sail-api-schema.json`
 - ✅ NO invented functions, parameters, or values
 
 **Valid a!measure() function values (ONLY these):**
@@ -132,7 +132,7 @@ a!measure(
 
 **MANDATORY REFACTORING for charts using record data:**
 - ✅ Convert mockup pattern (`categories` + `series`) → record data pattern (`data` + `config`)
-- ✅ See `/ui-guidelines/4-chart-instructions.md` section "Two Different Data Approaches" (lines 6-36)
+- ✅ See `/ui-guidelines/components/chart-instructions.md` section "Two Different Data Approaches" (lines 6-36)
 - ✅ Use appropriate chart config function
 
 **Chart Config Functions:**
@@ -287,12 +287,12 @@ a!richTextDisplayField(
   - Output: Document in internal notes: "Refactoring requirements reviewed: [list 4 categories + UX preservation rules]"
 
 **1B: Read Parameter Validation Sources**
-- [ ] Read ui-guidelines/0-sail-api-schema.json (a!measure parameters)
+- [ ] Read ui-guidelines/reference/sail-api-schema.json (a!measure parameters)
   - Use Grep tool to search for `"a!measure"` in the JSON file
   - Extract: Complete list of valid function values from `parameters.function.validValues`
   - Output: "Valid a!measure() functions: [COUNT, SUM, MIN, MAX, AVG, DISTINCT_COUNT]"
 
-- [ ] Read ui-guidelines/0-sail-api-schema.json (user() valid properties)
+- [ ] Read ui-guidelines/reference/sail-api-schema.json (user() valid properties)
   - Use Grep tool to search for `"user"` in expressionFunctions section
   - Extract: Valid property values from the function definition
   - Output: "Valid user() properties: [firstName, lastName, email, username, displayName]"
@@ -406,7 +406,7 @@ Use Read tool to scan the static interface file:
 🚨 **CONDITIONAL READING** - Based on Step 2D analysis, read FULL sections (not summaries):
 
 **3A: IF charts detected (from Step 2B):**
-- [ ] Read ui-guidelines/4-chart-instructions.md lines 6-36 IN FULL
+- [ ] Read ui-guidelines/components/chart-instructions.md lines 6-36 IN FULL
   - Use Read tool with these exact line numbers
   - Extract: Complete differences between mockup pattern and record data pattern
   - Extract: List of chart config functions
@@ -448,7 +448,7 @@ Use Read tool to scan the static interface file:
 **Additional conditional reading based on components:**
 
 - [ ] IF checkboxes → Read `/sail-guidelines/checkbox-patterns.md`
-- [ ] IF wizards → Read `/ui-guidelines/3-wizard-layout-instructions.md`
+- [ ] IF wizards → Read `/ui-guidelines/layouts/wizard-layout-instructions.md`
 - [ ] IF form interface → Read `/record-type-guidelines/form-interface-patterns.md`
 
 **3D: IF form interface for CREATE/UPDATE detected:**

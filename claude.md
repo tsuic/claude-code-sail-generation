@@ -14,7 +14,7 @@
   - ✅ Repeat logic inline wherever needed (even if duplicative across multiple columns/components)
   - ✅ For complex repeated logic, use if()/a!match() patterns directly in each location
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/0-sail-api-schema.json`
+- ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/reference/sail-api-schema.json`
 - When converting mock to functional, apply ALL "Logic Refactoring Requirements" (see dedicated section below), refactor code structure for record queries (e.g., chart patterns), but preserve visual design
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
@@ -82,7 +82,7 @@ Use this checklist:
 
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
-- [ ] For functional interfaces: ALL a!measure() functions validated against 0-sail-api-schema.json
+- [ ] For functional interfaces: ALL a!measure() functions validated against sail-api-schema.json
 - [ ] For functional interfaces: ALL a!queryFilter() operators validated against `/record-type-guidelines/query-filters-operators.md`
 
 ### Layout Validation:
@@ -98,7 +98,7 @@ Use this checklist:
 **ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
 **Two-tier documentation structure:**
-1. **Schema Reference** - `/ui-guidelines/0-sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
+1. **Schema Reference** - `/ui-guidelines/reference/sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
 
 ### Schema Structure:
 ```json
@@ -133,43 +133,43 @@ Use this checklist:
 ### Available Documentation Files:
 
 **Core Reference (use for ALL components):**
-- `0-sail-api-schema.json` - Complete parameter reference for all SAIL components (JSON schema)
+- `reference/sail-api-schema.json` - Complete parameter reference for all SAIL components (JSON schema)
 
 **Expression Grammar & Variables:**
-- `1-expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
+- `reference/expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
 
-**Layout Components (3-*):**
-- `3-header-content-layout-instructions.md` - HeaderContentLayout guidelines
-- `3-columns-layout-instructions.md` - ColumnsLayout guidelines
-- `3-sidebyside-layout-instructions.md` - SideBySideLayout guidelines
-- `3-form-layout-instructions.md` - FormLayout guidelines
-- `3-pane-layout-instructions.md` - PaneLayout guidelines
-- `3-wizard-layout-instructions.md` - WizardLayout guidelines
+**Layout Components:**
+- `layouts/header-content-layout-instructions.md` - HeaderContentLayout guidelines
+- `layouts/columns-layout-instructions.md` - ColumnsLayout guidelines
+- `layouts/sidebyside-layout-instructions.md` - SideBySideLayout guidelines
+- `layouts/form-layout-instructions.md` - FormLayout guidelines
+- `layouts/pane-layout-instructions.md` - PaneLayout guidelines
+- `layouts/wizard-layout-instructions.md` - WizardLayout guidelines
+- `layouts/card-layout-instructions.md` - CardLayout guidelines
 
-**Display Components (4-*):**
-- `4-button-instructions.md` - Button and ButtonArrayLayout guidelines
-- `4-card-layout-instructions.md` - CardLayout guidelines
-- `4-grid-field-instructions.md` - GridField (read-only grid) guidelines
-- `4-grid-layout-instructions.md` - GridLayout (editable grid) guidelines
-- `4-rich-text-instructions.md` - Rich Text component guidelines
-- `4-stamp-field-instructions.md` - Stamp Field guidelines
-- `4-card-choice-field-instructions.md` - Card Choice Field guidelines
-- `4-chart-instructions.md` - Chart component guidelines
-- `4-image-field-instructions.md` - Image Field guidelines
-- `4-tabular-data-display-pattern.md` - Custom tabular display pattern
+**Display Components:**
+- `components/button-instructions.md` - Button and ButtonArrayLayout guidelines
+- `components/grid-field-instructions.md` - GridField (read-only grid) guidelines
+- `components/grid-layout-instructions.md` - GridLayout (editable grid) guidelines
+- `components/rich-text-instructions.md` - Rich Text component guidelines
+- `components/stamp-field-instructions.md` - Stamp Field guidelines
+- `components/card-choice-field-instructions.md` - Card Choice Field guidelines
+- `components/chart-instructions.md` - Chart component guidelines
+- `components/image-field-instructions.md` - Image Field guidelines
+- `components/tabular-data-display-pattern.md` - Custom tabular display pattern
 
 **Icons:**
-- `5-rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
+- `reference/rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
 
-**All other components** (textField, dropdownField, etc.) are documented in `/ui-guidelines/0-sail-api-schema.json` only.
+**All other components** (textField, dropdownField, etc.) are documented in `/ui-guidelines/reference/sail-api-schema.json` only.
 
 ### Documentation Lookup Process:
 
 1. **Check if a dedicated instruction file exists** for the component (see list above)
    - If YES → Read the dedicated file for templates, patterns, and detailed rules
-   - If NO → Use `/ui-guidelines/0-sail-api-schema.json` for parameters and values
+   - If NO → Use `/ui-guidelines/reference/sail-api-schema.json` for parameters and values
 
-2. **For unfamiliar components** - Read the component entry in `/ui-guidelines/0-sail-api-schema.json` first to understand basic parameters
+2. **For unfamiliar components** - Read the component entry in `/ui-guidelines/reference/sail-api-schema.json` first to understand basic parameters
 
 ### ❌ NEVER:
 - Use parameters that aren't explicitly documented in either the reference or instruction files
@@ -177,11 +177,11 @@ Use this checklist:
 - Skip reading documentation because "it seems straightforward"
 
 ### ✅ ALWAYS:
-- Start with `/ui-guidelines/0-sail-api-schema.json` for parameter validation
+- Start with `/ui-guidelines/reference/sail-api-schema.json` for parameter validation
 - Read dedicated instruction files when available for templates and patterns
 - Follow templates exactly from instruction files
 - Verify against validation checklists
-- **Read `/ui-guidelines/5-rich-text-icon-aliases.md` in full before using ANY icons**
+- **Read `/ui-guidelines/reference/rich-text-icon-aliases.md` in full before using ANY icons**
 
 **THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
@@ -308,11 +308,11 @@ When designing a full page, follow these planning steps (not necessary if user r
   - [ ] Wizard layout - for multi-step forms, or,
   - [ ] Header-content layout - for everything else
 2. Read primary layout docs
-  - [ ] If using FormLayout → Read `3-form-layout-instructions.md`
-  - [ ] If using HeaderContentLayout → Read `3-header-content-layout-instructions.md`
-  - [ ] If using PaneLayout → Read `3-pane-layout-instructions.md`
-  - [ ] If using WizardLayout → Read `3-wizard-layout-instructions.md`
-3. Plan the main page content layout using columnsLayout → Always read `3-columns-layout-instructions.md`
+  - [ ] If using FormLayout → Read `layouts/form-layout-instructions.md`
+  - [ ] If using HeaderContentLayout → Read `layouts/header-content-layout-instructions.md`
+  - [ ] If using PaneLayout → Read `layouts/pane-layout-instructions.md`
+  - [ ] If using WizardLayout → Read `layouts/wizard-layout-instructions.md`
+3. Plan the main page content layout using columnsLayout → Always read `layouts/columns-layout-instructions.md`
   - **For FormLayout/WizardLayout:** Use the `contentsWidth` parameter to control max content width (no columnsLayout needed unless splitting into multiple columns)
   - **For HeaderContentLayout:** Content fills full width by default. Use columnsLayout for either:
     - **Width constraint:** Limit all contents to a max width instead of spanning the full screen
@@ -325,7 +325,7 @@ When designing a full page, follow these planning steps (not necessary if user r
     - [ ] Does content need a max width constraint? → Use gutter + WIDE_PLUS + gutter pattern
     - [ ] Should content be split into multiple columns? → Use 2-3 columns with appropriate widths
     - [ ] If NO to both → Skip columnsLayout
-4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `3-sidebyside-layout-instructions.md`
+4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `layouts/sidebyside-layout-instructions.md`
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
   - If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
@@ -358,13 +358,13 @@ When designing a full page, follow these planning steps (not necessary if user r
 
 ### List Display
 - `gridField` is the simplest way to show tabular data, especially from records
-- A custom tabular display pattern (`4-tabular-data-display-pattern.md`) can be used if the capabilities of `gridField` are too limiting (such as when each cell needs to show multiple components)
+- A custom tabular display pattern (`components/tabular-data-display-pattern.md`) can be used if the capabilities of `gridField` are too limiting (such as when each cell needs to show multiple components)
 - Use `cardGroupLayout` to show a responsive grid of cards with each card representing a list item. This creates a more visually interesting list than a basic `gridField`.
 
 ### Decorative Data Display
-- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `4-stamp-field-instructions.md`if using.
-- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `0-sail-api-schema.json` if using.
-- Use `richTextDisplayField` to show styled text and icons. Read `4-rich-text-instructions.md` if using.
+- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `components/stamp-field-instructions.md`if using.
+- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `reference/sail-api-schema.json` if using.
+- Use `richTextDisplayField` to show styled text and icons. Read `components/rich-text-instructions.md` if using.
 
 ### Common Patterns
 Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements.
@@ -603,7 +603,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Color values must use 6-character hex codes (#RRGGBB) or documented enumeration values (like "ACCENT").
   - Allowed color enumeration values vary across components. Only use values specified in the documentation for that component.
   - HTML color names like "RED" are invalid
-- Icons must reference valid aliases (see `/ui-guidelines/5-rich-text-icon-aliases.md`)
+- Icons must reference valid aliases (see `/ui-guidelines/reference/rich-text-icon-aliases.md`)
 - RichTextItem align parameter allowed values are "LEFT", "CENTER", or "RIGHT", do not use "START" or "END"!
 - Checkbox and radio button labels can only accept plain text, not rich text
 - choiceValues CANNOT be null or empty strings ("")

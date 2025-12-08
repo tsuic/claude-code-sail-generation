@@ -30,7 +30,7 @@ Buttons trigger actions in SAIL interfaces. **CRITICAL:** Buttons CANNOT exist s
 | `style` | `"OUTLINE"`, `"GHOST"`, `"LINK"`, `"SOLID"` | **Only these 4!** |
 | `color` | `"ACCENT"`, `"SECONDARY"`, `"NEGATIVE"`, hex codes (#RRGGBB) | For prominence/semantic meaning |
 | `size` | `"SMALL"`, `"STANDARD"`, `"LARGE"` | |
-| `icon` | Valid icon alias | MUST look up in: `ui-guidelines/5-rich-text-icon-aliases.md` |
+| `icon` | Valid icon alias | MUST look up in: `/ui-guidelines/reference/rich-text-icon-aliases.md` |
 | `saveInto` | Variable/expression | Action to perform |
 | `submit` | Boolean | Submit form on click |
 | `loadingIndicator` | Boolean | Shows spinner during processing |
@@ -201,7 +201,7 @@ Before finalizing button code:
 - [ ] Button `style` is one of: `"OUTLINE"`, `"GHOST"`, `"LINK"`, `"SOLID"`
 - [ ] Button is wrapped in `a!buttonArrayLayout` (never standalone)
 - [ ] If using custom color, it's `"ACCENT"` or valid 6-character hex code
-- [ ] If using icon, it's a valid icon alias found in `/ui-guidelines/5-rich-text-icon-aliases.md`
+- [ ] If using icon, it's a valid icon alias found in `/ui-guidelines/reference/rich-text-icon-aliases.md`
 - [ ] `marginBelow: "NONE"` set on buttonArrayLayout when inside other components
 - [ ] Size is one of: `"SMALL"`, `"STANDARD"`, `"LARGE"` (if specified)
 

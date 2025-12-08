@@ -3,7 +3,7 @@
 ## ⚠️ CRITICAL: Icon Parameter Validation
 
 **BEFORE using ANY icons in stampField, you MUST:**
-- [ ] Read `/ui-guidelines/5-rich-text-icon-aliases.md` in full to see all valid icon names
+- [ ] Read `/ui-guidelines/reference/rich-text-icon-aliases.md` in full to see all valid icon names
 - [ ] ONLY use icon names that appear exactly in that file
 - [ ] NEVER guess icon names - always verify first
 
@@ -27,7 +27,7 @@ StampField creates an icon and/or text displayed on a colored background shape. 
 ## Core StampField Parameters
 
 ### Icon Parameter
-- **icon**: Valid icon alias string from `/ui-guidelines/5-rich-text-icon-aliases.md`
+- **icon**: Valid icon alias string from `/ui-guidelines/reference/rich-text-icon-aliases.md`
 - **⚠️ MANDATORY**: Look up icon name in aliases file BEFORE use
 - **❌ DO NOT GUESS** icon names - they must match exactly
 
@@ -157,7 +157,7 @@ a!stampField(
 ## Best Practices
 
 ### ✅ DO:
-- **ALWAYS read `/ui-guidelines/5-rich-text-icon-aliases.md` before using ANY icon parameter**
+- **ALWAYS read `/ui-guidelines/reference/rich-text-icon-aliases.md` before using ANY icon parameter**
 - Choose shape based on content: ROUNDED for avatars/status, SEMI_ROUNDED for modern badges
 - Use TINY size for most UI elements to avoid overwhelming the interface
 - Provide tooltips for icon-only stamps
@@ -214,7 +214,7 @@ Remember: StampField is for simple badges and indicators with background shapes.
 Before using stampField in your code:
 
 ### Icon Validation (CRITICAL):
-- [ ] **IF using `icon` parameter:** Read `/ui-guidelines/5-rich-text-icon-aliases.md` FIRST
+- [ ] **IF using `icon` parameter:** Read `/ui-guidelines/reference/rich-text-icon-aliases.md` FIRST
 - [ ] **Verify icon name exists** in aliases file using exact string match
 - [ ] **DO NOT GUESS** icon names based on other frameworks (Font Awesome, Material Icons, etc.)
 - [ ] Common mistake: "chart-bar" ❌ → Correct: "bar-chart" ✅ (always check the file!)
