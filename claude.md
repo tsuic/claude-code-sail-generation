@@ -38,12 +38,15 @@ Use this checklist:
 - ✅ Before calling validation sub-agents
 
 ### Before Writing Dynamic Code:
+- [ ] Read `/sail-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
 - [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
 - [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
 
 ### Dynamic Form Field Validation:
-- [ ] forEach generating input fields stores to arrays - use `index()` + `a!update()` pattern ‼️
+- [ ] **Pattern Selection for Multi-Instance Forms** (see `/sail-guidelines/foreach-patterns.md`):
+  - [ ] **Array of Maps** (PREFERRED): When collecting multiple instances of related data (work experiences, addresses, contacts, line items) → Use `local!items: {a!map(...)}` with `saveInto: fv!item.propertyName` ‼️
+  - [ ] **Parallel Arrays** (ALTERNATIVE): Only when iterating over a FIXED source list to collect SEPARATE data → Use `index()` + `a!update()` pattern
 - [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
 - [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
 - [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/sail-guidelines/checkbox-patterns.md`)
@@ -529,8 +532,10 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 - **Always check for null/empty before comparing values or accessing properties** - See "NULL SAFETY RULES" section above for complete patterns
 
 ### Dynamic Form Generation
-- When using `forEach` to generate multiple input fields, each field MUST store data using the parallel array pattern with `fv!index`
-- Read `/sail-guidelines/foreach-patterns.md` for parallel array patterns before implementing
+- **Choose the right pattern** - See "Dynamic Form Field Validation" checklist above:
+  - **Array of Maps** (PREFERRED): For multi-instance data entry (work experiences, addresses, line items) → `saveInto: fv!item.propertyName`
+  - **Parallel Arrays**: Only when iterating a fixed source list to collect separate data → `index()` + `a!update()` pattern
+- Read `/sail-guidelines/foreach-patterns.md` for complete pattern guidance before implementing
 - NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES

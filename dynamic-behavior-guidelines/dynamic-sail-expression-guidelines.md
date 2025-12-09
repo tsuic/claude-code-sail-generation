@@ -12,13 +12,14 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 ### 📁 Extracted Topic Files (Read These for Detailed Patterns):
 
 **Shared Foundations (used by both mockup and functional interfaces):**
+- `/sail-guidelines/local-variable-patterns.md` - Data modeling, mockup vs functional differences
 - `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
 - `/sail-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
 - `/sail-guidelines/functions-reference.md` - Essential functions by category
 - `/sail-guidelines/datetime-handling.md` - Date/time type matching & operators
 
 **Mockup Patterns (mock data interfaces):**
-- `/sail-guidelines/foreach-patterns.md` - fv! variables, parallel array pattern
+- `/sail-guidelines/foreach-patterns.md` - fv! variables, Pattern A (array of maps) vs Pattern B (parallel arrays)
 - `/sail-guidelines/grid-selection-patterns.md` - Two-variable approach, naming conventions
 - `/sail-guidelines/checkbox-patterns.md` - Multi-checkbox, single checkbox initialization
 - `/sail-guidelines/pattern-matching.md` - a!match() for status/category lookups
@@ -33,6 +34,7 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 - **Requirement-Driven Documentation** → `"## 📋 Requirement-Driven Documentation Pattern"`
 
 ### By Task Type:
+- **Structuring local variables (maps vs separate)** → `/sail-guidelines/local-variable-patterns.md`
 - **Documenting requirements in code** → `"## 📋 Requirement-Driven Documentation Pattern"`
 - **Handling unused variables** → `"## 📝 Unused Variables in Mockups"`
 - **Handling non-existent constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
@@ -85,8 +87,8 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 5. **Always validate for null values** - Use `a!isNullOrEmpty()` and `a!isNotNullOrEmpty()`
 6. **wherecontains()**: See "Using wherecontains() Correctly" in Array Manipulation Patterns section for complete usage
 7. **Single checkbox variables MUST be initialized to null, NOT false()** - See Single Checkbox Field Pattern for complete pattern
-8. **MOCKUPS NEVER use rule inputs (ri!)** - Only local variables (local!) for self-contained demos
-9. **Local variables are ONLY for UI state** - Mock data, selections, transient state
+8. **MOCKUPS NEVER use rule inputs (ri!)** - See `/sail-guidelines/local-variable-patterns.md` for mockup vs functional differences
+9. **Local variables serve different purposes in mockup vs functional** - See `/sail-guidelines/local-variable-patterns.md`
 10. **Always try to use record types for read-only grids and charts** instead of mock data when possible
 11. **Empty arrays MUST be type-initialized for primitive types** - Use type-casting functions to avoid Variant list errors
     - `tointeger({})` for ID arrays, counts, numeric selections
@@ -105,68 +107,24 @@ This guide covers dynamic SAIL expressions using **local variables with hardcode
 
 **MOCKUPS = local variables ONLY**
 
-```sail
-/* ❌ WRONG - Don't use ri! in mockups */
-local!name: ri!record.name  /* ERROR: ri! doesn't exist in standalone mockup */
-
-/* ✅ CORRECT - Use local variables with mock data */
-local!name: "Sample Name"  /* Hardcoded sample data */
-
-/* ✅ CORRECT - Simulate edit mode with local toggle */
-local!isEditMode: false,  /* Toggle to test create vs edit */
-local!mockData: a!map(name: "Sample Name"),
-local!name: if(local!isEditMode, local!mockData.name, null)
-```
-
-**Why:** Mockups must be self-contained and pasteable directly into Interface Designer without dependencies.
-
-**When to use ri!:** Only in functional interfaces with record types, process models, or parent interfaces.
+See `/sail-guidelines/local-variable-patterns.md` for:
+- Complete rules on mockup vs functional variable usage
+- When to use `local!` vs `ri!`
+- Data modeling patterns (entity data, reference data, UI state)
 
 ## Essential SAIL Structure
 
-```sail
-a!localVariables(
-  /* Variable definitions first - ALL must be declared */
-  local!userName: "John Doe",
-  local!selectedStatus,  /* No initial value - declare by name only */
-  local!isVisible: true(),
+See `/sail-guidelines/local-variable-patterns.md` for complete local variable patterns including:
+- Declaration syntax (with/without initial values)
+- Initialization rules by scenario
+- Scope rules for nested contexts
+- Data modeling philosophy (maps vs separate variables)
 
-  /* Interface expression last */
-  a!formLayout(
-    contents: {
-      /* Interface components */
-    }
-  )
-)
-```
-
+**Quick reference:**
 - **With initial values**: `local!variable: value`
 - **Without initial values**: `local!variable` (no null/empty placeholders)
 - **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
 - **For booleans**: Always explicit: `true()` or `false()`
-
-🚨 CRITICAL: Local Variable Scope in Nested Contexts {#foreach-local-variables}
-- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
-- **Cannot declare variables inline within expressions**
-
-```sail
-/* ❌ WRONG - Cannot declare variables inline */
-a!forEach(
-  items: data,
-  expression: local!temp: someValue, /* Invalid syntax */
-  otherExpression
-)
-
-/* ✅ CORRECT - Use nested a!localVariables() */
-a!forEach(
-  items: data,
-  expression: a!localVariables(
-    local!temp: someValue,
-    /* Use local!temp in expression here */
-    someExpression
-  )
-)
-```
 
 ## 📝 Unused Variables in Mockups
 

@@ -10,6 +10,7 @@
 ### 📁 Extracted Topic Files (Read These for Detailed Patterns):
 
 **Shared Foundations (used by both mockup and functional interfaces):**
+- `/sail-guidelines/local-variable-patterns.md` - Data modeling, mockup vs functional differences
 - `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
 - `/sail-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
 - `/sail-guidelines/functions-reference.md` - Essential functions by category
@@ -685,49 +686,20 @@ value: condition ? trueValue : falseValue
 
 ## Essential SAIL Structure
 
-```sail
-a!localVariables(
-  /* Variable definitions first - ALL must be declared */
-  local!userName: "John Doe",
-  local!selectedStatus,  /* No initial value - declare by name only */
-  local!isVisible: true(),
+See `/sail-guidelines/local-variable-patterns.md` for complete local variable patterns.
 
-  /* Interface expression last */
-  a!formLayout(
-    contents: {
-      /* Interface components */
-    }
-  )
-)
-```
+**Key differences for functional interfaces:**
+- **Use `ri!` for entity data** being created/updated (never copy to `local!`)
+- **Use queries for reference data** and display lists
+- **Use `local!` only for UI state** (selections, toggles, pagination)
 
+**Quick reference:**
 - **With initial values**: `local!variable: value`
 - **Without initial values**: `local!variable` (no null/empty placeholders)
 - **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
 - **For booleans**: Always explicit: `true()` or `false()`
 
-🚨 CRITICAL: Local Variable Scope in Nested Contexts
-- **Local variables MUST be declared at the top of `a!localVariables()` or in new `a!localVariables()` blocks**
-- **Cannot declare variables inline within expressions**
-
-```sail
-/* ❌ WRONG - Cannot declare variables inline */
-a!forEach(
-  items: data,
-  expression: local!temp: someValue, /* Invalid syntax */
-  otherExpression
-)
-
-/* ✅ CORRECT - Use nested a!localVariables() */
-a!forEach(
-  items: data,
-  expression: a!localVariables(
-    local!temp: someValue,
-    /* Use local!temp in expression here */
-    someExpression
-  )
-)
-```
+For scope rules and nested context patterns, see `/sail-guidelines/local-variable-patterns.md#scope-rules`.
 
 ## 📝 Documenting Unused Local Variables {#unused-variables-decision-tree}
 
