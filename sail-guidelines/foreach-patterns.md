@@ -3,8 +3,45 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
+> - `sail-guidelines/local-variable-patterns.md` (data modeling philosophy - why Pattern A is preferred)
 > - `sail-guidelines/grid-selection-patterns.md` (grid-specific iteration)
 > - `sail-guidelines/functions-reference.md` (function reference)
+
+---
+
+## 🎯 Pattern Selection Decision Tree (READ FIRST)
+
+When using `a!forEach()` to generate input fields, choose the correct pattern:
+
+```
+Are you collecting MULTIPLE INSTANCES of RELATED data?
+(e.g., work experiences, addresses, contacts, line items, education history)
+│
+├─ YES → Use PATTERN A: Array of Maps (PREFERRED)
+│        • local!items: {a!map(field1: null, field2: null, ...)}
+│        • saveInto: fv!item.fieldName
+│        • Supports add/remove items dynamically
+│
+└─ NO → Are you iterating a FIXED source list to collect SEPARATE data?
+        (e.g., checklist items where you upload files, approval steps with comments)
+        │
+        ├─ YES → Use PATTERN B: Parallel Arrays (type-initialized)
+        │        • local!uploads: tointeger({}), local!comments: touniformstring({}), etc.
+        │        • saveInto: a!save(local!array, a!update(local!array, fv!index, save!value))
+        │
+        └─ NO → You may not need forEach for input fields
+                • Consider single variables or other patterns
+```
+
+### Quick Reference
+
+| Scenario | Pattern | Data Structure | Save Pattern |
+|----------|---------|----------------|--------------|
+| Case notes form | **A: Array of Maps** | `{a!map(noteType: null, description: null, ...)}` | `fv!item.noteType` |
+| Contact list | **A: Array of Maps** | `{a!map(name: null, phone: null, ...)}` | `fv!item.name` |
+| Invoice line items | **A: Array of Maps** | `{a!map(description: null, amount: null, ...)}` | `fv!item.amount` |
+| Document checklist with uploads | **B: Parallel Arrays** | `local!files: tointeger({}), local!notes: touniformstring({})` | `a!update(local!files, fv!index, ...)` |
+| Approval steps with comments | **B: Parallel Arrays** | `local!decisions: touniformstring({}), local!comments: touniformstring({})` | `a!update(local!decisions, fv!index, ...)` |
 
 ---
 
@@ -273,7 +310,17 @@ a!forEach(
 
 ---
 
-## Direct Property Saving in forEach
+## PATTERN A: Array of Maps (PREFERRED for Multi-Instance Data Entry)
+
+Use this pattern when collecting **multiple instances of related data** such as work experiences, addresses, contacts, education history, or line items. The forEach items ARE the data being edited.
+
+**Why this is preferred:** Map structure mirrors record types, making mockup → functional conversion straightforward. See `local-variable-patterns.md` for the full data modeling philosophy.
+
+**Key characteristics:**
+- User can add/remove entries dynamically
+- All fields for one entry are grouped together in a map
+- Direct property saving: `saveInto: fv!item.propertyName`
+- Structure converts cleanly to record type instances
 
 When updating individual properties of items in a forEach loop, save directly to the property—do NOT reconstruct the entire map.
 
@@ -286,7 +333,7 @@ a!forEach(
     label: "Employer Name",
     value: a!defaultValue(fv!item.employerName, ""),
     saveInto: fv!item.employerName,  /* Directly updates just this property */
-    required: true
+    required: true()
   )
 )
 ```
@@ -348,19 +395,24 @@ a!dateField(
 
 ---
 
-## Dynamic Form Fields with forEach - Parallel Array Pattern
+## PATTERN B: Parallel Arrays (for Fixed Source List with Separate Data Collection)
 
-When using forEach to generate multiple input fields (textField, dateField, fileUploadField, etc.), each field MUST save to a specific position in an array using `fv!index`.
+Use this pattern when iterating over a **fixed source list** (like a checklist or approval steps) to collect **separate data** that doesn't belong to the source items. The forEach items are NOT the data being edited—they're a reference list.
 
-### Pattern: Parallel Arrays for Multiple Fields per Item
+**Key characteristics:**
+- Source list is fixed (e.g., required documents, approval steps)
+- Collected data (files, comments, dates) is stored separately from source
+- Index-based saving: `saveInto: a!save(local!array, a!update(local!array, fv!index, save!value))`
 
-Use this pattern when forEach generates multiple input fields that need to store user data.
+When using forEach to generate multiple input fields (textField, dateField, fileUploadField, etc.) against a fixed source list, each field MUST save to a specific position in an array using `fv!index`.
+
+### Pattern: Parallel Arrays for Fixed Source Lists
 
 ```sail
-/* Initialize parallel arrays - one per field type */
-local!uploadedFiles: {},
-local!completionDates: {},
-local!notes: {},
+/* Initialize parallel arrays - type-initialized per data type (see array-type-initialization-guidelines.md) */
+local!uploadedFiles: tointeger({}),       /* Document IDs */
+local!completionDates: todate({}),        /* Date values */
+local!notes: touniformstring({}),         /* Text values */
 
 a!forEach(
   items: local!requiredItems,
