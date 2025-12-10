@@ -8,12 +8,9 @@
       "category": "layout",
       "parameters": {
         "titleBar": {
-          "type": "Text|CardLayout|HeaderTemplate",
-          "required": false
+          "type": "Text|CardLayout|HeaderTemplate"
         },
         "contentsWidth": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "FULL",
             "WIDE",
@@ -23,16 +20,12 @@
           ]
         },
         "contents": {
-          "type": "Any Type Array",
-          "required": false
+          "type": "Any Type Array"
         },
         "buttons": {
-          "type": "Button Layout",
-          "required": false
+          "type": "Button Layout"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "WHITE",
             "TRANSPARENT"
@@ -40,12 +33,7 @@
           "acceptsHexColors": true
         },
         "validations": {
-          "type": "Text/Validation Message",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Text/Validation Message"
         }
       }
     },
@@ -54,16 +42,12 @@
       "category": "layout",
       "parameters": {
         "header": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "contents": {
-          "type": "Any Type Array",
-          "required": false
+          "type": "Any Type Array"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "WHITE",
             "TRANSPARENT"
@@ -71,8 +55,6 @@
           "acceptsHexColors": true
         },
         "contentsPadding": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -81,14 +63,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "isHeaderFixed": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       }
     },
@@ -98,10 +72,6 @@
         "panes": {
           "type": "List of a!pane",
           "required": true
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "specialNote": "At least one pane must have width: \"AUTO\" for fluid layout",
@@ -111,12 +81,9 @@
       "category": "layout",
       "parameters": {
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "EXTRA_NARROW",
@@ -129,13 +96,10 @@
           ]
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -144,10 +108,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Individual pane within paneLayout"
@@ -156,16 +116,13 @@
       "category": "layout",
       "parameters": {
         "titleBar": {
-          "type": "Text|CardLayout|HeaderTemplate",
-          "required": false
+          "type": "Text|CardLayout|HeaderTemplate"
         },
         "steps": {
           "type": "List of a!wizardStep",
           "required": true
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "DOT_VERTICAL",
             "DOT_HORIZONTAL",
@@ -177,8 +134,6 @@
           ]
         },
         "contentsWidth": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "FULL",
             "WIDE",
@@ -188,36 +143,25 @@
           ]
         },
         "primaryButtons": {
-          "type": "List of ButtonWidget",
-          "required": false
+          "type": "List of ButtonWidget"
         },
         "secondaryButtons": {
-          "type": "List of ButtonWidget",
-          "required": false
+          "type": "List of ButtonWidget"
         },
         "showStepHeadings": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "focusOnFirstInput": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "isTitleBarFixed": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "showButtonDivider": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "showTitleBarDivider": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Multi-step form layout with automatic navigation and progress indicators"
@@ -226,28 +170,17 @@
       "category": "layout",
       "parameters": {
         "label": {
-          "type": "Text",
           "required": true
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
         },
         "contents": {
           "type": "Any Type",
           "required": true
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "disableNextButton": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
+          "type": "List of Text"
         }
       },
       "description": "Individual step within wizardLayout"
@@ -255,17 +188,10 @@
     "a!boxLayout": {
       "category": "layout",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "contents": {
-          "type": "Any Type Array",
-          "required": false
+          "type": "Any Type Array"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "ACCENT",
@@ -278,7 +204,6 @@
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -288,17 +213,7 @@
             "EVEN_MORE"
           ]
         },
-        "showBorder": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -309,8 +224,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -331,8 +244,6 @@
           "required": true
         },
         "alignVertical": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TOP",
             "MIDDLE",
@@ -340,8 +251,6 @@
           ]
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "NONE",
@@ -350,12 +259,10 @@
           ]
         },
         "showDividers": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "stackWhen": {
           "type": "List of Text",
-          "required": false,
           "validValues": [
             "PHONE",
             "TABLET_PORTRAIT",
@@ -364,13 +271,7 @@
             "DESKTOP_WIDE"
           ]
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -381,8 +282,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -400,12 +299,9 @@
       "category": "layout",
       "parameters": {
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "EXTRA_NARROW",
@@ -426,10 +322,6 @@
             "9X",
             "10X"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Single column within columns layout"
@@ -442,8 +334,6 @@
           "required": true
         },
         "alignVertical": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TOP",
             "MIDDLE",
@@ -451,8 +341,6 @@
           ]
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "NONE",
@@ -460,13 +348,7 @@
             "SPARSE"
           ]
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -477,8 +359,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -500,8 +380,6 @@
           "required": true
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "MINIMIZE",
@@ -516,10 +394,6 @@
             "9X",
             "10X"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "specialNote": "Can ONLY contain single components - NEVER arrays of components or layout components (columnsLayout, cardLayout, sideBySideLayout, etc.)",
@@ -529,12 +403,9 @@
       "category": "layout",
       "parameters": {
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "TRANSPARENT",
@@ -551,8 +422,6 @@
           "acceptsHexColors": true
         },
         "shape": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SQUARED",
             "SEMI_ROUNDED",
@@ -561,7 +430,6 @@
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -571,17 +439,7 @@
             "EVEN_MORE"
           ]
         },
-        "showBorder": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showShadow": {
-          "type": "Boolean",
-          "required": false
-        },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "EXTRA_SHORT",
             "SHORT",
@@ -595,12 +453,9 @@
           ]
         },
         "link": {
-          "type": "a!dynamicLink",
-          "required": false
+          "type": "a!dynamicLink"
         },
         "decorativeBarPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "TOP",
@@ -610,8 +465,6 @@
           ]
         },
         "decorativeBarColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -621,8 +474,6 @@
           "acceptsHexColors": true
         },
         "borderColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -631,13 +482,7 @@
           ],
           "acceptsHexColors": true
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -648,8 +493,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -658,10 +501,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Content within a styled card with optional border, shadow, and background color"
@@ -670,12 +509,10 @@
       "category": "layout",
       "parameters": {
         "cards": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "cardWidth": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "EXTRA_NARROW",
             "NARROW",
@@ -689,7 +526,6 @@
         },
         "cardHeight": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "EXTRA_SHORT",
@@ -703,8 +539,6 @@
           ]
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "NONE",
@@ -713,20 +547,9 @@
           ]
         },
         "fillContainer": {
-          "type": "Boolean",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Boolean"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -734,17 +557,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -755,8 +568,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -772,21 +583,11 @@
     "a!sectionLayout": {
       "category": "layout",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "contents": {
-          "type": "Any Type",
-          "required": false
-        },
-        "isCollapsible": {
-          "type": "Boolean",
-          "required": false
+          "type": "Any Type"
         },
         "labelColor": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "STANDARD",
@@ -798,7 +599,6 @@
         },
         "labelSize": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "LARGE_PLUS",
             "LARGE",
@@ -809,21 +609,13 @@
           ]
         },
         "divider": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "ABOVE",
             "BELOW"
           ]
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -834,8 +626,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -844,10 +634,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Section with title and optionally collapsible content"
@@ -856,17 +642,12 @@
       "category": "layout",
       "parameters": {
         "backgroundMedia": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "EXTRA_SHORT",
             "SHORT",
@@ -881,16 +662,9 @@
         },
         "overlay": {
           "type": "a!fullOverlay | a!barOverlay | a!columnOverlay",
-          "required": false,
           "specialNote": "Must use a!fullOverlay(), a!barOverlay(), or a!columnOverlay() - cannot accept components directly"
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -901,8 +675,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -911,10 +683,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Background image or video with optional overlay content"
@@ -923,8 +691,6 @@
       "category": "layout",
       "parameters": {
         "alignVertical": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TOP",
             "MIDDLE",
@@ -932,12 +698,9 @@
           ]
         },
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "DARK",
             "SEMI_DARK",
@@ -948,7 +711,6 @@
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -957,10 +719,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Full overlay completely covering entire billboard"
@@ -970,7 +728,6 @@
       "parameters": {
         "position": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "TOP",
             "MIDDLE",
@@ -978,12 +735,9 @@
           ]
         },
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "DARK",
             "SEMI_DARK",
@@ -994,7 +748,6 @@
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1003,10 +756,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Horizontal bar overlay positioned at top, middle, or bottom of billboard"
@@ -1015,8 +764,6 @@
       "category": "layout",
       "parameters": {
         "alignVertical": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TOP",
             "MIDDLE",
@@ -1025,7 +772,6 @@
         },
         "position": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "START",
             "CENTER",
@@ -1033,8 +779,6 @@
           ]
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NARROW",
             "MEDIUM",
@@ -1042,12 +786,9 @@
           ]
         },
         "contents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "DARK",
             "SEMI_DARK",
@@ -1058,7 +799,6 @@
         },
         "padding": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1067,10 +807,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Vertical column overlay positioned at left, middle, or right of billboard"
@@ -1078,25 +814,14 @@
     "a!textField": {
       "category": "input",
       "parameters": {
-        "value": {
-          "type": "Text",
-          "required": false
-        },
-        "placeholder": {
-          "type": "Text",
-          "required": false
-        },
         "refreshAfter": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "KEYPRESS",
             "UNFOCUS"
           ]
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LEFT",
             "CENTER",
@@ -1104,12 +829,10 @@
           ]
         },
         "masked": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "inputPurpose": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NAME",
             "EMAIL",
@@ -1121,24 +844,9 @@
           ]
         },
         "characterLimit": {
-          "type": "Integer",
-          "required": false
-        },
-        "showCharacterCount": {
-          "type": "Boolean",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Integer"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1146,45 +854,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1195,8 +874,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1205,10 +882,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Single line text input"
@@ -1216,13 +889,7 @@
     "a!paragraphField": {
       "category": "input",
       "parameters": {
-        "value": {
-          "type": "Text",
-          "required": false
-        },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "MEDIUM",
@@ -1230,24 +897,9 @@
           ]
         },
         "characterLimit": {
-          "type": "Integer",
-          "required": false
-        },
-        "showCharacterCount": {
-          "type": "Boolean",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Integer"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1255,45 +907,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1304,8 +927,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1314,10 +935,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Multi-line text input"
@@ -1326,13 +943,7 @@
       "description": "Rich text input with formatting toolbar - stores text with HTML formatting",
       "category": "input",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1340,57 +951,16 @@
             "COLLAPSED"
           ]
         },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "value": {
-          "type": "Text",
-          "required": false
-        },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "List of Text"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "EXTRA_SHORT",
             "SHORT",
@@ -1403,16 +973,10 @@
           ]
         },
         "sizeLimit": {
-          "type": "Integer",
-          "required": false
-        },
-        "placeholder": {
-          "type": "Text",
-          "required": false
+          "type": "Integer"
         },
         "allowedFormats": {
           "type": "List of Text",
-          "required": false,
           "validValues": [
             "BOLD",
             "ITALIC",
@@ -1428,8 +992,6 @@
           ]
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1440,8 +1002,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1458,24 +1018,12 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "masked": {
-          "type": "Boolean",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Boolean"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1483,45 +1031,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1532,8 +1051,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1542,10 +1059,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Integer number input"
@@ -1554,20 +1067,9 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Decimal",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Decimal"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1575,45 +1077,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1624,8 +1097,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1634,10 +1105,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Decimal number input"
@@ -1646,20 +1113,9 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Date",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Date"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1667,45 +1123,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1716,8 +1143,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1726,10 +1151,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Date input (year, month, day)"
@@ -1738,42 +1159,24 @@
       "category": "input",
       "parameters": {
         "choiceLabels": {
-          "type": "List of Text",
-          "required": false
+          "type": "List of Text"
         },
         "choiceValues": {
           "type": "List of Variant",
-          "required": false,
           "validation": "cannot be null or empty strings"
         },
         "value": {
-          "type": "Any Type",
-          "required": false
-        },
-        "placeholder": {
-          "type": "Text",
-          "required": false
+          "type": "Any Type"
         },
         "searchDisplay": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "ON",
             "OFF"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1781,37 +1184,13 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1822,8 +1201,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1832,10 +1209,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Single selection dropdown"
@@ -1844,21 +1217,16 @@
       "category": "input",
       "parameters": {
         "choiceLabels": {
-          "type": "List of Text",
-          "required": false
+          "type": "List of Text"
         },
         "choiceValues": {
           "type": "List of Variant",
-          "required": false,
           "validation": "cannot be null or empty strings"
         },
         "value": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "choiceLayout": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STACKED",
             "COMPACT"
@@ -1866,23 +1234,12 @@
         },
         "choiceStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "CARDS"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1890,33 +1247,13 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1927,8 +1264,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -1937,10 +1272,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Single selection radio buttons"
@@ -1949,21 +1280,16 @@
       "category": "input",
       "parameters": {
         "choiceLabels": {
-          "type": "List of Text",
-          "required": false
+          "type": "List of Text"
         },
         "choiceValues": {
           "type": "List of Variant",
-          "required": false,
           "validation": "cannot be null or empty strings"
         },
         "value": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "choiceLayout": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STACKED",
             "COMPACT"
@@ -1971,23 +1297,12 @@
         },
         "choiceStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "CARDS"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -1995,33 +1310,13 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2032,8 +1327,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2042,10 +1335,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Multiple selection checkboxes"
@@ -2054,20 +1343,9 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Date and Time",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Date and Time"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2075,45 +1353,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2124,8 +1373,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2134,10 +1381,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Date and time input (year, month, day, hour, minute, second)"
@@ -2146,20 +1389,9 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Time",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Time"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2167,45 +1399,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2216,8 +1419,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2226,10 +1427,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Time input (hour, minute, second)"
@@ -2237,42 +1434,21 @@
     "a!barcodeField": {
       "category": "input",
       "parameters": {
-        "value": {
-          "type": "Text",
-          "required": false
-        },
-        "placeholder": {
-          "type": "Text",
-          "required": false
-        },
         "refreshAfter": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "KEYPRESS",
             "UNFOCUS"
           ]
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LEFT",
             "CENTER",
             "RIGHT"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2280,45 +1456,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2329,8 +1476,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2339,10 +1484,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Displays and allows entry of a barcode value"
@@ -2351,28 +1492,15 @@
       "category": "input",
       "parameters": {
         "maxSelections": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "groupFilter": {
-          "type": "Group",
-          "required": false
+          "type": "Group"
         },
         "value": {
-          "type": "List of Username",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of Username"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2380,45 +1508,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2429,8 +1528,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2439,10 +1536,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Selects one or more users"
@@ -2451,28 +1544,15 @@
       "category": "input",
       "parameters": {
         "maxSelections": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "groupFilter": {
-          "type": "Group",
-          "required": false
+          "type": "Group"
         },
         "value": {
-          "type": "List of Group",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of Group"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2480,45 +1560,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2529,8 +1580,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2539,10 +1588,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Selects one or more groups"
@@ -2551,28 +1596,15 @@
       "category": "input",
       "parameters": {
         "maxSelections": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "groupFilter": {
-          "type": "Group",
-          "required": false
+          "type": "Group"
         },
         "value": {
-          "type": "List of User or Group",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of User or Group"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2580,45 +1612,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2629,8 +1632,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2639,10 +1640,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Selects one or more users or groups"
@@ -2651,28 +1648,18 @@
       "category": "input",
       "parameters": {
         "data": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "cardTemplate": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "value": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "maxSelections": {
-          "type": "Integer",
-          "required": false
-        },
-        "showShadow": {
-          "type": "Boolean",
-          "required": false
+          "type": "Integer"
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "NONE",
@@ -2681,25 +1668,13 @@
           ]
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "START",
             "CENTER",
             "END"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2707,33 +1682,13 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2744,8 +1699,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2754,10 +1707,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Selection displayed as styled cards"
@@ -2766,20 +1715,16 @@
       "category": "input",
       "parameters": {
         "target": {
-          "type": "Document/Folder",
-          "required": false
+          "type": "Document/Folder"
         },
         "value": {
-          "type": "List of Document",
-          "required": false
+          "type": "List of Document"
         },
         "maxSelections": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "buttonStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "NORMAL",
             "PRIMARY",
@@ -2789,7 +1734,6 @@
         },
         "buttonDisplay": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "LABEL",
             "ICON",
@@ -2798,24 +1742,13 @@
         },
         "buttonSize": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "STANDARD",
             "LARGE"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2823,33 +1756,13 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2860,8 +1773,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2870,10 +1781,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "File upload with document management"
@@ -2883,12 +1790,9 @@
       "parameters": {
         "value": {
           "type": "Any Type",
-          "required": false,
           "validation": "Can only contain a!richTextItem, a!richTextIcon, a!richTextBulletedList, a!richTextNumberedList, or plain text"
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LEFT",
             "CENTER",
@@ -2896,24 +1800,9 @@
           ]
         },
         "preventWrapping": {
-          "type": "Boolean",
-          "required": false
-        },
-        "tooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Boolean"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -2921,17 +1810,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2942,8 +1821,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -2952,10 +1829,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Formatted text display with styles, links, lists"
@@ -2963,17 +1836,10 @@
     "a!stampField": {
       "category": "display",
       "parameters": {
-        "icon": {
-          "type": "Text",
-          "required": false
-        },
         "text": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -2985,7 +1851,6 @@
         },
         "contentColor": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "ACCENT",
@@ -2995,8 +1860,6 @@
           "acceptsHexColors": true
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TINY",
             "SMALL",
@@ -3005,25 +1868,13 @@
           ]
         },
         "shape": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ROUNDED",
             "SEMI_ROUNDED",
             "SQUARED"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3031,17 +1882,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3052,8 +1893,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3062,10 +1901,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Icon and/or text on colored background"
@@ -3074,12 +1909,9 @@
       "category": "display",
       "parameters": {
         "text": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LARGE_PLUS",
             "LARGE",
@@ -3091,7 +1923,6 @@
         },
         "headingTag": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "H1",
             "H2",
@@ -3102,8 +1933,6 @@
           ]
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "STANDARD",
@@ -3113,7 +1942,6 @@
         },
         "fontWeight": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "LIGHT",
             "NORMAL",
@@ -3122,13 +1950,7 @@
             "EXTRA_BOLD"
           ]
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3139,8 +1961,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3157,12 +1977,9 @@
       "category": "display",
       "parameters": {
         "percentage": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -3172,28 +1989,15 @@
           "acceptsHexColors": true
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "THIN",
             "THICK"
           ]
         },
         "showPercentage": {
-          "type": "Boolean",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Boolean"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3201,17 +2005,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3222,8 +2016,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3232,10 +2024,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Progress bar showing completion percentage"
@@ -3244,37 +2032,22 @@
       "category": "display",
       "parameters": {
         "tags": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "STANDARD"
           ]
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "START",
             "CENTER",
             "END"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3282,17 +2055,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3303,8 +2066,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3313,10 +2074,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Colored text labels for highlighting attributes"
@@ -3325,47 +2082,22 @@
       "category": "display",
       "parameters": {
         "links": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LEFT",
             "CENTER",
             "RIGHT"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Displays a list of clickable links"
@@ -3374,12 +2106,9 @@
       "category": "display",
       "parameters": {
         "actions": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "TOOLBAR",
             "LINKS",
@@ -3393,28 +2122,13 @@
           ]
         },
         "display": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "openActionsIn": {
-          "type": "Text",
-          "required": false
-        },
-        "align": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "securityOnDemand": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Displays record actions in various configurable styles"
@@ -3423,12 +2137,9 @@
       "category": "display",
       "parameters": {
         "images": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ICON",
             "ICON_PLUS",
@@ -3446,24 +2157,12 @@
           ]
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "AVATAR"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3471,17 +2170,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3492,8 +2181,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3502,10 +2189,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Image display from documents or web"
@@ -3514,20 +2197,15 @@
       "category": "display",
       "parameters": {
         "percentage": {
-          "type": "Decimal",
-          "required": false
+          "type": "Decimal"
         },
         "primaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -3537,25 +2215,13 @@
           "acceptsHexColors": true
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "MEDIUM",
             "LARGE"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3563,17 +2229,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3584,8 +2240,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3594,10 +2248,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Circular progress indicator"
@@ -3606,16 +2256,13 @@
       "category": "display",
       "parameters": {
         "steps": {
-          "type": "List of Text",
-          "required": false
+          "type": "List of Text"
         },
         "active": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "orientation": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "HORIZONTAL",
             "VERTICAL"
@@ -3623,7 +2270,6 @@
         },
         "stepStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "LINE",
             "CHEVRON",
@@ -3631,8 +2277,6 @@
           ]
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -3641,17 +2285,7 @@
           ],
           "acceptsHexColors": true
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3659,17 +2293,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3680,8 +2304,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3690,10 +2312,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Process step indicator"
@@ -3702,8 +2320,6 @@
       "category": "display",
       "parameters": {
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SECONDARY",
             "STANDARD",
@@ -3713,7 +2329,6 @@
         },
         "weight": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "THIN",
             "MEDIUM",
@@ -3721,21 +2336,13 @@
           ]
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SOLID",
             "DOT",
             "DASH"
           ]
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3746,8 +2353,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3764,37 +2369,22 @@
       "category": "display",
       "parameters": {
         "document": {
-          "type": "Document",
-          "required": false
+          "type": "Document"
         },
         "showName": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "showDescription": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "MEDIUM",
             "TALL"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3802,17 +2392,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3823,8 +2403,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3833,10 +2411,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Displays a document using the web browser's built-in document viewer"
@@ -3845,29 +2419,17 @@
       "category": "display",
       "parameters": {
         "value": {
-          "type": "Time",
-          "required": false
+          "type": "Time"
         },
         "format": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "MEDIUM",
             "LONG"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -3875,17 +2437,7 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3896,8 +2448,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -3906,10 +2456,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Displays a single time (hour, minute, second) in read-only format"
@@ -3917,17 +2463,7 @@
     "a!buttonWidget": {
       "category": "interactive",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "icon": {
-          "type": "Text",
-          "required": false
-        },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "OUTLINE",
             "GHOST",
@@ -3936,8 +2472,6 @@
           ]
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "STANDARD",
@@ -3945,12 +2479,9 @@
           ]
         },
         "submit": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "NEGATIVE",
@@ -3958,49 +2489,29 @@
           ],
           "acceptsHexColors": true
         },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
         "confirmMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "confirmHeader": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MINIMIZE",
             "FILL"
           ]
         },
         "loadingIndicator": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "validate": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
+          "type": "List of Save"
         },
         "value": {
-          "type": "Any Type",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Interactive button with conditional form submission"
@@ -4009,12 +2520,9 @@
       "category": "interactive",
       "parameters": {
         "buttons": {
-          "type": "List of ButtonWidget",
-          "required": false
+          "type": "List of ButtonWidget"
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "START",
             "CENTER",
@@ -4022,8 +2530,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -4032,14 +2538,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "specialNote": "Best practice: explicitly set marginBelow: \"NONE\" to improve vertical alignment by removing extra space below buttons",
@@ -4049,20 +2547,10 @@
       "category": "interactive",
       "parameters": {
         "primaryButtons": {
-          "type": "List of ButtonWidget",
-          "required": false
+          "type": "List of ButtonWidget"
         },
         "secondaryButtons": {
-          "type": "List of ButtonWidget",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "List of ButtonWidget"
         }
       },
       "description": "Grouped buttons by prominence"
@@ -4071,68 +2559,50 @@
       "category": "data",
       "parameters": {
         "data": {
-          "type": "RecordType/List/DataSubset",
-          "required": false
+          "type": "RecordType/List/DataSubset"
         },
         "columns": {
-          "type": "List of a!gridColumn",
-          "required": false
+          "type": "List of a!gridColumn"
         },
         "emptyGridMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "pageSize": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "pagingSaveInto": {
-          "type": "Save Array",
-          "required": false
+          "type": "Save Array"
         },
         "initialSorts": {
-          "type": "List of SortInfo",
-          "required": false
+          "type": "List of SortInfo"
         },
         "secondarySorts": {
-          "type": "List of SortInfo",
-          "required": false
-        },
-        "selectable": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of SortInfo"
         },
         "selectionStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "CHECKBOX",
             "ROW_HIGHLIGHT"
           ]
         },
         "selectionValue": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "selectionSaveInto": {
-          "type": "Save Array",
-          "required": false
+          "type": "Save Array"
         },
         "selectionRequired": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "selectionRequiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "maxSelections": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "showSelectionCount": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "ON",
@@ -4140,12 +2610,9 @@
           ]
         },
         "disableRowSelectionWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "SHORT_PLUS",
@@ -4158,40 +2625,21 @@
           ]
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "DENSE"
           ]
         },
         "borderStyle": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "LIGHT"
           ]
         },
-        "shadeAlternateRows": {
-          "type": "Boolean",
-          "required": false
-        },
         "rowHeader": {
-          "type": "Integer",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Integer"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -4199,45 +2647,14 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "List of Save"
         }
       },
       "description": "Read-only data grid with sorting, paging, selection, search, and record actions"
@@ -4245,25 +2662,13 @@
     "a!gridColumn": {
       "category": "data",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "value": {
-          "type": "Any Type",
-          "required": false
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
+          "type": "Any Type"
         },
         "sortField": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "ICON",
@@ -4286,8 +2691,6 @@
           ]
         },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "START",
             "CENTER",
@@ -4295,8 +2698,6 @@
           ]
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "ACCENT",
@@ -4306,14 +2707,6 @@
             "ERROR"
           ],
           "acceptsHexColors": true
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Column definition for read-only grid with advanced display and export options"
@@ -4322,20 +2715,15 @@
       "category": "chart",
       "parameters": {
         "data": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "categories": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "series": {
-          "type": "List of ChartSeries",
-          "required": false
+          "type": "List of ChartSeries"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MICRO",
             "SHORT",
@@ -4344,8 +2732,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4358,63 +2744,22 @@
           ]
         },
         "stacking": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "NORMAL",
             "PERCENT_TO_TOTAL"
           ]
         },
-        "showLegend": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showDataLabels": {
-          "type": "Boolean",
-          "required": false
-        },
-        "xAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "yAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
         "referenceLines": {
-          "type": "List of ReferenceLine",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of ReferenceLine"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Vertical bars for data changes over time"
@@ -4423,12 +2768,9 @@
       "category": "chart",
       "parameters": {
         "series": {
-          "type": "List of PieChartSeries",
-          "required": false
+          "type": "List of PieChartSeries"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "MEDIUM",
@@ -4436,12 +2778,9 @@
           ]
         },
         "showAsPercentage": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "PIE",
             "DONUT"
@@ -4449,7 +2788,6 @@
         },
         "seriesLabelStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "ON_CHART",
             "LEGEND",
@@ -4457,8 +2795,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4470,35 +2806,13 @@
             "SUNSET"
           ]
         },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Circular slices for parts of a whole"
@@ -4507,20 +2821,15 @@
       "category": "chart",
       "parameters": {
         "data": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "categories": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "series": {
-          "type": "List of ChartSeries",
-          "required": false
+          "type": "List of ChartSeries"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MICRO",
             "SHORT",
@@ -4529,8 +2838,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4542,51 +2849,16 @@
             "SUNSET"
           ]
         },
-        "connectNulls": {
-          "type": "Boolean",
-          "required": false
-        },
-        "xAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "yAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
         "referenceLines": {
-          "type": "List of ReferenceLine",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of ReferenceLine"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Connected points for trends over time"
@@ -4595,20 +2867,15 @@
       "category": "chart",
       "parameters": {
         "data": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "categories": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "series": {
-          "type": "List of ChartSeries",
-          "required": false
+          "type": "List of ChartSeries"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MICRO",
             "SHORT",
@@ -4618,8 +2885,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4632,63 +2897,22 @@
           ]
         },
         "stacking": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "NORMAL",
             "PERCENT_TO_TOTAL"
           ]
         },
-        "showLegend": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showDataLabels": {
-          "type": "Boolean",
-          "required": false
-        },
-        "xAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "yAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
         "referenceLines": {
-          "type": "List of ReferenceLine",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of ReferenceLine"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Horizontal bars for values at same time point"
@@ -4697,20 +2921,15 @@
       "category": "chart",
       "parameters": {
         "data": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "categories": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "series": {
-          "type": "List of ChartSeries",
-          "required": false
+          "type": "List of ChartSeries"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MICRO",
             "SHORT",
@@ -4719,8 +2938,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4733,67 +2950,22 @@
           ]
         },
         "stacking": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NORMAL",
             "PERCENT_TO_TOTAL",
             "NONE"
           ]
         },
-        "connectNulls": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showLegend": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showDataLabels": {
-          "type": "Boolean",
-          "required": false
-        },
-        "xAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "yAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
         "referenceLines": {
-          "type": "List of ReferenceLine",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "List of ReferenceLine"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Area chart with shaded regions"
@@ -4802,12 +2974,9 @@
       "category": "chart",
       "parameters": {
         "data": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "MICRO",
             "SHORT",
@@ -4816,8 +2985,6 @@
           ]
         },
         "colorScheme": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "CLASSIC",
             "MIDNIGHT",
@@ -4829,43 +2996,13 @@
             "SUNSET"
           ]
         },
-        "xAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "yAxisTitle": {
-          "type": "Text",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
             "JUSTIFIED",
             "COLLAPSED"
           ]
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Points showing relationship between values"
@@ -4874,12 +3011,10 @@
       "category": "helper",
       "parameters": {
         "text": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "style": {
           "type": "Text Array",
-          "required": false,
           "validValues": [
             "PLAIN",
             "EMPHASIS",
@@ -4889,8 +3024,6 @@
           ]
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "STANDARD",
@@ -4902,8 +3035,6 @@
           ]
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "ACCENT",
@@ -4914,12 +3045,9 @@
           "acceptsHexColors": true
         },
         "link": {
-          "type": "Link",
-          "required": false
+          "type": "Link"
         },
         "linkStyle": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "INLINE",
             "STANDALONE"
@@ -4931,13 +3059,7 @@
     "a!richTextIcon": {
       "category": "helper",
       "parameters": {
-        "icon": {
-          "type": "Text",
-          "required": false
-        },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "ACCENT",
@@ -4948,8 +3070,6 @@
           "acceptsHexColors": true
         },
         "size": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SMALL",
             "STANDARD",
@@ -4961,8 +3081,7 @@
           ]
         },
         "altText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "Icon for rich text display"
@@ -4970,17 +3089,10 @@
     "a!chartSeries": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "data": {
-          "type": "Decimal Array",
-          "required": false
+          "type": "Decimal Array"
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "BLUEGRAY",
@@ -4997,10 +3109,6 @@
             "VIOLETRED"
           ],
           "acceptsHexColors": true
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Data series for charts"
@@ -5008,21 +3116,11 @@
     "a!dynamicLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "value": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "saveInto": {
-          "type": "Save Array",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Save Array"
         }
       },
       "description": "Link that updates variables"
@@ -5031,12 +3129,7 @@
       "category": "helper",
       "parameters": {
         "uri": {
-          "type": "Text",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "Creates a link to an external URL that opens in a new tab/window"
@@ -5047,10 +3140,6 @@
         "record": {
           "type": "Record",
           "required": true
-        },
-        "label": {
-          "type": "Text",
-          "required": false
         }
       },
       "description": "Creates a link to an Appian record"
@@ -5059,12 +3148,9 @@
       "category": "helper",
       "parameters": {
         "text": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "POSITIVE",
@@ -5075,15 +3161,13 @@
         },
         "textColor": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD"
           ],
           "acceptsHexColors": true
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Individual tag for tag field"
@@ -5092,8 +3176,7 @@
       "category": "helper",
       "parameters": {
         "items": {
-          "type": "List of Text/RichTextItem",
-          "required": false
+          "type": "List of Text/RichTextItem"
         }
       },
       "description": "Creates a bulleted list within rich text display"
@@ -5102,8 +3185,7 @@
       "category": "helper",
       "parameters": {
         "items": {
-          "type": "List of Text/RichTextItem",
-          "required": false
+          "type": "List of Text/RichTextItem"
         }
       },
       "description": "Creates a numbered list within rich text display"
@@ -5111,36 +3193,25 @@
     "a!headerTemplateFull": {
       "category": "helper",
       "parameters": {
-        "title": {
-          "type": "Text",
-          "required": false
-        },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "titleColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "secondaryTextColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "stampIcon": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "stampColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         }
       },
@@ -5149,31 +3220,22 @@
     "a!headerTemplateSimple": {
       "category": "helper",
       "parameters": {
-        "title": {
-          "type": "Text",
-          "required": false
-        },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "titleColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "secondaryTextColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "stampIcon": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "stampColor": {
           "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         }
       },
@@ -5182,21 +3244,14 @@
     "a!sidebarTemplate": {
       "category": "helper",
       "parameters": {
-        "title": {
-          "type": "Text",
-          "required": false
-        },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "image": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "additionalContents": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Sidebar header template (desktop) that becomes header on mobile"
@@ -5205,22 +3260,15 @@
       "category": "utility",
       "parameters": {
         "message": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ERROR",
             "WARN",
             "INFO",
             "SUCCESS"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Configures a standalone validation message for layouts or custom error handling"
@@ -5233,8 +3281,7 @@
           "required": true
         },
         "altText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "References an image from a web URL for use in imageField or billboardLayout"
@@ -5247,8 +3294,7 @@
           "required": true
         },
         "altText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "References an Appian document as an image source"
@@ -5261,8 +3307,7 @@
           "required": true
         },
         "altText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "References a user's profile image"
@@ -5338,8 +3383,7 @@
           "required": true
         },
         "sort": {
-          "type": "List of a!sortInfo",
-          "required": false
+          "type": "List of a!sortInfo"
         }
       },
       "description": "Defines paging information for data queries"
@@ -5352,20 +3396,17 @@
           "required": true
         },
         "fields": {
-          "type": "List of Field References or a!aggregationFields",
-          "required": false
+          "type": "List of Field References or a!aggregationFields"
         },
         "filters": {
-          "type": "List of a!queryFilter or a!queryLogicalExpression",
-          "required": false
+          "type": "List of a!queryFilter or a!queryLogicalExpression"
         },
         "pagingInfo": {
           "type": "a!pagingInfo",
           "required": true
         },
         "fetchTotalCount": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Query record type data with filtering and sorting"
@@ -5378,12 +3419,10 @@
           "required": true
         },
         "filters": {
-          "type": "List of a!queryFilter or a!queryLogicalExpression",
-          "required": false
+          "type": "List of a!queryFilter or a!queryLogicalExpression"
         },
         "relatedRecordData": {
-          "type": "List of a!relatedRecordData",
-          "required": false
+          "type": "List of a!relatedRecordData"
         }
       },
       "specialNote": "ONLY use directly in a!gridField data parameter or chart data parameter - NEVER in local variables",
@@ -5399,17 +3438,14 @@
         },
         "filters": {
           "type": "Any Type (queryFilter or list of queryFilters)",
-          "required": false,
           "description": "Filters applied to related records, combined with AND logic. Field references must use related record type fields."
         },
         "sort": {
           "type": "List of a!sortInfo",
-          "required": false,
           "description": "Sort order for related records using fields from the related record type"
         },
         "limit": {
           "type": "Number (Integer)",
-          "required": false,
           "description": "Maximum related records to return. Default: 10. Max: 100 for a!queryRecordType/a!recordData, 250 for a!queryRecordByIdentifier"
         }
       },
@@ -5420,12 +3456,10 @@
       "category": "data",
       "parameters": {
         "groupings": {
-          "type": "List of a!grouping",
-          "required": false
+          "type": "List of a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         }
       },
       "description": "Defines grouping and measure fields for data aggregation"
@@ -5459,8 +3493,7 @@
           "required": true
         },
         "filters": {
-          "type": "List of a!queryFilter",
-          "required": false
+          "type": "List of a!queryFilter"
         }
       },
       "description": "Defines a measure calculation for aggregated data"
@@ -5478,7 +3511,6 @@
         },
         "interval": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "AUTO",
             "YEAR",
@@ -5533,12 +3565,10 @@
           ]
         },
         "value": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "applyWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Defines a filter condition for record queries"
@@ -5565,24 +3595,9 @@
       "category": "input",
       "parameters": {
         "value": {
-          "type": "Encrypted Text",
-          "required": false
-        },
-        "placeholder": {
-          "type": "Text",
-          "required": false
-        },
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
+          "type": "Encrypted Text"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -5590,45 +3605,16 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
-        "required": {
-          "type": "Boolean",
-          "required": false
-        },
         "requiredMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Save"
         },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -5639,8 +3625,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -5649,10 +3633,6 @@
             "MORE",
             "EVEN_MORE"
           ]
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
         }
       },
       "specialNote": "Returns Encrypted Text type which CANNOT be compared, concatenated, or used in expressions. NOT compatible with synced record types - use a!textField with warning banner instead",
@@ -5666,8 +3646,7 @@
           "required": true
         },
         "identifier": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Defines a record action for display in recordActionField"
@@ -5676,16 +3655,12 @@
       "category": "display",
       "parameters": {
         "primaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "backgroundColor": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ACCENT",
             "SUCCESS",
@@ -5695,13 +3670,7 @@
           ],
           "acceptsHexColors": true
         },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
         "marginAbove": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -5712,8 +3681,6 @@
           ]
         },
         "marginBelow": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "NONE",
             "EVEN_LESS",
@@ -5730,32 +3697,25 @@
       "category": "chart-config",
       "parameters": {
         "primaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "secondaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         },
         "sort": {
-          "type": "a!sortInfo",
-          "required": false
+          "type": "a!sortInfo"
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "showIntervalsWithNoData": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Configuration for column chart with record data"
@@ -5764,32 +3724,25 @@
       "category": "chart-config",
       "parameters": {
         "primaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "secondaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         },
         "sort": {
-          "type": "a!sortInfo",
-          "required": false
+          "type": "a!sortInfo"
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "showIntervalsWithNoData": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Configuration for bar chart with record data"
@@ -5798,32 +3751,25 @@
       "category": "chart-config",
       "parameters": {
         "primaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "secondaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         },
         "sort": {
-          "type": "a!sortInfo",
-          "required": false
+          "type": "a!sortInfo"
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "showIntervalsWithNoData": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Configuration for line chart with record data"
@@ -5832,32 +3778,25 @@
       "category": "chart-config",
       "parameters": {
         "primaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "secondaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         },
         "sort": {
-          "type": "a!sortInfo",
-          "required": false
+          "type": "a!sortInfo"
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "showIntervalsWithNoData": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Configuration for area chart with record data"
@@ -5866,24 +3805,19 @@
       "category": "chart-config",
       "parameters": {
         "primaryGrouping": {
-          "type": "a!grouping",
-          "required": false
+          "type": "a!grouping"
         },
         "measures": {
-          "type": "List of a!measure",
-          "required": false
+          "type": "List of a!measure"
         },
         "sort": {
-          "type": "a!sortInfo",
-          "required": false
+          "type": "a!sortInfo"
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Configuration for pie chart with record data"
@@ -5900,12 +3834,10 @@
           "required": true
         },
         "dataLimit": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "link": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "specialNote": "Scatter charts ONLY work with a!recordData - cannot use categories + series",
@@ -5914,33 +3846,19 @@
     "a!gridLayout": {
       "category": "data",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "instructions": {
-          "type": "Text",
-          "required": false
-        },
         "headerCells": {
-          "type": "List of a!gridLayoutHeaderCell",
-          "required": false
+          "type": "List of a!gridLayoutHeaderCell"
         },
         "columnConfigs": {
-          "type": "List of a!gridLayoutColumnConfig",
-          "required": false
+          "type": "List of a!gridLayoutColumnConfig"
         },
         "rows": {
-          "type": "List of a!gridRowLayout",
-          "required": false
+          "type": "List of a!gridRowLayout"
         },
         "emptyGridMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "height": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SHORT",
             "SHORT_PLUS",
@@ -5953,72 +3871,49 @@
           ]
         },
         "spacing": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "DENSE"
           ]
         },
         "borderStyle": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "STANDARD",
             "LIGHT"
           ]
         },
-        "shadeAlternateRows": {
-          "type": "Boolean",
-          "required": false
-        },
-        "selectable": {
-          "type": "Boolean",
-          "required": false
-        },
         "selectionValue": {
-          "type": "List of Variant",
-          "required": false
+          "type": "List of Variant"
         },
         "selectionSaveInto": {
-          "type": "List of Save",
-          "required": false
+          "type": "List of Save"
         },
         "selectionStyle": {
           "type": "Text",
-          "required": false,
           "validValues": [
             "CHECKBOX",
             "ROW_HIGHLIGHT"
           ]
         },
         "selectionDisabled": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "selectionRequired": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "addRowLink": {
-          "type": "Link",
-          "required": false
+          "type": "Link"
         },
         "rowDeletions": {
-          "type": "List of a!gridRowDeletion",
-          "required": false
+          "type": "List of a!gridRowDeletion"
         },
         "totalCount": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "rowHeader": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         },
         "labelPosition": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "ABOVE",
             "ADJACENT",
@@ -6026,37 +3921,11 @@
             "COLLAPSED"
           ]
         },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
         "validations": {
-          "type": "List of Text",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "disabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "readOnly": {
-          "type": "Boolean",
-          "required": false
+          "type": "List of Text"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        },
-        "accessibilityText": {
-          "type": "Text",
-          "required": false
+          "type": "List of Save"
         }
       },
       "specialNote": "For inline editing - use a!gridField for read-only display",
@@ -6065,26 +3934,12 @@
     "a!gridLayoutHeaderCell": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
-        "helpTooltip": {
-          "type": "Text",
-          "required": false
-        },
         "align": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "LEFT",
             "CENTER",
             "RIGHT"
           ]
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
         }
       },
       "description": "Header cell definition for editable grid layout"
@@ -6093,8 +3948,6 @@
       "category": "helper",
       "parameters": {
         "width": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "DISTRIBUTE",
             "AUTO",
@@ -6118,8 +3971,7 @@
           ]
         },
         "weight": {
-          "type": "Integer",
-          "required": false
+          "type": "Integer"
         }
       },
       "description": "Column configuration for editable grid layout"
@@ -6132,32 +3984,14 @@
           "required": true
         },
         "id": {
-          "type": "Any Type",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Row definition for editable grid layout"
     },
     "a!gridRowDeletion": {
       "category": "helper",
-      "parameters": {
-        "icon": {
-          "type": "Text",
-          "required": false
-        },
-        "isDisabled": {
-          "type": "Boolean",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
-        }
-      },
+      "parameters": {},
       "description": "Row deletion configuration for editable grid"
     },
     "a!webVideo": {
@@ -6168,8 +4002,7 @@
           "required": true
         },
         "altText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "References a video from a web URL for use in billboardLayout"
@@ -6195,10 +4028,6 @@
     "a!authorizationLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "task": {
           "type": "Task",
           "required": true
@@ -6209,10 +4038,6 @@
     "a!documentDownloadLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "document": {
           "type": "Document",
           "required": true
@@ -6223,10 +4048,6 @@
     "a!processTaskLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "task": {
           "type": "Task",
           "required": true
@@ -6237,17 +4058,12 @@
     "a!startProcessLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "processModel": {
           "type": "Process Model",
           "required": true
         },
         "processParameters": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         }
       },
       "description": "Creates a link to start a process"
@@ -6255,41 +4071,23 @@
     "a!submitLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "value": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "saveInto": {
-          "type": "List of Save",
-          "required": false
+          "type": "List of Save"
         },
         "confirm": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         },
         "confirmHeader": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "confirmMessage": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "validate": {
-          "type": "Boolean",
-          "required": false
-        },
-        "validationGroup": {
-          "type": "Text",
-          "required": false
-        },
-        "showWhen": {
-          "type": "Boolean",
-          "required": false
+          "type": "Boolean"
         }
       },
       "description": "Creates a link that submits form data"
@@ -6297,10 +4095,6 @@
     "a!userRecordLink": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "user": {
           "type": "User",
           "required": true
@@ -6312,24 +4106,18 @@
       "category": "helper",
       "parameters": {
         "id": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "primaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "tertiaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "emphasize": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "PRIMARY",
             "SECONDARY",
@@ -6343,20 +4131,16 @@
       "category": "helper",
       "parameters": {
         "id": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "primaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "tertiaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "Card template with justified text layout"
@@ -6365,16 +4149,13 @@
       "category": "helper",
       "parameters": {
         "id": {
-          "type": "Any Type",
-          "required": false
+          "type": "Any Type"
         },
         "primaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         },
         "secondaryText": {
-          "type": "Text",
-          "required": false
+          "type": "Text"
         }
       },
       "description": "Card template for tile-style display"
@@ -6393,22 +4174,14 @@
     "a!chartReferenceLine": {
       "category": "helper",
       "parameters": {
-        "label": {
-          "type": "Text",
-          "required": false
-        },
         "value": {
           "type": "Decimal",
           "required": true
         },
         "color": {
-          "type": "Text",
-          "required": false,
           "acceptsHexColors": true
         },
         "style": {
-          "type": "Text",
-          "required": false,
           "validValues": [
             "SOLID",
             "DASHED"
