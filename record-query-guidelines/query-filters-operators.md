@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/query-result-structures.md` (query patterns)
-> - `sail-guidelines/datetime-handling.md` (date/time filters)
+> - `record-query-guidelines/query-result-structures.md` (query patterns)
+> - `logic-guidelines/datetime-handling.md` (date/time filters)
 
 ---
 

@@ -4,7 +4,7 @@
 > - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
 > - `record-type-handling-guidelines.md` (record types & queries)
 >
-> **Quick Reference:** `sail-guidelines/null-safety-quick-ref.md` (Date/Time section)
+> **Quick Reference:** `logic-guidelines/null-safety-quick-ref.md` (Date/Time section)
 
 ---
 

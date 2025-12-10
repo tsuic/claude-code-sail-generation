@@ -4,7 +4,7 @@
 > - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
 > - `record-type-handling-guidelines.md` (record types & queries)
 >
-> **Related:** `sail-guidelines/null-safety-quick-ref.md` for quick pattern lookup
+> **Related:** `logic-guidelines/null-safety-quick-ref.md` for quick pattern lookup
 
 ---
 

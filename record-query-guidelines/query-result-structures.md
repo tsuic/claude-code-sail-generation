@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/kpi-aggregation-patterns.md` (aggregation patterns)
-> - `sail-guidelines/functions-reference.md` (function reference)
+> - `record-query-guidelines/kpi-aggregation-patterns.md` (aggregation patterns)
+> - `logic-guidelines/functions-reference.md` (function reference)
 
 ---
 

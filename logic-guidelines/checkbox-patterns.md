@@ -3,8 +3,8 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
-> - `sail-guidelines/null-safety-quick-ref.md` (null checking)
-> - `sail-guidelines/functions-reference.md` (function reference)
+> - `logic-guidelines/null-safety-quick-ref.md` (null checking)
+> - `logic-guidelines/functions-reference.md` (function reference)
 
 ---
 

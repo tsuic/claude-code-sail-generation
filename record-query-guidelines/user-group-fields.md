@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/relationship-navigation.md` (relationship patterns)
-> - `sail-guidelines/null-safety-quick-ref.md` (null checking)
+> - `record-query-guidelines/relationship-navigation.md` (relationship patterns)
+> - `logic-guidelines/null-safety-quick-ref.md` (null checking)
 
 ---
 

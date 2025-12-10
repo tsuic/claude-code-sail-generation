@@ -3,8 +3,8 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
-> - `sail-guidelines/foreach-patterns.md` (iteration patterns)
-> - `sail-guidelines/null-safety-quick-ref.md` (null checking)
+> - `logic-guidelines/foreach-patterns.md` (iteration patterns)
+> - `logic-guidelines/null-safety-quick-ref.md` (null checking)
 
 ---
 

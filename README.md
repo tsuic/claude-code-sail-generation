@@ -144,7 +144,7 @@ See record-type-handling-guidelines.md #anchor-name
 
 **Files with anchor-based cross-references:**
 - `.claude/agents/sail-dynamic-converter.md` - References guideline files using anchors
-- `sail-guidelines/null-safety-quick-ref.md` - References guideline sections
+- `logic-guidelines/null-safety-quick-ref.md` - References guideline sections
 - `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - Internal cross-references
 - `dynamic-behavior-guidelines/record-type-handling-guidelines.md` - Internal cross-references
 
@@ -168,22 +168,22 @@ See record-type-handling-guidelines.md #anchor-name
 
 | Folder | File | Description |
 |--------|------|-------------|
-| sail-guidelines/ | `short-circuit-evaluation.md` | Why if() vs and()/or() for null safety |
-| sail-guidelines/ | `null-safety-quick-ref.md` | Quick pattern lookup table |
-| sail-guidelines/ | `null-safety-patterns.md` | Detailed null safety implementation examples |
-| sail-guidelines/ | `functions-reference.md` | Essential functions by category |
-| sail-guidelines/ | `datetime-handling.md` | Date/time type matching & operators |
-| sail-guidelines/ | `foreach-patterns.md` | fv! variables, parallel array pattern |
-| sail-guidelines/ | `grid-selection-patterns.md` | Two-variable approach, naming conventions |
-| sail-guidelines/ | `checkbox-patterns.md` | Multi-checkbox, single checkbox initialization |
-| sail-guidelines/ | `pattern-matching.md` | a!match() for status/category lookups |
-| sail-guidelines/ | `chart-configuration.md` | Chart components, mock data patterns |
-| record-type-guidelines/ | `query-result-structures.md` | Property access by query type |
-| record-type-guidelines/ | `form-interface-patterns.md` | ri! pattern, testing simulation |
-| record-type-guidelines/ | `one-to-many-management.md` | Relationship data in forms |
-| record-type-guidelines/ | `user-group-fields.md` | User/Group fields vs relationships |
-| record-type-guidelines/ | `query-filters-operators.md` | Filter patterns, nesting rules |
-| record-type-guidelines/ | `kpi-aggregation-patterns.md` | Dashboard aggregations |
+| logic-guidelines/ | `short-circuit-evaluation.md` | Why if() vs and()/or() for null safety |
+| logic-guidelines/ | `null-safety-quick-ref.md` | Quick pattern lookup table |
+| logic-guidelines/ | `null-safety-patterns.md` | Detailed null safety implementation examples |
+| logic-guidelines/ | `functions-reference.md` | Essential functions by category |
+| logic-guidelines/ | `datetime-handling.md` | Date/time type matching & operators |
+| logic-guidelines/ | `foreach-patterns.md` | fv! variables, parallel array pattern |
+| logic-guidelines/ | `grid-selection-patterns.md` | Two-variable approach, naming conventions |
+| logic-guidelines/ | `checkbox-patterns.md` | Multi-checkbox, single checkbox initialization |
+| logic-guidelines/ | `pattern-matching.md` | a!match() for status/category lookups |
+| logic-guidelines/ | `chart-configuration.md` | Chart components, mock data patterns |
+| record-query-guidelines/ | `query-result-structures.md` | Property access by query type |
+| record-query-guidelines/ | `form-interface-patterns.md` | ri! pattern, testing simulation |
+| record-query-guidelines/ | `one-to-many-management.md` | Relationship data in forms |
+| record-query-guidelines/ | `user-group-fields.md` | User/Group fields vs relationships |
+| record-query-guidelines/ | `query-filters-operators.md` | Filter patterns, nesting rules |
+| record-query-guidelines/ | `kpi-aggregation-patterns.md` | Dashboard aggregations |
 
 **Adding new anchors:**
 When creating a new section that may be referenced elsewhere, add an anchor:

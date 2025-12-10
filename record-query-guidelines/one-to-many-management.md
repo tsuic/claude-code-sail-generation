@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/form-interface-patterns.md` (form patterns)
-> - `record-type-guidelines/user-group-fields.md` (user/group handling)
+> - `record-query-guidelines/form-interface-patterns.md` (form patterns)
+> - `record-query-guidelines/user-group-fields.md` (user/group handling)
 
 ---
 

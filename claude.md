@@ -38,18 +38,18 @@ Use this checklist:
 - ✅ Before calling validation sub-agents
 
 ### Before Writing Dynamic Code:
-- [ ] Read `/sail-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
+- [ ] Read `/logic-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
 - [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
 - [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
 
 ### Dynamic Form Field Validation:
-- [ ] **Pattern Selection for Multi-Instance Forms** (see `/sail-guidelines/foreach-patterns.md`):
+- [ ] **Pattern Selection for Multi-Instance Forms** (see `/logic-guidelines/foreach-patterns.md`):
   - [ ] **Array of Maps** (PREFERRED): When collecting multiple instances of related data (work experiences, addresses, contacts, line items) → Use `local!items: {a!map(...)}` with `saveInto: fv!item.propertyName` ‼️
   - [ ] **Parallel Arrays** (ALTERNATIVE): Only when iterating over a FIXED source list to collect SEPARATE data → Use `index()` + `a!update()` pattern
 - [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
 - [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
-- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/sail-guidelines/checkbox-patterns.md`)
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/logic-guidelines/checkbox-patterns.md`)
 
 ### Syntax Validation:
 - [ ] Starts with a!localVariables()
@@ -74,7 +74,7 @@ Use this checklist:
 - [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
 - [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
 - [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
-- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see `/record-type-guidelines/query-result-structures.md`)
+- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see `/record-query-guidelines/query-result-structures.md`)
 
 ### Function Variable Validation:
 - [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
@@ -86,7 +86,7 @@ Use this checklist:
 ### Parameter Validation:
 - [ ] Check to see that every parameter and value is listed in documentation before using!
 - [ ] For functional interfaces: ALL a!measure() functions validated against sail-api-schema.json
-- [ ] For functional interfaces: ALL a!queryFilter() operators validated against `/record-type-guidelines/query-filters-operators.md`
+- [ ] For functional interfaces: ALL a!queryFilter() operators validated against `/record-query-guidelines/query-filters-operators.md`
 
 ### Layout Validation:
 - [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
@@ -505,9 +505,9 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 
 ### Where to Learn More
 **Null Safety Topic Files (for detailed patterns):**
-- `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or()
-- `/sail-guidelines/null-safety-quick-ref.md` - Complete quick reference table
-- `/sail-guidelines/functions-reference.md` - Functions by category including null-rejecting functions
+- `/logic-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or()
+- `/logic-guidelines/null-safety-quick-ref.md` - Complete quick reference table
+- `/logic-guidelines/functions-reference.md` - Functions by category including null-rejecting functions
 
 **Master guidelines (for comprehensive rules):**
 - `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` #null-safety-implementation
@@ -535,7 +535,7 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 - **Choose the right pattern** - See "Dynamic Form Field Validation" checklist above:
   - **Array of Maps** (PREFERRED): For multi-instance data entry (work experiences, addresses, line items) → `saveInto: fv!item.propertyName`
   - **Parallel Arrays**: Only when iterating a fixed source list to collect separate data → `index()` + `a!update()` pattern
-- Read `/sail-guidelines/foreach-patterns.md` for complete pattern guidance before implementing
+- Read `/logic-guidelines/foreach-patterns.md` for complete pattern guidance before implementing
 - NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
@@ -545,8 +545,8 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 **Most common mistake**: Using `fv!index` in grid columns (it doesn't exist - only `fv!row` is available)
 
 **Detailed Topic Files:**
-- `/sail-guidelines/foreach-patterns.md` - Complete a!forEach() function variables (fv!item, fv!index, etc.)
-- `/sail-guidelines/grid-selection-patterns.md` - Two-variable approach and selection behavior
+- `/logic-guidelines/foreach-patterns.md` - Complete a!forEach() function variables (fv!item, fv!index, etc.)
+- `/logic-guidelines/grid-selection-patterns.md` - Two-variable approach and selection behavior
 
 **Master guidelines:**
 - `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` for comprehensive patterns

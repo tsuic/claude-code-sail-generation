@@ -3,9 +3,9 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
-> - `sail-guidelines/local-variable-patterns.md` (data modeling philosophy - why Pattern A is preferred)
-> - `sail-guidelines/grid-selection-patterns.md` (grid-specific iteration)
-> - `sail-guidelines/functions-reference.md` (function reference)
+> - `logic-guidelines/local-variable-patterns.md` (data modeling philosophy - why Pattern A is preferred)
+> - `logic-guidelines/grid-selection-patterns.md` (grid-specific iteration)
+> - `logic-guidelines/functions-reference.md` (function reference)
 
 ---
 

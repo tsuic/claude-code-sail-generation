@@ -3,7 +3,7 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
-> - `sail-guidelines/functions-reference.md` (function reference)
+> - `logic-guidelines/functions-reference.md` (function reference)
 > - `/ui-guidelines/components/chart-instructions.md` (detailed chart documentation)
 
 ---

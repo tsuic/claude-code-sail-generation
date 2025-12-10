@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/query-result-structures.md` (query patterns)
-> - `record-type-guidelines/query-filters-operators.md` (filter patterns)
+> - `record-query-guidelines/query-result-structures.md` (query patterns)
+> - `record-query-guidelines/query-filters-operators.md` (filter patterns)
 
 ---
 

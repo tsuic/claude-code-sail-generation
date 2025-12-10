@@ -10,19 +10,19 @@
 ### 📁 Extracted Topic Files (Read These for Detailed Patterns):
 
 **Shared Foundations (used by both mockup and functional interfaces):**
-- `/sail-guidelines/local-variable-patterns.md` - Data modeling, mockup vs functional differences
-- `/sail-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
-- `/sail-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
-- `/sail-guidelines/functions-reference.md` - Essential functions by category
-- `/sail-guidelines/datetime-handling.md` - Date/time type matching & operators
+- `/logic-guidelines/local-variable-patterns.md` - Data modeling, mockup vs functional differences
+- `/logic-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or() for null safety
+- `/logic-guidelines/null-safety-quick-ref.md` - Quick pattern lookup table
+- `/logic-guidelines/functions-reference.md` - Essential functions by category
+- `/logic-guidelines/datetime-handling.md` - Date/time type matching & operators
 
 **Record Type Patterns (functional interfaces):**
-- `/record-type-guidelines/query-result-structures.md` - Property access by query type
-- `/record-type-guidelines/form-interface-patterns.md` - ri! pattern, testing simulation
-- `/record-type-guidelines/one-to-many-management.md` - Relationship data in forms
-- `/record-type-guidelines/user-group-fields.md` - User/Group fields vs relationships
-- `/record-type-guidelines/query-filters-operators.md` - Filter patterns, nesting rules
-- `/record-type-guidelines/kpi-aggregation-patterns.md` - Dashboard aggregations
+- `/record-query-guidelines/query-result-structures.md` - Property access by query type
+- `/record-query-guidelines/form-interface-patterns.md` - ri! pattern, testing simulation
+- `/record-query-guidelines/one-to-many-management.md` - Relationship data in forms
+- `/record-query-guidelines/user-group-fields.md` - User/Group fields vs relationships
+- `/record-query-guidelines/query-filters-operators.md` - Filter patterns, nesting rules
+- `/record-query-guidelines/kpi-aggregation-patterns.md` - Dashboard aggregations
 
 ### 🚨 Critical Sections in This File (Read These First):
 - **Mandatory Foundation Rules** → `"## 🚨 MANDATORY FOUNDATION RULES"`
@@ -35,21 +35,21 @@
 - **Grid Column Sorting Rules** → `"## 🚨 CRITICAL: Grid Column Sorting Rules"`
 
 ### By Task Type:
-- **Using query results in components** → `/record-type-guidelines/query-result-structures.md`
-- **Accessing properties on queried data** → `/record-type-guidelines/query-result-structures.md`
-- **Building a form/wizard (create/update)** → `/record-type-guidelines/form-interface-patterns.md`
-- **Testing simulation variables** → `/record-type-guidelines/form-interface-patterns.md`
+- **Using query results in components** → `/record-query-guidelines/query-result-structures.md`
+- **Accessing properties on queried data** → `/record-query-guidelines/query-result-structures.md`
+- **Building a form/wizard (create/update)** → `/record-query-guidelines/form-interface-patterns.md`
+- **Testing simulation variables** → `/record-query-guidelines/form-interface-patterns.md`
 - **Handling non-existent constants** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
 - **Creating new record instances** → `"## Creating New Record Instances"`
 - **Handling data model mismatches** → `"## Field Mapping Strategies"`
 - **Multi-type form entry patterns** → `"## Multi-Type Form Entry Pattern"`
-- **Displaying data in grids or charts** → `/record-type-guidelines/query-filters-operators.md`
-- **Nesting query logical expressions** → `/record-type-guidelines/query-filters-operators.md`
-- **Managing one-to-many relationships** → `/record-type-guidelines/one-to-many-management.md`
-- **User/Group fields in forms** → `/record-type-guidelines/user-group-fields.md`
-- **Displaying user names** → `/record-type-guidelines/user-group-fields.md`
-- **Working with dates and times** → `/sail-guidelines/datetime-handling.md`
-- **KPI and aggregation calculations** → `/record-type-guidelines/kpi-aggregation-patterns.md`
+- **Displaying data in grids or charts** → `/record-query-guidelines/query-filters-operators.md`
+- **Nesting query logical expressions** → `/record-query-guidelines/query-filters-operators.md`
+- **Managing one-to-many relationships** → `/record-query-guidelines/one-to-many-management.md`
+- **User/Group fields in forms** → `/record-query-guidelines/user-group-fields.md`
+- **Displaying user names** → `/record-query-guidelines/user-group-fields.md`
+- **Working with dates and times** → `/logic-guidelines/datetime-handling.md`
+- **KPI and aggregation calculations** → `/record-query-guidelines/kpi-aggregation-patterns.md`
 - **Pattern matching with record fields** → `"## Pattern Matching with Record Fields"`
 - **Record links and identifiers** → `"## Record Links and Identifiers"`
 - **Implementing record actions** → `"## Record Actions"`
@@ -57,33 +57,33 @@
 - **Role-based access control** → `"## Group-Based Access Control Pattern"`
 
 ### By Error Type:
-- **"Property not found" on query results** → `/record-type-guidelines/query-result-structures.md`
-- **Empty dropdown/checkbox from queries** → `/record-type-guidelines/query-result-structures.md`
-- **forEach showing blank data** → `/record-type-guidelines/query-result-structures.md`
+- **"Property not found" on query results** → `/record-query-guidelines/query-result-structures.md`
+- **Empty dropdown/checkbox from queries** → `/record-query-guidelines/query-result-structures.md`
+- **forEach showing blank data** → `/record-query-guidelines/query-result-structures.md`
 - **"Variable not defined"** → `"## 🚨 MANDATORY FOUNDATION RULES"`
 - **"Constant not found"** → `"## ⚠️ IMPORTANT: Handling Non-Existent Constants"`
-- **Null reference errors** → `/sail-guidelines/null-safety-quick-ref.md`
-- **Short-circuit evaluation errors** → `/sail-guidelines/short-circuit-evaluation.md`
+- **Null reference errors** → `/logic-guidelines/null-safety-quick-ref.md`
+- **Short-circuit evaluation errors** → `/logic-guidelines/short-circuit-evaluation.md`
 - **Record type reference errors** → `"## ⚠️ Record Type Reference Syntax"`
-- **Relationship navigation errors** → `/record-type-guidelines/user-group-fields.md`
+- **Relationship navigation errors** → `/record-query-guidelines/user-group-fields.md`
 - **Grid column sorting errors** → `"## 🚨 CRITICAL: Grid Column Sorting Rules"`
 - **Using a!map() instead of record constructor** → `"## Creating New Record Instances"`
-- **Query returning only primary key** → `/record-type-guidelines/query-filters-operators.md`
-- **Query .totalCount is null** → `/record-type-guidelines/query-filters-operators.md`
-- **Using sorts instead of sort** → `/record-type-guidelines/query-filters-operators.md`
-- **Query filter nesting errors** → `/record-type-guidelines/query-filters-operators.md`
-- **Copying ri! to local variables** → `/record-type-guidelines/form-interface-patterns.md`
-- **DateTime vs Date type mismatch** → `/sail-guidelines/datetime-handling.md`
-- **Query filter errors with rule inputs** → `/record-type-guidelines/query-filters-operators.md`
-- **user() on relationship instead of field** → `/record-type-guidelines/user-group-fields.md`
+- **Query returning only primary key** → `/record-query-guidelines/query-filters-operators.md`
+- **Query .totalCount is null** → `/record-query-guidelines/query-filters-operators.md`
+- **Using sorts instead of sort** → `/record-query-guidelines/query-filters-operators.md`
+- **Query filter nesting errors** → `/record-query-guidelines/query-filters-operators.md`
+- **Copying ri! to local variables** → `/record-query-guidelines/form-interface-patterns.md`
+- **DateTime vs Date type mismatch** → `/logic-guidelines/datetime-handling.md`
+- **Query filter errors with rule inputs** → `/record-query-guidelines/query-filters-operators.md`
+- **user() on relationship instead of field** → `/record-query-guidelines/user-group-fields.md`
 - **Button/wizard configuration errors** → `"## ⚠️ a!buttonWidget() Parameter Rules"`
-- **not() with null values** → `/sail-guidelines/null-safety-quick-ref.md`
+- **not() with null values** → `/logic-guidelines/null-safety-quick-ref.md`
 
 ### Validation & Troubleshooting:
 - **Quick troubleshooting guide** → `"## 🔧 Quick Troubleshooting"`
 - **Common critical errors** → `"## Common Critical Errors"`
 - **Final validation checklist** → `"## Syntax Validation Checklist"`
-- **Essential functions reference** → `/sail-guidelines/functions-reference.md`
+- **Essential functions reference** → `/logic-guidelines/functions-reference.md`
 
 ---
 
@@ -686,7 +686,7 @@ value: condition ? trueValue : falseValue
 
 ## Essential SAIL Structure
 
-See `/sail-guidelines/local-variable-patterns.md` for complete local variable patterns.
+See `/logic-guidelines/local-variable-patterns.md` for complete local variable patterns.
 
 **Key differences for functional interfaces:**
 - **Use `ri!` for entity data** being created/updated (never copy to `local!`)
@@ -699,7 +699,7 @@ See `/sail-guidelines/local-variable-patterns.md` for complete local variable pa
 - **For dropdowns**: Initialize to valid `choiceValue` OR use `placeholder`
 - **For booleans**: Always explicit: `true()` or `false()`
 
-For scope rules and nested context patterns, see `/sail-guidelines/local-variable-patterns.md#scope-rules`.
+For scope rules and nested context patterns, see `/logic-guidelines/local-variable-patterns.md#scope-rules`.
 
 ## 📝 Documenting Unused Local Variables {#unused-variables-decision-tree}
 
@@ -1133,7 +1133,7 @@ a!buttonArrayLayout(
 
 ## 🚨 MANDATORY: Null Safety Implementation {#null-safety-implementation}
 
-> **🔗 Quick Reference:** For fast pattern lookup, see `/sail-guidelines/null-safety-quick-ref.md`
+> **🔗 Quick Reference:** For fast pattern lookup, see `/logic-guidelines/null-safety-quick-ref.md`
 > **🔧 Enforcement:** For functional interfaces, see `sail-dynamic-converter.md` Step 5D.6
 > **📖 This section:** Explains WHY null safety matters and HOW the patterns work
 

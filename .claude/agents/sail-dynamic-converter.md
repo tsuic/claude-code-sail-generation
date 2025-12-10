@@ -112,7 +112,7 @@ When converting mock interfaces to functional interfaces, the following logic im
 **MANDATORY REFACTORING:**
 - ✅ Replace nested if() (3+ levels) with a!match() for value comparisons
 - ✅ Decision criteria: Single variable compared against 3+ distinct values OR ranges
-- ✅ See `/sail-guidelines/pattern-matching.md` for a!match() patterns
+- ✅ See `/logic-guidelines/pattern-matching.md` for a!match() patterns
 
 **When to Apply:**
 - Pattern: `if(var = "A", ..., if(var = "B", ..., if(var = "C", ...)))`
@@ -147,7 +147,7 @@ a!match(
 
 **MANDATORY VALIDATION:**
 - ✅ ALL a!measure() function values MUST exist in `/ui-guidelines/reference/sail-api-schema.json` (path: `$.components["a!measure"].parameters.function.validValues`)
-- ✅ ALL a!queryFilter() operators MUST exist in `/record-type-guidelines/query-filters-operators.md`
+- ✅ ALL a!queryFilter() operators MUST exist in `/record-query-guidelines/query-filters-operators.md`
 - ✅ ALL component parameters MUST be verified against `/ui-guidelines/reference/sail-api-schema.json`
 - ✅ NO invented functions, parameters, or values
 
@@ -242,7 +242,7 @@ a!columnChartField(
 
 **MANDATORY for functional interfaces:**
 - ✅ Convert a!map() → record type constructors where creating/updating record instances
-- ✅ See `/record-type-guidelines/form-interface-patterns.md` for record type constructor patterns
+- ✅ See `/record-query-guidelines/form-interface-patterns.md` for record type constructor patterns
 - ✅ Use relationship navigation instead of separate queries where possible
 
 **When to Apply:**
@@ -554,14 +554,14 @@ Use Read tool to scan the static interface file:
   - Output: "Chart refactoring patterns extracted: [summarize key differences]"
 
 **3B: IF forEach detected:**
-- [ ] Read `/sail-guidelines/foreach-patterns.md` for forEach patterns
+- [ ] Read `/logic-guidelines/foreach-patterns.md` for forEach patterns
 - [ ] Read that ENTIRE section (typically 100-200 lines)
 - [ ] Extract: Parallel array pattern details
 - [ ] Extract: index() + a!update() usage patterns
 - [ ] Output: "forEach patterns extracted: [summarize key patterns]"
 
 **3C: IF dashboard or KPI metrics detected:**
-- [ ] Read `/record-type-guidelines/kpi-aggregation-patterns.md` for KPI patterns
+- [ ] Read `/record-query-guidelines/kpi-aggregation-patterns.md` for KPI patterns
 - [ ] Read that ENTIRE section including all 4 subsections:
   - Subsection 1: Single aggregation with no grouping
   - Subsection 2: Grouped aggregations
@@ -572,14 +572,14 @@ Use Read tool to scan the static interface file:
 - [ ] Output: "KPI aggregation patterns extracted: [summarize patterns]"
 
 **3D: IF grids detected:**
-- [ ] Read `/record-type-guidelines/query-filters-operators.md` for grid sorting rules
+- [ ] Read `/record-query-guidelines/query-filters-operators.md` for grid sorting rules
 - [ ] Read that ENTIRE section
 - [ ] Extract: sortField validation rules (fields only, not relationships)
 - [ ] Extract: Relationship type sorting rules (many-to-one can sort, one-to-many cannot)
 - [ ] Output: "Grid sorting rules extracted"
 
 **3E: IF nested if() detected (from Step 2A):**
-- [ ] Read `/sail-guidelines/pattern-matching.md` for a!match() patterns
+- [ ] Read `/logic-guidelines/pattern-matching.md` for a!match() patterns
 - [ ] Read that ENTIRE section (#amatch-status-lookups)
 - [ ] Extract: When to use a!match() vs parallel arrays
 - [ ] Extract: Complete syntax pattern with examples
@@ -588,9 +588,9 @@ Use Read tool to scan the static interface file:
 
 **Additional conditional reading based on components:**
 
-- [ ] IF checkboxes → Read `/sail-guidelines/checkbox-patterns.md`
+- [ ] IF checkboxes → Read `/logic-guidelines/checkbox-patterns.md`
 - [ ] IF wizards → Read `/ui-guidelines/layouts/wizard-layout-instructions.md`
-- [ ] IF form interface → Read `/record-type-guidelines/form-interface-patterns.md`
+- [ ] IF form interface → Read `/record-query-guidelines/form-interface-patterns.md`
 
 **3F: IF dropdowns with "All/Any" filter options detected:**
 
@@ -1206,7 +1206,7 @@ For EVERY a!measure() function you plan to use:
   - Document the alternative in code comments
 
 For EVERY a!queryFilter() operator you plan to use:
-- [ ] Read `/record-type-guidelines/query-filters-operators.md` for valid operators
+- [ ] Read `/record-query-guidelines/query-filters-operators.md` for valid operators
 - [ ] Read that table/section
 - [ ] Verify operator is valid for the field's data type
 - [ ] Common valid operators: "=", "not in", "is null", "not null", ">", ">=", "<", "<=", "between"
@@ -1219,7 +1219,7 @@ For EVERY date/time filter you plan to use:
 - [ ] Apply correct function:
   - IF field type = "Datetime" → Use now(), a!subtractDateTime(), a!addDateTime(), datetime()
   - IF field type = "Date" → Use today(), todate(), date arithmetic
-- [ ] Cross-validate with `/sail-guidelines/datetime-handling.md` for date/time patterns
+- [ ] Cross-validate with `/logic-guidelines/datetime-handling.md` for date/time patterns
 
 **If ANY validation fails, STOP and document the blocker before proceeding.**
 
@@ -1403,13 +1403,13 @@ For EACH unused variable (count = 1) with NO clear future use:
 **Why this is mandatory:**
 - Unused variables cause confusion during code review and violate SAIL best practices
 - They may trigger validation warnings in Appian Designer
-- They violate guidelines per `/sail-guidelines/foreach-patterns.md`
+- They violate guidelines per `/logic-guidelines/foreach-patterns.md`
 - Automated verification provides objective proof of cleanup (no interpretation needed)
 
 **After completing Step 5D.5:**
 - [ ] Bash verification proves all variables have count ≥ 2 or UNUSED comments
 - [ ] Removed variables documented in conversion summary
-- [ ] Code follows record-type-handling-guidelines.md and record-type-guidelines documentation standards
+- [ ] Code follows record-type-handling-guidelines.md and record-query-guidelines documentation standards
 - [ ] I am ready for null safety detection and enforcement
 
 ---
@@ -1513,7 +1513,7 @@ echo "Found $(wc -l < /tmp/null_check_dropdown.txt) dropdownField instances"
 
 **5D.6.3: Apply Corrections**
 
-For EACH instance marked for correction, apply the appropriate pattern from `/sail-guidelines/null-safety-quick-ref.md`:
+For EACH instance marked for correction, apply the appropriate pattern from `/logic-guidelines/null-safety-quick-ref.md`:
 
 **Correcting text() calls:**
 ```sail
@@ -1613,7 +1613,7 @@ For editable form input components (textField, dateField, dropdownField, paragra
 - [ ] Remove if(a!isNotNullOrEmpty(ri!submission)) wrapper from `saveInto` → Use direct field binding
 - [ ] Simplify cross-field validations → Remove redundant ri!submission checks
 - [ ] KEEP null checks for dropdownField `choiceLabels`/`choiceValues` (query results)
-- [ ] See `/sail-guidelines/null-safety-quick-ref.md` "Form Input Components - Special Rules" for detailed examples
+- [ ] See `/logic-guidelines/null-safety-quick-ref.md` "Form Input Components - Special Rules" for detailed examples
 
 - [ ] Use Edit tool to apply each correction
 - [ ] Track corrections made: `[N text(), M user(), P concat, Q todate(), R queryFilter, S form inputs simplified]`
@@ -1650,7 +1650,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 **🛑 BLOCKING REQUIREMENT - You CANNOT proceed to Step 5E until:**
 - [ ] All detection commands executed and counts documented
 - [ ] Manual review completed for ALL instances found
-- [ ] All corrections applied using patterns from `/sail-guidelines/null-safety-quick-ref.md`
+- [ ] All corrections applied using patterns from `/logic-guidelines/null-safety-quick-ref.md`
 - [ ] Re-verification confirms 100% pattern compliance
 - [ ] Summary documented with counts showing before/after verification
 - [ ] You can demonstrate evidence of manual review (not just running commands)
@@ -1953,7 +1953,7 @@ Use this reference when determining value types:
 - [ ] Did I verify ALL string concatenations use proper null handling?
 - [ ] Did I verify ALL date arithmetic is protected with if() checks?
 - [ ] Did I verify ALL a!queryFilter with variables have applyWhen?
-- [ ] Did I apply corrections using patterns from `/sail-guidelines/null-safety-quick-ref.md`?
+- [ ] Did I apply corrections using patterns from `/logic-guidelines/null-safety-quick-ref.md`?
 - [ ] Did I re-run detection and verify 100% pattern compliance?
 - [ ] Can I show detection output + manual review notes proving coverage?
 - [ ] Did I document null safety fixes in conversion summary with counts?
@@ -2279,7 +2279,7 @@ For each validation agent result:
   - Nested if() → a!match() for enumerated values (MANDATORY)
   - Chart mockup pattern → record data pattern (MANDATORY)
   - Parameter validation against schemas (MANDATORY)
-- **Record Integration**: Follow patterns from record-type-handling-guidelines.md and `/record-type-guidelines/` folder
+- **Record Integration**: Follow patterns from record-type-handling-guidelines.md and `/record-query-guidelines/` folder
   - Form data patterns - ri! vs queries
   - Query patterns - a!recordData() and a!queryRecordType()
   - Relationship navigation - single continuous path

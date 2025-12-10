@@ -4,8 +4,8 @@
 > - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
 > - `record-type-handling-guidelines.md` (record types & queries)
 >
-> **Quick Reference:** `sail-guidelines/null-safety-quick-ref.md`
-> **Related:** `sail-guidelines/short-circuit-evaluation.md` for nested if() patterns
+> **Quick Reference:** `logic-guidelines/null-safety-quick-ref.md`
+> **Related:** `logic-guidelines/short-circuit-evaluation.md` for nested if() patterns
 
 ---
 
@@ -160,7 +160,7 @@ readOnly: if(
 
 **Computed variables that derive from empty arrays require special null checking with nested if() statements.**
 
-**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation, see `sail-guidelines/short-circuit-evaluation.md`.
+**⚠️ IMPORTANT:** SAIL's `and()` and `or()` functions **DO NOT short-circuit**. For detailed explanation, see `logic-guidelines/short-circuit-evaluation.md`.
 
 ### Pattern for Null-Safe Property Access on Computed Variables
 

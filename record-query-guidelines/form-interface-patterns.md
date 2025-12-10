@@ -3,8 +3,8 @@
 > **Parent guide:** `record-type-handling-guidelines.md`
 >
 > **Related:**
-> - `record-type-guidelines/one-to-many-management.md` (relationship management)
-> - `sail-guidelines/null-safety-quick-ref.md` (null checking)
+> - `record-query-guidelines/one-to-many-management.md` (relationship management)
+> - `logic-guidelines/null-safety-quick-ref.md` (null checking)
 
 ---
 

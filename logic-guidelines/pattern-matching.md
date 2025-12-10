@@ -3,8 +3,8 @@
 > **Parent guide:** `dynamic-sail-expression-guidelines.md`
 >
 > **Related:**
-> - `sail-guidelines/short-circuit-evaluation.md` (short-circuit rules)
-> - `sail-guidelines/functions-reference.md` (function reference)
+> - `logic-guidelines/short-circuit-evaluation.md` (short-circuit rules)
+> - `logic-guidelines/functions-reference.md` (function reference)
 
 ---
 
