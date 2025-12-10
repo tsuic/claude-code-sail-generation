@@ -5389,6 +5389,33 @@
       "specialNote": "ONLY use directly in a!gridField data parameter or chart data parameter - NEVER in local variables",
       "description": "Defines record data source for grids and charts"
     },
+    "a!relatedRecordData": {
+      "category": "data",
+      "parameters": {
+        "relationship": {
+          "type": "Record Type Relationship",
+          "required": true,
+          "description": "A one-to-many record type relationship reference using recordType! domain notation"
+        },
+        "filters": {
+          "type": "Any Type (queryFilter or list of queryFilters)",
+          "required": false,
+          "description": "Filters applied to related records, combined with AND logic. Field references must use related record type fields."
+        },
+        "sort": {
+          "type": "List of a!sortInfo",
+          "required": false,
+          "description": "Sort order for related records using fields from the related record type"
+        },
+        "limit": {
+          "type": "Number (Integer)",
+          "required": false,
+          "description": "Maximum related records to return. Default: 10. Max: 100 for a!queryRecordType/a!recordData, 250 for a!queryRecordByIdentifier"
+        }
+      },
+      "specialNote": "ONLY works with ONE-TO-MANY relationships. Cannot be used in aggregations or records-powered charts. Requires data sync enabled.",
+      "description": "References a one-to-many relationship and allows filtering, sorting, and limiting of the related record set"
+    },
     "a!aggregationFields": {
       "category": "data",
       "parameters": {

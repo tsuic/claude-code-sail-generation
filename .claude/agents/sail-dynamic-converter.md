@@ -29,6 +29,67 @@ You have THREE core responsibilities (not just one):
    - Do NOT modify: layout structure, component arrangement, user experience flow
    - **DO cleanup**: unused variables, redundant logic, outdated patterns from mockup
 
+## a!relatedRecordData() USAGE GUIDELINES
+
+### When to Use
+**USE for ONE-TO-MANY relationships when you need to:**
+- Filter related records (e.g., only active comments)
+- Sort related records (e.g., most recent first)
+- Limit related records (default is 10, specify if you need more)
+
+### When NOT to Use
+**DO NOT USE for:**
+- Many-to-one relationships (status lookups, type lookups, etc.) — access fields directly
+- Aggregation queries — not supported
+- Records-powered charts — not supported
+
+### For Many-to-One Lookups (Most Common Grid Scenario)
+```sail
+/* No a!relatedRecordData() needed — just access the relationship path directly */
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Submission'
+  ),
+  columns: {
+    a!gridColumn(
+      label: "Role Name",
+      /* Direct access to many-to-one related field */
+      value: fv!row['recordType!Submission.relationships.role.fields.roleName']
+    )
+  }
+)
+```
+
+### For One-to-Many with Filtering/Sorting/Limiting
+```sail
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Case',
+    relatedRecordData: {
+      a!relatedRecordData(
+        relationship: 'recordType!Case.relationships.comments',
+        filters: a!queryFilter(
+          field: 'recordType!Comment.fields.isPublic',
+          operator: "=",
+          value: true
+        ),
+        sort: a!sortInfo(
+          field: 'recordType!Comment.fields.createdOn',
+          ascending: false
+        ),
+        limit: 5
+      )
+    }
+  ),
+  columns: { ... }
+)
+```
+
+### Key Constraints
+- **Default limit is 10** — Always specify `limit` if you need more (max 100 for grids)
+- **Requires data sync enabled** on the record type
+- **Cannot be used in aggregations** or records-powered charts
+
 ## YOUR WORKFLOW
 
 **📝 CONTEXT**: This agent is called AFTER a static mockup has been created using dynamic-sail-expression-guidelines.md guidelines.
@@ -203,6 +264,86 @@ local!newCase: 'recordType!{uuid}Case'(
   title: "New Case",
   status: "Open",
   assignedTo: loggedInUser()
+)
+```
+
+### **5. Dropdown "All" Option Conversion Pattern**
+
+**MANDATORY for dropdowns with "All/Any" filter options:**
+- ❌ NEVER use `append()` to add "All" to query results
+- ✅ Use `placeholder` parameter instead
+- ✅ Leave filter variable uninitialized (null = placeholder shows)
+
+**Why:** `append()` with query results creates **List of Variant** type errors. Appending a scalar text value ("All") to a list extracted from query results causes type coercion issues that break dropdown functionality.
+
+**MOCKUP PATTERN (static data with hardcoded "All"):**
+```sail
+local!filterType: "All",  /* Initialized to "All" */
+a!dropdownField(
+  choiceLabels: {"All Types", "Board", "Committee"},
+  choiceValues: {"All", "Board", "Committee"},
+  value: local!filterType,
+  saveInto: local!filterType
+)
+
+/* Filter logic checks for "All" */
+a!queryFilter(
+  field: 'recordType!...typeId',
+  operator: "=",
+  value: local!selectedTypeId,
+  applyWhen: local!filterType <> "All"
+)
+```
+
+**FUNCTIONAL PATTERN (query data with placeholder):**
+```sail
+local!filterType,  /* Uninitialized = null = placeholder shows */
+
+/* Query for dropdown options */
+local!types: a!queryRecordType(
+  recordType: 'recordType!{uuid}Type',
+  fields: {
+    'recordType!{uuid}Type.fields.{uuid}typeId',
+    'recordType!{uuid}Type.fields.{uuid}typeName'
+  },
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100)
+).data,
+
+a!dropdownField(
+  choiceLabels: index(local!types, 'recordType!{uuid}Type.fields.{uuid}typeName', {}),
+  choiceValues: index(local!types, 'recordType!{uuid}Type.fields.{uuid}typeName', {}),
+  value: local!filterType,
+  saveInto: local!filterType,
+  placeholder: "All Types"  /* Replaces the hardcoded "All" option */
+)
+
+/* Filter logic checks for null (placeholder selected) */
+a!queryFilter(
+  field: 'recordType!...typeId',
+  operator: "=",
+  value: local!selectedTypeId,
+  applyWhen: a!isNotNullOrEmpty(local!filterType)  /* Changed from <> "All" */
+)
+```
+
+**Key Conversion Steps:**
+1. **Remove "All" from choiceLabels/choiceValues** - Don't append or prepend
+2. **Add `placeholder: "All Types"` parameter** - Replaces the hardcoded option
+3. **Leave filter variable uninitialized** - `local!filterType,` (no value)
+4. **Update filter applyWhen logic** - Change `<> "All"` to `a!isNotNullOrEmpty()`
+
+**Common Mistake to Avoid:**
+```sail
+/* ❌ WRONG - Creates List of Variant type error */
+local!typeChoiceLabels: append(
+  "All Types",
+  index(local!types, 'recordType!...typeName', {})
+)
+
+/* ❌ WRONG - Also creates type issues */
+local!typeChoiceValues: append(
+  "All",
+  index(local!types, 'recordType!...typeName', {})
 )
 ```
 
@@ -450,6 +591,22 @@ Use Read tool to scan the static interface file:
 - [ ] IF checkboxes → Read `/sail-guidelines/checkbox-patterns.md`
 - [ ] IF wizards → Read `/ui-guidelines/layouts/wizard-layout-instructions.md`
 - [ ] IF form interface → Read `/record-type-guidelines/form-interface-patterns.md`
+
+**3F: IF dropdowns with "All/Any" filter options detected:**
+
+🚨 **CRITICAL for filter dropdowns that need an "All" option**
+
+- [ ] Scan mockup for dropdowns with hardcoded "All" options:
+  - Use Grep to search for: `choiceValues.*"All"|choiceLabels.*"All`
+  - Use Grep to search for: `"All Types"|"All Statuses"|"All Categories"|"All Roles"`
+- [ ] If found, review "MANDATORY LOGIC REFACTORING REQUIREMENTS" → Section 5: Dropdown "All" Option Conversion Pattern
+- [ ] Extract: The before/after conversion pattern
+- [ ] Key rules to remember:
+  - ❌ NEVER use `append()` to add "All" to query results (creates List of Variant)
+  - ✅ Use `placeholder: "All..."` parameter instead
+  - ✅ Leave filter variable uninitialized (null = placeholder shows)
+  - ✅ Change filter `applyWhen: var <> "All"` to `applyWhen: a!isNotNullOrEmpty(var)`
+- [ ] Output: "Found [N] dropdowns with 'All' options requiring placeholder conversion"
 
 **3D: IF form interface for CREATE/UPDATE detected:**
 
@@ -1818,6 +1975,14 @@ Use this reference when determining value types:
   - Variables with no dependencies declared first
   - Variables that reference other local! variables declared AFTER their dependencies
   - No forward references (using a variable before it's declared)
+
+**Dropdown "All" Option Validation:**
+- [ ] For EACH dropdownField with "All/Any" filter option:
+  - [ ] ❌ VERIFY: choiceLabels does NOT use `append()` with query data
+  - [ ] ❌ VERIFY: choiceValues does NOT use `append()` with query data
+  - [ ] ✅ VERIFY: Uses `placeholder: "All..."` parameter instead
+  - [ ] ✅ VERIFY: Filter variable is uninitialized (not set to "All")
+  - [ ] ✅ VERIFY: Filter applyWhen uses `a!isNotNullOrEmpty()` (not `<> "All"`)
 
 **Completeness Check:**
 - [ ] Is conversion 100% complete (ALL sections, ALL fields)?

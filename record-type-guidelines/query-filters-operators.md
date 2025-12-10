@@ -281,16 +281,21 @@ filters: a!queryLogicalExpression(
 
 ---
 
-## ⚠️ Protecting Query Filters That Use Rule Inputs
+## ⚠️ Protecting Query Filters That Use Variable Values
 
-**Rule inputs can be null in CREATE scenarios or when related data doesn't exist yet. Query filters that use rule input values MUST use `applyWhen` to prevent runtime errors.**
+**Variables (both ri! and local!) can be null or empty. Query filters that use variable values MUST use `applyWhen` to prevent runtime errors and unexpected behavior.**
 
-**When Rule Input Values Can Be Null:**
+**When Variable Values Can Be Null/Empty:**
 
 1. **CREATE Scenarios**: `ri!record` is null when creating a new record
 2. **Related Record Filtering**: Parent record's ID field may not exist yet
 3. **Optional Relationships**: Related records might not be populated
 4. **Conditional Data**: Fields that are only populated under certain conditions
+5. **Uninitialized filter variables**: `local!filterStatus,` (declared without value)
+6. **Search boxes**: Empty text fields default to empty string or null
+7. **Optional dropdowns**: User hasn't selected a value yet
+8. **Date range filters**: User leaves start/end date empty
+9. **Cleared filters**: User clicks "Clear Filters" button
 
 **Required Pattern for Filters Using Rule Inputs:**
 
@@ -311,19 +316,54 @@ a!queryFilter(
 )
 ```
 
-**Key Rule**: Any query filter whose `value` parameter comes from a rule input (ri!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`.
+**Required Pattern for Filters Using Local Variables:**
+
+```sail
+/* ✅ CORRECT - Use applyWhen to protect against null/empty local variable values */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus,
+  applyWhen: a!isNotNullOrEmpty(local!selectedStatus)
+)
+
+/* ✅ CORRECT - Search filter with local variable */
+a!queryFilter(
+  field: 'recordType!Organization.fields.name',
+  operator: "includes",
+  value: local!searchText,
+  applyWhen: a!isNotNullOrEmpty(local!searchText)
+)
+
+/* ✅ CORRECT - Date range filter with local variable */
+a!queryFilter(
+  field: 'recordType!Case.fields.startDate',
+  operator: ">=",
+  value: local!filterStartDateFrom,
+  applyWhen: a!isNotNullOrEmpty(local!filterStartDateFrom)
+)
+
+/* ❌ WRONG - No applyWhen protection, filter may behave unexpectedly when local! is null/empty */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus
+)
+```
+
+**Key Rule**: Any query filter whose `value` parameter comes from a **variable** (ri! or local!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`. Literal values (strings, numbers, booleans, function results like `loggedInUser()`) do NOT need `applyWhen`.
 
 ---
 
 ## ✅ CHECKPOINT: Before Finalizing Query Filters
 
 For every `a!queryFilter()` in your code, verify:
-- [ ] Does the `value` parameter use a rule input (ri!)?
+- [ ] Does the `value` parameter use a **variable** (ri! or local!)?
 - [ ] If yes, have I added `applyWhen: a!isNotNullOrEmpty(value)`?
-- [ ] Have I tested the interface in CREATE mode where ri! might be null?
-- [ ] Are literal values (like "Active", 5, true) used without applyWhen? (correct - they're never null)
+- [ ] Have I tested the interface when filter variables are null/empty?
+- [ ] Are literal values (like "Active", 5, true, loggedInUser()) used without applyWhen? (correct - they're never null)
 
-**Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
+**Remember**: If a query filter's value comes from `ri!` or `local!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
 
 ---
 

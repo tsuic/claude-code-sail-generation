@@ -125,10 +125,10 @@
 **Query Structure:**
 ```sail
 a!queryRecordType(
-  recordType: 'recordType!{uuid}Type',
+  recordType: 'recordType!Type',
   fields: {
-    'recordType!{uuid}Type.fields.{uuid}field1',
-    'recordType!{uuid}Type.fields.{uuid}field2'
+    'recordType!Type.fields.field1',
+    'recordType!Type.fields.field2'
   }
 ).data
 ```
@@ -174,7 +174,7 @@ a!gridColumn(
 **Query Structure:**
 ```sail
 a!queryRecordType(
-  recordType: 'recordType!{uuid}Type',
+  recordType: 'recordType!Type',
   fields: a!aggregationFields(
     groupings: {
       a!grouping(field: 'recordType!Type.fields.category', alias: "categoryName")
@@ -438,7 +438,7 @@ a!localVariables(
    * TESTING SIMULATION - REMOVE FOR PRODUCTION
    * These simulate rule inputs for standalone testing
    * ============================================ */
-  local!ri_submission: 'recordType!{uuid}Submission'(),  /* DELETE IN PRODUCTION */
+  local!ri_submission: 'recordType!Submission'(),  /* DELETE IN PRODUCTION */
   local!ri_isUpdate: false(),                             /* DELETE IN PRODUCTION */
 
   /* ❌ DO NOT create intermediate variables that copy ri! values */
@@ -453,8 +453,8 @@ a!localVariables(
     ),
     contents: {
       a!textField(
-        value: local!ri_submission['recordType!{uuid}Submission.fields.{uuid}title'],
-        saveInto: local!ri_submission['recordType!{uuid}Submission.fields.{uuid}title']
+        value: local!ri_submission['recordType!Submission.fields.title'],
+        saveInto: local!ri_submission['recordType!Submission.fields.title']
       )
     }
   )
@@ -475,8 +475,8 @@ a!localVariables(
     ),
     contents: {
       a!textField(
-        value: ri!submission['recordType!{uuid}Submission.fields.{uuid}title'],
-        saveInto: ri!submission['recordType!{uuid}Submission.fields.{uuid}title']
+        value: ri!submission['recordType!Submission.fields.title'],
+        saveInto: ri!submission['recordType!Submission.fields.title']
       )
     }
   )
@@ -530,20 +530,20 @@ a!localVariables(
 ```sail
 a!localVariables(
   local!recordData: a!queryRecordType(
-    recordType: 'recordType!{uuid}Type',
+    recordType: 'recordType!Type',
     filters: a!queryFilter(...)
   ),
 
   /* Display in read-only grid: */
   a!gridField(
     data: a!recordData(
-      recordType: 'recordType!{uuid}Type',
+      recordType: 'recordType!Type',
       filters: a!queryFilter(...)
     ),
     columns: {
       a!gridColumn(
         label: "Name",
-        value: fv!row['recordType!{uuid}Type.fields.{uuid}name']
+        value: fv!row['recordType!Type.fields.name']
       )
     }
   )
@@ -558,7 +558,7 @@ a!localVariables(
 
 2. **Saving form inputs to local variables instead of rule inputs**
    - ❌ Wrong: `saveInto: local!firstName` when creating/updating a record
-   - ✅ Right: `saveInto: ri!recordName['recordType!{uuid}Type.fields.{uuid}firstName']`
+   - ✅ Right: `saveInto: ri!recordName['recordType!Type.fields.firstName']`
 
 3. **Mixing patterns inappropriately**
    - ❌ Wrong: Using ri! for reference data that shouldn't be edited
@@ -990,7 +990,7 @@ When a single relationship contains multiple types of records (e.g., Phone Conta
 **UI Implementation:**
 ```sail
 a!forEach(
-  items: ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+  items: ri!case['recordType!Case.relationships.caseContacts'],
   expression: a!cardLayout(
     contents: {
       /* Card title based on type */
@@ -998,7 +998,7 @@ a!forEach(
         labelPosition: "COLLAPSED",
         value: a!richTextItem(
           text: if(
-            fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 2,
+            fv!item['recordType!CaseContact.fields.contactMethodTypeId'] = 2,
             "Email Contact",
             "Phone Contact"
           ),
@@ -1009,17 +1009,17 @@ a!forEach(
 
       /* Phone contact fields - show when type = 1 */
       if(
-        fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 1,
+        fv!item['recordType!CaseContact.fields.contactMethodTypeId'] = 1,
         {
           a!textField(
             label: "Phone Number",
-            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}phoneNumber'],
-            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}phoneNumber']
+            value: fv!item['recordType!CaseContact.fields.phoneNumber'],
+            saveInto: fv!item['recordType!CaseContact.fields.phoneNumber']
           ),
           a!integerField(
             label: "Call Duration (minutes)",
-            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}callDuration'],
-            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}callDuration']
+            value: fv!item['recordType!CaseContact.fields.callDuration'],
+            saveInto: fv!item['recordType!CaseContact.fields.callDuration']
           )
         },
         {}
@@ -1027,17 +1027,17 @@ a!forEach(
 
       /* Email contact fields - show when type = 2 */
       if(
-        fv!item['recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId'] = 2,
+        fv!item['recordType!CaseContact.fields.contactMethodTypeId'] = 2,
         {
           a!textField(
             label: "Email Address",
-            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailAddress'],
-            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailAddress']
+            value: fv!item['recordType!CaseContact.fields.emailAddress'],
+            saveInto: fv!item['recordType!CaseContact.fields.emailAddress']
           ),
           a!textField(
             label: "Subject Line",
-            value: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailSubject'],
-            saveInto: fv!item['recordType!{uuid}CaseContact.fields.{uuid}emailSubject']
+            value: fv!item['recordType!CaseContact.fields.emailSubject'],
+            saveInto: fv!item['recordType!CaseContact.fields.emailSubject']
           )
         },
         {}
@@ -1057,14 +1057,14 @@ a!buttonArrayLayout(
       style: "OUTLINE",
       saveInto: {
         a!save(
-          ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+          ri!case['recordType!Case.relationships.caseContacts'],
           append(
-            ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
-            'recordType!{uuid}CaseContact'(
-              'recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId': 1,  /* Set type on creation */
-              'recordType!{uuid}CaseContact.fields.{uuid}contactName': null,
-              'recordType!{uuid}CaseContact.fields.{uuid}phoneNumber': null,
-              'recordType!{uuid}CaseContact.fields.{uuid}callDuration': null
+            ri!case['recordType!Case.relationships.caseContacts'],
+            'recordType!CaseContact'(
+              'recordType!CaseContact.fields.contactMethodTypeId': 1,  /* Set type on creation */
+              'recordType!CaseContact.fields.contactName': null,
+              'recordType!CaseContact.fields.phoneNumber': null,
+              'recordType!CaseContact.fields.callDuration': null
             )
           )
         )
@@ -1076,14 +1076,14 @@ a!buttonArrayLayout(
       style: "OUTLINE",
       saveInto: {
         a!save(
-          ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
+          ri!case['recordType!Case.relationships.caseContacts'],
           append(
-            ri!case['recordType!{uuid}Case.relationships.{uuid}caseContacts'],
-            'recordType!{uuid}CaseContact'(
-              'recordType!{uuid}CaseContact.fields.{uuid}contactMethodTypeId': 2,  /* Set type on creation */
-              'recordType!{uuid}CaseContact.fields.{uuid}contactName': null,
-              'recordType!{uuid}CaseContact.fields.{uuid}emailAddress': null,
-              'recordType!{uuid}CaseContact.fields.{uuid}emailSubject': null
+            ri!case['recordType!Case.relationships.caseContacts'],
+            'recordType!CaseContact'(
+              'recordType!CaseContact.fields.contactMethodTypeId': 2,  /* Set type on creation */
+              'recordType!CaseContact.fields.contactName': null,
+              'recordType!CaseContact.fields.emailAddress': null,
+              'recordType!CaseContact.fields.emailSubject': null
             )
           )
         )
@@ -1327,16 +1327,21 @@ local!isPartner: ri!userRole = "Partner"
 - **Type Safety**: Group type provides proper validation and prevents typos
 - **Best Practice**: Aligns with Appian's security architecture
 
-## ⚠️ Protecting Query Filters That Use Rule Inputs
+## ⚠️ Protecting Query Filters That Use Variable Values
 
-**Rule inputs can be null in CREATE scenarios or when related data doesn't exist yet. Query filters that use rule input values MUST use `applyWhen` to prevent runtime errors.**
+**Variables (both ri! and local!) can be null or empty. Query filters that use variable values MUST use `applyWhen` to prevent runtime errors and unexpected behavior.**
 
-**When Rule Input Values Can Be Null:**
+**When Variable Values Can Be Null/Empty:**
 
 1. **CREATE Scenarios**: `ri!record` is null when creating a new record
 2. **Related Record Filtering**: Parent record's ID field may not exist yet
 3. **Optional Relationships**: Related records might not be populated
 4. **Conditional Data**: Fields that are only populated under certain conditions
+5. **Uninitialized filter variables**: `local!filterStatus,` (declared without value)
+6. **Search boxes**: Empty text fields default to empty string or null
+7. **Optional dropdowns**: User hasn't selected a value yet
+8. **Date range filters**: User leaves start/end date empty
+9. **Cleared filters**: User clicks "Clear Filters" button
 
 **The Problem**: Query filters with null values can cause runtime errors. Using `applyWhen` conditionally applies the filter only when the value exists.
 
@@ -1359,7 +1364,42 @@ a!queryFilter(
 )
 ```
 
-**Key Rule**: Any query filter whose `value` parameter comes from a rule input (ri!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`.
+**Required Pattern for Filters Using Local Variables:**
+
+```sail
+/* ✅ CORRECT - Use applyWhen to protect against null/empty local variable values */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus,
+  applyWhen: a!isNotNullOrEmpty(local!selectedStatus)
+)
+
+/* ✅ CORRECT - Search filter with local variable */
+a!queryFilter(
+  field: 'recordType!Organization.fields.name',
+  operator: "includes",
+  value: local!searchText,
+  applyWhen: a!isNotNullOrEmpty(local!searchText)
+)
+
+/* ✅ CORRECT - Date range filter with local variable */
+a!queryFilter(
+  field: 'recordType!Case.fields.startDate',
+  operator: ">=",
+  value: local!filterStartDateFrom,
+  applyWhen: a!isNotNullOrEmpty(local!filterStartDateFrom)
+)
+
+/* ❌ WRONG - No applyWhen protection, filter may behave unexpectedly when local! is null/empty */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus
+)
+```
+
+**Key Rule**: Any query filter whose `value` parameter comes from a **variable** (ri! or local!) MUST include an `applyWhen` check using `a!isNotNullOrEmpty()`. Literal values (strings, numbers, booleans, function results like `loggedInUser()`) do NOT need `applyWhen`.
 
 **Common Scenarios Requiring applyWhen:**
 
@@ -1379,7 +1419,7 @@ a!gridField(
 )
 ```
 
-**Multiple Filters Example (Combining Rule Inputs and Literals):**
+**Multiple Filters Example (Combining Variables and Literals):**
 ```sail
 a!queryRecordType(
   recordType: 'recordType!Document',
@@ -1391,6 +1431,12 @@ a!queryRecordType(
         operator: "=",
         value: ri!case['recordType!Case.fields.caseId'],
         applyWhen: a!isNotNullOrEmpty(ri!case['recordType!Case.fields.caseId'])  /* Protect rule input */
+      ),
+      a!queryFilter(
+        field: 'recordType!Document.fields.name',
+        operator: "includes",
+        value: local!searchText,
+        applyWhen: a!isNotNullOrEmpty(local!searchText)  /* Protect local variable */
       ),
       a!queryFilter(
         field: 'recordType!Document.fields.status',
@@ -1406,12 +1452,12 @@ a!queryRecordType(
 **✅ CHECKPOINT: Before Finalizing Query Filters**
 
 For every `a!queryFilter()` in your code, verify:
-- [ ] Does the `value` parameter use a rule input (ri!)?
+- [ ] Does the `value` parameter use a **variable** (ri! or local!)?
 - [ ] If yes, have I added `applyWhen: a!isNotNullOrEmpty(value)`?
-- [ ] Have I tested the interface in CREATE mode where ri! might be null?
-- [ ] Are literal values (like "Active", 5, true) used without applyWhen? (correct - they're never null)
+- [ ] Have I tested the interface when filter variables are null/empty?
+- [ ] Are literal values (like "Active", 5, true, loggedInUser()) used without applyWhen? (correct - they're never null)
 
-**Remember**: If a query filter's value comes from `ri!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
+**Remember**: If a query filter's value comes from `ri!` or `local!`, it MUST have `applyWhen: a!isNotNullOrEmpty()`.
 
 ## 🔥 Complex Scenario Handling
 
@@ -1516,12 +1562,12 @@ local!employees: a!queryRecordType(
 ```sail
 /* ❌ ERROR: sorts doesn't exist as a parameter */
 local!positionTypes: a!queryRecordType(
-  recordType: 'recordType!{uuid}RBC Position Type',
+  recordType: 'recordType!PositionType',
   fields: {...},
   pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100),
   sorts: {  /* ❌ Invalid parameter */
     a!sortInfo(
-      field: 'recordType!{uuid}RBC Position Type.fields.{uuid}displayOrder',
+      field: 'recordType!PositionType.fields.displayOrder',
       ascending: true
     )
   }
@@ -1532,13 +1578,13 @@ local!positionTypes: a!queryRecordType(
 ```sail
 /* ✅ Sort goes INSIDE pagingInfo, parameter name is 'sort' (singular) */
 local!positionTypes: a!queryRecordType(
-  recordType: 'recordType!{uuid}RBC Position Type',
+  recordType: 'recordType!PositionType',
   fields: {...},
   pagingInfo: a!pagingInfo(
     startIndex: 1,
     batchSize: 100,
     sort: a!sortInfo(  /* ✅ Correct: inside pagingInfo, singular 'sort' */
-      field: 'recordType!{uuid}RBC Position Type.fields.{uuid}displayOrder',
+      field: 'recordType!PositionType.fields.displayOrder',
       ascending: true
     )
   )
@@ -3126,11 +3172,104 @@ user(
 
 **Valid uses of relationships:**
 
-1. **a!relatedRecordData()** - Query related record data in charts
+1. **a!relatedRecordData()** - Filter, sort, and limit one-to-many related records
+
+   **Purpose:** Use within `a!recordData()` or `a!queryRecordType()` to filter, sort, and limit records from a **one-to-many relationship**.
+
+   **Key Constraints:**
+   - **ONE-TO-MANY relationships ONLY** — Does NOT work with many-to-one
+   - **Requires data sync enabled** on the record type
+   - **Cannot be used in aggregations** or records-powered charts
+   - **Default limit is 10** — Always specify limit if you need more (max 100 for grids, 250 for queryRecordByIdentifier)
+   - Inherits default filters from the related record type
+
+   **Parameters:**
+   | Parameter | Required | Description |
+   |-----------|----------|-------------|
+   | `relationship` | Yes | One-to-many relationship reference |
+   | `filters` | No | Filter related records (AND logic) |
+   | `sort` | No | Sort related records |
+   | `limit` | No | Max records (default: 10, max: 100/250) |
+
+   **Pattern: Get Latest Related Record**
    ```sail
-   /* ✅ CORRECT - a!relatedRecordData() accepts relationships */
+   /* Get only the most recent comment for each case */
    a!relatedRecordData(
-     relationship: 'recordType!Case.relationships.comments'
+     relationship: 'recordType!Case.relationships.comments',
+     sort: a!sortInfo(
+       field: 'recordType!Comment.fields.createdOn',
+       ascending: false
+     ),
+     limit: 1
+   )
+   ```
+
+   **Pattern: Filter Related Records**
+   ```sail
+   /* Get only active line items */
+   a!relatedRecordData(
+     relationship: 'recordType!Order.relationships.lineItems',
+     filters: a!queryFilter(
+       field: 'recordType!LineItem.fields.status',
+       operator: "=",
+       value: "Active"
+     ),
+     limit: 50
+   )
+   ```
+
+   **Pattern: Grid with Filtered Related Data**
+   ```sail
+   a!gridField(
+     data: a!recordData(
+       recordType: 'recordType!Case',
+       relatedRecordData: {
+         a!relatedRecordData(
+           relationship: 'recordType!Case.relationships.comments',
+           filters: a!queryFilter(
+             field: 'recordType!Comment.fields.isPublic',
+             operator: "=",
+             value: true
+           ),
+           sort: a!sortInfo(
+             field: 'recordType!Comment.fields.createdOn',
+             ascending: false
+           ),
+           limit: 5
+         )
+       }
+     ),
+     columns: { ... }
+   )
+   ```
+
+   **Common Mistakes:**
+   ```sail
+   /* ❌ WRONG - Many-to-one relationship (use direct field access instead) */
+   a!relatedRecordData(
+     relationship: 'recordType!Case.relationships.status'  /* This is many-to-one! */
+   )
+
+   /* ✅ CORRECT - For many-to-one, access fields directly without a!relatedRecordData() */
+   fv!row['recordType!Case.relationships.status.fields.statusName']
+
+   /* ❌ WRONG - Using in aggregation query */
+   a!queryRecordType(
+     recordType: 'recordType!Case',
+     fields: a!aggregationFields(...),
+     relatedRecordData: { ... }  /* Not supported with aggregations! */
+   )
+
+   /* ❌ WRONG - Assuming all related records are returned */
+   a!relatedRecordData(
+     relationship: 'recordType!Order.relationships.lineItems'
+     /* Missing limit - only returns 10 by default! */
+   )
+
+   /* ✅ CORRECT - Specify limit when you need more than 10 */
+   a!relatedRecordData(
+     relationship: 'recordType!Order.relationships.lineItems',
+     limit: 100
    )
    ```
 
@@ -3258,20 +3397,20 @@ user(
 | **a!relatedRecordData()** | ✅ YES | Relationship | Only function designed for relationships |
 | **a!isNullOrEmpty(), a!isNotNullOrEmpty()** | ✅ YES | Any type | Check existence of related records |
 | **Array functions** (a!forEach, length, wherecontains, index, etc.) | ✅ YES (one-to-many only) | Array | Iterate/manipulate relationship arrays |
-| **Navigation to fields** | ✅ YES | Relationship path | `relationships.{uuid}.fields.{uuid}fieldName` |
-| **user()** | ❌ NO | **User** or **Text** (field values) | Use `fields.{uuid}fieldName` (User type), NOT relationships |
-| **text(), concat()** | ❌ NO | Text/Number/Date (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
-| **Arithmetic (+, -, *, /)** | ❌ NO | Number (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
-| **Date functions (datetext, etc.)** | ❌ NO | Date/DateTime (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
-| **Comparison (=, <, >, etc.)** | ❌ NO | Scalar values | Use `fields.{uuid}fieldName` or navigate to related field |
-| **All other functions** | ❌ NO | Check schema for expected type | Use `fields.{uuid}fieldName` or navigate to related field |
+| **Navigation to fields** | ✅ YES | Relationship path | `relationships.relationshipName.fields.fieldName` |
+| **user()** | ❌ NO | **User** or **Text** (field values) | Use `fields.fieldName` (User type), NOT relationships |
+| **text(), concat()** | ❌ NO | Text/Number/Date (field values) | Use `fields.fieldName` or navigate to related field |
+| **Arithmetic (+, -, *, /)** | ❌ NO | Number (field values) | Use `fields.fieldName` or navigate to related field |
+| **Date functions (datetext, etc.)** | ❌ NO | Date/DateTime (field values) | Use `fields.fieldName` or navigate to related field |
+| **Comparison (=, <, >, etc.)** | ❌ NO | Scalar values | Use `fields.fieldName` or navigate to related field |
+| **All other functions** | ❌ NO | Check schema for expected type | Use `fields.fieldName` or navigate to related field |
 
 **Quick decision tree:**
 
 1. **Is it a!relatedRecordData()?** → ✅ Relationship OK
 2. **Is it a null check (a!isNullOrEmpty/a!isNotNullOrEmpty)?** → ✅ Relationship OK
 3. **Is it an array function (a!forEach, length, wherecontains) AND a one-to-many relationship?** → ✅ Relationship OK
-4. **Are you navigating further with `.fields.{uuid}fieldName`?** → ✅ Relationship OK (as path)
+4. **Are you navigating further with `.fields.fieldName`?** → ✅ Relationship OK (as path)
 5. **Passing relationship directly to any other function?** → ❌ WRONG - use the field instead
 
 **Remember:**

@@ -41,7 +41,8 @@ grep -B5 "a!queryFilter(" output/interface.sail | grep -v "applyWhen"
 | **Concat - without formatting** | `a!defaultValue(field1, "") & " " & a!defaultValue(field2, "")` | "" |
 | **Date arithmetic** | `if(a!isNotNullOrEmpty(field), todate(field + 30), null)` | null |
 | **Date comparison** | `if(if(a!isNotNullOrEmpty(field), todate(field + 30) < today(), false), ...)` | false |
-| **a!queryFilter** | `a!queryFilter(..., value: var, applyWhen: a!isNotNullOrEmpty(var))` | N/A |
+| **a!queryFilter (ri!/local!)** | `a!queryFilter(..., value: local!var, applyWhen: a!isNotNullOrEmpty(local!var))` | Filter skipped |
+| **a!queryFilter (literal)** | `a!queryFilter(..., value: "Active")` - NO applyWhen needed | N/A |
 | **Display field** | `a!defaultValue(field, "N/A")` | "N/A" |
 | **Editable field** | `field` (direct - no a!defaultValue) | N/A |
 | **not() function** | `not(a!defaultValue(var, false()))` | false() |
