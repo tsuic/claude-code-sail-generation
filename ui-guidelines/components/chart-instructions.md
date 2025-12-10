@@ -271,6 +271,44 @@ a!grouping(
 )
 ```
 
+### ⚠️ CRITICAL: Grouping Field Selection (Primary & Secondary)
+
+Group by human-readable values (Text, Date, DateTime, Boolean), **never by numeric IDs** (Integer, Decimal).
+
+This applies to BOTH `primaryGrouping` AND `secondaryGrouping`.
+
+**Decision Logic:**
+1. Base record has Text field? → Use directly
+2. Base record has Date/DateTime? → Use with `interval` parameter
+3. Base record only has Integer FK? → Navigate to related record's Text field
+
+```sail
+/* ❌ WRONG - grouping by Integer ID */
+primaryGrouping: a!grouping(field: 'recordType!Case.fields.statusId', ...)
+
+/* ✅ CORRECT - Text field in base record */
+primaryGrouping: a!grouping(field: 'recordType!Case.fields.statusName', ...)
+
+/* ✅ CORRECT - Related Text field when base record only has FK */
+primaryGrouping: a!grouping(field: 'recordType!Case.relationships.status.fields.statusName', ...)
+
+/* ✅ CORRECT - Date with interval */
+primaryGrouping: a!grouping(
+  field: 'recordType!Case.fields.submissionDate',
+  interval: "DATE_TEXT"
+)
+```
+
+**Quick Reference:**
+| Field Type | Pattern |
+|------------|---------|
+| Text (in base record) | `...fields.textField` directly |
+| Integer FK (no text in base) | `...relationships.X.fields.firstTextField` |
+| Date (group by date) | `...fields.dateField` with `interval: "DATE_TEXT"` |
+| Date (group by month) | `...fields.dateField` with `interval: "MONTH_SHORT_TEXT"` |
+| Date (group by year) | `...fields.dateField` with `interval: "YEAR"` |
+| Boolean | `...fields.booleanField` directly |
+
 ### a!measure()
 Defines aggregated values to display.
 
