@@ -58,6 +58,7 @@ Use this checklist:
 - [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
 - [ ] Comments use /* */ not //
 - [ ] `or(a,b)` NOT `a or b` ‼️
+- [ ] Range comparisons use `a!match(whenTrue:)` NOT nested `if()` ‼️
 - [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
 - [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
 - [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️

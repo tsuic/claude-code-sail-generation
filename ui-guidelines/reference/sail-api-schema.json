@@ -4400,9 +4400,9 @@
       "description": "Immutably update array element at index"
     },
     "a!match": {
-      "syntax": "a!match(value, equals, then, default)",
-      "parameterCount": 4,
-      "description": "Pattern matching for cleaner conditional logic"
+      "syntax": "a!match(value, equals|whenTrue, then, default)",
+      "description": "Pattern matching. Use 'equals' for exact matches, 'whenTrue' for ranges/thresholds. Access value via fv!value in conditions. Keywords required.",
+      "specialNote": "Short-circuits on first match. Can mix equals and whenTrue. PREFER over nested if() for 3+ conditions."
     },
     "datetime": {
       "syntax": "datetime(year, month, day, hour, minute, second)",
