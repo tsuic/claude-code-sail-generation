@@ -142,14 +142,26 @@ user(
 
 ## Valid Uses of Relationships
 
-### 1. a!relatedRecordData() - Query Related Record Data in Charts
+### 1. a!relatedRecordData() - Filter, Sort, and Limit One-to-Many Related Records
+
+**For comprehensive documentation, see:** `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` section "a!relatedRecordData() - Complete Usage Guide"
 
 ```sail
-/* ✅ CORRECT - a!relatedRecordData() accepts relationships */
+/* ✅ CORRECT - a!relatedRecordData() accepts one-to-many relationships */
 a!relatedRecordData(
-  relationship: 'recordType!Case.relationships.comments'
+  relationship: 'recordType!Case.relationships.comments',
+  sort: a!sortInfo(
+    field: 'recordType!Comment.fields.createdOn',
+    ascending: false
+  ),
+  limit: 10  /* Default is 10; max 100 for grids */
 )
 ```
+
+**Key constraints:**
+- **One-to-many relationships ONLY** — Does not work with many-to-one
+- **Default limit is 10** — Always specify if you need more
+- **Cannot be used in aggregations** or records-powered charts
 
 ### 2. Null Checking Functions - Check for Existence of Related Records
 
@@ -258,11 +270,11 @@ user(
 | **a!relatedRecordData()** | ✅ YES | Relationship | Only function designed for relationships |
 | **a!isNullOrEmpty(), a!isNotNullOrEmpty()** | ✅ YES | Any type | Check existence of related records |
 | **Array functions** (a!forEach, length, wherecontains, index, etc.) | ✅ YES (one-to-many only) | Array | Iterate/manipulate relationship arrays |
-| **Navigation to fields** | ✅ YES | Relationship path | `relationships.{uuid}.fields.{uuid}fieldName` |
-| **user()** | ❌ NO | **User** or **Text** (field values) | Use `fields.{uuid}fieldName` (User type), NOT relationships |
-| **text(), concat()** | ❌ NO | Text/Number/Date (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
-| **Arithmetic (+, -, *, /)** | ❌ NO | Number (field values) | Use `fields.{uuid}fieldName` or navigate to related field |
-| **All other functions** | ❌ NO | Check schema for expected type | Use `fields.{uuid}fieldName` or navigate to related field |
+| **Navigation to fields** | ✅ YES | Relationship path | `relationships.relationshipName.fields.fieldName` |
+| **user()** | ❌ NO | **User** or **Text** (field values) | Use `fields.fieldName` (User type), NOT relationships |
+| **text(), concat()** | ❌ NO | Text/Number/Date (field values) | Use `fields.fieldName` or navigate to related field |
+| **Arithmetic (+, -, *, /)** | ❌ NO | Number (field values) | Use `fields.fieldName` or navigate to related field |
+| **All other functions** | ❌ NO | Check schema for expected type | Use `fields.fieldName` or navigate to related field |
 
 ---
 
@@ -271,7 +283,7 @@ user(
 1. **Is it a!relatedRecordData()?** → ✅ Relationship OK
 2. **Is it a null check (a!isNullOrEmpty/a!isNotNullOrEmpty)?** → ✅ Relationship OK
 3. **Is it an array function (a!forEach, length, wherecontains) AND a one-to-many relationship?** → ✅ Relationship OK
-4. **Are you navigating further with `.fields.{uuid}fieldName`?** → ✅ Relationship OK (as path)
+4. **Are you navigating further with `.fields.fieldName`?** → ✅ Relationship OK (as path)
 5. **Passing relationship directly to any other function?** → ❌ WRONG - use the field instead
 
 **Remember:**
