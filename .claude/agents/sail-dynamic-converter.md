@@ -92,7 +92,7 @@ a!gridField(
 
 ## YOUR WORKFLOW
 
-**📝 CONTEXT**: This agent is called AFTER a static mockup has been created using dynamic-sail-expression-guidelines.md guidelines.
+**📝 CONTEXT**: This agent is called AFTER a static mockup has been created using LOGIC-PRIMARY-REFERENCE.md guidelines.
 
 **Your job has THREE components:**
 1. **Replace mock data with live queries** (primary goal)
@@ -439,15 +439,15 @@ a!richTextDisplayField(
   - Output: "Valid user() properties: [firstName, lastName, email, username, displayName]"
 
 **1C: Read Navigation Indexes**
-- [ ] Read dynamic-sail-expression-guidelines.md #nav-index (Navigation Index)
+- [ ] Read logic-guidelines/LOGIC-PRIMARY-REFERENCE.md #nav-index (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
-  - Output: "dynamic-sail-expression-guidelines.md structure loaded"
+  - Output: "LOGIC-PRIMARY-REFERENCE.md structure loaded"
 
-- [ ] Read record-type-handling-guidelines.md #nav-index (Navigation Index)
+- [ ] Read record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md #nav-index (Navigation Index)
   - Use Read tool
   - Extract: Section titles and search keywords
-  - Output: "record-type-handling-guidelines.md structure loaded"
+  - Output: "RECORD-QUERY-PRIMARY-REFERENCE.md structure loaded"
 
 **After completing Step 1:**
 - [ ] I have reviewed MANDATORY LOGIC REFACTORING REQUIREMENTS section
@@ -529,8 +529,8 @@ Use Read tool to scan the static interface file:
   - Other components
 
 - [ ] Use Navigation Indexes from Step 1C to identify required reading sections:
-  - For each component type, note which sections to read from dynamic-sail-expression-guidelines.md
-  - For each component type, note which sections to read from record-type-handling-guidelines.md
+  - For each component type, note which sections to read from logic-guidelines/LOGIC-PRIMARY-REFERENCE.md
+  - For each component type, note which sections to read from record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md
 
 - [ ] Output: "Components detected: [list], Required reading sections: [list with file names and search keywords]"
 
@@ -723,7 +723,7 @@ Map user's mockup local variables to appropriate ri! names based on the record t
 - Clear documentation for developers configuring process models
 - Consistent output across all conversions
 
-**Note**: The record-type-handling-guidelines.md documents testing simulation pattern (`local!ri_*`) for manual development/prototyping. Do NOT use that pattern for code generation.
+**Note**: The RECORD-QUERY-PRIMARY-REFERENCE.md documents testing simulation pattern (`local!ri_*`) for manual development/prototyping. Do NOT use that pattern for code generation.
 
 **After completing Step 3:**
 - [ ] I have read ALL relevant component-specific sections IN FULL
@@ -1007,7 +1007,7 @@ Before writing ANY code, review your conversion plan and identify ALL references
 
   **Case B: Reference is needed but doesn't exist in mockup**
   - ✅ Use `null` value with TODO comment
-  - ✅ Follow pattern from record-type-handling-guidelines.md #handling-non-existent-constants
+  - ✅ Follow pattern from record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md #handling-non-existent-constants
   - ✅ Document what needs to be configured
   - Example for groups:
     ```sail
@@ -1363,7 +1363,7 @@ Add comments for:
 
 For EACH variable with occurrence count = 1:
 - [ ] Variable appears ONLY in declaration → **UNUSED**
-- [ ] Apply decision tree from record-type-handling-guidelines.md (#unused-variables-decision-tree):
+- [ ] Apply decision tree from record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md (#unused-variables-decision-tree):
   - **NO clear future use** → **REMOVE with Edit tool**
   - **Has documented future use** → **ADD UNUSED comment** following template
 
@@ -1409,7 +1409,7 @@ For EACH unused variable (count = 1) with NO clear future use:
 **After completing Step 5D.5:**
 - [ ] Bash verification proves all variables have count ≥ 2 or UNUSED comments
 - [ ] Removed variables documented in conversion summary
-- [ ] Code follows record-type-handling-guidelines.md and record-query-guidelines documentation standards
+- [ ] Code follows record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md and record-query-guidelines documentation standards
 - [ ] I am ready for null safety detection and enforcement
 
 ---
@@ -2279,7 +2279,7 @@ For each validation agent result:
   - Nested if() → a!match() for enumerated values (MANDATORY)
   - Chart mockup pattern → record data pattern (MANDATORY)
   - Parameter validation against schemas (MANDATORY)
-- **Record Integration**: Follow patterns from record-type-handling-guidelines.md and `/record-query-guidelines/` folder
+- **Record Integration**: Follow patterns from record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md and `/record-query-guidelines/` folder
   - Form data patterns - ri! vs queries
   - Query patterns - a!recordData() and a!queryRecordType()
   - Relationship navigation - single continuous path

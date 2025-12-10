@@ -73,7 +73,7 @@ Or generate and convert in one request:
 The `sail-dynamic-converter` agent:
 1. **Reads** your static SAIL mockup
 2. **Consults** `/context/data-model-context.md` for record type UUIDs and field references
-3. **Applies** patterns from `record-type-handling-guidelines.md`:
+3. **Applies** patterns from `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`:
    - Replaces `local!` arrays with `a!queryRecordType()` or `a!recordData()`
    - Converts form fields to use `ri!` rule input pattern
    - Adds null-safe field access patterns
@@ -139,30 +139,30 @@ Claude Code validates generated SAIL expressions using different approaches:
 
 **Reference format:**
 ```markdown
-See record-type-handling-guidelines.md #anchor-name
+See record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md #anchor-name
 ```
 
 **Files with anchor-based cross-references:**
 - `.claude/agents/sail-dynamic-converter.md` - References guideline files using anchors
 - `logic-guidelines/null-safety-quick-ref.md` - References guideline sections
-- `dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` - Internal cross-references
-- `dynamic-behavior-guidelines/record-type-handling-guidelines.md` - Internal cross-references
+- `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` - Internal cross-references
+- `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` - Internal cross-references
 
 **Available anchors:**
 
 | File | Anchor | Section |
 |------|--------|---------|
-| dynamic-sail-expression-guidelines.md | `#nav-index` | Quick Navigation Index |
-| dynamic-sail-expression-guidelines.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
-| dynamic-sail-expression-guidelines.md | `#foreach-local-variables` | Local Variable Scope in Nested Contexts |
-| dynamic-sail-expression-guidelines.md | `#null-safety-implementation` | Null Safety Implementation |
-| record-type-handling-guidelines.md | `#nav-index` | Quick Navigation Index |
-| record-type-handling-guidelines.md | `#rule-input-pattern` | Rule Input Pattern |
-| record-type-handling-guidelines.md | `#handling-non-existent-constants` | Handling Non-Existent Constants |
-| record-type-handling-guidelines.md | `#unused-variables-decision-tree` | Documenting Unused Variables |
-| record-type-handling-guidelines.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
-| record-type-handling-guidelines.md | `#null-safety-implementation` | Null Safety Implementation |
-| record-type-handling-guidelines.md | `#datetime-critical-rules` | Date/Time Critical Rules |
+| logic-guidelines/LOGIC-PRIMARY-REFERENCE.md | `#nav-index` | Quick Navigation Index |
+| logic-guidelines/LOGIC-PRIMARY-REFERENCE.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
+| logic-guidelines/LOGIC-PRIMARY-REFERENCE.md | `#foreach-local-variables` | Local Variable Scope in Nested Contexts |
+| logic-guidelines/LOGIC-PRIMARY-REFERENCE.md | `#null-safety-implementation` | Null Safety Implementation |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#nav-index` | Quick Navigation Index |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#rule-input-pattern` | Rule Input Pattern |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#handling-non-existent-constants` | Handling Non-Existent Constants |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#unused-variables-decision-tree` | Documenting Unused Variables |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#short-circuit-rules` | Short-Circuit Evaluation Rules |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#null-safety-implementation` | Null Safety Implementation |
+| record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md | `#datetime-critical-rules` | Date/Time Critical Rules |
 
 **Extracted Topic Files (smaller, focused documentation):**
 

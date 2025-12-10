@@ -2898,7 +2898,7 @@ a!match(
 - Clearer mapping of status codes to colors/icons
 - Less error-prone when editing
 
-See `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` section "Using a!match() for Status-Based Lookups" for complete `a!match()` guidance and decision criteria.
+See `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` section "Using a!match() for Status-Based Lookups" for complete `a!match()` guidance and decision criteria.
 
 ## 🚨 CRITICAL: One-to-Many Relationship Data Management in Forms
 

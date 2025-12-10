@@ -1,6 +1,6 @@
 # Checkbox Field Patterns {#checkbox-patterns}
 
-> **Parent guide:** `dynamic-sail-expression-guidelines.md`
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `logic-guidelines/null-safety-quick-ref.md` (null checking)

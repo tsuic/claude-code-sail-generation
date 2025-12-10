@@ -1,6 +1,6 @@
 # Chart Data Configuration {#chart-configuration}
 
-> **Parent guide:** `dynamic-sail-expression-guidelines.md`
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `logic-guidelines/functions-reference.md` (function reference)

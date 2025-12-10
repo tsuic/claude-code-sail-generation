@@ -1,6 +1,6 @@
 # Query Result Data Structures {#query-result-structures}
 
-> **Parent guide:** `record-type-handling-guidelines.md`
+> **Parent guide:** `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `record-query-guidelines/kpi-aggregation-patterns.md` (aggregation patterns)

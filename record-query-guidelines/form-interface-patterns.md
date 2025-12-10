@@ -1,6 +1,6 @@
 # Form Interface Data Patterns {#form-interface-patterns}
 
-> **Parent guide:** `record-type-handling-guidelines.md`
+> **Parent guide:** `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `record-query-guidelines/one-to-many-management.md` (relationship management)

@@ -1,6 +1,6 @@
 # Dashboard KPI Aggregation Patterns {#kpi-aggregation-patterns}
 
-> **Parent guide:** `record-type-handling-guidelines.md`
+> **Parent guide:** `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `record-query-guidelines/query-result-structures.md` (query patterns)

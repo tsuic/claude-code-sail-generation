@@ -1,6 +1,6 @@
 # User/Group Fields vs Relationships {#user-group-fields}
 
-> **Parent guide:** `record-type-handling-guidelines.md`
+> **Parent guide:** `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `record-query-guidelines/relationship-navigation.md` (relationship patterns)
@@ -144,7 +144,7 @@ user(
 
 ### 1. a!relatedRecordData() - Filter, Sort, and Limit One-to-Many Related Records
 
-**For comprehensive documentation, see:** `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` section "a!relatedRecordData() - Complete Usage Guide"
+**For comprehensive documentation, see:** `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` section "a!relatedRecordData() - Complete Usage Guide"
 
 ```sail
 /* ✅ CORRECT - a!relatedRecordData() accepts one-to-many relationships */

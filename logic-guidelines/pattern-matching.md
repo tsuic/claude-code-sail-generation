@@ -1,6 +1,6 @@
 # Pattern Matching with a!match() {#pattern-matching}
 
-> **Parent guide:** `dynamic-sail-expression-guidelines.md`
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `logic-guidelines/short-circuit-evaluation.md` (short-circuit rules)

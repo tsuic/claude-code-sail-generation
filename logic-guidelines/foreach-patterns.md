@@ -1,6 +1,6 @@
 # a!forEach() Patterns and Function Variables {#foreach-patterns}
 
-> **Parent guide:** `dynamic-sail-expression-guidelines.md`
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `logic-guidelines/local-variable-patterns.md` (data modeling philosophy - why Pattern A is preferred)

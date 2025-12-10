@@ -39,8 +39,8 @@ Use this checklist:
 
 ### Before Writing Dynamic Code:
 - [ ] Read `/logic-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
-- [ ] Read `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` if using arrays, loops, null checking in mock data interfaces
-- [ ] Read `/dynamic-behavior-guidelines/record-type-handling-guidelines.md` if working with record types, queries, or relationships
+- [ ] Read `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` if using arrays, loops, null checking in mock data interfaces
+- [ ] Read `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` if working with record types, queries, or relationships
 - [ ] Remember that SAIL doesn't support regex
 
 ### Dynamic Form Field Validation:
@@ -193,7 +193,7 @@ Use this checklist:
 **When working with dynamic data (arrays, loops, conditionals), ALWAYS read the appropriate guidelines FIRST:**
 
 ### **FOUNDATIONAL SAIL SYNTAX (Required for ALL Interfaces)**
-**Read:** `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md`
+**Read:** `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 
 **Contains:** Universal SAIL syntax rules that apply to **both mock and functional interfaces:**
 - ✅ **Language-specific syntax** (and/or/if functions, NOT JavaScript operators)
@@ -210,9 +210,9 @@ Use this checklist:
 **⚠️ Important:** This file contains **FOUNDATIONAL rules for ALL SAIL code** (both mock and dynamic interfaces).
 
 ### **RECORD TYPE INTEGRATION (When Using Record Data)**
-**Read:** `/dynamic-behavior-guidelines/record-type-handling-guidelines.md`
+**Read:** `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 
-**Contains:** Record-specific patterns built **ON TOP of dynamic-sail-expression-guidelines.md:**
+**Contains:** Record-specific patterns built **ON TOP of LOGIC-PRIMARY-REFERENCE.md:**
 - ✅ **Record type reference syntax** (UUID usage)
 - ✅ **Form interface data patterns** (ri! vs queries decision tree)
 - ✅ **Query construction** (a!queryRecordType, a!recordData)
@@ -220,7 +220,7 @@ Use this checklist:
 - ✅ **Record type constructors** vs a!map()
 - ✅ **Testing simulation variables**
 
-**⚠️ Critical:** Functional interfaces with record types and data use **ALL rules from dynamic-sail-expression-guidelines.md PLUS** record-specific rules from this file.
+**⚠️ Critical:** Functional interfaces with record types and data use **ALL rules from LOGIC-PRIMARY-REFERENCE.md PLUS** record-specific rules from this file.
 
 ### When to Read Dynamic Guidelines:
 - ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
@@ -510,7 +510,7 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
 - `/logic-guidelines/functions-reference.md` - Functions by category including null-rejecting functions
 
 **Master guidelines (for comprehensive rules):**
-- `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` #null-safety-implementation
+- `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` #null-safety-implementation
 
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
@@ -549,7 +549,7 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 - `/logic-guidelines/grid-selection-patterns.md` - Two-variable approach and selection behavior
 
 **Master guidelines:**
-- `/dynamic-behavior-guidelines/dynamic-sail-expression-guidelines.md` for comprehensive patterns
+- `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` for comprehensive patterns
 
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 

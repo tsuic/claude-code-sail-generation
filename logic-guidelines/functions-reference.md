@@ -1,8 +1,8 @@
 # Essential Functions Reference {#functions-reference}
 
 > **Parent guides:**
-> - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
-> - `record-type-handling-guidelines.md` (record types & queries)
+> - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
+> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
 >
 > **Full API Reference:** `/ui-guidelines/reference/sail-api-schema.json`
 

@@ -294,7 +294,7 @@ a!localVariables(
 )
 ```
 
-See `record-type-handling-guidelines.md` for complete functional interface patterns.
+See `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` for complete functional interface patterns.
 
 ---
 

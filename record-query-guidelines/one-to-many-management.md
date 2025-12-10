@@ -1,6 +1,6 @@
 # One-to-Many Relationship Data Management {#one-to-many-management}
 
-> **Parent guide:** `record-type-handling-guidelines.md`
+> **Parent guide:** `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `record-query-guidelines/form-interface-patterns.md` (form patterns)

@@ -1,6 +1,6 @@
 # Grid Selection Patterns {#grid-selection-patterns}
 
-> **Parent guide:** `dynamic-sail-expression-guidelines.md`
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Related:**
 > - `logic-guidelines/foreach-patterns.md` (iteration patterns)

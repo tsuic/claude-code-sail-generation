@@ -1,8 +1,8 @@
 # Date/Time Handling Rules {#datetime-critical-rules}
 
 > **Parent guides:**
-> - `dynamic-sail-expression-guidelines.md` (mock data interfaces)
-> - `record-type-handling-guidelines.md` (record types & queries)
+> - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
+> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
 >
 > **Quick Reference:** `logic-guidelines/null-safety-quick-ref.md` (Date/Time section)
 
