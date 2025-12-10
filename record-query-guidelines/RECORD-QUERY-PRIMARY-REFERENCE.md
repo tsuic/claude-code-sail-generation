@@ -3812,7 +3812,9 @@ a!barChartField(
   ),
   config: a!barChartConfig(
     primaryGrouping: a!grouping(
-      field: recordType!Employee.fields.department,
+      /* Use Text field directly if available in base record,
+         otherwise navigate to related record's Text field */
+      field: recordType!Employee.fields.departmentName,
       alias: "department_primaryGrouping"
     ),
     measures: {
@@ -4018,12 +4020,13 @@ a!columnChartField(
 
 ```sail
 /* ✅ CORRECT - Aggregation query for KPI calculation */
+/* Note: Group by Text field (statusName) if available, or navigate to related record */
 local!caseStats: a!queryRecordType(
   recordType: recordType!Case,
   fields: a!aggregationFields(
     groupings: {
       a!grouping(
-        field: recordType!Case.fields.status,
+        field: recordType!Case.fields.statusName, /* Use Text field, not Integer ID */
         alias: "status_group"
       )
     },

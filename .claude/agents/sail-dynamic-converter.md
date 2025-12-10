@@ -238,6 +238,49 @@ a!columnChartField(
 3. Remove top-level `grouping` parameter → Move to `config.primaryGrouping`
 4. Add `config: a!<chartType>Config()` wrapper
 
+**⚠️ CRITICAL: Chart Grouping Field Selection (Primary & Secondary)**
+
+Group by human-readable values (Text, Date, DateTime, Boolean), **never by numeric IDs** (Integer, Decimal).
+
+**Decision Logic:**
+1. **Base record has Text field?** → Use it directly (e.g., `...fields.statusName`)
+2. **Base record has Date/DateTime?** → Use with `interval` parameter
+3. **Base record only has Integer FK?** → Navigate to related record's Text field
+
+| Scenario | Pattern |
+|----------|---------|
+| Text field exists in base record | `recordType!Case.fields.statusName` |
+| Integer FK only, need related text | `recordType!Case.relationships.status.fields.statusName` |
+| Date grouping by specific date | `...fields.dateField` with `interval: "DATE_TEXT"` |
+| Date grouping by month | `...fields.dateField` with `interval: "MONTH_SHORT_TEXT"` |
+| Date grouping by year | `...fields.dateField` with `interval: "YEAR"` |
+| Boolean field | `...fields.booleanField` directly |
+
+**Finding the right related field:**
+- Check the data model for the related record type
+- Use the **first Text field** in the field order listed in the record type definition
+
+**Example:**
+```sail
+config: a!columnChartConfig(
+  primaryGrouping: a!grouping(
+    field: 'recordType!Case.relationships.status.fields.statusName',
+    alias: "statusGroup"
+  ),
+  secondaryGrouping: a!grouping(
+    field: 'recordType!Case.fields.submissionDate',
+    alias: "monthGroup",
+    interval: "MONTH_SHORT_TEXT"
+  ),
+  measures: {...}
+)
+```
+
+**Checklist for each grouping:**
+- [ ] Is the field Integer/Decimal? → Find Text field (base record first, then related record)
+- [ ] Is the field Date/DateTime? → Add appropriate `interval` parameter
+- [ ] Apply this rule to BOTH `primaryGrouping` AND `secondaryGrouping`
+
 ### **4. Data Structure Refactoring**
 
 **MANDATORY for functional interfaces:**
@@ -1253,10 +1296,77 @@ For EVERY chart identified in Step 2B:
 - [ ] Verify current pattern uses categories + series (mockup pattern)
 - [ ] Plan record data pattern:
   - Identify correct chart config function (a!columnChartConfig, a!lineChartConfig, etc.)
-  - Plan primaryGrouping: field and interval
-  - Plan secondaryGrouping if more than one grouping
   - Plan measures: function, field, alias
 - [ ] Document the refactoring decision
+
+**4C.2: MANDATORY - Chart Grouping Field Type Validation**
+
+🚨 **BLOCKING GATE** - Cannot proceed with chart code until ALL grouping fields pass type validation.
+
+For EACH `a!grouping()` you plan to write (primaryGrouping AND secondaryGrouping):
+
+- [ ] **Step 1: Identify the mockup's grouping intent**
+  - What category is the chart grouping by? (e.g., "Organization Type", "Role", "Month")
+  - Document: "Chart groups by: [category name]"
+
+- [ ] **Step 2: Find the field in data model context**
+  - Search context/data-model-context.md for the base record type
+  - Locate the field that corresponds to the grouping intent
+  - Extract: Field name and Data Type from the Fields table
+
+- [ ] **Step 3: Apply Field Type Decision Tree**
+
+  | Field Data Type | Action |
+  |-----------------|--------|
+  | **Text** | ✅ Use directly: `...fields.textFieldName` |
+  | **Date/DateTime** | ✅ Use with interval: `...fields.dateField` + `interval: "MONTH_SHORT_TEXT"` or `"DATE_TEXT"` or `"YEAR"` |
+  | **Boolean** | ✅ Use directly: `...fields.booleanField` |
+  | **Integer/Decimal** | ❌ **STOP** - Find Text alternative (Step 4) |
+
+- [ ] **Step 4: If Integer/Decimal - Find Text Alternative**
+
+  🚨 **REQUIRED when field type is Integer or Decimal**
+
+  4a. Check if base record has a **Relationships** section in data model context
+  4b. Find the relationship that corresponds to the Integer FK field
+      - Example: `organizationTypeId` → relationship `organizationType`
+      - Example: `boardCommitteeRoleId` → relationship `boardCommitteeRole`
+  4c. Look up the TARGET record type's Fields table
+  4d. Find the **first Text field** in the target record type
+      - Example: ORGANIZATION_TYPE → `typeName` (Text)
+      - Example: BOARD_COMMITTEE_ROLE → `roleName` (Text)
+  4e. Construct relationship navigation path:
+      ```
+      'recordType!{base-uuid}BASE_RECORD.relationships.{rel-uuid}relationshipName.fields.{target-field-uuid}textFieldName'
+      ```
+
+- [ ] **Step 5: Document the grouping field decision**
+
+  ```
+  ========================================
+  CHART GROUPING FIELD VALIDATION
+  ========================================
+  Chart: [Pie/Bar/Line/Column] - [Chart label/purpose]
+
+  Primary Grouping:
+  - Mockup intent: [What category is being grouped]
+  - Base field found: [fieldName] (Type: [Integer/Text/Date])
+  - Decision: [DIRECT | NAVIGATE TO RELATED]
+  - Final field path: [full field reference]
+
+  Secondary Grouping (if applicable):
+  - Mockup intent: [What category is being grouped]
+  - Base field found: [fieldName] (Type: [Integer/Text/Date])
+  - Decision: [DIRECT | NAVIGATE TO RELATED]
+  - Final field path: [full field reference]
+  ========================================
+  ```
+
+**🛑 BLOCKING**: You CANNOT write chart code until:
+- [ ] ALL grouping fields have been validated against this checklist
+- [ ] NO Integer/Decimal fields are used directly in groupings
+- [ ] ALL Integer FKs have been replaced with relationship navigation to Text fields
+- [ ] Validation report is documented
 
 **After completing Step 4:**
 - [ ] All data model availability validated (Step 4A)
@@ -1265,6 +1375,7 @@ For EVERY chart identified in Step 2B:
 - [ ] All date/time filters validated against data model field types (Step 4B)
 - [ ] All nested if() refactoring planned with a!match() syntax (Step 4C)
 - [ ] All chart refactoring planned with data + config pattern (Step 4C)
+- [ ] **All chart grouping fields validated - NO Integer/Decimal groupings (Step 4C.2)**
 - [ ] I am ready to implement conversion
 
 ---
