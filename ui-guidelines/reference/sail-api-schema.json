@@ -3476,12 +3476,7 @@
             "AVG",
             "MIN",
             "MAX",
-            "MEDIAN",
-            "MODE",
-            "STDEV",
-            "STDEVP",
-            "VAR",
-            "VARP"
+            "DISTINCT_COUNT"
           ]
         },
         "field": {

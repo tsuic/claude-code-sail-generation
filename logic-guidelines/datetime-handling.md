@@ -22,18 +22,25 @@ a!dateTimeValue(year: year(today()), month: month(today()), day: 1)
 
 ---
 
-## Type Casting with todate()
+## Type Casting with todate() in Sample Data
 
-**Always cast date arithmetic in sample data to ensure consistent types:**
+**When creating sample data with dates, use todate() for consistency:**
 
 ```sail
-/* ❌ WRONG */
+/* ❌ WRONG - mixing date literals with date arithmetic can cause inconsistencies */
 local!data: {
-  a!map(dueDate: today()),        /* Type: Date */
-  a!map(dueDate: today() + 1)     /* Type: DateTime - causes grid sort errors! */
+  a!map(dueDate: today()),              /* Type: Date */
+  a!map(dueDate: now() + 1)             /* Type: DateTime - causes grid sort errors! */
 }
 
-/* ✅ RIGHT */
+/* ✅ RIGHT - consistent Date types */
+local!data: {
+  a!map(dueDate: today()),              /* Type: Date */
+  a!map(dueDate: today() + 1),          /* Type: Date */
+  a!map(dueDate: today() + 7)           /* Type: Date */
+}
+
+/* ✅ ALSO RIGHT - explicit todate() for clarity */
 local!data: {
   a!map(dueDate: todate(today())),      /* Type: Date */
   a!map(dueDate: todate(today() + 1)),  /* Type: Date */
@@ -85,32 +92,93 @@ a!queryFilter(
 )
 ```
 
-### Common Type Conversions:
-- **DateTime fields**: Use `a!subtractDateTime()`, `a!addDateTime()`, `now()`, `dateTime()`
-- **Date fields**: Use `today()`, date arithmetic, `date()`
-- **Number fields**: Use `tointeger()`, `todecimal()`
-- **Text fields**: Use `totext()`
+### Most Common Mismatches (Date vs DateTime):
+- **DateTime fields**: Use `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`
+- **Date fields**: Use `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic
+
+**For all other types, see the Type Compatibility Matrix below.**
 
 ### Workflow Before Writing Date/DateTime Filters:
 1. **Check data-model-context.md** for the actual field type
-2. **Date field** → Use `today()`, `todate()`, date arithmetic (e.g., `today() - 30`)
-3. **DateTime field** → Use `now()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`
+2. **Date field** → Use `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic
+3. **DateTime field** → Use `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`
 
 ---
 
-## Key Date/Time Functions
+## Complete Type Matching Reference for a!queryFilter()
 
-| Function | Use For |
-|----------|---------|
-| `todate()` | Cast to Date type (use for all date arithmetic in sample data) |
-| `tointeger()` | Convert interval to whole days as integer |
-| `text(value, format)` | Format numbers/dates/intervals as text |
-| `today()` | Current date (Date type) |
-| `now()` | Current date and time (DateTime type) |
-| `dateTime(y, m, d, h, m, s)` | Create specific DateTime |
-| `date(y, m, d)` | Create specific Date |
-| `a!subtractDateTime()` | Subtract from DateTime (for past dates) |
-| `a!addDateTime()` | Add to DateTime (for future dates) |
+**a!queryFilter() requires exact type matching between `field` and `value` parameters. Mismatched types cause runtime failures.**
+
+### Type Compatibility Matrix
+
+| Field Type | Compatible Value Types | Incompatible (Will Fail) |
+|------------|----------------------|--------------------------|
+| **Text** | Text literals, text variables, `tostring()`, `concat()` | Integer, Boolean, Date, DateTime, User |
+| **Number (Integer)** | Integer literals, integer variables, `tointeger()`, Decimal | Text, Boolean, Date, DateTime |
+| **Number (Decimal)** | Decimal literals, decimal variables, `todecimal()`, Integer | Text, Boolean, Date, DateTime |
+| **Date** | `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic, Date variables | DateTime, `now()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`, Text, Integer |
+| **DateTime** | `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`, DateTime variables | Date, `today()`, `todate()`, `datevalue()`, `eomonth()`, `edate()`, Text, Integer |
+| **Boolean** | `true()`, `false()`, Boolean variables | Text (`"true"`), Integer (`1`, `0`) |
+| **User** | `loggedInUser()`, `touser()`, User variables | Text (username string without `touser()`) |
+
+**Note:** Integer and Decimal are the ONLY interchangeable types. All other combinations require exact match.
+
+### Function Return Types Quick Reference
+
+**Date Functions:**
+
+| Function | Returns | Use For |
+|----------|---------|---------|
+| `today()` | Date | Current date only |
+| `todate(...)` | Date | Convert value to Date |
+| `date(y, m, d)` | Date | Create specific Date |
+| `datevalue(text)` | Date | Parse text string to Date |
+| `eomonth(startDate, months)` | Date | Last day of month N months from startDate |
+| `edate(startDate, months)` | Date | Same day N months from startDate |
+| `today() + N` / `today() - N` | Date | Date arithmetic |
+
+**DateTime Functions:**
+
+| Function | Returns | Use For |
+|----------|---------|---------|
+| `now()` | DateTime | Current date and time |
+| `todatetime(...)` | DateTime | Convert value to DateTime |
+| `dateTime(y, m, d, h, m, s)` | DateTime | Create specific DateTime |
+| `a!subtractDateTime(...)` | DateTime | Past DateTime calculation |
+| `a!addDateTime(...)` | DateTime | Future DateTime calculation |
+| `userdatetime(y, m, d, h, m, s)` | DateTime | Create DateTime in user's preferred calendar |
+
+**Other Type Functions:**
+
+| Function | Returns | Use For |
+|----------|---------|---------|
+| `tointeger(...)` | Integer | Convert to whole number |
+| `todecimal(...)` | Decimal | Convert to decimal number |
+| `tostring(...)` | Text | Convert to text |
+| `true()` / `false()` | Boolean | Boolean literals |
+| `loggedInUser()` | User | Current user |
+| `touser(...)` | User | Convert username to User |
+
+**Formatting (Returns Text, not Date/DateTime):**
+
+| Function | Returns | Use For |
+|----------|---------|---------|
+| `datetext(value, format)` | Text | Format Date or DateTime as text string |
+
+### Local Variable Type Inheritance
+
+A local variable's type is determined by its initialization expression:
+
+```sail
+local!filterDate: today(),           /* Type: Date */
+local!filterTimestamp: now(),        /* Type: DateTime */
+local!filterStatus: "Active",        /* Type: Text */
+local!filterStatusId: 1,             /* Type: Integer */
+local!filterActive: true(),          /* Type: Boolean */
+local!filterUser: loggedInUser(),    /* Type: User */
+```
+
+**When using a local variable in a!queryFilter(), trace back to its declaration to verify type compatibility with the field.**
 
 ---
 
@@ -185,56 +253,4 @@ if(
 
 ## Valid Operators by Data Type
 
-The following operators are valid for each data type in `a!queryFilter`:
-
-| Data Type | Valid Operators |
-|-----------|----------------|
-| **Text** | `=`, `<>`, `in`, `not in`, `starts with`, `not starts with`, `ends with`, `not ends with`, `includes`, `not includes`, `is null`, `not null`, `search` |
-| **Integer, Float, Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
-| **Date, Date and Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
-| **Boolean** | `=`, `<>`, `in`, `not in`, `is null`, `not null` |
-
-### Key Notes:
-- `"between"` operator requires **two values** in an array: `value: {startValue, endValue}`
-- `"in"` and `"not in"` operators accept arrays of values
-- Text operators (`starts with`, `ends with`, `includes`, `search`) work ONLY with Text fields
-- Date/DateTime comparison operators (`>`, `>=`, `<`, `<=`) require proper type matching
-
-### Examples:
-
-```sail
-/* ✅ Using "between" with Date field */
-a!queryFilter(
-  field: recordType!Case.fields.dueDate,
-  operator: "between",
-  value: {today() - 30, today()}  /* Array of two dates */
-)
-
-/* ✅ Using "in" with Integer field */
-a!queryFilter(
-  field: recordType!Order.fields.statusId,
-  operator: "in",
-  value: {1, 2, 3}  /* Array of valid status IDs */
-)
-
-/* ✅ Using "starts with" with Text field */
-a!queryFilter(
-  field: recordType!Product.fields.productCode,
-  operator: "starts with",
-  value: "PROD-"
-)
-
-/* ❌ WRONG - "between" with single value */
-a!queryFilter(
-  field: recordType!Case.fields.dueDate,
-  operator: "between",
-  value: today()  /* ERROR: between requires array of 2 values */
-)
-
-/* ❌ WRONG - Text operator on Date field */
-a!queryFilter(
-  field: recordType!Case.fields.dueDate,
-  operator: "starts with",  /* ERROR: Invalid for Date fields */
-  value: "2024"
-)
-```
+See `record-query-guidelines/query-filters-operators.md` for the complete operator reference table and examples.

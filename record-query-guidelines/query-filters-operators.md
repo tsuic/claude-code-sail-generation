@@ -367,6 +367,64 @@ For every `a!queryFilter()` in your code, verify:
 
 ---
 
+## Valid Operators by Data Type
+
+The following operators are valid for each data type in `a!queryFilter`:
+
+| Data Type | Valid Operators |
+|-----------|----------------|
+| **Text** | `=`, `<>`, `in`, `not in`, `starts with`, `not starts with`, `ends with`, `not ends with`, `includes`, `not includes`, `is null`, `not null`, `search` |
+| **Integer, Float, Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
+| **Date, Date and Time** | `=`, `<>`, `>`, `>=`, `<`, `<=`, `between`, `in`, `not in`, `is null`, `not null` |
+| **Boolean** | `=`, `<>`, `in`, `not in`, `is null`, `not null` |
+
+### Key Notes:
+- `"between"` operator requires **two values** in an array: `value: {startValue, endValue}`
+- `"in"` and `"not in"` operators accept arrays of values
+- Text operators (`starts with`, `ends with`, `includes`, `search`) work ONLY with Text fields
+- Date/DateTime comparison operators (`>`, `>=`, `<`, `<=`) require proper type matching (see `logic-guidelines/datetime-handling.md`)
+
+### Examples:
+
+```sail
+/* ✅ Using "between" with Date field */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "between",
+  value: {today() - 30, today()}  /* Array of two dates */
+)
+
+/* ✅ Using "in" with Integer field */
+a!queryFilter(
+  field: recordType!Order.fields.statusId,
+  operator: "in",
+  value: {1, 2, 3}  /* Array of valid status IDs */
+)
+
+/* ✅ Using "starts with" with Text field */
+a!queryFilter(
+  field: recordType!Product.fields.productCode,
+  operator: "starts with",
+  value: "PROD-"
+)
+
+/* ❌ WRONG - "between" with single value */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "between",
+  value: today()  /* ERROR: between requires array of 2 values */
+)
+
+/* ❌ WRONG - Text operator on Date field */
+a!queryFilter(
+  field: recordType!Case.fields.dueDate,
+  operator: "starts with",  /* ERROR: Invalid for Date fields */
+  value: "2024"
+)
+```
+
+---
+
 ## Handling Sparse Aggregation Results
 
 - **Aggregation queries only return records that exist** - Missing statuses/categories won't appear in results
