@@ -60,6 +60,27 @@ a!gridField(
 )
 ```
 
+**🚨 PATH CONSTRUCTION RULE (from data-model-context.md):**
+
+Given these references from data-model-context.md:
+- **Relationship**: `'recordType!{uuid1}Base.relationships.{uuid2}relName'`
+- **Target field**: `'recordType!{uuid3}Target.fields.{uuid4}fieldName'`
+
+**Construct by appending `.fields.{uuid4}fieldName` to the relationship path:**
+```
+'recordType!{uuid1}Base.relationships.{uuid2}relName.fields.{uuid4}fieldName'
+```
+
+**Key**: Drop the target record type prefix (`'recordType!{uuid3}Target`) — only append `.fields.{uuid4}fieldName`.
+
+```sail
+/* ❌ WRONG - Double bracket syntax (NEVER DO THIS) */
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel']['recordType!{uuid}Target.fields.{uuid}field']
+
+/* ✅ CORRECT - Single continuous path */
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel.fields.{uuid}field']
+```
+
 ### For One-to-Many with Filtering/Sorting/Limiting
 ```sail
 a!gridField(
@@ -1462,6 +1483,37 @@ a!queryFilter(field: '...statusId', value: local!filterStatusId)
 
 - [ ] For EACH a!queryFilter I write, I have verified field type matches value type
 - [ ] For local variable values, I have traced back to declaration to confirm type
+
+---
+
+**5A.2: 🚨 MANDATORY - Single Continuous Path for Relationship Navigation**
+
+When accessing fields through relationships, construct a SINGLE continuous path - NOT separate bracket accesses.
+
+**❌ WRONG - Double bracket syntax:**
+```sail
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel']['recordType!{uuid}Target.fields.{uuid}field']
+```
+
+**✅ CORRECT - Single continuous path:**
+```sail
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel.fields.{uuid}field']
+```
+
+**Construction Rule:**
+Given from data-model-context.md:
+- Relationship: `'recordType!{uuid}Base.relationships.{uuid}relationshipName'`
+- Target field: `'recordType!{uuid}Target.fields.{uuid}fieldName'`
+
+Construct by appending `.fields.{uuid}fieldName` to the relationship path:
+```
+'recordType!{uuid}Base.relationships.{uuid}relationshipName.fields.{uuid}fieldName'
+```
+
+**Key**: Drop the target record type prefix (`'recordType!{uuid}Target`) - only append `.fields.{uuid}fieldName`.
+
+- [ ] For EACH relationship field access, I have used single continuous path syntax
+- [ ] I have NOT used double bracket `][` syntax anywhere
 
 ---
 

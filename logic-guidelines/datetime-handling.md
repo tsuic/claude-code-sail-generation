@@ -92,9 +92,11 @@ a!queryFilter(
 )
 ```
 
-### Most Common Mismatches (Date vs DateTime):
+### Most Common Mismatches:
 - **DateTime fields**: Use `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`
 - **Date fields**: Use `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic
+- **User fields**: Use `loggedInUser()`, `touser()`, or User variables from `a!pickerFieldUsers` — NOT plain text usernames
+- **Group fields**: Use `togroup()` or Group variables from `a!pickerFieldGroups` — NOT plain group IDs
 
 **For all other types, see the Type Compatibility Matrix below.**
 
@@ -119,7 +121,8 @@ a!queryFilter(
 | **Date** | `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic, Date variables | DateTime, `now()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`, Text, Integer |
 | **DateTime** | `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`, DateTime variables | Date, `today()`, `todate()`, `datevalue()`, `eomonth()`, `edate()`, Text, Integer |
 | **Boolean** | `true()`, `false()`, Boolean variables | Text (`"true"`), Integer (`1`, `0`) |
-| **User** | `loggedInUser()`, `touser()`, User variables | Text (username string without `touser()`) |
+| **User** | `loggedInUser()`, `touser()`, User variables, `a!pickerFieldUsers` result | Text (username string without `touser()`) |
+| **Group** | `togroup()`, Group variables, `a!pickerFieldGroups` result | Integer (group ID without `togroup()`), Text |
 
 **Note:** Integer and Decimal are the ONLY interchangeable types. All other combinations require exact match.
 
@@ -157,7 +160,8 @@ a!queryFilter(
 | `tostring(...)` | Text | Convert to text |
 | `true()` / `false()` | Boolean | Boolean literals |
 | `loggedInUser()` | User | Current user |
-| `touser(...)` | User | Convert username to User |
+| `touser(...)` | User | Convert username/value to User |
+| `togroup(...)` | Group | Convert group ID/value to Group |
 
 **Formatting (Returns Text, not Date/DateTime):**
 
