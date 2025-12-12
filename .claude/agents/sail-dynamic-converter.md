@@ -60,6 +60,27 @@ a!gridField(
 )
 ```
 
+**🚨 PATH CONSTRUCTION RULE (from data-model-context.md):**
+
+Given these references from data-model-context.md:
+- **Relationship**: `'recordType!{uuid1}Base.relationships.{uuid2}relName'`
+- **Target field**: `'recordType!{uuid3}Target.fields.{uuid4}fieldName'`
+
+**Construct by appending `.fields.{uuid4}fieldName` to the relationship path:**
+```
+'recordType!{uuid1}Base.relationships.{uuid2}relName.fields.{uuid4}fieldName'
+```
+
+**Key**: Drop the target record type prefix (`'recordType!{uuid3}Target`) — only append `.fields.{uuid4}fieldName`.
+
+```sail
+/* ❌ WRONG - Double bracket syntax (NEVER DO THIS) */
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel']['recordType!{uuid}Target.fields.{uuid}field']
+
+/* ✅ CORRECT - Single continuous path */
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel.fields.{uuid}field']
+```
+
 ### For One-to-Many with Filtering/Sorting/Limiting
 ```sail
 a!gridField(
@@ -1397,6 +1418,105 @@ Use patterns extracted from Step 3:
 - [ ] Add fetchTotalCount: true to ALL a!queryRecordType() calls
 - [ ] Add fields parameter to ALL a!queryRecordType() calls listing needed fields
 
+**5A.1: 🚨 MANDATORY - Type Matching for a!queryFilter()**
+
+**BEFORE writing ANY a!queryFilter(), complete this checklist:**
+
+**Step A: Determine Field Type**
+1. Extract field name from the record type reference
+2. Search `data-model-context.md` for the field
+3. Note the **Data Type** column value (Text, Number, Date, DateTime, Boolean, User)
+
+**Step B: Ensure Value Type Matches**
+
+| Field Type | Valid Value Expressions | Invalid (Will Fail) |
+|------------|------------------------|---------------------|
+| **Text** | `"Active"`, `local!textVar`, `concat(...)`, `tostring(...)` | Integer literals, `true()`, dates |
+| **Number (Integer)** | `123`, `local!intVar`, `tointeger(...)` | `"123"` (text), dates |
+| **Number (Decimal)** | `123.45`, `local!decVar`, `todecimal(...)` | `"123.45"` (text), dates |
+| **Date** | `today()`, `todate(...)`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic, `local!dateVar` | `now()`, `a!subtractDateTime(...)`, `userdatetime()` |
+| **DateTime** | `now()`, `todatetime(...)`, `dateTime()`, `a!subtractDateTime(...)`, `a!addDateTime(...)`, `userdatetime()`, `local!datetimeVar` | `today()`, `todate(...)`, `eomonth()`, `edate()` |
+| **Boolean** | `true()`, `false()`, `local!boolVar` | `"true"` (text), `1` (integer) |
+| **User** | `loggedInUser()`, `touser(...)`, `local!userVar` | `"username"` (text without touser) |
+
+**Note:** Integer and Decimal are interchangeable. All other types require exact match.
+
+**Step C: If Value is a Local Variable**
+1. Find where the variable is declared in the file
+2. Check the expression that initializes it
+3. That expression's return type = the variable's type
+4. Verify it matches the field type from Step A
+
+**Example - Tracing Local Variable Type:**
+```sail
+/* Variable declaration */
+local!filterDate: today(),           /* ← Initialized with today() → Type: Date */
+
+/* Later in a!queryFilter - MUST match the field type */
+a!queryFilter(
+  field: '...membershipEndDate',     /* ← Field type: Date (from data-model-context.md) */
+  operator: ">=",
+  value: local!filterDate            /* ← Variable type: Date ✅ MATCH */
+)
+```
+
+**Common Mistakes:**
+```sail
+/* ❌ WRONG: DateTime field filtered with Date value */
+local!filterDate: today(),  /* Date type */
+a!queryFilter(field: '...submissionDate', value: local!filterDate)  /* DateTime field! */
+
+/* ✅ CORRECT: DateTime field filtered with DateTime value */
+local!filterDate: now(),  /* DateTime type */
+a!queryFilter(field: '...submissionDate', value: local!filterDate)
+
+/* ❌ WRONG: Integer field filtered with Text value */
+local!filterStatus: "Active",  /* Text type */
+a!queryFilter(field: '...statusId', value: local!filterStatus)  /* Integer field! */
+
+/* ✅ CORRECT: Integer field filtered with Integer value */
+local!filterStatusId: 1,  /* Integer type */
+a!queryFilter(field: '...statusId', value: local!filterStatusId)
+```
+
+**Reference:** See `/logic-guidelines/datetime-handling.md` for complete type compatibility matrix.
+
+- [ ] For EACH a!queryFilter I write, I have verified field type matches value type
+- [ ] For local variable values, I have traced back to declaration to confirm type
+
+---
+
+**5A.2: 🚨 MANDATORY - Single Continuous Path for Relationship Navigation**
+
+When accessing fields through relationships, construct a SINGLE continuous path - NOT separate bracket accesses.
+
+**❌ WRONG - Double bracket syntax:**
+```sail
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel']['recordType!{uuid}Target.fields.{uuid}field']
+```
+
+**✅ CORRECT - Single continuous path:**
+```sail
+fv!row['recordType!{uuid}Base.relationships.{uuid}rel.fields.{uuid}field']
+```
+
+**Construction Rule:**
+Given from data-model-context.md:
+- Relationship: `'recordType!{uuid}Base.relationships.{uuid}relationshipName'`
+- Target field: `'recordType!{uuid}Target.fields.{uuid}fieldName'`
+
+Construct by appending `.fields.{uuid}fieldName` to the relationship path:
+```
+'recordType!{uuid}Base.relationships.{uuid}relationshipName.fields.{uuid}fieldName'
+```
+
+**Key**: Drop the target record type prefix (`'recordType!{uuid}Target`) - only append `.fields.{uuid}fieldName`.
+
+- [ ] For EACH relationship field access, I have used single continuous path syntax
+- [ ] I have NOT used double bracket `][` syntax anywhere
+
+---
+
 **5B: Apply Mandatory Logic Refactoring**
 
 From Step 4C planning:
@@ -1781,235 +1901,38 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 
 ---
 
-### **Step 5E: Query Filter Type Validation**
+### **Step 5E: Query Filter Type Verification (Quick Check)**
 
-🚨 **MANDATORY TYPE VALIDATION** - Execute AFTER implementing all queries, BEFORE Pre-Flight Validation:
+🚨 **MANDATORY** - Verify type matching was done correctly in Step 5A.1:
 
-**Critical Rule:** In a!queryFilter(), the data type of the 'field' parameter and 'value' parameter MUST ALWAYS match exactly.
+**For EACH `a!queryFilter()` in the generated file, confirm:**
 
-**5E.1: Extract All Query Filters**
+| Field Type | Value Must Be | Invalid Values |
+|------------|---------------|----------------|
+| **Date** | `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic, Date variable | `now()`, `a!subtractDateTime()`, `userdatetime()` |
+| **DateTime** | `now()`, `todatetime()`, `dateTime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()`, DateTime variable | `today()`, `todate()`, `eomonth()`, `edate()` |
+| **Text** | String literal, `tostring()`, `concat()`, Text variable | Integer, Boolean, Date |
+| **Number** | Numeric literal, `tointeger()`, `todecimal()`, Number variable | Text, Boolean, Date |
+| **Boolean** | `true()`, `false()`, Boolean variable | `"true"` (text), `1` (integer) |
+| **User** | `loggedInUser()`, `touser()`, User variable | `"username"` (text) |
 
-- [ ] Use Read tool to read the generated .sail file in full
-- [ ] Search for ALL instances of `a!queryFilter(` in the file
-- [ ] For EACH filter found, extract:
-  - Line number
-  - Field parameter value (full recordType path)
-  - Value parameter expression
-- [ ] Document all filters found:
-  ```
-  Filters Found:
-  - Line 106: field='...submissionDate', value=local!filterStartDate
-  - Line 134: field='...endDate', operator='is null' (no value - skip)
-  - Line 194: field='...submissionDate', value=local!filterStartDate
-  ```
+**For local variable values:** Trace back to declaration → verify initialization expression type matches field type.
 
-**5E.2: Validate Each Filter (Type Matching)**
+**If mismatch found:**
 
-For EACH extracted filter that has a `value` parameter:
+| Mismatch | Fix |
+|----------|-----|
+| DateTime field + Date value | Change `today()` → `now()`, `todate()` → `todatetime()` |
+| Date field + DateTime value | Change `now()` → `today()`, `a!subtractDateTime()` → `todate(today() - N)` |
+| Integer field + Text value | Change `"123"` → `123`, or wrap in `tointeger()` |
+| Text field + Integer value | Change `123` → `"123"`, or wrap in `tostring()` |
 
-**Step 2A: Determine Field Type**
-- [ ] Extract the field name from the field reference (last part after `fields.{uuid}`)
-- [ ] Use Grep tool to search context/data-model-context.md for that field name
-- [ ] Read the matching line to extract the field's data type
-- [ ] Document field type:
-  ```
-  Line 106: submissionDate → Type: Datetime (from data-model-context.md line 27)
-  ```
+**Reference:** See `/logic-guidelines/datetime-handling.md` for complete type compatibility matrix.
 
-**Step 2B: Determine Value Type**
-
-- [ ] Analyze the value expression to determine its type:
-
-**If value is a direct function call:**
-  - `today()` → Date
-  - `now()` → Datetime
-  - `todate(...)` → Date
-  - `todatetime(...)` → Datetime
-  - `date(...)` → Date
-  - `datetime(...)` → Datetime
-  - `a!subtractDateTime(...)` → Datetime
-  - `a!addDateTime(...)` → Datetime
-  - `text(...)` or `concat(...)` or `&` → Text
-  - `tointeger(...)` → Integer
-  - `todecimal(...)` → Decimal
-  - `true()` or `false()` → Boolean
-  - `loggedInUser()` or `user(...)` → User
-  - Numeric literal (e.g., `30`, `100`) → Integer
-  - String literal (e.g., `"Active"`) → Text
-
-**If value is a local variable (e.g., `local!filterStartDate`):**
-  - [ ] Search backwards in the file for the variable declaration
-  - [ ] Find the assignment expression (right side of `:`)
-  - [ ] If assignment is a direct function/literal:
-    - Apply the function type rules above
-  - [ ] If assignment uses `a!match()`:
-    - Check ALL `then:` values for consistent type
-    - All `then:` values must be the same type
-    - Use that type as the variable's type
-  - [ ] If assignment is another local variable:
-    - Recursively trace to find the ultimate source type
-  - [ ] Document value type:
-    ```
-    Line 106: local!filterStartDate
-      → Declared at line 10 as a!match(... then: a!subtractDateTime(...), ...)
-      → Type: Datetime (from a!subtractDateTime return type)
-    ```
-
-**Step 2C: Compare Types**
-- [ ] Compare field type (from Step 2A) vs value type (from Step 2B)
-- [ ] Mark result:
-  - ✅ MATCH if types are identical (e.g., Datetime field + Datetime value)
-  - ❌ TYPE MISMATCH if types differ (e.g., Datetime field + Date value)
-- [ ] Document comparison:
-  ```
-  Line 106 Validation:
-    Field: submissionDate (Datetime)
-    Value: local!filterStartDate (Datetime)
-    Result: ✅ MATCH
-
-  Line 194 Validation:
-    Field: submissionDate (Datetime)
-    Value: local!filterStartDate (Date from todate())
-    Result: ❌ TYPE MISMATCH
-  ```
-
-**Step 2D: Generate Validation Report**
-- [ ] Create a summary report of all validations:
-  ```
-  ========================================
-  QUERY FILTER TYPE VALIDATION REPORT
-  ========================================
-
-  Total Filters Checked: 5
-  Passed: 4
-  Failed: 1
-
-  ✅ Line 106: submissionDate (Datetime) = local!filterStartDate (Datetime)
-  ✅ Line 163: submissionDate (Datetime) >= a!subtractDateTime(...) (Datetime)
-  ❌ Line 194: submissionDate (Datetime) >= local!filterStartDate (Date)
-      FIX REQUIRED: Change local!filterStartDate to use a!subtractDateTime() instead of todate()
-  ✅ Line 42: endDate (Date) > today() (Date)
-  ✅ Line 80: endDate (Date) <= today() (Date)
-
-  ========================================
-  DATA MODEL LIMITATIONS REPORT
-  ========================================
-
-  Features Using Mockup Data Fallback:
-
-  When relationship targets or record types are unavailable in the data model,
-  features are preserved using sample data from the original mockup:
-
-  ✅ Client Profile View:
-     - UX Flow: Preserved (3 view modes remain functional)
-     - Data Source: Mockup data (Client record type unavailable)
-     - Visual Indicator: "(Sample Data)" shown in UI labels
-     - Upgrade Path: Documented in TODO comment (lines 45-62)
-     - Blocker: Client record type not in context/data-model-context.md
-     - Recommendation: Add Client record type to enable live data
-
-  ⚠️ Advanced Filters Section:
-     - UX Flow: Preserved (filter inputs visible but not functional)
-     - Data Source: N/A (filter not applied to queries)
-     - Visual Indicator: None (appears functional)
-     - Blocker: FilterCriteria record type not in data model
-     - Recommendation: Either add FilterCriteria record type OR remove filter UI
-
-  Summary:
-  - Total features with mockup fallback: 2
-  - Features with visual indicators: 1/2
-  - Features documented with TODO: 2/2
-  - Unresolved placeholders: 0
-
-  Next Steps:
-  1. Review data-model-context.md completeness
-  2. Add missing record types to enable live data
-  3. Re-run conversion after data model updated
-
-  ========================================
-  ```
-
-**5E.3: Fix Type Mismatches**
-
-If ANY ❌ TYPE MISMATCH found:
-
-- [ ] For EACH mismatch, identify the fix:
-
-  **Common Mismatch Patterns and Fixes:**
-
-  | Mismatch | Field Type | Value Type | Fix |
-  |----------|------------|------------|-----|
-  | **Datetime field + Date value** | Datetime | Date (from todate(), today()) | Change to: now(), a!subtractDateTime(), a!addDateTime(), datetime() |
-  | **Date field + Datetime value** | Date | Datetime (from now(), a!subtractDateTime()) | Change to: today(), todate(), date() |
-  | **Text field + Integer value** | Text | Integer | Wrap in text(): text(value, "0") |
-  | **Integer field + Text value** | Text | Text | Wrap in tointeger(): tointeger(value) |
-
-- [ ] Use Edit tool to fix the value expression
-- [ ] Example fix:
-  ```sail
-  /* ❌ BEFORE - Type mismatch */
-  local!filterStartDate: a!match(
-    value: local!selectedDateRange,
-    equals: "Last Quarter",
-    then: todate(today() - 90),  /* Returns Date type */
-    default: null
-  ),
-
-  /* ✅ AFTER - Type match */
-  local!filterStartDate: a!match(
-    value: local!selectedDateRange,
-    equals: "Last Quarter",
-    then: a!subtractDateTime(startDateTime: now(), days: 90),  /* Returns Datetime type */
-    default: null
-  ),
-  ```
-
-- [ ] After fixing, re-run Step 5E.2 to verify the fix
-- [ ] Repeat until ALL filters show ✅ MATCH
-
-**Common Function Type Reference:**
-
-Use this reference when determining value types:
-
-**Date Type (returns Date):**
-- `today()` - Current date
-- `todate(value)` - Convert to date
-- `date(year, month, day)` - Create date
-- Date arithmetic with today(): `today() - 30`, `today() + 7`
-
-**Datetime Type (returns Datetime):**
-- `now()` - Current datetime
-- `todatetime(value)` - Convert to datetime
-- `datetime(year, month, day, hour, minute, second)` - Create datetime
-- `a!subtractDateTime(startDateTime: datetime, years:, months:, days:, hours:, minutes:, seconds:)` - Subtract time
-- `a!addDateTime(startDateTime: datetime, years:, months:, days:, hours:, minutes:, seconds:)` - Add time
-
-**Text Type (returns Text):**
-- String literals: `"Active"`, `"Pending"`
-- `text(value, format)` - Format as text
-- `concat(text1, text2, ...)` - Concatenate strings
-- String concatenation: `"prefix" & value & "suffix"`
-
-**Integer/Decimal Type (returns Number):**
-- Numeric literals: `30`, `100`, `3.14`
-- `tointeger(value)` - Convert to integer
-- `todecimal(value)` - Convert to decimal
-
-**Boolean Type (returns Boolean):**
-- `true()` - Boolean true
-- `false()` - Boolean false
-- `and(...)`, `or(...)`, `not(...)` - Logical operations
-
-**User Type (returns User):**
-- `loggedInUser()` - Current logged-in user
-- `user(userId, property)` - Get user by ID
-
-**After completing Step 5E:**
-- [ ] ALL a!queryFilter() calls have been validated for type matching
-- [ ] ALL type mismatches have been fixed
-- [ ] Validation report shows 100% ✅ MATCH results
-- [ ] Zero type mismatches remain in the code
-- [ ] I am ready for pre-flight validation
+- [ ] All a!queryFilter() field types match value types
+- [ ] All local variable values traced back to confirm type
+- [ ] Zero type mismatches remain
+- [ ] Ready for pre-flight validation
 
 ---
 

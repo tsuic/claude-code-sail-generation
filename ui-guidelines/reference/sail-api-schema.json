@@ -3476,12 +3476,7 @@
             "AVG",
             "MIN",
             "MAX",
-            "MEDIAN",
-            "MODE",
-            "STDEV",
-            "STDEVP",
-            "VAR",
-            "VARP"
+            "DISTINCT_COUNT"
           ]
         },
         "field": {
@@ -4435,11 +4430,23 @@
       "parameterCount": 0,
       "description": "Get current logged-in user"
     },
+    "touser": {
+      "syntax": "touser(value)",
+      "parameterCount": 1,
+      "description": "Convert value to User type. Accepts User, Text, Binary, People, or Array.",
+      "specialNote": "Use to ensure User type when filtering User fields with text usernames"
+    },
     "group": {
       "syntax": "group(groupId, property)",
       "parameterCount": 2,
       "description": "Get group information",
       "specialNote": "Common properties: name, description, members"
+    },
+    "togroup": {
+      "syntax": "togroup(value)",
+      "parameterCount": 1,
+      "description": "Convert value to Group type. Accepts Group ID (Integer), Text, or Array.",
+      "specialNote": "Use to ensure Group type when filtering Group fields"
     },
     "a!toJson": {
       "syntax": "a!toJson(value)",
