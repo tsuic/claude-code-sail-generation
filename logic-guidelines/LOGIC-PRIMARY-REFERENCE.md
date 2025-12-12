@@ -601,21 +601,9 @@ value: condition ? trueValue : falseValue
 
 🚨 CRITICAL: Grid Column Sorting Rules
 
-**CORRECT Sorting:**
-```sail
-/* ✅ Sort on fields only */
-sortField: 'field',       /* Field reference */
-```
+For mock data grids: Use field name strings (`sortField: "fieldName"`) matching your data structure.
 
-**WRONG Sorting - NEVER DO THIS:**
-```sail
-/* ❌ Never sort on relationships or computed values */
-sortField: local!computedValue,  /* INVALID */
-```
-
-**Fundamental Rule**:
-- **Fields** = Data values that can be sorted, filtered, displayed
-- Always sort on field references, not computed expressions or relationships
+For record data grids: See `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` section "Grid Column Sorting Rules" for complete relationship navigation patterns.
 
 - **KPI Metrics** - Use direct property access on mock data: `length(local!items)`, `sum(local!items.price)`, etc.
 - **Use arrays and a!forEach() for iteration** - When dealing with mock data lists

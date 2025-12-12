@@ -598,10 +598,67 @@ Use Read tool to scan the static interface file:
 
 - [ ] Output: "Components detected: [list], Required reading sections: [list with file names and search keywords]"
 
+---
+
+### **Step 2E: Identify Action Buttons for Conversion**
+
+🚨 **AUTOMATED DETECTION** - Scan mockup for buttons intended as record actions.
+
+**2E.1: Run Detection Commands**
+
+```bash
+# Find buttons with startProcess TODO comments
+grep -n "TODO.*startProcess\|TODO.*process model\|TODO.*Configure.*process" [mockup-file].sail
+
+# Find buttonWidget with action-related icons
+grep -n "a!buttonWidget" [mockup-file].sail | grep -i "plus\|edit\|pencil\|trash\|delete"
+```
+
+- [ ] Execute detection commands
+- [ ] Document: "Found [N] potential action buttons at lines: [list]"
+
+**2E.2: For EACH detected button, determine conversion path**
+
+| Detection Signal | Action Type | Identifier Required? | Next Step |
+|------------------|-------------|---------------------|-----------|
+| `TODO.*startProcess` + "plus" icon | Record Action | ❌ No | Check for Record Action in data-model |
+| `TODO.*startProcess` + "pencil/edit" icon | Related Action | ✅ Yes | Check for Related Action + determine identifier source |
+| `TODO.*startProcess` + "trash/delete" icon | Related Action | ✅ Yes | Check for Related Action + determine identifier source |
+| Button in grid column with edit/delete | Related Action | ✅ Yes (`fv!identifier`) | Check for Related Action |
+| No TODO comment | UI-only button | N/A | Keep as `a!buttonWidget` |
+
+**2E.3: Match to data-model-context.md**
+
+For EACH button identified as a potential record action:
+
+1. Identify the target record type from surrounding context (grid data source, page title, etc.)
+2. Read the **Record Actions** section for that record type in data-model-context.md
+3. Look for matching action by name or type:
+
+   | Button Intent | Look For in Record Actions |
+   |---------------|---------------------------|
+   | Create new record | Action Type = "Record Action" |
+   | Edit existing record | Action Type = "Related Action" |
+   | Delete record | Action Type = "Related Action" |
+
+4. Document findings:
+   ```
+   Action Button Conversion Plan:
+   - Line [N]: "[Button Label]" → [RecordType].actions.[actionName] (Record Action)
+   - Line [M]: "[Button Label]" → [RecordType].actions.[actionName] (Related Action, needs identifier)
+   - Line [P]: "[Button Label]" → No matching action found, keep as buttonWidget with TODO
+   ```
+
+**2E.4: Output requirements**
+- [ ] All potential action buttons detected
+- [ ] Each button matched to record action OR documented as non-convertible
+- [ ] Ready to proceed with component reading
+
 **After completing Step 2:**
 - [ ] I have identified all nested if() statements requiring refactoring
 - [ ] I have identified all charts requiring pattern refactoring
 - [ ] I have identified all components and required reading sections
+- [ ] I have identified all action buttons and their conversion paths
 - [ ] I am ready to read component-specific guidance
 
 ---
@@ -1389,6 +1446,55 @@ For EACH `a!grouping()` you plan to write (primaryGrouping AND secondaryGrouping
 - [ ] ALL Integer FKs have been replaced with relationship navigation to Text fields
 - [ ] Validation report is documented
 
+**4C.3: MANDATORY - Grid Column sortField Validation**
+
+🚨 **BLOCKING GATE** - Cannot proceed with grid code until ALL sortField values are validated.
+
+For EACH `a!gridColumn()` with a `sortField` parameter:
+
+- [ ] **Step 1: Identify the sortField value**
+  - Extract the field reference from `sortField: '...'`
+  - Document: "Column [label] sorts by: [sortField value]"
+
+- [ ] **Step 2: Apply sortField Decision Tree**
+
+  | sortField Pattern | Valid? | Action |
+  |-------------------|--------|--------|
+  | `...fields.fieldName` | ✅ | Direct field - valid |
+  | `...relationships.relName.fields.fieldName` | ✅ | Related field (many-to-one) - valid |
+  | `...relationships.relName` | ❌ | Relationship only - **INVALID** |
+  | No `.fields.` in path | ❌ | Missing field - **INVALID** |
+
+- [ ] **Step 3: Fix invalid sortField values**
+
+  **If sortField references a relationship without `.fields.`:**
+  - Find the target record type in data-model-context.md
+  - Identify an appropriate sortable field (usually first Text field)
+  - Append `.fields.{fieldName}` to the relationship path
+
+  ```sail
+  /* ❌ INVALID */
+  sortField: 'recordType!Case.relationships.status'
+
+  /* ✅ FIXED */
+  sortField: 'recordType!Case.relationships.status.fields.statusName'
+  ```
+
+- [ ] **Step 4: Document validation results**
+
+  ```
+  Grid sortField Validation:
+  - Columns with sortField: [count]
+  - Valid sortField values: [count]
+  - Fixed sortField values: [count]
+  - Status: [PASS/FAIL]
+  ```
+
+**🛑 BLOCKING**: You CANNOT write grid code until:
+- [ ] ALL sortField values end with `.fields.fieldName`
+- [ ] NO sortField values reference relationships without fields
+- [ ] Validation report is documented
+
 **After completing Step 4:**
 - [ ] All data model availability validated (Step 4A)
 - [ ] All a!measure() functions validated against schema (Step 4B)
@@ -1397,6 +1503,7 @@ For EACH `a!grouping()` you plan to write (primaryGrouping AND secondaryGrouping
 - [ ] All nested if() refactoring planned with a!match() syntax (Step 4C)
 - [ ] All chart refactoring planned with data + config pattern (Step 4C)
 - [ ] **All chart grouping fields validated - NO Integer/Decimal groupings (Step 4C.2)**
+- [ ] **All grid sortField values validated - must end with `.fields.fieldName` (Step 4C.3)**
 - [ ] I am ready to implement conversion
 
 ---
@@ -1932,6 +2039,246 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] All a!queryFilter() field types match value types
 - [ ] All local variable values traced back to confirm type
 - [ ] Zero type mismatches remain
+- [ ] Ready for action button conversion
+
+---
+
+### **Step 5F: Convert Action Buttons to Record Actions**
+
+For EACH action button identified in Step 2E with a matching record action:
+
+**5F.1: Record Action Conversion (Create/New actions)**
+
+Use this pattern when the action does NOT require a specific record identifier.
+
+```sail
+/* ❌ MOCKUP PATTERN */
+a!buttonArrayLayout(
+  buttons: {
+    a!buttonWidget(
+      label: "Create New Case",
+      icon: "plus-circle",
+      style: "SOLID",
+      color: "ACCENT"
+      /* TODO: Configure startProcess with actual process model */
+    )
+  }
+)
+
+/* ✅ FUNCTIONAL PATTERN */
+a!recordActionField(
+  actions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.createCase'
+    )
+  },
+  style: "TOOLBAR_PRIMARY",
+  display: "LABEL_AND_ICON",
+  align: "END"
+)
+```
+
+**5F.2: Style Mapping**
+
+| Mockup Button | Record Action Style |
+|---------------|---------------------|
+| `style: "SOLID", color: "ACCENT"` | `style: "TOOLBAR_PRIMARY"` |
+| `style: "SOLID", color: "SECONDARY"` | `style: "TOOLBAR"` |
+| `style: "OUTLINE"` | `style: "TOOLBAR"` |
+| `style: "LINK"` | `style: "LINKS"` |
+
+**5F.3: Key Parameters**
+
+| Parameter | Values | When to Use |
+|-----------|--------|-------------|
+| `style` | `"TOOLBAR_PRIMARY"` | Primary action (Create, Submit) |
+| `style` | `"TOOLBAR"` | Secondary actions |
+| `style` | `"LINKS"` | Subtle/tertiary actions |
+| `display` | `"LABEL_AND_ICON"` | Default - shows both |
+| `display` | `"ICON"` | Space-constrained contexts |
+| `openActionsIn` | `"DIALOG"` | Quick forms (default) |
+| `openActionsIn` | `"NEW_TAB"` | Complex forms |
+| `align` | `"START"`, `"CENTER"`, `"END"` | Match original button alignment |
+
+**5F.4: Record Action Validation Checklist**
+- [ ] Action reference copied exactly from data-model-context.md **Record Actions** section
+- [ ] UUIDs are complete (not placeholders)
+- [ ] Style matches original button prominence
+- [ ] No `a!buttonWidget` with `startProcess` TODO remains for convertible actions
+
+**5F.5: Related Action Conversion (Edit/Update/Delete actions)**
+
+Use this pattern when the action REQUIRES a specific record identifier.
+
+**Key Difference from Record Actions:**
+- **Record Action**: Creates new record → NO `identifier` parameter
+- **Related Action**: Acts on existing record → REQUIRES `identifier` parameter
+
+**Context determines identifier source:**
+
+| Context | Identifier Source | Example |
+|---------|-------------------|---------|
+| Grid row action button | `fv!identifier` (from `a!recordData`) | Edit button in grid column |
+| Grid `recordActions` parameter | `fv!identifier` (from grid context) | Row-level action menu |
+| Standalone button (detail view) | `ri!recordId` or query result | Edit button on record detail page |
+| Card list (a!forEach) | `fv!item.idField` | Edit button on each card |
+
+**Pattern A: Grid Row Edit Button (in grid column)**
+```sail
+/* ❌ MOCKUP PATTERN - Button in grid column */
+a!gridColumn(
+  label: "Actions",
+  value: a!buttonArrayLayout(
+    buttons: {
+      a!buttonWidget(
+        label: "Edit",
+        icon: "pencil",
+        style: "LINK"
+        /* TODO: Configure edit action */
+      )
+    }
+  )
+)
+
+/* ✅ FUNCTIONAL PATTERN - Related action in grid column */
+a!gridColumn(
+  label: "Actions",
+  value: a!recordActionField(
+    actions: {
+      a!recordActionItem(
+        action: 'recordType!Case.actions.editCase',
+        identifier: fv!identifier
+      )
+    },
+    style: "LINKS",
+    display: "ICON"
+  ),
+  width: "ICON"
+)
+```
+
+**Pattern B: Grid recordActions Parameter (row menu)**
+```sail
+/* ✅ FUNCTIONAL PATTERN - Grid with row actions menu */
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Case'
+  ),
+  columns: { /* ... */ },
+  recordActions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.editCase',
+      identifier: fv!identifier
+    ),
+    a!recordActionItem(
+      action: 'recordType!Case.actions.deleteCase',
+      identifier: fv!identifier
+    )
+  }
+)
+```
+
+**Pattern C: Standalone Edit Button (detail view with ri!)**
+```sail
+/* ❌ MOCKUP PATTERN */
+a!buttonWidget(
+  label: "Edit Case",
+  icon: "pencil",
+  style: "OUTLINE"
+  /* TODO: Configure edit process */
+)
+
+/* ✅ FUNCTIONAL PATTERN - Uses rule input as identifier */
+a!recordActionField(
+  actions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.editCase',
+      identifier: ri!caseId
+    )
+  },
+  style: "TOOLBAR",
+  display: "LABEL_AND_ICON"
+)
+```
+
+**5F.6: Related Action Validation Checklist**
+- [ ] Related Action (Edit/Update/Delete) has `identifier` parameter
+- [ ] Identifier source matches context:
+  - Grid with `a!recordData` → `fv!identifier`
+  - Grid `recordActions` param → `fv!identifier`
+  - Detail view → `ri!recordId`
+  - Card list forEach → `fv!item.idField`
+- [ ] Action reference copied exactly from data-model-context.md (Action Type = "Related Action")
+
+**After completing Step 5F:**
+- [ ] All Record Actions converted to `a!recordActionField()`
+- [ ] All Related Actions converted with correct `identifier` parameter
+- [ ] Non-convertible buttons documented with TODO comments explaining why
+- [ ] Ready for pre-flight validation
+
+---
+
+### **Step 5G: Convert Dynamic Links to Record Links**
+
+Mockups use `a!dynamicLink()` as placeholders for navigation. Convert these to `a!recordLink()` for record detail navigation.
+
+**5G.1: Detection**
+```bash
+# Find dynamicLink placeholders that need record link conversion
+grep -n "a!dynamicLink" [mockup-file].sail
+```
+
+**5G.2: Conversion Patterns**
+
+| Context | Mockup Pattern | Functional Pattern |
+|---------|---------------|-------------------|
+| Grid with `a!recordData()` | `link: a!dynamicLink(value: fv!row.id, saveInto: {})` | `link: a!recordLink(recordType: recordType!Case, identifier: fv!identifier)` |
+| `a!forEach()` over query results | `link: a!dynamicLink(value: fv!item.id, saveInto: {})` | `link: a!recordLink(recordType: recordType!Case, identifier: fv!item[recordType!Case.fields.caseId])` |
+
+**5G.3: Identifier Source Rules**
+
+Same as Related Actions (Step 5F.5):
+
+| Context | Identifier Source |
+|---------|-------------------|
+| Grid column with `a!recordData()` | `fv!identifier` |
+| `a!forEach()` over `.data` results | `fv!item[recordType!Case.fields.primaryKeyField]` |
+| Detail view interface | `ri!recordId` |
+
+**5G.4: Example Conversion**
+
+```sail
+/* ❌ MOCKUP - dynamicLink placeholder */
+a!richTextItem(
+  text: fv!row.organizationName,
+  style: "STRONG",
+  link: a!dynamicLink(
+    value: fv!row.id,
+    saveInto: {}
+  ),
+  linkStyle: "STANDALONE"
+)
+
+/* ✅ FUNCTIONAL - recordLink with identifier */
+a!richTextItem(
+  text: fv!row[recordType!Membership.fields.organizationName],
+  style: "STRONG",
+  link: a!recordLink(
+    recordType: recordType!Membership,
+    identifier: fv!identifier
+  ),
+  linkStyle: "STANDALONE"
+)
+```
+
+**5G.5: Record Link Validation Checklist**
+- [ ] All `a!dynamicLink()` in grids converted to `a!recordLink()`
+- [ ] `recordType` parameter uses correct record type reference from data-model-context.md
+- [ ] `identifier` source matches context (see 5G.3 table)
+- [ ] Links in `a!forEach()` contexts use primary key field, NOT `fv!identifier`
+
+**After completing Step 5G:**
+- [ ] All navigation links converted to `a!recordLink()`
 - [ ] Ready for pre-flight validation
 
 ---
@@ -1949,6 +2296,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Did I identify ALL nested if() statements (Step 2A)?
 - [ ] Did I identify ALL charts requiring refactoring (Step 2B)?
 - [ ] Did I identify ALL components and required reading (Step 2D)?
+- [ ] Did I identify ALL action buttons for conversion (Step 2E)?
 
 **Component-Specific Reading Verification:**
 - [ ] Did I read ALL relevant component sections IN FULL (Step 3)?
@@ -1961,6 +2309,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Did I validate EVERY date/time filter against data model field types (Step 4B)?
 - [ ] Did I plan ALL nested if() → a!match() refactoring (Step 4C)?
 - [ ] Did I plan ALL chart pattern refactoring (Step 4C)?
+- [ ] Did I validate ALL grid sortField values against sorting rules (Step 4C.3)?
 
 **Form Interface Pattern Verification (if applicable):**
 - [ ] Did I use direct `ri!` pattern for CREATE/UPDATE forms (Step 3D)?
@@ -1978,6 +2327,8 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Do ALL variables have occurrence count ≥ 2 or UNUSED comments (Step 5D.5.4)?
 - [ ] Can I show the Bash verification output proving cleanup?
 - [ ] Did I document removed variables in conversion summary (Step 5D.5.4)?
+- [ ] Did I convert action buttons to `a!recordActionField()` where record actions exist (Step 5F)?
+- [ ] Did I convert `a!dynamicLink()` to `a!recordLink()` for record navigation (Step 5G)?
 
 **Null Safety Verification (MANDATORY - Step 5D.6):**
 - [ ] Did I run automated null safety detection (Step 5D.6.1)?
@@ -2033,8 +2384,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 **7A: Write Dynamic SAIL Code**
 
 - [ ] Use Write tool to create new .sail file in /output folder
-- [ ] Filename: [original-name]-with-data.sail 
-- [ ] Ensure complete conversion (no partial implementations)
+- [ ] Filename: [original-name]-functional.sail
 
 **7B: Document Conversion Summary**
 
@@ -2294,6 +2644,12 @@ For each validation agent result:
 - [ ] Date filters use correct function (Date → today(), DateTime → now())
 - [ ] All operators validated against "Valid Operators by Data Type" table
 
+⚠️ **CRITICAL: Grid sortField Rules**
+- [ ] sortField MUST end with `.fields.fieldName` (never just a relationship)
+- [ ] sortField can use direct fields OR related fields (many-to-one only)
+- [ ] ❌ NEVER: `sortField: '...relationships.status'` (relationship without field)
+- [ ] ✅ CORRECT: `sortField: '...relationships.status.fields.statusName'`
+
 ⚠️ **CRITICAL: a!queryFilter() TYPE MATCHING (MANDATORY - Step 5E)**
 - [ ] Field type MUST EXACTLY MATCH value type in EVERY a!queryFilter()
 - [ ] Datetime field → Datetime value (now(), a!subtractDateTime(), a!addDateTime())
@@ -2303,6 +2659,15 @@ For each validation agent result:
 - [ ] Boolean field → Boolean value (true(), false())
 - [ ] User field → User value (loggedInUser(), user())
 - [ ] Run Step 5E validation to verify ALL filters before completing conversion
+
+⚠️ **CRITICAL: Record Action Conversion (Step 5F)**
+- [ ] Buttons with `TODO.*startProcess` + create intent → `a!recordActionField()` (Record Action)
+- [ ] Buttons with `TODO.*startProcess` + edit/delete intent → `a!recordActionField()` with `identifier` (Related Action)
+- [ ] Related Actions in grid context → use `fv!identifier` from `a!recordData()`
+- [ ] Related Actions in detail view → use `ri!recordId` rule input
+- [ ] ❌ NEVER use `a!startProcess()` when record action is available in data-model-context.md
+- [ ] ❌ NEVER use `a!buttonWidget` to trigger record actions
+- [ ] Action reference MUST be copied exactly from data-model-context.md **Record Actions** section (includes UUIDs)
 
 ## QUALITY STANDARDS
 
