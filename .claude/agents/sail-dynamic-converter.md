@@ -1389,6 +1389,55 @@ For EACH `a!grouping()` you plan to write (primaryGrouping AND secondaryGrouping
 - [ ] ALL Integer FKs have been replaced with relationship navigation to Text fields
 - [ ] Validation report is documented
 
+**4C.3: MANDATORY - Grid Column sortField Validation**
+
+🚨 **BLOCKING GATE** - Cannot proceed with grid code until ALL sortField values are validated.
+
+For EACH `a!gridColumn()` with a `sortField` parameter:
+
+- [ ] **Step 1: Identify the sortField value**
+  - Extract the field reference from `sortField: '...'`
+  - Document: "Column [label] sorts by: [sortField value]"
+
+- [ ] **Step 2: Apply sortField Decision Tree**
+
+  | sortField Pattern | Valid? | Action |
+  |-------------------|--------|--------|
+  | `...fields.fieldName` | ✅ | Direct field - valid |
+  | `...relationships.relName.fields.fieldName` | ✅ | Related field (many-to-one) - valid |
+  | `...relationships.relName` | ❌ | Relationship only - **INVALID** |
+  | No `.fields.` in path | ❌ | Missing field - **INVALID** |
+
+- [ ] **Step 3: Fix invalid sortField values**
+
+  **If sortField references a relationship without `.fields.`:**
+  - Find the target record type in data-model-context.md
+  - Identify an appropriate sortable field (usually first Text field)
+  - Append `.fields.{fieldName}` to the relationship path
+
+  ```sail
+  /* ❌ INVALID */
+  sortField: 'recordType!Case.relationships.status'
+
+  /* ✅ FIXED */
+  sortField: 'recordType!Case.relationships.status.fields.statusName'
+  ```
+
+- [ ] **Step 4: Document validation results**
+
+  ```
+  Grid sortField Validation:
+  - Columns with sortField: [count]
+  - Valid sortField values: [count]
+  - Fixed sortField values: [count]
+  - Status: [PASS/FAIL]
+  ```
+
+**🛑 BLOCKING**: You CANNOT write grid code until:
+- [ ] ALL sortField values end with `.fields.fieldName`
+- [ ] NO sortField values reference relationships without fields
+- [ ] Validation report is documented
+
 **After completing Step 4:**
 - [ ] All data model availability validated (Step 4A)
 - [ ] All a!measure() functions validated against schema (Step 4B)
@@ -1397,6 +1446,7 @@ For EACH `a!grouping()` you plan to write (primaryGrouping AND secondaryGrouping
 - [ ] All nested if() refactoring planned with a!match() syntax (Step 4C)
 - [ ] All chart refactoring planned with data + config pattern (Step 4C)
 - [ ] **All chart grouping fields validated - NO Integer/Decimal groupings (Step 4C.2)**
+- [ ] **All grid sortField values validated - must end with `.fields.fieldName` (Step 4C.3)**
 - [ ] I am ready to implement conversion
 
 ---
@@ -1961,6 +2011,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Did I validate EVERY date/time filter against data model field types (Step 4B)?
 - [ ] Did I plan ALL nested if() → a!match() refactoring (Step 4C)?
 - [ ] Did I plan ALL chart pattern refactoring (Step 4C)?
+- [ ] Did I validate ALL grid sortField values against sorting rules (Step 4C.3)?
 
 **Form Interface Pattern Verification (if applicable):**
 - [ ] Did I use direct `ri!` pattern for CREATE/UPDATE forms (Step 3D)?
@@ -2293,6 +2344,12 @@ For each validation agent result:
 - [ ] EVERY query has `fields` parameter listing all needed fields
 - [ ] Date filters use correct function (Date → today(), DateTime → now())
 - [ ] All operators validated against "Valid Operators by Data Type" table
+
+⚠️ **CRITICAL: Grid sortField Rules**
+- [ ] sortField MUST end with `.fields.fieldName` (never just a relationship)
+- [ ] sortField can use direct fields OR related fields (many-to-one only)
+- [ ] ❌ NEVER: `sortField: '...relationships.status'` (relationship without field)
+- [ ] ✅ CORRECT: `sortField: '...relationships.status.fields.statusName'`
 
 ⚠️ **CRITICAL: a!queryFilter() TYPE MATCHING (MANDATORY - Step 5E)**
 - [ ] Field type MUST EXACTLY MATCH value type in EVERY a!queryFilter()
