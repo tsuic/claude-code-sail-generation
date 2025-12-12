@@ -343,12 +343,13 @@ a!gridColumn(
 ### 2. Linked Text (Clickable Records)
 ```sail
 a!gridColumn(
-  label: "Claim ID", 
+  label: "Claim ID",
   value: a!richTextDisplayField(
     value: a!richTextItem(
       text: fv!row.id,
       style: "STRONG",
-      link: a!recordLink(),
+      /* TODO: Convert to a!recordLink() with recordType and identifier when making functional */
+      link: a!dynamicLink(value: fv!row.id, saveInto: {}),
       linkStyle: "STANDALONE"
     ),
     labelPosition: "COLLAPSED"
@@ -541,7 +542,8 @@ a!gridField(
           a!richTextItem(
             text: fv!row.id,
             style: "STRONG",
-            link: a!recordLink(),
+            /* TODO: Convert to a!recordLink() with recordType and identifier when making functional */
+            link: a!dynamicLink(value: fv!row.id, saveInto: {}),
             linkStyle: "STANDALONE"
           ),
           char(10),

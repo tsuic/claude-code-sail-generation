@@ -2218,6 +2218,71 @@ a!recordActionField(
 
 ---
 
+### **Step 5G: Convert Dynamic Links to Record Links**
+
+Mockups use `a!dynamicLink()` as placeholders for navigation. Convert these to `a!recordLink()` for record detail navigation.
+
+**5G.1: Detection**
+```bash
+# Find dynamicLink placeholders that need record link conversion
+grep -n "a!dynamicLink" [mockup-file].sail
+```
+
+**5G.2: Conversion Patterns**
+
+| Context | Mockup Pattern | Functional Pattern |
+|---------|---------------|-------------------|
+| Grid with `a!recordData()` | `link: a!dynamicLink(value: fv!row.id, saveInto: {})` | `link: a!recordLink(recordType: recordType!Case, identifier: fv!identifier)` |
+| `a!forEach()` over query results | `link: a!dynamicLink(value: fv!item.id, saveInto: {})` | `link: a!recordLink(recordType: recordType!Case, identifier: fv!item[recordType!Case.fields.caseId])` |
+
+**5G.3: Identifier Source Rules**
+
+Same as Related Actions (Step 5F.5):
+
+| Context | Identifier Source |
+|---------|-------------------|
+| Grid column with `a!recordData()` | `fv!identifier` |
+| `a!forEach()` over `.data` results | `fv!item[recordType!Case.fields.primaryKeyField]` |
+| Detail view interface | `ri!recordId` |
+
+**5G.4: Example Conversion**
+
+```sail
+/* ❌ MOCKUP - dynamicLink placeholder */
+a!richTextItem(
+  text: fv!row.organizationName,
+  style: "STRONG",
+  link: a!dynamicLink(
+    value: fv!row.id,
+    saveInto: {}
+  ),
+  linkStyle: "STANDALONE"
+)
+
+/* ✅ FUNCTIONAL - recordLink with identifier */
+a!richTextItem(
+  text: fv!row[recordType!Membership.fields.organizationName],
+  style: "STRONG",
+  link: a!recordLink(
+    recordType: recordType!Membership,
+    identifier: fv!identifier
+  ),
+  linkStyle: "STANDALONE"
+)
+```
+
+**5G.5: Record Link Validation Checklist**
+- [ ] All `a!dynamicLink()` in grids converted to `a!recordLink()`
+- [ ] `recordType` parameter uses correct record type reference from data-model-context.md
+- [ ] `identifier` source matches context (see 5G.3 table)
+- [ ] Links in `a!forEach()` contexts use primary key field, NOT `fv!identifier`
+
+**After completing Step 5G:**
+- [ ] All navigation links converted to `a!recordLink()`
+- [ ] Ready for pre-flight validation
+
+---
+
 ### **Step 6: Pre-Flight Validation**
 
 🚨 **MANDATORY CHECKLIST** - Before writing output file:
@@ -2263,6 +2328,7 @@ a!recordActionField(
 - [ ] Can I show the Bash verification output proving cleanup?
 - [ ] Did I document removed variables in conversion summary (Step 5D.5.4)?
 - [ ] Did I convert action buttons to `a!recordActionField()` where record actions exist (Step 5F)?
+- [ ] Did I convert `a!dynamicLink()` to `a!recordLink()` for record navigation (Step 5G)?
 
 **Null Safety Verification (MANDATORY - Step 5D.6):**
 - [ ] Did I run automated null safety detection (Step 5D.6.1)?
