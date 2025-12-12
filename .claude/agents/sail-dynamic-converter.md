@@ -598,10 +598,67 @@ Use Read tool to scan the static interface file:
 
 - [ ] Output: "Components detected: [list], Required reading sections: [list with file names and search keywords]"
 
+---
+
+### **Step 2E: Identify Action Buttons for Conversion**
+
+🚨 **AUTOMATED DETECTION** - Scan mockup for buttons intended as record actions.
+
+**2E.1: Run Detection Commands**
+
+```bash
+# Find buttons with startProcess TODO comments
+grep -n "TODO.*startProcess\|TODO.*process model\|TODO.*Configure.*process" [mockup-file].sail
+
+# Find buttonWidget with action-related icons
+grep -n "a!buttonWidget" [mockup-file].sail | grep -i "plus\|edit\|pencil\|trash\|delete"
+```
+
+- [ ] Execute detection commands
+- [ ] Document: "Found [N] potential action buttons at lines: [list]"
+
+**2E.2: For EACH detected button, determine conversion path**
+
+| Detection Signal | Action Type | Identifier Required? | Next Step |
+|------------------|-------------|---------------------|-----------|
+| `TODO.*startProcess` + "plus" icon | Record Action | ❌ No | Check for Record Action in data-model |
+| `TODO.*startProcess` + "pencil/edit" icon | Related Action | ✅ Yes | Check for Related Action + determine identifier source |
+| `TODO.*startProcess` + "trash/delete" icon | Related Action | ✅ Yes | Check for Related Action + determine identifier source |
+| Button in grid column with edit/delete | Related Action | ✅ Yes (`fv!identifier`) | Check for Related Action |
+| No TODO comment | UI-only button | N/A | Keep as `a!buttonWidget` |
+
+**2E.3: Match to data-model-context.md**
+
+For EACH button identified as a potential record action:
+
+1. Identify the target record type from surrounding context (grid data source, page title, etc.)
+2. Read the **Record Actions** section for that record type in data-model-context.md
+3. Look for matching action by name or type:
+
+   | Button Intent | Look For in Record Actions |
+   |---------------|---------------------------|
+   | Create new record | Action Type = "Record Action" |
+   | Edit existing record | Action Type = "Related Action" |
+   | Delete record | Action Type = "Related Action" |
+
+4. Document findings:
+   ```
+   Action Button Conversion Plan:
+   - Line [N]: "[Button Label]" → [RecordType].actions.[actionName] (Record Action)
+   - Line [M]: "[Button Label]" → [RecordType].actions.[actionName] (Related Action, needs identifier)
+   - Line [P]: "[Button Label]" → No matching action found, keep as buttonWidget with TODO
+   ```
+
+**2E.4: Output requirements**
+- [ ] All potential action buttons detected
+- [ ] Each button matched to record action OR documented as non-convertible
+- [ ] Ready to proceed with component reading
+
 **After completing Step 2:**
 - [ ] I have identified all nested if() statements requiring refactoring
 - [ ] I have identified all charts requiring pattern refactoring
 - [ ] I have identified all components and required reading sections
+- [ ] I have identified all action buttons and their conversion paths
 - [ ] I am ready to read component-specific guidance
 
 ---
@@ -1982,6 +2039,181 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] All a!queryFilter() field types match value types
 - [ ] All local variable values traced back to confirm type
 - [ ] Zero type mismatches remain
+- [ ] Ready for action button conversion
+
+---
+
+### **Step 5F: Convert Action Buttons to Record Actions**
+
+For EACH action button identified in Step 2E with a matching record action:
+
+**5F.1: Record Action Conversion (Create/New actions)**
+
+Use this pattern when the action does NOT require a specific record identifier.
+
+```sail
+/* ❌ MOCKUP PATTERN */
+a!buttonArrayLayout(
+  buttons: {
+    a!buttonWidget(
+      label: "Create New Case",
+      icon: "plus-circle",
+      style: "SOLID",
+      color: "ACCENT"
+      /* TODO: Configure startProcess with actual process model */
+    )
+  }
+)
+
+/* ✅ FUNCTIONAL PATTERN */
+a!recordActionField(
+  actions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.createCase'
+    )
+  },
+  style: "TOOLBAR_PRIMARY",
+  display: "LABEL_AND_ICON",
+  align: "END"
+)
+```
+
+**5F.2: Style Mapping**
+
+| Mockup Button | Record Action Style |
+|---------------|---------------------|
+| `style: "SOLID", color: "ACCENT"` | `style: "TOOLBAR_PRIMARY"` |
+| `style: "SOLID", color: "SECONDARY"` | `style: "TOOLBAR"` |
+| `style: "OUTLINE"` | `style: "TOOLBAR"` |
+| `style: "LINK"` | `style: "LINKS"` |
+
+**5F.3: Key Parameters**
+
+| Parameter | Values | When to Use |
+|-----------|--------|-------------|
+| `style` | `"TOOLBAR_PRIMARY"` | Primary action (Create, Submit) |
+| `style` | `"TOOLBAR"` | Secondary actions |
+| `style` | `"LINKS"` | Subtle/tertiary actions |
+| `display` | `"LABEL_AND_ICON"` | Default - shows both |
+| `display` | `"ICON"` | Space-constrained contexts |
+| `openActionsIn` | `"DIALOG"` | Quick forms (default) |
+| `openActionsIn` | `"NEW_TAB"` | Complex forms |
+| `align` | `"START"`, `"CENTER"`, `"END"` | Match original button alignment |
+
+**5F.4: Record Action Validation Checklist**
+- [ ] Action reference copied exactly from data-model-context.md **Record Actions** section
+- [ ] UUIDs are complete (not placeholders)
+- [ ] Style matches original button prominence
+- [ ] No `a!buttonWidget` with `startProcess` TODO remains for convertible actions
+
+**5F.5: Related Action Conversion (Edit/Update/Delete actions)**
+
+Use this pattern when the action REQUIRES a specific record identifier.
+
+**Key Difference from Record Actions:**
+- **Record Action**: Creates new record → NO `identifier` parameter
+- **Related Action**: Acts on existing record → REQUIRES `identifier` parameter
+
+**Context determines identifier source:**
+
+| Context | Identifier Source | Example |
+|---------|-------------------|---------|
+| Grid row action button | `fv!identifier` (from `a!recordData`) | Edit button in grid column |
+| Grid `recordActions` parameter | `fv!identifier` (from grid context) | Row-level action menu |
+| Standalone button (detail view) | `ri!recordId` or query result | Edit button on record detail page |
+| Card list (a!forEach) | `fv!item.idField` | Edit button on each card |
+
+**Pattern A: Grid Row Edit Button (in grid column)**
+```sail
+/* ❌ MOCKUP PATTERN - Button in grid column */
+a!gridColumn(
+  label: "Actions",
+  value: a!buttonArrayLayout(
+    buttons: {
+      a!buttonWidget(
+        label: "Edit",
+        icon: "pencil",
+        style: "LINK"
+        /* TODO: Configure edit action */
+      )
+    }
+  )
+)
+
+/* ✅ FUNCTIONAL PATTERN - Related action in grid column */
+a!gridColumn(
+  label: "Actions",
+  value: a!recordActionField(
+    actions: {
+      a!recordActionItem(
+        action: 'recordType!Case.actions.editCase',
+        identifier: fv!identifier
+      )
+    },
+    style: "LINKS",
+    display: "ICON"
+  ),
+  width: "ICON"
+)
+```
+
+**Pattern B: Grid recordActions Parameter (row menu)**
+```sail
+/* ✅ FUNCTIONAL PATTERN - Grid with row actions menu */
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Case'
+  ),
+  columns: { /* ... */ },
+  recordActions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.editCase',
+      identifier: fv!identifier
+    ),
+    a!recordActionItem(
+      action: 'recordType!Case.actions.deleteCase',
+      identifier: fv!identifier
+    )
+  }
+)
+```
+
+**Pattern C: Standalone Edit Button (detail view with ri!)**
+```sail
+/* ❌ MOCKUP PATTERN */
+a!buttonWidget(
+  label: "Edit Case",
+  icon: "pencil",
+  style: "OUTLINE"
+  /* TODO: Configure edit process */
+)
+
+/* ✅ FUNCTIONAL PATTERN - Uses rule input as identifier */
+a!recordActionField(
+  actions: {
+    a!recordActionItem(
+      action: 'recordType!Case.actions.editCase',
+      identifier: ri!caseId
+    )
+  },
+  style: "TOOLBAR",
+  display: "LABEL_AND_ICON"
+)
+```
+
+**5F.6: Related Action Validation Checklist**
+- [ ] Related Action (Edit/Update/Delete) has `identifier` parameter
+- [ ] Identifier source matches context:
+  - Grid with `a!recordData` → `fv!identifier`
+  - Grid `recordActions` param → `fv!identifier`
+  - Detail view → `ri!recordId`
+  - Card list forEach → `fv!item.idField`
+- [ ] Action reference copied exactly from data-model-context.md (Action Type = "Related Action")
+
+**After completing Step 5F:**
+- [ ] All Record Actions converted to `a!recordActionField()`
+- [ ] All Related Actions converted with correct `identifier` parameter
+- [ ] Non-convertible buttons documented with TODO comments explaining why
 - [ ] Ready for pre-flight validation
 
 ---
@@ -1999,6 +2231,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Did I identify ALL nested if() statements (Step 2A)?
 - [ ] Did I identify ALL charts requiring refactoring (Step 2B)?
 - [ ] Did I identify ALL components and required reading (Step 2D)?
+- [ ] Did I identify ALL action buttons for conversion (Step 2E)?
 
 **Component-Specific Reading Verification:**
 - [ ] Did I read ALL relevant component sections IN FULL (Step 3)?
@@ -2029,6 +2262,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 - [ ] Do ALL variables have occurrence count ≥ 2 or UNUSED comments (Step 5D.5.4)?
 - [ ] Can I show the Bash verification output proving cleanup?
 - [ ] Did I document removed variables in conversion summary (Step 5D.5.4)?
+- [ ] Did I convert action buttons to `a!recordActionField()` where record actions exist (Step 5F)?
 
 **Null Safety Verification (MANDATORY - Step 5D.6):**
 - [ ] Did I run automated null safety detection (Step 5D.6.1)?
@@ -2084,8 +2318,7 @@ echo "Before: $(wc -l < /tmp/null_check_text.txt) text() | After: $(wc -l < /tmp
 **7A: Write Dynamic SAIL Code**
 
 - [ ] Use Write tool to create new .sail file in /output folder
-- [ ] Filename: [original-name]-with-data.sail 
-- [ ] Ensure complete conversion (no partial implementations)
+- [ ] Filename: [original-name]-functional.sail
 
 **7B: Document Conversion Summary**
 
@@ -2360,6 +2593,15 @@ For each validation agent result:
 - [ ] Boolean field → Boolean value (true(), false())
 - [ ] User field → User value (loggedInUser(), user())
 - [ ] Run Step 5E validation to verify ALL filters before completing conversion
+
+⚠️ **CRITICAL: Record Action Conversion (Step 5F)**
+- [ ] Buttons with `TODO.*startProcess` + create intent → `a!recordActionField()` (Record Action)
+- [ ] Buttons with `TODO.*startProcess` + edit/delete intent → `a!recordActionField()` with `identifier` (Related Action)
+- [ ] Related Actions in grid context → use `fv!identifier` from `a!recordData()`
+- [ ] Related Actions in detail view → use `ri!recordId` rule input
+- [ ] ❌ NEVER use `a!startProcess()` when record action is available in data-model-context.md
+- [ ] ❌ NEVER use `a!buttonWidget` to trigger record actions
+- [ ] Action reference MUST be copied exactly from data-model-context.md **Record Actions** section (includes UUIDs)
 
 ## QUALITY STANDARDS
 
