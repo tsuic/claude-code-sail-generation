@@ -706,472 +706,71 @@ label: "Application Status",  /* TODO: Replace with translation set in productio
 
 ## 🚨 CRITICAL: a!forEach() Function Variables Reference
 
-### Available Function Variables in a!forEach()
+> **📖 Complete Guide:** `/logic-guidelines/foreach-patterns.md`
 
-When using `a!forEach()`, Appian automatically provides these function variables within the `expression` parameter:
+### Available Function Variables (Quick Reference)
 
-| Variable | Type | Description | Common Use Cases |
-|----------|------|-------------|------------------|
-| `fv!item` | Any | Current item value from the array | Accessing properties, creating UI components, data transformations |
-| `fv!index` | Integer | Current iteration position (1-based) | Array manipulation, numbering, position-based logic |
-| `fv!isFirst` | Boolean | `true` only on first iteration | Special formatting for first item, conditional headers |
-| `fv!isLast` | Boolean | `true` only on last iteration | Special formatting for last item, conditional footers |
-| `fv!itemCount` | Integer | Total number of items in array | Progress indicators, conditional logic based on total |
+| Variable | Description | Use For |
+|----------|-------------|---------|
+| `fv!item` | Current item value | Accessing properties (`.title`), scalar values |
+| `fv!index` | Position (1-based) | Array manipulation, numbering, remove buttons |
+| `fv!isFirst` | `true` on first iteration | Conditional headers, skip first divider |
+| `fv!isLast` | `true` on last iteration | Conditional footers, "Add" buttons after last item |
+| `fv!itemCount` | Total items in array | Progress indicators, conditional logic |
 
-**⚠️ CRITICAL:** These variables are **ONLY** available inside `a!forEach()` expressions. They do NOT exist in grid columns, chart configurations, or other iteration functions.
+**⚠️ CRITICAL:** These variables are **ONLY** available inside `a!forEach()` expressions. They do NOT exist in grid columns or chart configurations.
 
----
-
-### fv!item - Accessing Current Item
-
-**Purpose:** Access the current item's value or properties during iteration
-
-**SAIL-Specific Syntax:**
-- **Map properties:** Use dot notation: `fv!item.title`
-- **Scalar values:** Use `fv!item` directly
-
+**Common pattern examples:**
 ```sail
-/* Map data with dot notation */
-a!forEach(
-  items: {
-    a!map(title: "Overview", icon: "info-circle"),
-    a!map(title: "Details", icon: "list")
-  },
-  expression: a!sectionLayout(
-    label: fv!item.title,  /* Dot notation for maps */
-    contents: {
-      a!richTextIcon(icon: fv!item.icon)
-    }
-  )
-)
+/* Remove button using fv!index */
+saveInto: a!save(local!items, remove(local!items, fv!index))
+
+/* Progress indicator using fv!index and fv!itemCount */
+text: "Processing " & fv!index & " of " & fv!itemCount
 ```
 
----
+**See `/logic-guidelines/foreach-patterns.md` for:**
+- Pattern A: Array of Maps (multi-instance data entry)
+- Pattern B: Parallel Arrays (fixed source lists)
+- Complete examples for all 5 function variables
+- Direct property saving patterns
+- Best practices and common mistakes
 
-### fv!index - Current Position (1-Based)
 
-**Purpose:** Get the current iteration position for array manipulation or position-based logic
+## ⚠️ CRITICAL: Direct Property Saving and Parallel Arrays
 
-**IMPORTANT:** Appian uses 1-based indexing. First item is index 1, not 0.
+> **📖 Complete Guide:** `/logic-guidelines/foreach-patterns.md`
 
-#### Critical Pattern: Removing Items from Arrays
-```sail
-/* Common pattern: Remove button for dynamic lists */
-a!forEach(
-  items: local!items,
-  expression: a!cardLayout(
-    contents: {
-      a!textField(
-        label: "Item " & fv!index,  /* Use for labeling */
-        value: fv!item.text,
-        saveInto: fv!item.text
-      )
-    },
-    link: a!dynamicLink(
-      label: "Remove",
-      value: fv!index,  /* Pass index to identify which item to remove */
-      saveInto: {
-        a!save(
-          local!items,
-          remove(
-            local!items,
-            fv!index  /* Remove at this position */
-          )
-        )
-      }
-    )
-  )
-)
-```
+**Two patterns for forEach with input fields:**
 
-#### Parallel Array Lookups (Status/Icon Mapping)
-```sail
-/* Map colors and icons to status values by position */
-local!statuses: {"Open", "In Progress", "Completed"},
-local!icons: {"folder-open", "clock", "check-circle"},
-local!colors: {"#EF4444", "#F59E0B", "#10B981"},
-
-a!forEach(
-  items: local!statuses,
-  expression: a!stampField(
-    icon: index(local!icons, fv!index, "file"),      /* Match by position */
-    backgroundColor: index(local!colors, fv!index, "#6B7280"),
-    contentColor: "#FFFFFF",
-    size: "MEDIUM"
-  )
-)
-```
-
----
-
-### fv!isFirst - First Iteration Detection
-
-**Purpose:** Detect the first iteration for conditional headers or skipping separators
+### Pattern A: Direct Property Save (Array of Maps - PREFERRED)
+Use for multi-instance data entry (contacts, work history, line items):
 
 ```sail
-a!forEach(
-  items: local!sections,
-  expression: {
-    /* Add divider before all items EXCEPT the first */
-    if(
-      fv!isFirst,
-      {},  /* No divider for first item */
-      a!columnsLayout(
-        columns: {a!columnLayout(contents: {}, width: "FILL")},
-        marginBelow: "STANDARD"
-      )
-    ),
-    /* Then show the content */
-    a!cardLayout(
-      contents: {
-        a!richTextDisplayField(value: fv!item.content)
-      }
-    )
-  }
-)
+/* ✅ CORRECT - Save directly to property */
+saveInto: fv!item.employerName  /* Updates just this property in the map */
+
+/* ❌ WRONG - Don't reconstruct entire map */
+saveInto: a!save(local!array, a!update(local!array, fv!index, a!map(...all fields...)))
 ```
 
----
-
-### fv!isLast - Last Iteration Detection
-
-**Purpose:** Detect the last iteration for conditional footers, "Add" buttons, or skipping separators
-
-#### Critical Pattern: Add Button After Last Item
-```sail
-a!forEach(
-  items: local!invoiceItems,
-  expression: {
-    /* Show each line item */
-    a!columnsLayout(
-      columns: {
-        a!columnLayout(
-          contents: {a!richTextDisplayField(value: fv!item.description)}
-        ),
-        a!columnLayout(
-          contents: {a!richTextDisplayField(value: "$" & fv!item.amount)},
-          width: "NARROW"
-        )
-      }
-    ),
-    /* Show "Add" button or total only after last item */
-    if(
-      fv!isLast,
-      a!richTextDisplayField(
-        value: a!richTextItem(
-          text: "Total: $" & sum(local!invoiceItems.amount),
-          size: "LARGE",
-          style: "STRONG"
-        )
-      ),
-      {}
-    )
-  }
-)
-```
-
----
-
-### fv!itemCount - Total Item Count
-
-**Purpose:** Access the total number of items for progress indicators or conditional logic
+### Pattern B: Parallel Arrays (Fixed Source Lists)
+Use when iterating a fixed source list to collect separate data (document checklist):
 
 ```sail
-/* Progress indicator pattern */
-a!forEach(
-  items: local!uploadQueue,
-  expression: a!cardLayout(
-    contents: {
-      a!richTextDisplayField(
-        value: a!richTextItem(
-          text: "Processing " & fv!index & " of " & fv!itemCount,
-          style: "STRONG"
-        )
-      ),
-      a!textField(
-        label: "File",
-        value: fv!item.filename,
-        readOnly: true
-      )
-    }
-  )
-)
+/* ✅ CORRECT - Index-based save */
+value: index(local!uploadedFiles, fv!index, null)
+saveInto: a!save(local!uploadedFiles, a!update(local!uploadedFiles, fv!index, save!value))
+
+/* ⚠️ Type Safety: Wrap index() in type converters for arithmetic */
+todate(index(local!dates, fv!index, today()))  /* For date arithmetic */
 ```
 
----
-
-### Combining Multiple Variables
-
-```sail
-/* Dynamic remove button logic with fv!itemCount and fv!isLast */
-a!forEach(
-  items: local!lineItems,
-  expression: a!cardLayout(
-    contents: {
-      a!textField(
-        label: "Item " & fv!index,
-        value: fv!item.name
-      )
-    },
-    link: if(
-      and(
-        fv!itemCount > 1,  /* Only show remove if more than 1 item */
-        not(fv!isLast)     /* Keep at least the last item */
-      ),
-      a!dynamicLink(
-        label: "Remove",
-        value: fv!index,
-        saveInto: a!save(local!lineItems, remove(local!lineItems, fv!index))
-      ),
-      {}
-    )
-  )
-)
-```
-
----
-
-### ⚠️ Common Mistakes
-
-#### ❌ MISTAKE: Accessing properties on scalar values
-```sail
-/* ❌ WRONG - fv!item is a string, not an object */
-a!forEach(
-  items: {"Open", "Closed"},
-  expression: fv!item.status  /* ❌ ERROR */
-)
-
-/* ✅ RIGHT */
-a!forEach(
-  items: {"Open", "Closed"},
-  expression: a!tagField(text: fv!item)  /* ✅ fv!item IS the value */
-)
-```
-
----
-
-### Best Practices Summary
-
-#### ✅ DO:
-- **Understand fv!item type** - Scalar, map, or object?
-- **Use fv!index for array manipulation** - `remove()`, `insert()`, `a!update()`
-- **Use fv!isFirst/isLast for conditional rendering** - Headers, footers, dividers
-- **Remember fv!index is 1-based** - Matches Appian's `index()` function
-- **Combine variables for complex logic** - e.g., `and(fv!itemCount > 1, not(fv!isLast))`
-
-#### ❌ DON'T:
-- **Don't access properties on scalar fv!item** - Check your data type first
-- **Don't use 0-based indexing** - Appian is 1-based throughout
-- **Don't use fv! variables outside a!forEach()** - They don't exist in other contexts
-- **Don't forget null checks on fv!item properties** - Map fields can be null
-
-
-## ⚠️ CRITICAL: Direct Property Saving in forEach
-
-When updating individual properties of items in a forEach loop, save directly to the property—do NOT reconstruct the entire map.
-
-### ✅ CORRECT - Direct Property Save
-```sail
-a!forEach(
-  items: local!employers,
-  expression: a!textField(
-    label: "Employer Name",
-    value: a!defaultValue(fv!item.employerName, ""),
-    saveInto: fv!item.employerName,  /* Directly updates just this property */
-    required: true
-  )
-)
-```
-
-### ❌ WRONG - Full Map Reconstruction
-```sail
-a!forEach(
-  items: local!employers,
-  expression: a!textField(
-    label: "Employer Name",
-    value: a!defaultValue(fv!item.employerName, ""),
-    saveInto: a!save(
-      local!employers,
-      a!update(
-        local!employers,
-        fv!index,
-        a!map(
-          employerName: save!value,
-          jobTitle: fv!item.jobTitle,
-          contactName: fv!item.contactName,
-          /* ...reconstructing all fields is inefficient and verbose... */
-        )
-      )
-    )
-  )
-)
-```
-
-### When to Use Multi-Save Pattern
-Use the multi-save pattern ONLY when a field update must trigger dependent calculations:
-
-```sail
-a!dateField(
-  label: "Start Date",
-  value: fv!item.startDate,
-  saveInto: {
-    fv!item.startDate,           /* Save the date */
-    a!save(                       /* Calculate dependent field */
-      fv!item.experienceYears,
-      if(
-        and(
-          a!isNotNullOrEmpty(save!value),
-          a!isNotNullOrEmpty(fv!item.endDate)
-        ),
-        fixed(tointeger(fv!item.endDate - save!value) / 365, 1),
-        0
-      )
-    )
-  }
-)
-```
-
-### Key Rules
-- ✅ Simple field updates → `saveInto: fv!item.propertyName`
-- ✅ Dependent calculations → Use multi-save with direct property updates
-- ❌ NEVER reconstruct the entire map for a single field change
-
-
-## Dynamic Form Fields with forEach - Parallel Array Pattern
-
-When using forEach to generate multiple input fields (textField, dateField, fileUploadField, etc.), each field MUST save to a specific position in an array using `fv!index`.
-
-### Pattern: Parallel Arrays for Multiple Fields per Item
-
-Use this pattern when forEach generates multiple input fields that need to store user data.
-
-```sail
-/* Initialize parallel arrays - one per field type */
-local!uploadedFiles: {},
-local!completionDates: {},
-local!notes: {},
-
-a!forEach(
-  items: local!requiredItems,
-  expression: {
-    a!fileUploadField(
-      label: "Upload " & fv!item.name,
-      value: index(local!uploadedFiles, fv!index, null),  /* ✅ Access by index */
-      saveInto: a!save(
-        local!uploadedFiles,
-        a!update(local!uploadedFiles, fv!index, save!value)  /* ✅ Update by index */
-      )
-    ),
-    a!dateField(
-      label: "Completion Date",
-      value: index(local!completionDates, fv!index, null),  /* ✅ Access by index */
-      saveInto: a!save(
-        local!completionDates,
-        a!update(local!completionDates, fv!index, save!value)  /* ✅ Update by index */
-      )
-    ),
-    a!textField(
-      label: "Notes",
-      value: index(local!notes, fv!index, null),  /* ✅ Access by index */
-      saveInto: a!save(
-        local!notes,
-        a!update(local!notes, fv!index, save!value)  /* ✅ Update by index */
-      )
-    )
-  }
-)
-```
-
-### ❌ WRONG - Not storing user input:
-```sail
-a!forEach(
-  items: local!requiredItems,
-  expression: a!fileUploadField(
-    label: "Upload " & fv!item.name,
-    value: null,      /* ❌ No data access */
-    saveInto: null    /* ❌ User input lost! */
-  )
-)
-```
-
-### ❌ WRONG - Trying to use fv!item properties:
-```sail
-/* This doesn't work - you can't store different values in the same property */
-a!forEach(
-  items: local!requiredItems,
-  expression: a!fileUploadField(
-    label: "Upload " & fv!item.name,
-    value: fv!item.uploadedFile,        /* ❌ Can't write to fv!item */
-    saveInto: fv!item.uploadedFile      /* ❌ fv!item is read-only */
-  )
-)
-```
-
-### ⚠️ CRITICAL: Type Safety with index() in Arithmetic Operations
-
-The `index()` function returns a **List type**, even when accessing a single element. When using `index()` results in arithmetic operations (date calculations, numeric operations), you MUST wrap the result in a type converter.
-
-**❌ WRONG - Direct use in date arithmetic:**
-```sail
-a!dateField(
-  label: "Completion Date",
-  value: index(local!completionDates, fv!index, null),
-  saveInto: a!save(
-    local!completionDates,
-    a!update(local!completionDates, fv!index, save!value)
-  ),
-  validations: if(
-    fv!item.startDate - index(local!completionDates, fv!index, today()) > 365,  /* ❌ ERROR: List type! */
-    "Date too old",
-    null
-  )
-)
-```
-
-**✅ CORRECT - Wrapped in todate():**
-```sail
-a!dateField(
-  label: "Completion Date",
-  value: index(local!completionDates, fv!index, null),
-  saveInto: a!save(
-    local!completionDates,
-    a!update(local!completionDates, fv!index, save!value)
-  ),
-  validations: if(
-    fv!item.startDate - todate(index(local!completionDates, fv!index, today())) > 365,  /* ✅ todate() wrapper */
-    "Date too old",
-    null
-  )
-)
-```
-
-**Required Type Converters by Operation:**
-- **Date/DateTime arithmetic**: Use `todate(index(...))` or `todatetime(index(...))`
-- **Numeric calculations**: Use `tonumber(index(...))` or `tointeger(index(...))`
-- **Text concatenation**: Use `totext(index(...))` if needed
-
-**Validation Checkpoint:**
-- [ ] Any `index()` result used in date arithmetic is wrapped in `todate()`
-- [ ] Any `index()` result used in numeric operations is wrapped in `tonumber()` or `tointeger()`
-
-### Key Rules:
-1. **One local variable per field type** - Use parallel arrays indexed by `fv!index`
-2. **Initialize as empty arrays** - `local!uploadedFiles: {}`
-3. **Access pattern** - `value: index(local!array, fv!index, null)`
-4. **Save pattern** - `saveInto: a!save(local!array, a!update(local!array, fv!index, save!value))`
-5. **Array synchronization** - All parallel arrays maintain same index positions for same item
-6. **Type safety for arithmetic** - Wrap `index()` in type converters (`todate()`, `tonumber()`) when used in calculations
-
-### When to Use This Pattern:
-- ✅ forEach generating file upload fields for multiple items
-- ✅ forEach generating date fields for multiple items
-- ✅ forEach generating text input fields for multiple items
-- ✅ Any scenario where forEach creates input fields that need to store different values per item
-
-### When NOT to Use This Pattern:
-- ❌ forEach only displaying data (use fv!item properties directly)
-- ❌ Single input field not in forEach (use regular local variable)
-- ❌ Input fields where all items share one value (use single local variable)
+**See `/logic-guidelines/foreach-patterns.md` for:**
+- Complete decision tree: When to use Pattern A vs Pattern B
+- Multi-save pattern for dependent calculations
+- Type safety rules for index() in arithmetic operations
+- Complete examples and anti-patterns
 
 
 ## Array and Data Manipulation Patterns
@@ -1494,6 +1093,9 @@ local!color: index(
 
 ### Using a!match() for Status-Based Lookups {#amatch-status-lookups}
 
+> **📖 Complete Guide:** `/logic-guidelines/pattern-matching.md` (includes `whenTrue` for ranges/thresholds)
+> **This section:** Covers `equals` pattern only
+
 **When to use `a!match()` instead of parallel arrays:**
 - Single value compared against multiple options (status, category, priority, etc.)
 - Cleaner and more maintainable than nested `if()` statements
@@ -1667,6 +1269,8 @@ This checks TWO variables with AND logic - can't use `a!match()`.
 4. **Approval states** (Draft, Submitted, Approved, Rejected)
 5. **Any enumerated field with 3+ possible values**
 
+**⚠️ For numeric ranges and thresholds:** See `/logic-guidelines/pattern-matching.md` for `whenTrue` pattern (e.g., performance >= 110, scores >= 90, date ranges)
+
 ## ⚠️ Function Parameter Validation
 
 Array Functions - EXACT Parameter Counts
@@ -1709,104 +1313,24 @@ and(
 
 ### 🚨 CRITICAL: Short-Circuit Evaluation Rules {#short-circuit-rules}
 
-> **🔗 Quick Reference:** For nested if() patterns, see `/logic-guidelines/null-safety-quick-ref.md`
-> **📖 This section:** Explains WHY and() doesn't short-circuit and when to use nested if()
+> **📖 Complete Guide:** `/logic-guidelines/short-circuit-evaluation.md`
+> **🔗 Quick Reference:** `/logic-guidelines/null-safety-quick-ref.md`
 
-**SAIL's `and()` and `or()` functions DO NOT short-circuit** - they evaluate ALL arguments even if the result is already determined.
+**Core Rule:** SAIL's `and()` and `or()` functions DO NOT short-circuit - they evaluate ALL arguments. Use nested `if()` for null-safe property access.
 
-#### ❌ WRONG: Using and() for Null Safety
 ```sail
-/* ❌ ERROR - and() evaluates BOTH arguments */
-/* If local!computedData is empty, the second argument still evaluates */
-/* This causes: "Invalid index: Cannot index property 'type' of Null" */
-and(
-  a!isNotNullOrEmpty(local!computedData),
-  local!computedData.type = "Contract"  /* CRASHES if computedData is empty */
-)
+/* ❌ WRONG - and() evaluates both conditions even if first is false */
+and(a!isNotNullOrEmpty(local!data), local!data.type = "Contract")  /* CRASHES if empty! */
+
+/* ✅ CORRECT - if() short-circuits, only evaluates matched branch */
+if(if(a!isNotNullOrEmpty(local!data), local!data.type = "Contract", false), ...)
 ```
 
-#### ✅ CORRECT: Use Nested if() for Short-Circuit Behavior
-```sail
-/* ✅ if() short-circuits - only evaluates the returned branch */
-if(
-  if(
-    a!isNotNullOrEmpty(local!computedData),
-    local!computedData.type = "Contract",  /* Only evaluated when not empty */
-    false
-  ),
-  /* Then branch - show registration code field */,
-  /* Else branch - hide field */
-)
-```
-
-#### When to Use Nested if() vs and()
-
-**Use nested if() when:**
-- Checking null/empty before property access on computed variables
-- Any scenario where the second condition CANNOT be safely evaluated if the first is false
-- Accessing properties on variables that could be empty arrays or null
-
-**Use and() when:**
-- All conditions are independent and can be safely evaluated in any order
-- All variables involved are guaranteed to have values (not null, not empty)
-- Simple boolean combinations without property access
-
-#### Quick Reference Table
-
-| Function | Short-Circuits? | Use For |
-|----------|----------------|---------|
-| `if()` | ✅ Yes - Only evaluates returned branch | Null-safe property access, conditional logic, binary conditions |
-| `and()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
-| `or()` | ❌ No - Evaluates all arguments | Independent boolean conditions only (never for null safety) |
-| `a!match()` | ✅ Yes - Only evaluates matched branch | Pattern matching - single value against 3+ options (status, category, priority) |
-
-#### Common Scenarios Requiring Nested if()
-
-**Scenario 1: Computed Variables from Grid Selections**
-```sail
-/* Grid selection derives full data */
-local!selectedItems: a!forEach(
-  items: local!selectedIds,
-  expression: index(...)
-),
-
-/* ❌ WRONG - Crashes when no items selected */
-showWhen: and(
-  length(local!selectedItems) > 0,
-  local!selectedItems.type = "Contract"  /* ERROR if empty */
-)
-
-/* ✅ RIGHT - Nested if() prevents crash */
-showWhen: if(
-  if(
-    a!isNotNullOrEmpty(local!selectedItems),
-    length(intersection(local!selectedItems.type, {"Contract"})) > 0,
-    false
-  ),
-  true,
-  false
-)
-```
-
-**Scenario 2: Array Property Access**
-```sail
-/* ❌ WRONG - Crashes if items array is empty */
-and(
-  length(local!items) > 0,
-  local!items.price > 100  /* ERROR if items is {} */
-)
-
-/* ✅ RIGHT */
-if(
-  if(
-    a!isNotNullOrEmpty(local!items),
-    length(where(local!items.price > 100)) > 0,
-    false
-  ),
-  /* Then branch */,
-  /* Else branch */
-)
-```
+**See `/logic-guidelines/short-circuit-evaluation.md` for:**
+- Complete explanation of why and() doesn't short-circuit
+- When to use nested if() vs and()
+- Common scenarios requiring nested if() (grid selections, array access, filtered arrays)
+- Quick reference table of all short-circuit behaviors
 
 ## 🚨 MANDATORY: Null Safety Implementation {#null-safety-implementation}
 
@@ -2168,1034 +1692,135 @@ a!localVariables(
 )
 ```
 
-## ⚠️ CRITICAL: Multi-Checkbox Field Pattern
+## ⚠️ CRITICAL: Checkbox Field Patterns
 
-When a checkbox field has multiple choice values (multi-select), use a **single array variable** to store selections—do NOT use separate boolean variables for each choice.
+> **📖 Complete Guide:** `/logic-guidelines/checkbox-patterns.md`
 
-### ✅ CORRECT - Single Array Variable
-```sail
-a!localVariables(
-  local!selectedPriorities: {},  /* Single array for all selections */
-  {
-    a!checkboxField(
-      label: "Case Priorities",
-      choiceLabels: {"High", "Medium", "Low", "Critical"},
-      choiceValues: {"HIGH", "MEDIUM", "LOW", "CRITICAL"},
-      value: local!selectedPriorities,     /* Direct reference */
-      saveInto: local!selectedPriorities,  /* Direct save */
-      choiceLayout: "STACKED"
-    ),
-    /* Check if any selections exist */
-    if(
-      a!isNotNullOrEmpty(local!selectedPriorities),
-      a!textField(
-        label: "Filter Reason",
-        value: local!filterReason,
-        saveInto: local!filterReason
-      ),
-      {}
-    ),
-    /* Check if specific value is selected */
-    if(
-      contains(local!selectedPriorities, "CRITICAL"),
-      a!textField(
-        label: "Escalation Contact",
-        value: local!escalationContact,
-        saveInto: local!escalationContact,
-        required: true
-      ),
-      {}
-    )
-  }
-)
-```
-
-### ❌ WRONG - Separate Boolean Variables
-```sail
-a!localVariables(
-  /* DON'T create separate variables for each choice */
-  local!highPriority,
-  local!mediumPriority,
-  local!lowPriority,
-  local!criticalPriority,
-  {
-    a!checkboxField(
-      label: "Case Priorities",
-      choiceLabels: {"High", "Medium", "Low", "Critical"},
-      choiceValues: {"HIGH", "MEDIUM", "LOW", "CRITICAL"},
-      /* DON'T reconstruct array from multiple booleans */
-      value: a!flatten({
-        if(a!defaultValue(local!highPriority, false), "HIGH", null),
-        if(a!defaultValue(local!mediumPriority, false), "MEDIUM", null),
-        if(a!defaultValue(local!lowPriority, false), "LOW", null),
-        if(a!defaultValue(local!criticalPriority, false), "CRITICAL", null)
-      }),
-      /* DON'T reverse-map array back to separate booleans */
-      saveInto: {
-        a!save(local!highPriority, if(contains(save!value, "HIGH"), true, null)),
-        a!save(local!mediumPriority, if(contains(save!value, "MEDIUM"), true, null)),
-        a!save(local!lowPriority, if(contains(save!value, "LOW"), true, null)),
-        a!save(local!criticalPriority, if(contains(save!value, "CRITICAL"), true, null))
-      }
-    )
-  }
-)
-```
-
-### Why the Wrong Pattern Fails
-- **Complex and verbose**: Requires mapping logic in both `value` and `saveInto`
-- **Maintenance nightmare**: Adding/removing choices requires changes in 4+ places
-- **Error-prone**: Easy to miss updating one of the mappings
-- **Inefficient**: Unnecessary data transformation on every interaction
-
-### Key Rules
-- ✅ Multi-select checkboxes → Single array variable
-- ✅ Check selections using `contains(arrayVariable, value)`
-- ✅ Check if any selected using `a!isNotNullOrEmpty(arrayVariable)`
-- ✅ Get selection count using `length(arrayVariable)`
-- ❌ NEVER create separate boolean variables for each checkbox choice
+**Core Rules:**
+- ✅ Multi-select → Single array variable (NOT separate booleans)
+- ✅ Single checkbox → Initialize to `null` (NOT `false`)
+- ✅ Use `contains()` to check specific selections
 - ❌ NEVER use `a!flatten()` to reconstruct arrays from booleans
 
-Single Checkbox Field Pattern
-
-**Pattern 1: Boolean Variable (Simple Toggle)**
-
-When binding a single checkbox directly to a boolean variable with no dependent logic:
-
 ```sail
-/* ✅ CORRECT - Direct assignment for boolean variables */
-local!enableFeature,  /* null by default */
-a!checkboxField(
-  label: "Options",
-  choiceLabels: {"Enable Feature"},
-  choiceValues: {true},
-  value: local!enableFeature,
-  saveInto: local!enableFeature,
-  choiceLayout: "STACKED"
+/* Multi-select pattern */
+local!selectedPriorities: {},  /* Single array */
+value: local!selectedPriorities, saveInto: local!selectedPriorities
+
+/* Single checkbox initialization */
+local!agreeToTerms,  /* null by default, NOT false */
+choiceValues: {true}
+```
+
+**See `/logic-guidelines/checkbox-patterns.md` for:**
+- Complete multi-select vs single checkbox patterns
+- Why separate boolean variables fail
+- Null initialization requirements
+- save!value usage rules
+- Common mistakes and fixes
+
+## 🚨 MANDATORY: Grid Selection Patterns
+
+> **📖 Complete Guide:** `/logic-guidelines/grid-selection-patterns.md`
+
+**Critical Understanding:** Grid `selectionValue` stores **ONLY identifiers** (Integer/Text Array), NOT full row objects.
+
+### MANDATORY: Two-Variable Approach
+
+**Pattern:**
+```sail
+/* Variable 1: ID array with clear naming */
+local!selectedCaseIds: {},  /* Suffix: Ids, Keys, or Indexes */
+
+/* Variable 2: Computed - derives full data from IDs */
+local!selectedCases: a!forEach(
+  items: local!selectedCaseIds,
+  expression: index(local!allCases, wherecontains(fv!item, local!allCases.id), null)
+)
+
+/* Grid uses ID variable */
+selectionValue: local!selectedCaseIds,
+selectionSaveInto: local!selectedCaseIds
+
+/* Property access uses computed variable ONLY */
+showWhen: if(
+  a!isNotNullOrEmpty(local!selectedCases),
+  contains(local!selectedCases.type, "Contract"),
+  false
 )
 ```
 
-**Pattern 2: Local Variable with Dependent Field Clearing**
-
-When using a single checkbox with local variables that start as null or need to clear dependent fields:
-
-**Critical: Variable Initialization for Pattern 2**
-
-When using Pattern 2 (local variables with checkboxes), nullable boolean variables MUST be initialized to `null`, NOT `false`:
-
-```sail
-/* ✅ CORRECT - Null-initialized */
-a!localVariables(
-  local!caseUrgent,      /* null by default */
-  local!requiresReview,  /* null by default */
-  local!publicRecord,    /* null by default */
-  ...
-)
-
-/* ❌ WRONG - False-initialized */
-a!localVariables(
-  local!caseUrgent: false,      /* ERROR: false is not a valid choiceValue! */
-  local!requiresReview: false,
-  local!publicRecord: false,
-  ...
-)
-```
-
-**Why?** Single checkboxes with `choiceValues: {true}` can only represent two states:
-- **Checked**: `{true}` (stored as the value `true`)
-- **Unchecked**: `{}` or `null` (NOT `false`)
-
-Since `choiceValues` can only contain `{true}`, the variable must be `null` when unchecked. Initializing to `false` creates a mismatch between the variable state and the checkbox's valid values.
-
-**Complete Pattern 2 Example:**
-
-```sail
-/* ✅ CORRECT - Null-aware toggle pattern with dependent field clearing */
-a!localVariables(
-  /* Initialize checkbox variable to null, NOT false */
-  local!caseUrgent,        /* null by default */
-  local!assignedTo,
-  local!escalationReason,
-
-  {
-    a!checkboxField(
-      label: "Case Priority",
-      choiceLabels: {"This is an urgent case requiring immediate attention"},
-      choiceValues: {true},
-      value: if(a!defaultValue(local!caseUrgent, false), {true}, {}),
-      saveInto: {
-        a!save(local!caseUrgent, if(a!isNotNullOrEmpty(save!value), true, null)),
-        a!save(local!assignedTo, if(a!isNotNullOrEmpty(save!value), "urgent-team@example.com", local!assignedTo)),
-        a!save(local!escalationReason, if(a!isNullOrEmpty(save!value), null, local!escalationReason))
-      }
-    ),
-    /* Dependent fields check null state */
-    a!textField(
-      label: "Escalation Reason",
-      value: local!escalationReason,
-      saveInto: local!escalationReason,
-      required: a!isNotNullOrEmpty(local!caseUrgent),
-      showWhen: a!isNotNullOrEmpty(local!caseUrgent)
-    )
-  }
-)
-```
-
-**Key Differences:**
-- **Pattern 1**: Use when binding to a boolean variable with no side effects
-- **Pattern 2**: Use when the checkbox state affects other fields or starts as null
-
-**Common Mistakes:**
-```sail
-/* ❌ WRONG - Using conditional value binding unnecessarily */
-value: if(local!caseUrgent, {true}, {})
-
-/* ✅ RIGHT - Direct assignment */
-value: local!caseUrgent
-
-/* ❌ WRONG - Using save!value in conditional */
-saveInto: {
-  a!save(local!var, or(save!value = {true})),
-  if(or(save!value = {true}), ...) /* ERROR: save!value not allowed here */
-}
-
-/* ✅ RIGHT - Check local variable state, not save!value */
-saveInto: {
-  if(a!isNullOrEmpty(local!var), ...)
-}
-
-/* ❌ WRONG - Using length() on save!value */
-saveInto: {
-  a!save(local!var, if(length(save!value) > 0, true, null))  /* ERROR: fails when null */
-}
-
-/* ✅ RIGHT - Use a!isNotNullOrEmpty() */
-saveInto: {
-  a!save(local!var, if(a!isNotNullOrEmpty(save!value), true, null))
-}
-```
-
-**Critical Rule:** `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)`. It cannot be used in conditionals, the target parameter, or anywhere outside `a!save()`.
-
-## 🚨 MANDATORY: Variable Naming Conventions for Grid Selections
-
-### The Naming Problem
-
-Grid `selectionValue` stores **ONLY identifiers** (Integer Array or Text Array), NOT full row objects. Variables that store these IDs MUST use naming conventions that make this clear.
-
-### ❌ WRONG - Ambiguous Names That Suggest Full Objects
-```sail
-local!selectedCases: {},      /* ❌ WRONG: Suggests full case objects */
-local!selectedTasks: {},      /* ❌ WRONG: Suggests full task objects */
-local!selectedEmployees: {},  /* ❌ WRONG: Suggests full employee objects */
-local!chosenItems: {},        /* ❌ WRONG: Suggests full item data */
-```
-
-**Why this is dangerous:**
-- Code readers assume these variables contain full objects
-- Leads to property access errors like `local!selectedCases.title` (ERROR: trying to access .title on integer array)
-- Runtime error: "Cannot index property 'title' of type Text into type Number (Integer)"
-
-### ✅ CORRECT - Clear Names That Indicate ID Arrays
-```sail
-/* Option 1: "Ids" suffix (recommended for primary keys) */
-local!selectedCaseIds: {},       /* ✅ CLEAR: Integer array of case IDs */
-local!selectedTaskIds: {},       /* ✅ CLEAR: Integer array of task IDs */
-local!selectedEmployeeIds: {},   /* ✅ CLEAR: Integer array of employee IDs */
-
-/* Option 2: "Keys" suffix (recommended for text identifiers) */
-local!selectedStatusKeys: {},    /* ✅ CLEAR: Text array of status keys */
-local!selectedCategoryKeys: {},  /* ✅ CLEAR: Text array of category keys */
-
-/* Option 3: "Indexes" suffix (recommended for positional selection) */
-local!selectedRowIndexes: {},    /* ✅ CLEAR: Integer array of row positions */
-```
-
-### Naming Convention Rules
-
-**MANDATORY naming pattern for grid selection ID arrays:**
-
-1. **For Integer IDs** (most common):
-   - ✅ Use suffix: `Ids`
-   - Examples: `local!selectedCaseIds`, `local!selectedTaskIds`, `local!chosenEmployeeIds`
-
-2. **For Text Keys**:
-   - ✅ Use suffix: `Keys`
-   - Examples: `local!selectedStatusKeys`, `local!selectedCategoryKeys`
-
-3. **For Array Indexes**:
-   - ✅ Use suffix: `Indexes`
-   - Examples: `local!selectedRowIndexes`
-
-4. **Computed Variables** (full data derived from IDs):
-   - ✅ Use descriptive name WITHOUT suffix
-   - Examples: `local!selectedCases`, `local!selectedTasks`, `local!selectedEmployees`
-
-### Complete Example with Correct Naming
-
-```sail
-a!localVariables(
-  /* Available data - all cases */
-  local!allCases: {
-    a!map(id: 1, title: "Case A", priority: "High"),
-    a!map(id: 2, title: "Case B", priority: "Low"),
-    a!map(id: 3, title: "Case C", priority: "High")
-  },
-
-  /* ✅ CORRECT: ID array with "Ids" suffix */
-  local!selectedCaseIds: {},
-
-  /* ✅ CORRECT: Computed variable with descriptive name (no suffix) */
-  local!selectedCases: a!forEach(
-    items: local!selectedCaseIds,
-    expression: index(
-      local!allCases,
-      wherecontains(fv!item, local!allCases.id),
-      null
-    )
-  ),
-
-  /* Grid configuration */
-  a!gridField(
-    data: local!allCases,
-    columns: {
-      a!gridColumn(label: "Title", value: fv!row.title),
-      a!gridColumn(label: "Priority", value: fv!row.priority)
-    },
-    selectable: true,
-    selectionValue: local!selectedCaseIds,  /* ✅ Use ID variable */
-    selectionSaveInto: local!selectedCaseIds
-  ),
-
-  /* ❌ WRONG: Trying to access properties on ID array */
-  /* local!selectedCaseIds.title */  /* ERROR! */
-
-  /* ✅ CORRECT: Access properties on computed variable */
-  local!selectedCases.title  /* Works! Returns array of titles */
-)
-```
-
-### Enforcement Checklist
-
-**Before writing grid selection code, verify:**
-- [ ] ID array variable name ends with "Ids", "Keys", or "Indexes"
-- [ ] Computed variable name is descriptive WITHOUT suffix
-- [ ] `selectionValue` and `selectionSaveInto` use the ID variable (with suffix)
-- [ ] Property access (`.fieldName`) ONLY uses computed variable (no suffix)
-- [ ] No property access attempted on ID array variable
-
-
-## 🚨 CRITICAL: Grid Selection Implementation Pattern - Two-Variable Approach
-
-### The Core Problem
-Grid `selectionValue` stores **ONLY identifiers** (Integer Array or Text Array), NOT full row data. Trying to access row properties directly from `selectionValue` will cause runtime errors.
-
-### ❌ WRONG Pattern - Single Variable (Common Mistake)
-```sail
-local!selectedItems: {},  /* ❌ Trying to use one variable for both selection and data */
-
-a!gridField(
-  data: local!availableItems,
-  columns: {...},
-  selectionValue: local!selectedItems,  /* ❌ This stores IDs only! */
-  selectionSaveInto: local!selectedItems
-)
-
-/* Later trying to access row data */
-if(
-  length(
-    intersection(
-      local!selectedItems.type,  /* ❌ ERROR: selectedItems contains IDs, not objects! */
-      {"Contract"}
-    )
-  ) > 0,
-  ...
-)
-```
-
-**Error you'll see:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'type' of type Text into type Number (Integer)
-```
-
-### ✅ CORRECT Pattern - Two-Variable Approach
-
-**Step 1: Declare TWO variables**
-```sail
-local!availableItems: {
-  a!map(id: 1, name: "Item A", type: "Public"),
-  a!map(id: 2, name: "Item B", type: "Contract"),
-  a!map(id: 3, name: "Item C", type: "Public")
-},
-local!selectedItemIds: {},  /* Stores grid selection (IDs only) */
-local!selectedItems: a!forEach(  /* Computed: derives full data from IDs */
-  items: local!selectedItemIds,
-  expression: index(
-    local!availableItems,
-    wherecontains(fv!item, local!availableItems.id),
-    null
-  )
-),
-```
-
-**How the computed variable works:**
-1. `a!forEach()` iterates over each ID in `local!selectedItemIds` (e.g., {1, 3})
-2. For each ID (`fv!item`), `wherecontains(fv!item, local!availableItems.id)` finds the position in the array
-3. `index()` retrieves the full map at that position
-4. Result: An array of complete objects for all selected IDs
-
-**Step 2: Configure grid to use the IDs variable**
-```sail
-a!gridField(
-  data: local!availableItems,
-  columns: {
-    a!gridColumn(label: "Name", value: fv!row.name),
-    a!gridColumn(label: "Type", value: fv!row.type)
-  },
-  selectable: true,
-  selectionValue: local!selectedItemIds,  /* ✅ Use IDs variable */
-  selectionSaveInto: local!selectedItemIds  /* ✅ Save to IDs variable */
-)
-```
-
-**Step 3: Access full data using the computed variable (with null safety)**
-```sail
-/* ✅ CORRECT: Use nested if() for null-safe property access */
-if(
-  if(
-    a!isNotNullOrEmpty(local!selectedItems),
-    length(
-      intersection(
-        local!selectedItems.type,  /* ✅ Safe: has full data */
-        {"Contract"}
-      )
-    ) > 0,
-    false  /* Return safe default when empty */
-  ),
-  /* Show registration code field */,
-  {} /* Hide field */
-)
-```
-
-**Step 4: Display selected items**
-```sail
-a!forEach(
-  items: local!selectedItems,  /* ✅ Iterate over full data */
-  expression: a!cardLayout(
-    contents: {
-      a!richTextDisplayField(
-        value: {
-          a!richTextItem(text: fv!item.name, style: "STRONG"),
-          " - ",
-          fv!item.type
-        }
-      )
-    }
-  )
-)
-```
-
-**Step 5: Remove items (modify IDs only)**
-```sail
-/* Remove button in forEach */
-a!buttonWidget(
-  label: "Remove",
-  value: fv!item.id,
-  saveInto: a!save(
-    local!selectedItemIds,  /* ✅ Modify IDs variable only */
-    remove(local!selectedItemIds, wherecontains(fv!item.id, local!selectedItemIds))
-  )
-)
-```
-
-### Critical Rules - COMPLETE ENFORCEMENT CHECKLIST
-
-**Before writing ANY grid with selection, verify ALL of these:**
-
-1. ✅ **Variable Naming Convention (MANDATORY)**:
-   - [ ] ID array variable name ends with "Ids", "Keys", or "Indexes"
-   - [ ] Computed variable name is descriptive WITHOUT suffix
-   - [ ] Variable names clearly distinguish between IDs and full data
-   - Example: `local!selectedCaseIds` (IDs) vs `local!selectedCases` (computed data)
-
-2. ✅ **Two-Variable Pattern (MANDATORY)**:
-   - [ ] TWO variables declared: one for IDs, one computed for full data
-   - [ ] ID variable initialized as empty array: `{}`
-   - [ ] Computed variable uses `a!forEach() + index() + wherecontains()` pattern
-   - [ ] Both variables declared before use
-
-3. ✅ **Grid Configuration (MANDATORY)**:
-   - [ ] `selectionValue` parameter uses ID variable (with suffix)
-   - [ ] `selectionSaveInto` parameter uses ID variable (with suffix)
-   - [ ] Grid `selectionValue` treated as ID array, NEVER as full row data
-
-4. ✅ **Property Access Rules (MANDATORY)**:
-   - [ ] ALL property access (`.fieldName`) uses computed variable ONLY
-   - [ ] NEVER attempt property access on ID array variable
-   - [ ] Null checks precede all property access on computed variable
-
-5. ✅ **Null Safety (MANDATORY)**:
-   - [ ] Use nested `if()` for null-safe property access (NOT `and()`)
-   - [ ] Pattern: `if(a!isNotNullOrEmpty(computed), computed.property, defaultValue)`
-   - [ ] `and()` does NOT short-circuit - see Short-Circuit Evaluation Rules
-
-6. ✅ **Data Derivation (MANDATORY)**:
-   - [ ] Use `a!forEach() + index() + wherecontains()` to derive full data from IDs
-   - [ ] Never use `filter()` for deriving data (requires fv!item context)
-   - [ ] Never save to computed variable (it recalculates automatically)
-
-7. ✅ **Iteration Patterns (MANDATORY)**:
-   - [ ] When iterating to display data: use computed variable (full data)
-   - [ ] When modifying selection: modify ID variable only
-   - [ ] Never iterate over ID array expecting full objects
-
-8. ✅ **Conditional Logic (MANDATORY)**:
-   - [ ] When checking properties: use computed variable with null checks
-   - [ ] Never check properties on ID array variable
-   - [ ] Pattern: `if(a!isNotNullOrEmpty(computed), <property check>, false)`
-
-9. ✅ **Selection Modifications (MANDATORY)**:
-   - [ ] All `saveInto` operations modify ID array ONLY
-   - [ ] Use `append()`, `remove()`, `a!save()` on ID variable
-   - [ ] Computed variable updates automatically
-
-10. ✅ **Grid Context (MANDATORY)**:
-    - [ ] Grid `selectionValue` is ALWAYS a list (even with `maxSelections: 1`)
-    - [ ] Use `index(selectionValue, 1, null)` to get first selection from list
-    - [ ] Check `length(selectionValue) > 0` before accessing selections
-
-11. ✅ **Code Review (MANDATORY)**:
-    - [ ] Search code for ID variable name - verify NO property access attempted
-    - [ ] Search code for computed variable name - verify ALL property access uses it
-    - [ ] Verify naming convention followed consistently throughout interface
-
-### Complete Working Example
-```sail
-a!localVariables(
-  local!availableCourses: {
-    a!map(id: 1, number: "OSHA #500", name: "Construction Safety", type: "Public"),
-    a!map(id: 2, number: "OSHA #501", name: "Maritime Safety", type: "Public"),
-    a!map(id: 3, number: "OSHA #5600", name: "Disaster Response", type: "Contract")
-  },
-  local!selectedCourseIds: {},
-  local!selectedCourses: a!forEach(
-    items: local!selectedCourseIds,
-    expression: index(
-      local!availableCourses,
-      wherecontains(fv!item, local!availableCourses.id),
-      null
-    )
-  ),
-  local!registrationCode,
-  {
-    a!gridField(
-      data: local!availableCourses,
-      columns: {
-        a!gridColumn(label: "Number", value: fv!row.number),
-        a!gridColumn(label: "Name", value: fv!row.name),
-        a!gridColumn(label: "Type", value: fv!row.type)
-      },
-      selectable: true,
-      selectionValue: local!selectedCourseIds,
-      selectionSaveInto: local!selectedCourseIds
-    ),
-    /* Show registration code field if contract course selected */
-    if(
-      if(
-        a!isNotNullOrEmpty(local!selectedCourses),
-        length(
-          intersection(
-            local!selectedCourses.type,
-            {"Contract"}
-          )
-        ) > 0,
-        false
-      ),
-      a!textField(
-        label: "Registration Code",
-        value: local!registrationCode,
-        saveInto: local!registrationCode,
-        required: true
-      ),
-      {}
-    )
-  }
-)
-```
-
-
-## 🚨 CRITICAL ANTI-PATTERNS - DO NOT DO THIS
-
-### Anti-Pattern 1: Property Access on ID Array Variable
-
-**THE ERROR:**
-```sail
-a!localVariables(
-  local!allTasks: {
-    a!map(id: 1, title: "Review contract", status: "Open"),
-    a!map(id: 2, title: "Update case file", status: "Closed"),
-    a!map(id: 3, title: "Schedule hearing", status: "Open")
-  },
-
-  /* ❌ WRONG: Variable name suggests objects but stores IDs */
-  local!selectedTasks: {},
-
-  a!gridField(
-    data: local!allTasks,
-    columns: {
-      a!gridColumn(label: "Title", value: fv!row.title),
-      a!gridColumn(label: "Status", value: fv!row.status)
-    },
-    selectable: true,
-    selectionValue: local!selectedTasks,  /* Stores integers {1, 3}, NOT objects! */
-    selectionSaveInto: local!selectedTasks
-  ),
-
-  /* ❌ WRONG: Trying to access .status property on integer array */
-  a!textField(
-    label: "Selected Task Status",
-    value: local!selectedTasks.status,  /* ERROR: Cannot access .status on {1, 3}! */
-    readOnly: true
-  )
-)
-```
-
-**Runtime Error:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'status' of type Text into type Number (Integer)
-```
-
-**THE FIX:**
-```sail
-a!localVariables(
-  local!allTasks: {
-    a!map(id: 1, title: "Review contract", status: "Open"),
-    a!map(id: 2, title: "Update case file", status: "Closed"),
-    a!map(id: 3, title: "Schedule hearing", status: "Open")
-  },
-
-  /* ✅ CORRECT: Clear naming - stores IDs only */
-  local!selectedTaskIds: {},
-
-  /* ✅ CORRECT: Computed variable derives full data */
-  local!selectedTasks: a!forEach(
-    items: local!selectedTaskIds,
-    expression: index(
-      local!allTasks,
-      wherecontains(fv!item, local!allTasks.id),
-      null
-    )
-  ),
-
-  a!gridField(
-    data: local!allTasks,
-    columns: {
-      a!gridColumn(label: "Title", value: fv!row.title),
-      a!gridColumn(label: "Status", value: fv!row.status)
-    },
-    selectable: true,
-    selectionValue: local!selectedTaskIds,  /* ✅ Use ID variable */
-    selectionSaveInto: local!selectedTaskIds
-  ),
-
-  /* ✅ CORRECT: Access properties on computed variable */
-  a!textField(
-    label: "Selected Task Status",
-    value: joinarray(local!selectedTasks.status, ", "),  /* ✅ Works! */
-    readOnly: true
-  )
-)
-```
-
-### Anti-Pattern 2: Using forEach on ID Array Without Lookup
-
-**THE ERROR:**
-```sail
-a!localVariables(
-  local!allEmployees: {
-    a!map(id: 101, name: "Alice Smith", department: "Legal"),
-    a!map(id: 102, name: "Bob Jones", department: "Finance"),
-    a!map(id: 103, name: "Carol White", department: "Legal")
-  },
-
-  /* ❌ WRONG: Ambiguous variable name */
-  local!selectedEmployees: {},
-
-  a!gridField(
-    data: local!allEmployees,
-    columns: {...},
-    selectionValue: local!selectedEmployees,  /* Stores {101, 103} */
-    selectionSaveInto: local!selectedEmployees
-  ),
-
-  /* ❌ WRONG: Iterating over IDs as if they were objects */
-  a!forEach(
-    items: local!selectedEmployees,  /* This is {101, 103}, NOT employee objects! */
-    expression: a!richTextDisplayField(
-      value: a!richTextItem(
-        text: fv!item.name  /* ERROR: fv!item is 101, not an object! */
-      )
-    )
-  )
-)
-```
-
-**Runtime Error:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'name' of type Text into type Number (Integer)
-```
-
-**THE FIX:**
-```sail
-a!localVariables(
-  local!allEmployees: {
-    a!map(id: 101, name: "Alice Smith", department: "Legal"),
-    a!map(id: 102, name: "Bob Jones", department: "Finance"),
-    a!map(id: 103, name: "Carol White", department: "Legal")
-  },
-
-  /* ✅ CORRECT: Clear ID variable naming */
-  local!selectedEmployeeIds: {},
-
-  /* ✅ CORRECT: Computed variable with full data */
-  local!selectedEmployees: a!forEach(
-    items: local!selectedEmployeeIds,
-    expression: index(
-      local!allEmployees,
-      wherecontains(fv!item, local!allEmployees.id),
-      null
-    )
-  ),
-
-  a!gridField(
-    data: local!allEmployees,
-    columns: {...},
-    selectionValue: local!selectedEmployeeIds,  /* ✅ Use ID variable */
-    selectionSaveInto: local!selectedEmployeeIds
-  ),
-
-  /* ✅ CORRECT: Iterate over computed variable with full data */
-  a!forEach(
-    items: local!selectedEmployees,  /* Full employee objects */
-    expression: a!richTextDisplayField(
-      value: a!richTextItem(
-        text: fv!item.name  /* ✅ Works! fv!item is now a complete employee object */
-      )
-    )
-  )
-)
-```
-
-### Anti-Pattern 3: Conditional Logic on ID Array Properties
-
-**THE ERROR:**
-```sail
-a!localVariables(
-  local!allCases: {
-    a!map(id: 1, title: "Case A", isUrgent: true),
-    a!map(id: 2, title: "Case B", isUrgent: false),
-    a!map(id: 3, title: "Case C", isUrgent: true)
-  },
-
-  /* ❌ WRONG: Stores IDs but name suggests objects */
-  local!selectedCases: {},
-
-  a!gridField(
-    data: local!allCases,
-    columns: {...},
-    selectionValue: local!selectedCases,  /* Stores {1, 3} */
-    selectionSaveInto: local!selectedCases
-  ),
-
-  /* ❌ WRONG: Trying to filter/check properties on ID array */
-  a!textField(
-    label: "Urgency Notes",
-    instructions: "Required for urgent cases",
-    value: local!urgencyNotes,
-    saveInto: local!urgencyNotes,
-    showWhen: length(
-      a!forEach(
-        items: local!selectedCases,  /* IDs: {1, 3} */
-        expression: if(fv!item.isUrgent, fv!item, null)  /* ERROR: fv!item is integer! */
-      )
-    ) > 0
-  )
-)
-```
-
-**Runtime Error:**
-```
-Expression evaluation error: Invalid index: Cannot index property 'isUrgent' of type Boolean (Boolean) into type Number (Integer)
-```
-
-**THE FIX:**
-```sail
-a!localVariables(
-  local!allCases: {
-    a!map(id: 1, title: "Case A", isUrgent: true),
-    a!map(id: 2, title: "Case B", isUrgent: false),
-    a!map(id: 3, title: "Case C", isUrgent: true)
-  },
-
-  /* ✅ CORRECT: Clear ID variable naming */
-  local!selectedCaseIds: {},
-
-  /* ✅ CORRECT: Computed variable with full data */
-  local!selectedCases: a!forEach(
-    items: local!selectedCaseIds,
-    expression: index(
-      local!allCases,
-      wherecontains(fv!item, local!allCases.id),
-      null
-    )
-  ),
-
-  a!gridField(
-    data: local!allCases,
-    columns: {...},
-    selectionValue: local!selectedCaseIds,  /* ✅ Use ID variable */
-    selectionSaveInto: local!selectedCaseIds
-  ),
-
-  /* ✅ CORRECT: Check properties on computed variable with null safety */
-  a!textField(
-    label: "Urgency Notes",
-    instructions: "Required for urgent cases",
-    value: local!urgencyNotes,
-    saveInto: local!urgencyNotes,
-    showWhen: if(
-      a!isNotNullOrEmpty(local!selectedCases),  /* Null check first */
-      length(
-        intersection(
-          local!selectedCases.isUrgent,  /* ✅ Access property on full data */
-          {true}
-        )
-      ) > 0,
-      false
-    )
-  )
-)
-```
-
-### Key Takeaways from Anti-Patterns
-
-**Every anti-pattern shares these root causes:**
-1. ❌ Ambiguous variable naming (no "Ids"/"Keys"/"Indexes" suffix)
-2. ❌ Only ONE variable created (missing computed variable)
-3. ❌ Property access attempted on ID array
-
-**Every fix requires:**
-1. ✅ Clear variable naming with suffix for IDs
-2. ✅ TWO variables (IDs + computed)
-3. ✅ Property access ONLY on computed variable
-4. ✅ Null checking before property access
+**Key Rules:**
+1. ✅ **TWO variables**: ID array (with suffix) + computed variable (full data)
+2. ✅ **Naming**: Use `Ids`/`Keys`/`Indexes` suffix for ID arrays
+3. ✅ **Grid config**: Use ID variable in `selectionValue`/`selectionSaveInto`
+4. ✅ **Property access**: ONLY on computed variable, NEVER on ID array
+5. ✅ **Null safety**: Use nested if() before property access on computed variable
+
+**See `/logic-guidelines/grid-selection-patterns.md` for:**
+- Complete two-variable implementation steps
+- Naming convention enforcement checklist
+- Common anti-patterns and fixes
+- Complete working examples
 
 ## Date/Time Critical Rules
 
-### Correct Date/Time Functions
+> **📖 Complete Guide:** `/logic-guidelines/datetime-handling.md`
 
-🚨 CRITICAL: Use the correct function for date/time creation
+**Core Rules:**
+- ✅ Use `dateTime()` for specific date/time creation (NOT `a!dateTimeValue()`)
+- ✅ Cast date arithmetic with `todate()` in sample data
+- ✅ Date/DateTime arithmetic returns Intervals → use `tointeger()` for comparisons
+- ✅ Match field type to filter function (`today()` for Date, `now()` for DateTime)
+
 ```sail
-/* ✅ CORRECT - Use dateTime() for specific date/time creation */
-dateTime(year(today()), month(today()), 1, 0, 0, 0)  /* Month to Date */
+/* Date field */
+todate(today() + 1)  /* Cast arithmetic */
 
-/* ❌ WRONG - a!dateTimeValue() does NOT exist in Appian */
-a!dateTimeValue(year: year(today()), month: month(today()), day: 1)
+/* DateTime field */
+a!subtractDateTime(startDateTime: now(), days: 30)
+
+/* Interval to Integer */
+tointeger(now() - timestamp) < 1
 ```
 
-### Type Casting with todate()
-
-**Always cast date arithmetic in sample data to ensure consistent types:**
-
-**WRONG:**
-```sail
-local!data: {
-  a!map(dueDate: today()),        /* Type: Date */
-  a!map(dueDate: today() + 1)     /* Type: DateTime - causes grid sort errors! */
-}
-```
-
-**RIGHT:**
-```sail
-local!data: {
-  a!map(dueDate: todate(today())),      /* Type: Date */
-  a!map(dueDate: todate(today() + 1)),  /* Type: Date */
-  a!map(dueDate: todate(today() + 7))   /* Type: Date */
-}
-```
-
-### Date/DateTime Arithmetic Returns Intervals
-
-Subtracting dates or datetimes returns an **Interval** type, not a Number:
-- `now() - timestamp` → Interval (Day to Second)
-- `today() - dateValue` → Interval (Day to Day)
-
-**Cannot compare Intervals directly to Numbers:**
-```sail
-/* WRONG */
-if(now() - fv!row.timestamp < 1, ...)  /* Error: Cannot compare Interval to Number */
-
-/* RIGHT */
-if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer first */
-```
-
-### Key Date/Time Functions
-- `todate()` - Cast to Date type (use for all date arithmetic in sample data)
-- `tointeger()` - Convert interval to whole days as integer
-- `text(value, format)` - Format numbers/dates/intervals as text
+**See `/logic-guidelines/datetime-handling.md` for:**
+- Complete type-specific functions (Date, DateTime, Time)
+- Query filter type matching rules
+- min()/max() return type casting
+- Null-safe text() formatting
 
 ## Chart Data Configuration
 
-Mock Data Charts (Prototyping)
+> **📖 Complete Guide:** `/logic-guidelines/chart-configuration.md`
+
+**Core Rules:**
+- ✅ Use `categories` + `series` for mock data charts (column, line, bar, area, pie)
+- ✅ `stacking` property exists ONLY on: area, bar, column charts (NOT pie/line)
+- ❌ Charts are display-only - cannot extract data from them
+- ❌ NEVER use scatter charts with static mockup data
+
 ```sail
-a!barChartField(
-  categories: {"Sales", "Engineering"},
-  series: {
-    a!chartSeries(
-      label: "Employees",
-      data: {25, 45}
-    )
-  }
-)
-```
-
-Chart Data Extraction Rules
-**CRITICAL**: Charts are display-only components
-- **Cannot extract data from chart components** - Only from queries
-- **Use separate calculations for KPIs** - Don't try to read chart data
-
-## Chart Components Usage
-
-**Available Chart Functions:**
-1. `a!areaChartField()` - Filled areas under lines for trends and cumulative values
-2. `a!barChartField()` - Horizontal bars for comparing categories
-3. `a!columnChartField()` - Vertical bars for comparing values across categories
-4. `a!lineChartField()` - Connected points for trends over time
-5. `a!pieChartField()` - Pie slices for part-to-whole relationships
-
-**Parameters Shared by All Chart Types:**
-- `label`, `labelPosition` (usually "COLLAPSED"), `instructions`
-- `height` - Values vary by type:
-  - Column/Line/Area/Bar: "MICRO", "SHORT", "MEDIUM", "TALL" (Bar also has "AUTO")
-  - Pie: "SHORT", "MEDIUM", "TALL"
-- `showWhen`, `accessibilityText`
-- `xAxisTitle`, `yAxisTitle` (not available for pie charts)
-- `showLegend` (column, line, bar, area only - NOT pie)
-- `showDataLabels`, `colorScheme`
-
-🚨 CRITICAL: Stacking Property
-
-**ONLY these chart types have a `stacking` property:**
-- `a!areaChartField()`
-- `a!barChartField()`
-- `a!columnChartField()`
-
-**The `stacking` property is on the CHART FIELD, NOT in the config:**
-```sail
-/* ✅ CORRECT - stacking on chart field */
+/* Mock data pattern */
 a!columnChartField(
-  categories: {"Q1", "Q2", "Q3", "Q4"},
-  series: {
-    a!chartSeries(label: "Sales", data: {100, 120, 115, 140})
-  },
-  stacking: "NORMAL"  /* On chart field level */
-)
-
-/* ❌ WRONG - stacking doesn't exist for mock data charts with categories/series */
-```
-
-**Valid stacking values:** "NONE" (default), "NORMAL", "PERCENT_TO_TOTAL"
-
-**For Mock Data: Static Mockup Data** (categories + series)
-- Use for: Column, Line, Bar, Area, Pie charts with hardcoded sample data
-- Structure:
-```sail
-a!columnChartField(
-  categories: {"Q1", "Q2", "Q3", "Q4"},
-  series: {
-    a!chartSeries(label: "Sales", data: {100, 120, 115, 140}, color: "#3B82F6")
-  }
+  categories: {"Q1", "Q2", "Q3"},
+  series: {a!chartSeries(label: "Sales", data: {100, 120, 115})},
+  stacking: "NORMAL"  /* Only on area/bar/column */
 )
 ```
 
-❌ **NEVER use scatter charts with static mockup data** - they require record data
+**See `/logic-guidelines/chart-configuration.md` for:**
+- All chart types and their parameters
+- Multi-series patterns
+- Height values by chart type
+- Complete examples
 
-## Essential Functions Reference
+---
 
-⚠️ **CRITICAL: Verify ALL functions exist in `/validation/sail-api-schema.json` before use**
-
-Common functions that DO NOT exist:
-- `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click
-- `property()` - Use dot notation instead: `object.field`
-
-Deprecated/Invalid Parameter Values:
-- `batchSize: -1` - Use `batchSize: 5000` (queries), `batchSize: 1` (single aggregations)
-
-Preferred Functions
-- **Null Checking**: `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()` over `isnull()`
-- **Logical**: `and()`, `or()`, `not()` over infix operators
-- **Looping**: `a!forEach()` over `map()`
-- **Matching**: `a!match()` over `choose()`
-- **Array Operations**: `append()`, `a!update()` for immutable operations
-- **Audit Functions**: `loggedInUser()`, `now()` for audit fields
-
-JSON Functions
-```sail
-/* Convert to JSON */
-a!toJson(
-  value: a!map(name: "John", age: 30),
-  removeNullOrEmptyFields: true
-)
-
-/* Parse from JSON */
-a!fromJson('{"name":"John","age":30}')
-
-/* Extract with JSONPath */
-a!jsonPath(json: local!data, expression: "$.employees[0].name")
-```
-
-contains() Usage
-```sail
-/* Arrays */
-contains({"id", "title"}, "title")  /* Returns true */
-
-/* Map arrays */
-contains(
-  local!items.name,
-  "Alice"
-)
-```
-
-## Quick Function Reference
-
-| Category | Functions |
-|----------|-----------|
-| Array | `a!flatten()`, `append()`, `index()`, `length()`, `where()`, `wherecontains()` |
-| Logical | `and()`, `or()`, `not()`, `if()`, `a!match()` |
-| Null Checking | `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()` |
-| Looping | `a!forEach()`, `filter()`, `reduce()`, `merge()` |
-| Text | `concat()`, `find()`, `left()`, `len()`, `substitute()`, `upper()`, `lower()` |
-| Date/Time | `today()`, `now()`, `dateTime()` |
-| JSON | `a!toJson()`, `a!fromJson()`, `a!jsonPath()` |
-| User/System | `loggedInUser()`, `user()` |
-
-## 🔧 Quick Troubleshooting
-
-If your interface fails to load, check:
-1. **Syntax basics** - All parentheses/brackets matched, variables declared at top
-2. **Null handling** - All variables protected (see MANDATORY: Null Safety Implementation)
-3. **Grid selections** - Two-variable pattern with proper naming conventions
-
-## Syntax Validation Checklist
-
-Before finalizing any SAIL interface with mock data, verify these critical items:
-
-### Foundation & Structure
-- [ ] **Expression starts with `a!localVariables()`** (see MANDATORY FOUNDATION RULES)
-- [ ] **All functions verified in schema** - No a!isPageLoad(), property(), or assumed functions
+## Validation Checklist
 
 ### Grid Selection Pattern (Mock Data)
-- [ ] **Grid selection uses two-variable approach** (see CRITICAL: Grid Selection Implementation Pattern)
+- [ ] **Two-variable approach implemented** (see Grid Selection Patterns)
   - [ ] ID array variable for `selectionValue` (e.g., `local!selectedCaseIds`, `local!selectedTaskIds`)
   - [ ] **ID variable name MUST end with "Ids", "Keys", or "Indexes"** (MANDATORY naming convention)
   - [ ] Computed variable using `a!forEach() + index() + wherecontains()` pattern

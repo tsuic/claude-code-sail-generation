@@ -37,6 +37,20 @@ Use this checklist:
 - ✅ When converting mockups to functional (sail-dynamic-converter agent)
 - ✅ Before calling validation sub-agents
 
+### 🛑 STOP - Before Writing ANY Code:
+
+**READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` NOW if your code will use ANY of the following:**
+- [ ] Arrays or lists (any `{}` or `local!data: {...}`)
+- [ ] Index access (`index()`, array element access)
+- [ ] Property access on maps (`.fieldName` or `fv!row.fieldName`)
+- [ ] Null checking or comparisons with variables that could be null
+- [ ] Any looping (`a!forEach`)
+- [ ] Data aggregation (showing counts, grouping "by status", "by priority", etc.)
+- [ ] Multiple data items (lists of cases, users, products, etc.)
+
+**❌ IF YES TO ANY → STOP AND READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` FIRST**
+**✅ IF NO TO ALL → Proceed with static UI generation (single values, no data manipulation)**
+
 ### Before Writing Dynamic Code:
 - [ ] Read `/logic-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
 - [ ] Read `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` if using arrays, loops, null checking in mock data interfaces
