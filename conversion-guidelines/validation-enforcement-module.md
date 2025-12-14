@@ -393,11 +393,19 @@ For EACH `a!queryFilter()` in the generated file:
 
 ### Form Interface Verification (if applicable) {#validation.pre-flight.form}
 
-- [ ] Used direct `ri!` pattern for CREATE/UPDATE forms
-- [ ] Used structured RULE INPUTS comment format
+- [ ] **🚨 MANDATORY RULE INPUTS (all 3 required):**
+  - [ ] `ri!{recordName}` - The record being created/updated
+  - [ ] `ri!isUpdate` - Boolean flag (true=update, false=create)
+  - [ ] `ri!cancel` - Boolean flag for cancellation signaling
+- [ ] **DO NOT derive mode from field checks** - Use `ri!isUpdate` directly
+- [ ] **REMOVE delete buttons** - Deletion handled from list views, not forms
+- [ ] Used structured RULE INPUTS comment format with ALL 3 inputs documented
 - [ ] Each rule input has Name/Type/Description
 - [ ] Form fields bind to `ri!recordName[...]`, NOT local variables
-- [ ] Audit fields properly set (createdBy, createdOn, modifiedBy, modifiedOn)
+- [ ] Create button: `showWhen: not(ri!isUpdate)`, sets ALL 4 audit fields
+- [ ] Update button: `showWhen: ri!isUpdate`, sets only modifiedBy/modifiedOn
+- [ ] Cancel button: `submit: true, validate: false, saveInto: a!save(ri!cancel, true)`
+- [ ] **RUN full form checklist:** `form-conversion-module.md {#form.checklist}`
 
 ### Validation Enforcement Verification {#validation.pre-flight.validation}
 

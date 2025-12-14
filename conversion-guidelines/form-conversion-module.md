@@ -58,6 +58,19 @@ These are **NOT** form interfaces (use display module instead):
 
 Form interfaces receive their data as **rule inputs (ri!)** from the calling context (process model, record action, related action). This allows forms to create or update record data.
 
+### 🚨 MANDATORY Rule Input Names {#form.ri-pattern.names}
+
+**USE THESE EXACT NAMES - DO NOT RENAME:**
+
+| Rule Input | Type | Purpose |
+|------------|------|---------|
+| `ri!{recordName}` | Record Type | The record being created/updated (e.g., `ri!submission`, `ri!case`) |
+| `ri!isUpdate` | Boolean | Mode flag - `true` = update, `false` = create. **NOT** `ri!isEditMode` |
+| `ri!cancel` | Boolean | Cancellation signal for process model |
+
+**❌ WRONG names:** `ri!isEditMode`, `ri!isEdit`, `ri!editMode`, `ri!cancelled`
+**✅ CORRECT names:** `ri!isUpdate`, `ri!cancel`
+
 ### Pattern Overview
 
 ```sail
