@@ -258,7 +258,8 @@ Include in response:
 ### Query Construction
 - [ ] `pagingInfo: a!pagingInfo(startIndex: 1, batchSize: N)` - REQUIRED
 - [ ] `fetchTotalCount: true` - Required for KPIs using `.totalCount`
-- [ ] Parameter is `sort` (singular) NOT `sorts` (plural)
+- [ ] `sort` goes INSIDE `a!pagingInfo()`, NOT as direct parameter of `a!queryRecordType()`
+- [ ] Parameter name is `sort` (singular), NOT `sorts` (plural)
 - [ ] Filters array contains ONLY `a!queryFilter()`, nested expressions go in `logicalExpressions`
 
 ### Relationship Navigation
