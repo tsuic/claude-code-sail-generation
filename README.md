@@ -89,6 +89,8 @@ The `sail-dynamic-converter` agent:
 - Relationships between record types
 - Field data types (Text, Number, Date, DateTime, etc.)
 
+Try using [@tokyojordan's tool](https://github.com/tokyojordan/data-model-context) to generate the data model context from your app.
+
 ### Validation Approaches
 
 Claude Code validates generated SAIL expressions using different approaches:
