@@ -5,11 +5,11 @@ This tool generates Appian SAIL UI expressions from natural language requests.
 ## Getting Started
 1. [Clone this repo](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 2. *Windows users:* [Install Git for Windows](https://git-scm.com/downloads/win)
-2. [Install and set up Claude Code](https://docs.claude.com/en/docs/claude-code/setup)
-3. For best performance, connect to the Appian VPN while using this project ([See why](#validation-approaches))
-4. Open a terminal window and navigate to the root folder for this repo
-5. Launch Claude Code by typing: `claude`
-6. Grant any permissions that Claude Code asks for
+3. [Install and set up Claude Code](https://docs.claude.com/en/docs/claude-code/setup)
+4. For best performance, connect to the Appian VPN while using this project ([See why](#validation-approaches))
+5. Open a terminal window and navigate to the root folder for this repo
+6. Launch Claude Code by typing: `claude`
+7. Grant any permissions that Claude Code asks for
 
 ## (Optional + Recommended) Use with Visual Studio Code
 If you want to use an IDE instead of the command line:
