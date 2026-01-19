@@ -1,5 +1,11 @@
 # SAIL Array Type Initialization Guidelines
 
+> **Parent guide:** `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
+>
+> **Related:**
+> - `/logic-guidelines/array-manipulation-patterns.md` - Dot notation, wherecontains()
+> - `/logic-guidelines/foreach-patterns.md` - Working with arrays in loops
+
 ## 🚨 CRITICAL: Empty Array Type Declaration
 
 **Problem:** In Appian, `{}` returns a **List of Variant** (untyped array), which causes type mismatch errors when used with typed operations.

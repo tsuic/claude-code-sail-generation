@@ -246,17 +246,10 @@ a!textField(
   inputPurpose: "EMAIL",  /* Browser provides format hint */
   value: local!email,
   saveInto: local!email,
-  required: true(),
+  required: true()
   /* VALIDATION RULE: Email format validation
-     Implementation: Using inputPurpose for browser hint + length check */
-  validations: if(
-    and(
-      a!isNotNullOrEmpty(local!email),
-      len(local!email) < 5
-    ),
-    "Email must be at least 5 characters",
-    null
-  )
+     BLOCKER: Complex format validation requires pattern from /logic-guidelines/functions-reference.md#email-validation-pattern
+     PARTIAL IMPLEMENTATION: inputPurpose provides browser hint only (not enforced server-side) */
 )
 ```
 

@@ -73,7 +73,7 @@ Or generate and convert in one request:
 The `sail-dynamic-converter` agent:
 1. **Reads** your static SAIL mockup
 2. **Consults** `/context/data-model-context.md` for record type UUIDs and field references
-3. **Applies** patterns from `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`:
+3. **Applies** conversion patterns:
    - Replaces `local!` arrays with `a!queryRecordType()` or `a!recordData()`
    - Converts form fields to use `ri!` rule input pattern
    - Adds null-safe field access patterns

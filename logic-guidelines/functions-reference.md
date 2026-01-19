@@ -1,8 +1,6 @@
 # Essential Functions Reference {#functions-reference}
 
-> **Parent guides:**
-> - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
-> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Full API Reference:** `/ui-guidelines/reference/sail-api-schema.json`
 
@@ -13,9 +11,17 @@
 ⚠️ **CRITICAL: Verify ALL functions exist in `/ui-guidelines/reference/sail-api-schema.json` before use**
 
 ### Functions That DO NOT Exist:
-- `a!isPageLoad()` - Use pattern: `local!showValidation: false()` + set to `true()` on button click
+- `a!isPageLoad()` - No direct equivalent; SAIL validations evaluate automatically when fields have values
 - `property()` - Use dot notation instead: `object.field`
 - `a!dateTimeValue()` - Use `dateTime()` instead
+- `apply()` - Use `a!forEach()` instead for all iteration
+- `regexmatch()`, `regex()`, or any regex functions - SAIL has no regex support; use `split()`, `stripwith()`, `contains()`, `find()` for pattern validation (see [Email Validation Pattern](#email-validation-pattern))
+
+### Functions to Avoid in Mockup Sample Data:
+- `rand()` - Generates new values on every re-evaluation (use hardcoded decimals instead)
+- `now()` - Use specific `dateTime(2025, 1, 15, 10, 30)` instead
+- `today()` - Use specific `date(2025, 1, 15)` instead
+- `loggedInUser()` - Use hardcoded user references like `"john.smith"` instead
 
 ### Deprecated/Invalid Parameter Values:
 - `batchSize: -1` - Use `batchSize: 5000` (queries), `batchSize: 1` (single aggregations)
@@ -45,7 +51,7 @@
 | **Logical** | `and()`, `or()`, `not()`, `if()`, `a!match()` |
 | **Null Checking** | `a!isNullOrEmpty()`, `a!isNotNullOrEmpty()`, `a!defaultValue()` |
 | **Looping** | `a!forEach()`, `filter()`, `reduce()`, `merge()` |
-| **Text** | `concat()`, `find()`, `left()`, `right()`, `len()`, `substitute()`, `upper()`, `lower()`, `trim()` |
+| **Text** | `concat()`, `find()`, `left()`, `right()`, `len()`, `substitute()`, `upper()`, `lower()`, `trim()`, `split()`, `stripwith()`, `count()` |
 | **Date/Time** | `today()`, `now()`, `dateTime()`, `date()`, `time()`, `todate()`, `todatetime()`, `a!addDateTime()`, `a!subtractDateTime()` |
 | **JSON** | `a!toJson()`, `a!fromJson()`, `a!jsonPath()` |
 | **User/System** | `loggedInUser()`, `user()`, `group()` |
@@ -89,6 +95,62 @@ contains(
   "Alice"
 )
 ```
+
+---
+
+## Email Validation Pattern
+
+Since SAIL doesn't support regex, use this pattern for robust email validation:
+
+```sail
+/* Returns true if valid, false if invalid */
+a!localVariables(
+  local!trimmed: trim(local!email),
+  if(
+    or(
+      a!isNullOrEmpty(local!trimmed),
+      len(local!trimmed) > 255,
+      length(split(local!trimmed, " ")) > 1,
+      count(split(local!trimmed, "@")) <> 2
+    ),
+    false(),
+    a!localVariables(
+      local!localPart: split(local!trimmed, "@")[1],
+      local!domainPart: split(local!trimmed, "@")[2],
+      if(
+        or(
+          length(split(local!domainPart, ".")) < 2,
+          contains(split(local!localPart, "."), ""),
+          contains(split(local!domainPart, "."), ""),
+          not(isnull(stripwith(lower(local!domainPart), "abcdefghijklmnopqrstuvwxyz1234567890-."))),
+          not(isnull(stripwith(lower(local!localPart), "abcdefghijklmnopqrstuvwxyz1234567890-._+'&%")))
+        ),
+        false(),
+        true()
+      )
+    )
+  )
+)
+```
+
+**What it validates:**
+- Not null, max 255 chars, no spaces, exactly one `@`
+- Domain has at least one `.`, no empty segments (catches `..` or leading/trailing dots)
+- Valid characters only (alphanumeric + allowed special chars)
+
+**Usage in validations parameter:**
+```sail
+validations: if(
+  /* email validation pattern returns false */,
+  "Please enter a valid email address",
+  {}
+)
+```
+
+**For other format validations (phone, SSN, zip code, etc.):**
+- Use this email pattern as a reference example
+- Replace `regexmatch()` thinking with SAIL string functions: `split()`, `stripwith()`, `contains()`, `find()`, `len()`, `count()`
+- Break format rules into checkable conditions (length, character sets, required segments)
 
 ---
 
@@ -188,6 +250,32 @@ a!match(
 
 ---
 
+## Mathematical & Random Functions
+
+### rand()
+
+**Syntax:**
+- `rand()` - Returns a single decimal between 0 and 1 (e.g., 0.3483318)
+- `rand(n)` - Returns an array of n decimals between 0 and 1
+
+**Examples:**
+```sail
+rand()  /* Returns: 0.3483318 */
+rand(5)  /* Returns: {0.1814373, 0.8513633, 0.9319652, 0.1100233, 0.5996339} */
+tointeger(rand() * 100) + 1  /* Random integer 1-100 */
+```
+
+**❌ NEVER use in mockup interfaces** - generates new values on every re-evaluation:
+```sail
+/* ❌ WRONG */
+local!orderId: "ORD-" & text(tointeger(rand() * 10000), "0000")
+
+/* ✅ CORRECT */
+local!orderId: "ORD-1234"
+```
+
+---
+
 ## Null Checking Functions
 
 ```sail
@@ -209,16 +297,16 @@ a!defaultValue(value, fallback)  /* Returns fallback if value is null */
 
 ```sail
 a!queryRecordType(
-  recordType: 'recordType!{uuid}Employee',
+  recordType: 'recordType!Employee',
   fields: {
-    'recordType!{uuid}Employee.fields.{uuid}firstName',
-    'recordType!{uuid}Employee.fields.{uuid}lastName'
+    'recordType!Employee.fields.firstName',
+    'recordType!Employee.fields.lastName'
   },
   filters: a!queryLogicalExpression(
     operator: "AND",
     filters: {
       a!queryFilter(
-        field: 'recordType!{uuid}Employee.fields.{uuid}status',
+        field: 'recordType!Employee.fields.status',
         operator: "=",
         value: "Active"
       )
@@ -233,7 +321,7 @@ a!queryRecordType(
 ```sail
 a!gridField(
   data: a!recordData(
-    recordType: 'recordType!{uuid}Employee',
+    recordType: 'recordType!Employee',
     filters: a!queryFilter(...)
   ),
   columns: {...}
@@ -244,22 +332,23 @@ a!gridField(
 
 ```sail
 a!queryRecordType(
-  recordType: 'recordType!{uuid}Order',
+  recordType: 'recordType!Order',
   fields: a!aggregationFields(
     groupings: {
       a!grouping(
-        field: 'recordType!{uuid}Order.fields.{uuid}status',
+        field: 'recordType!Order.fields.status',
         alias: "statusName"
       )
     },
     measures: {
       a!measure(
         function: "COUNT",
+        field: 'recordType!Order.fields.id',  /* field is REQUIRED even for COUNT */
         alias: "orderCount"
       ),
       a!measure(
         function: "SUM",
-        field: 'recordType!{uuid}Order.fields.{uuid}amount',
+        field: 'recordType!Order.fields.amount',
         alias: "totalAmount"
       )
     }

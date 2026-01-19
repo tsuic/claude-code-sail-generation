@@ -1,10 +1,8 @@
 # Short-Circuit Evaluation Rules {#short-circuit-rules}
 
-> **Parent guides:**
+> **Related documentation:**
 > - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
-> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
->
-> **Related:** `logic-guidelines/null-safety-quick-ref.md` for quick pattern lookup
+> - `logic-guidelines/null-safety-quick-ref.md` (quick pattern lookup)
 
 ---
 

@@ -75,19 +75,25 @@ a!tagField(size: "MEDIUM")  /* Line 135 */
 a!gridField(
   data: local!employees,       /* Line 210 - Uses local data */
   columns: {...},
-  showSearchBox: false,        /* Line 212 - Record-only parameter! */
-  showRefreshButton: false     /* Line 213 - Record-only parameter! */
+  showSearchBox: true,         /* Line 212 - Record-only parameter! */
+  userFilters: {...},          /* Line 213 - Record-only parameter! */
+  showRefreshButton: true      /* Line 214 - Record-only parameter! */
 )
 ```
 
 **Validation log:**
 ```
-❌ Line 212 | a!gridField | showSearchBox: false
+❌ Line 212 | a!gridField | showSearchBox: true
   Data source: local!employees (LOCAL DATA)
   Result: ❌ RECORD-ONLY PARAMETER WITH LOCAL DATA
   Final: ❌ INVALID - Remove this parameter
 
-❌ Line 213 | a!gridField | showRefreshButton: false
+❌ Line 213 | a!gridField | userFilters: {...}
+  Data source: local!employees (LOCAL DATA)
+  Result: ❌ RECORD-ONLY PARAMETER WITH LOCAL DATA
+  Final: ❌ INVALID - Remove this parameter
+
+❌ Line 214 | a!gridField | showRefreshButton: true
   Data source: local!employees (LOCAL DATA)
   Result: ❌ RECORD-ONLY PARAMETER WITH LOCAL DATA
   Final: ❌ INVALID - Remove this parameter
@@ -158,16 +164,18 @@ paramName: "VALID1"  /* Changed from "INVALID_VALUE" */
 ```
 ## ❌ ERROR [n]: Record-Only Parameter with Local Data
 
-**Location:** Line X | **Function:** `a!gridField` | **Parameter:** `showSearchBox` or `showRefreshButton`
+**Location:** Line X | **Function:** `a!gridField` | **Parameter:** `showSearchBox`, `userFilters`, `showRefreshButton`, etc.
 **Data Source:** `local!variableName` (LOCAL DATA)
 **Issue:** This parameter ONLY works with record data (`recordType!` or `a!recordData()`), NOT local variables
+
+**Record-only parameters:** `showSearchBox`, `showRefreshButton`, `showExportButton`, `userFilters`, `recordActions`, `loadDataAsync`, `refreshAfter`
 
 **Fix:**
 ```sail
 a!gridField(
   data: local!employees,
   columns: {...}
-  /* ✅ Removed showSearchBox and showRefreshButton */
+  /* ✅ Removed all record-only parameters */
 )
 ```
 ```
@@ -198,7 +206,7 @@ a!gridField(
      // 🆕 CRITICAL: Check for record-only parameters in a!gridField
      if function == "a!gridField":
        dataParam = parameters["data"]
-       recordOnlyParams = ["showSearchBox", "showRefreshButton", "recordActions"]
+       recordOnlyParams = ["showSearchBox", "showRefreshButton", "showExportButton", "userFilters", "recordActions", "loadDataAsync", "refreshAfter"]
 
        // Check if using local data
        if dataParam && dataParam.startsWith("local!"):

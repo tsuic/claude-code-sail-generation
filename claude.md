@@ -6,16 +6,24 @@
 - Use only valid SAIL components and the allowed parameter values for each
 - Use modern, but business-appropriate styling
 - Don't worry about querying live data, just hard-code sample content using local variables and a!map
-- Don't use `ri!` or `recordtype!` references to live record data unless explicitly asked to
+- NEVER use `ri!` or `recordtype!` references in mockups - mockups are pure UX prototypes
+- Use `local!` variables for ALL data AND control parameters (isUpdate, cancel)
+- Initialize control parameters: `local!isUpdate: false()`, `local!cancel: false()`
+- The sail-dynamic-converter agent will transform local! → ri! in Phase 2
 - Inline ALL logic - no `rule!` or `cons!` references unless explicitly specified!
   - ❌ SAIL does not support inline function definitions or helper expressions stored in variables
   - ❌ CANNOT create reusable logic: `local!calculateColor: rule!helper` (syntax error - rule references cannot be stored in variables)
-  - ❌ CANNOT define inline helper functions or lambdas: `local!helper: expression` (not supported in SAIL)
+  - ❌ CANNOT define inline helper functions or lambdas: `local!helper: function(x, y)(...)` or `local!helper: expression` (invalid SAIL syntax)
   - ✅ Repeat logic inline wherever needed (even if duplicative across multiple columns/components)
   - ✅ For complex repeated logic, use if()/a!match() patterns directly in each location
+- 💡 **When logic is repeated 3+ times**: Add TODO comment for future extraction:
+  ```sail
+  /* TODO: Extract to expression rule - repeated logic for status calculation
+   * Used in: Status column tag, Status column color, Filter dropdown
+   * Logic: if(and(startDate <= today(), endDate >= today()), "Current", ...) */
+  ```
 - ‼️Syntax errors are DISASTROUS and MUST BE AVOIDED at any cost! Be METICULOUS about following instructions to avoid making mistakes!
-- ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in `/ui-guidelines/reference/sail-api-schema.json`
-- When converting mock to functional, apply ALL "Logic Refactoring Requirements" (see dedicated section below), refactor code structure for record queries (e.g., chart patterns), but preserve visual design
+- ❌Don't assume that a parameter or parameter value exists - ✅ONLY use values specifically described in the appropriate schema files (`/ui-guidelines/reference/schemas/*.json`)
 
 ## ⚠️ BEFORE YOU BEGIN - MANDATORY RULES
 1. ❌ NEVER nest sideBySideLayouts inside sideBySideLayouts
@@ -25,230 +33,14 @@
 5. ✅ Each columnsLayout must have at least one AUTO-width columnLayout
 6. ❌ choiceValues CANNOT be null or empty strings
 7. ⚠️ ALWAYS check for null before comparisons/property access - use if() NOT and() (see NULL SAFETY RULES section)
+8. ⚠️ Grid record-only parameters (`showSearchBox`, `userFilters`, `recordActions`) cause runtime errors with local data - use custom search/filter UX with TODO comments for mockups instead
+9. ❌ NEVER use runtime generators (rand(), now(), today()) for sample data - use hardcoded static values instead
 
 If you violate any of these rules, STOP and reconsider your approach.
 
-## 🚨 UNIVERSAL SAIL VALIDATION CHECKLIST
+---
 
-**This checklist applies to BOTH mock generation AND functional conversion.**
-
-Use this checklist:
-- ✅ When generating new mockup interfaces (primary agent)
-- ✅ When converting mockups to functional (sail-dynamic-converter agent)
-- ✅ Before calling validation sub-agents
-
-### 🛑 STOP - Before Writing ANY Code:
-
-**READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` NOW if your code will use ANY of the following:**
-- [ ] Arrays or lists (any `{}` or `local!data: {...}`)
-- [ ] Index access (`index()`, array element access)
-- [ ] Property access on maps (`.fieldName` or `fv!row.fieldName`)
-- [ ] Null checking or comparisons with variables that could be null
-- [ ] Any looping (`a!forEach`)
-- [ ] Data aggregation (showing counts, grouping "by status", "by priority", etc.)
-- [ ] Multiple data items (lists of cases, users, products, etc.)
-
-**❌ IF YES TO ANY → STOP AND READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` FIRST**
-**✅ IF NO TO ALL → Proceed with static UI generation (single values, no data manipulation)**
-
-### Before Writing Dynamic Code:
-- [ ] Read `/logic-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
-- [ ] Read `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` if using arrays, loops, null checking in mock data interfaces
-- [ ] Read `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` if working with record types, queries, or relationships
-- [ ] Remember that SAIL doesn't support regex
-
-### Dynamic Form Field Validation:
-- [ ] **Pattern Selection for Multi-Instance Forms** (see `/logic-guidelines/foreach-patterns.md`):
-  - [ ] **Array of Maps** (PREFERRED): When collecting multiple instances of related data (work experiences, addresses, contacts, line items) → Use `local!items: {a!map(...)}` with `saveInto: fv!item.propertyName` ‼️
-  - [ ] **Parallel Arrays** (ALTERNATIVE): Only when iterating over a FIXED source list to collect SEPARATE data → Use `index()` + `a!update()` pattern
-- [ ] Parallel arrays type-initialized based on data type (see array-type-initialization-guidelines.md) ‼️
-- [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
-- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/logic-guidelines/checkbox-patterns.md`)
-
-### Syntax Validation:
-- [ ] Starts with a!localVariables()
-- [ ] All braces/parentheses matched
-- [ ] All strings in double quotes
-- [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
-- [ ] Comments use /* */ not //
-- [ ] `or(a,b)` NOT `a or b` ‼️
-- [ ] Range comparisons use `a!match(whenTrue:)` NOT nested `if()` ‼️
-- [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
-- [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
-- [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️
-- [ ] NO mixed-type appends that create List of Variant ‼️
-- [ ] All null-unsafe operations protected (see "NULL SAFETY RULES" section) ‼️
-  - Comparisons wrapped in if() short-circuit pattern
-  - Property access checked before use
-  - Function parameters use a!defaultValue() where needed
-  - Grid selections use index(..., 1, null) pattern
-- [ ] **Relationships ONLY used with: a!relatedRecordData(), null checks, array functions (a!forEach, length), or field navigation** ‼️
-- [ ] **All other functions receive FIELD values (User, Text, Number, Date), NOT relationships** ‼️
-- [ ] **user() function: Pass User FIELD or Text username - NEVER relationships** ‼️
-- [ ] **NEVER use touser() - user() already accepts both User and Text types** ‼️
-- [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
-- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
-- [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
-- [ ] **Query result property access**: Field queries use `'recordType!Type.fields.name'`, aggregations use `"aliasName"` ‼️ (see `/record-query-guidelines/query-result-structures.md`)
-
-### Function Variable Validation:
-- [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
-- [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
-- [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
-- [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
-- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️
-
-### Parameter Validation:
-- [ ] Check to see that every parameter and value is listed in documentation before using!
-- [ ] For functional interfaces: ALL a!measure() functions validated against sail-api-schema.json
-- [ ] For functional interfaces: ALL a!queryFilter() operators validated against `/record-query-guidelines/query-filters-operators.md`
-
-### Layout Validation:
-- [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
-- [ ] No nested sideBySideLayouts
-- [ ] No columns or card layouts inside sideBySideItems
-- [ ] Only richTextItems or richTextIcons in richTextDisplayField
-- [ ] At least one AUTO width column in each columnsLayout
-- [ ] ❌ DON'T USE `less` or `more` for `spacing`!
-
-## 📚 DOCUMENTATION REQUIREMENT
-
-**ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
-
-**Two-tier documentation structure:**
-1. **Schema Reference** - `/ui-guidelines/reference/sail-api-schema.json` summarizes ALL SAIL components and functions with their parameters and valid values
-
-### Schema Structure:
-```json
-{
-  "components": {
-    "a!componentName": {
-      "description": "What it does",
-      "category": "layout|input|display|chart|helper|...",
-      "parameters": {
-        "paramName": {
-          "type": "Text|Integer|Boolean|...",
-          "required": true|false,
-          "validValues": ["OPTION1", "OPTION2", ...],  // ONLY these!
-          "acceptsHexColors": true|false
-        }
-      },
-      "specialNote": "Important warnings or constraints"
-    }
-  },
-  "expressionFunctions": {
-    "functionName": {
-      "syntax": "functionName(param1, param2, ...)",
-      "parameterCount": 3,
-      "description": "What it does"
-    }
-  }
-}
-```
-
-2. **Detailed Instructions** - Select components have dedicated instruction files (listed below) - don't use a component in code without first reading its instructions!!!
-
-### Available Documentation Files:
-
-**Core Reference (use for ALL components):**
-- `reference/sail-api-schema.json` - Complete parameter reference for all SAIL components (JSON schema)
-
-**Expression Grammar & Variables:**
-- `reference/expression-grammar-instructions.md` - Expression grammar for calculation, logic, conversion functions (✅ ALWAYS check for function signatures)
-
-**Layout Components:**
-- `layouts/header-content-layout-instructions.md` - HeaderContentLayout guidelines
-- `layouts/columns-layout-instructions.md` - ColumnsLayout guidelines
-- `layouts/sidebyside-layout-instructions.md` - SideBySideLayout guidelines
-- `layouts/form-layout-instructions.md` - FormLayout guidelines
-- `layouts/pane-layout-instructions.md` - PaneLayout guidelines
-- `layouts/wizard-layout-instructions.md` - WizardLayout guidelines
-- `layouts/card-layout-instructions.md` - CardLayout guidelines
-
-**Display Components:**
-- `components/button-instructions.md` - Button and ButtonArrayLayout guidelines
-- `components/grid-field-instructions.md` - GridField (read-only grid) guidelines
-- `components/grid-layout-instructions.md` - GridLayout (editable grid) guidelines
-- `components/rich-text-instructions.md` - Rich Text component guidelines
-- `components/stamp-field-instructions.md` - Stamp Field guidelines
-- `components/card-choice-field-instructions.md` - Card Choice Field guidelines
-- `components/chart-instructions.md` - Chart component guidelines
-- `components/image-field-instructions.md` - Image Field guidelines
-- `components/tabular-data-display-pattern.md` - Custom tabular display pattern
-
-**Icons:**
-- `reference/rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
-
-**All other components** (textField, dropdownField, etc.) are documented in `/ui-guidelines/reference/sail-api-schema.json` only.
-
-### Documentation Lookup Process:
-
-1. **Check if a dedicated instruction file exists** for the component (see list above)
-   - If YES → Read the dedicated file for templates, patterns, and detailed rules
-   - If NO → Use `/ui-guidelines/reference/sail-api-schema.json` for parameters and values
-
-2. **For unfamiliar components** - Read the component entry in `/ui-guidelines/reference/sail-api-schema.json` first to understand basic parameters
-
-### ❌ NEVER:
-- Use parameters that aren't explicitly documented in either the reference or instruction files
-- Put components in layouts that don't accept them
-- Skip reading documentation because "it seems straightforward"
-
-### ✅ ALWAYS:
-- Start with `/ui-guidelines/reference/sail-api-schema.json` for parameter validation
-- Read dedicated instruction files when available for templates and patterns
-- Follow templates exactly from instruction files
-- Verify against validation checklists
-- **Read `/ui-guidelines/reference/rich-text-icon-aliases.md` in full before using ANY icons**
-
-**THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
-
-## 🔄 DYNAMIC SAIL EXPRESSIONS
-
-**When working with dynamic data (arrays, loops, conditionals), ALWAYS read the appropriate guidelines FIRST:**
-
-### **FOUNDATIONAL SAIL SYNTAX (Required for ALL Interfaces)**
-**Read:** `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
-
-**Contains:** Universal SAIL syntax rules that apply to **both mock and functional interfaces:**
-- ✅ **Language-specific syntax** (and/or/if functions, NOT JavaScript operators)
-- ✅ **Null safety and short-circuit evaluation** patterns
-- ✅ **Function parameter validation** (wherecontains, index, a!forEach, etc.)
-- ✅ **Array manipulation, loops, property access**
-- ✅ **Grid selection patterns** (two-variable approach, naming conventions)
-- ✅ **Checkbox patterns** (initialization, multi-select vs single)
-- ✅ **Chart data configuration**
-- ✅ **Date/time type handling**
-- ✅ **Pattern matching with a!match()**
-- ✅ **Dynamic form field patterns**
-
-**⚠️ Important:** This file contains **FOUNDATIONAL rules for ALL SAIL code** (both mock and dynamic interfaces).
-
-### **RECORD TYPE INTEGRATION (When Using Record Data)**
-**Read:** `/record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md`
-
-**Contains:** Record-specific patterns built **ON TOP of LOGIC-PRIMARY-REFERENCE.md:**
-- ✅ **Record type reference syntax** (UUID usage)
-- ✅ **Form interface data patterns** (ri! vs queries decision tree)
-- ✅ **Query construction** (a!queryRecordType, a!recordData)
-- ✅ **Relationship navigation** (one-to-many, many-to-one)
-- ✅ **Record type constructors** vs a!map()
-- ✅ **Testing simulation variables**
-
-**⚠️ Critical:** Functional interfaces with record types and data use **ALL rules from LOGIC-PRIMARY-REFERENCE.md PLUS** record-specific rules from this file.
-
-### When to Read Dynamic Guidelines:
-- ✅ Before using `a!forEach()`, `wherecontains()`, `index()`, or array operations
-- ✅ Before filtering or searching arrays
-- ✅ Before accessing properties on dynamic data
-- ✅ Before concatenating variables (type safety)
-- ✅ Before implementing conditional logic with data
-- ✅ Before using `a!checkboxField()` - for proper variable initialization (null vs false)
-- ✅ Before using variables in `required` parameter - for null-safe conditional logic
-- ✅ **Remember:** SAIL doesn't support regex
-
-**THIS IS NOT OPTIONAL for dynamic code. Static UIs may skip this.**
-**THIS IS NOT OPTIONAL when using checkboxes or conditional `required` parameters.**
+# PHASE 1: UNDERSTAND THE TASK
 
 ## INITIAL REQUEST CATEGORIZATION
 
@@ -276,46 +68,9 @@ Determine if the user wants a full page or just a component.
   - ✅ "Build a project management page..." → Generate full page structure
   - ✅ "Design an interface for..." → Generate full page structure
 
-## CAPTURING USER REQUIREMENTS IN GENERATED CODE
+---
 
-When generating mockups, capture user-specified requirements as comments. **ONLY use requirements explicitly provided by the user - DO NOT invent or assume requirements.**
-
-**File Header Comment Pattern:**
-```sail
-a!localVariables(
-  /* REQUIREMENT: [Interface Purpose from user's screen definition]
-   * Example: Case List View - Displays active cases assigned to current user with filtering */
-```
-
-**Query/Component-Level Comment Pattern:**
-Before each data query or significant business logic component, ONLY if user specified the requirement:
-```sail
-  /* REQUIREMENT: [Specific data/logic requirement from user specification]
-   * Example: Display cases where status is "Open" or "In Progress" and assignedTo equals current user */
-  local!activeCasesQuery: a!queryRecordType(...)
-```
-
-**Grid Column Comment Pattern:**
-For calculated/conditional columns, ONLY if user specified the business rule:
-```sail
-  a!gridColumn(
-    label: "Priority",
-    /* REQUIREMENT: [User-specified business rule]
-     * Example: High priority cases (priority = 1) show in red, medium (priority = 2) in yellow, low (priority = 3) in gray */
-    value: a!tagField(...)
-  )
-```
-
-**Critical Rules:**
-- ✅ ONLY capture requirements explicitly stated by the user
-- ❌ DO NOT add requirement comments for standard UI patterns (sorting, formatting, basic display)
-- ❌ DO NOT invent business rules or make assumptions about data logic
-- ❌ DO NOT add comments for: standard formatting (dates, numbers, currency), basic sorting, default UI behaviors, standard SAIL patterns
-
-**These comments serve as:**
-- Documentation for developers
-- Context for sail-dynamic-converter agent during conversion
-- Traceability back to user requirements
+# PHASE 2: PLAN THE UI
 
 ## PAGE UI DESIGN PLANNING STEPS
 When designing a full page, follow these planning steps (not necessary if user requests a single component):
@@ -326,11 +81,11 @@ When designing a full page, follow these planning steps (not necessary if user r
   - [ ] Wizard layout - for multi-step forms, or,
   - [ ] Header-content layout - for everything else
 2. Read primary layout docs
-  - [ ] If using FormLayout → Read `layouts/form-layout-instructions.md`
-  - [ ] If using HeaderContentLayout → Read `layouts/header-content-layout-instructions.md`
-  - [ ] If using PaneLayout → Read `layouts/pane-layout-instructions.md`
-  - [ ] If using WizardLayout → Read `layouts/wizard-layout-instructions.md`
-3. Plan the main page content layout using columnsLayout → Always read `layouts/columns-layout-instructions.md`
+  - [ ] If using FormLayout → Read `ui-guidelines/layouts/form-layout-instructions.md`
+  - [ ] If using HeaderContentLayout → Read `ui-guidelines/layouts/header-content-layout-instructions.md`
+  - [ ] If using PaneLayout → Read `ui-guidelines/layouts/pane-layout-instructions.md`
+  - [ ] If using WizardLayout → Read `ui-guidelines/layouts/wizard-layout-instructions.md`
+3. Plan the main page content layout using columnsLayout → Always read `ui-guidelines/layouts/columns-layout-instructions.md`
   - **For FormLayout/WizardLayout:** Use the `contentsWidth` parameter to control max content width (no columnsLayout needed unless splitting into multiple columns)
   - **For HeaderContentLayout:** Content fills full width by default. Use columnsLayout for either:
     - **Width constraint:** Limit all contents to a max width instead of spanning the full screen
@@ -343,7 +98,7 @@ When designing a full page, follow these planning steps (not necessary if user r
     - [ ] Does content need a max width constraint? → Use gutter + WIDE_PLUS + gutter pattern
     - [ ] Should content be split into multiple columns? → Use 2-3 columns with appropriate widths
     - [ ] If NO to both → Skip columnsLayout
-4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `layouts/sidebyside-layout-instructions.md`
+4. Use sideBySideLayout as needed to arrange groupings of content items, e.g. a stamp next to a rich text title next to a button → Always read `ui-guidelines/layouts/sidebyside-layout-instructions.md`
   - sideBysideItems CANNOT contain other sideBySideLayouts/items, cardLayouts, or columnLayouts
   - A sideBysideItem can only contain one component, not an array of components
   - If your plan requires an invalid sideBySideLayout, RECONSIDER THE DESIGN:
@@ -376,22 +131,22 @@ When designing a full page, follow these planning steps (not necessary if user r
 
 ### List Display
 - `gridField` is the simplest way to show tabular data, especially from records
-- A custom tabular display pattern (`components/tabular-data-display-pattern.md`) can be used if the capabilities of `gridField` are too limiting (such as when each cell needs to show multiple components)
+- A custom tabular display pattern (`ui-guidelines/components/tabular-data-display-pattern.md`) can be used if the capabilities of `gridField` are too limiting (such as when each cell needs to show multiple components)
 - Use `cardGroupLayout` to show a responsive grid of cards with each card representing a list item. This creates a more visually interesting list than a basic `gridField`.
 
 ### Decorative Data Display
-- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `components/stamp-field-instructions.md`if using.
-- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `reference/sail-api-schema.json` if using.
-- Use `richTextDisplayField` to show styled text and icons. Read `components/rich-text-instructions.md` if using.
+- `stampField` is a colored circle or square that shows an icon or initials. Use to represent user initials, anchor list items, etc. Read `ui-guidelines/components/stamp-field-instructions.md`if using.
+- Use `tagField` to show UI elements styled like tags or chips. Find `a!tagField` in `ui-guidelines/reference/schemas/display-components-schema.json` if using.
+- Use `richTextDisplayField` to show styled text and icons. Read `ui-guidelines/components/rich-text-instructions.md` if using.
 
 ### Common Patterns
 Browse the `/ui-guidelines/patterns` folder for examples of how to compose common UI elements.
 
 *ALWAYS* study the relevant patterns if the UI requires any of these elements:
-- `card_lists.md` for list items (users, tasks, products, messages, etc.) shown as cards
-- `kpis.md` for key performance indicator cards
-- `messages.md` for message banners (info, warning, etc.)
-- `tabs.md` for tab bars
+- `ui-guidelines/patterns/card_lists.md` for list items (users, tasks, products, messages, etc.) shown as cards
+- `ui-guidelines/patterns/kpis.md` for key performance indicator cards
+- `ui-guidelines/patterns/messages.md` for message banners (info, warning, etc.)
+- `ui-guidelines/patterns/tabs.md` for tab bars
 
 ### Special Rules
 - When using sectionLayout, set labelColor: "STANDARD" (unless a specific color is required in the instructions)
@@ -403,6 +158,157 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - [ ] Primary action = `style: "SOLID"` + `color: "ACCENT"` (both required)
 - [ ] Always wrapped in `a!buttonArrayLayout`
 
+### Grid Search and Filters
+
+**Mockups:** Create custom search/filter UX with TODO-CONVERTER comments:
+```sail
+/* TODO-CONVERTER: Convert to showSearchBox: true */
+a!textField(label: "Search", value: local!searchText, saveInto: local!searchText)
+
+/* TODO-CONVERTER: Convert to userFilters if available, otherwise document as TODO */
+a!dropdownField(
+  label: "Filter by Status",
+  placeholder: "All Statuses",
+  choiceLabels: {"Active", "Completed", "Cancelled"},
+  choiceValues: {"Active", "Completed", "Cancelled"},
+  value: local!statusFilter,
+  saveInto: local!statusFilter
+)
+```
+
+**Exception:** Multi-grid filters (apply to multiple grids/charts) remain as custom UX - no TODO-CONVERTER comment.
+
+---
+
+### Form Button Field-Setting
+
+Use TODO-CONVERTER comments to indicate field-setting:
+
+```sail
+/* TODO-CONVERTER: Set status to "Approved" */
+/* TODO-CONVERTER: Set approvedBy to current user */
+/* TODO-CONVERTER: Set approvedDate to current timestamp */
+a!buttonWidget(
+  label: "Approve",
+  saveInto: a!save(local!status, "Approved"),  /* Mockup uses local! + text */
+  submit: true(),
+  style: "SOLID",
+  color: "ACCENT"
+)
+
+/* TODO-CONVERTER: Read-only field - value set in button saveInto */
+a!textField(
+  label: "Status",
+  value: local!status,
+  readOnly: true  /* No saveInto */
+)
+```
+
+**Rules:**
+- TODO-CONVERTER ONLY for fields the button sets (not user-editable fields)
+- Use text values in mockups (`"Approved"`) - converter resolves to IDs if needed
+
+---
+
+### Form Control Parameters
+
+Initialize control parameters as local! with TODO-CONVERTER comments:
+
+```sail
+a!localVariables(
+  local!isUpdate: false(),   /* TODO-CONVERTER: Transform to ri!isUpdate */
+  local!cancel: false(),     /* TODO-CONVERTER: Transform to ri!cancel */
+
+  a!formLayout(
+    titleBar: if(a!defaultValue(local!isUpdate, false()), "Update", "Create"),
+    contents: { /* ... */ },
+    buttons: a!buttonLayout(
+      primaryButtons: {
+        /* TODO-CONVERTER: Set all form fields to corresponding record type fields */
+        a!buttonWidget(
+          label: if(a!defaultValue(local!isUpdate, false()), "Update", "Submit"),
+          submit: true()
+        )
+      },
+      secondaryButtons: {
+        /* TODO-CONVERTER: Set local!cancel to true, transform to ri!cancel */
+        a!buttonWidget(
+          label: "Cancel",
+          saveInto: a!save(local!cancel, true())
+        )
+      }
+    )
+  )
+)
+```
+
+**Required:**
+- Initialize: `local!isUpdate: false()`, `local!cancel: false()`
+- Use `a!defaultValue(local!isUpdate, false())` in conditionals
+- All references use `local!`, never `ri!`
+
+---
+
+### Comment Types
+
+| Prefix | Use For |
+|--------|---------|
+| `TODO-CONVERTER:` | Set field to X, Increment Y, Add audit fields, Transform to ri!, Convert to showSearchBox/userFilters |
+| `TODO:` | Send email, Trigger process, Configure webhook, Add user filter, Add translation set |
+| `TODO-DATA-MODEL:` | Add field to table, Create relationship |
+| `REQUIREMENT:` | User-specified business rules (see `/logic-guidelines/documentation-patterns.md`) |
+
+```sail
+/* ✅ Field-setting */
+/* TODO-CONVERTER: Set status to "Approved" */
+/* TODO-CONVERTER: Set approvedBy to current user */
+
+/* ✅ Process activity */
+/* TODO: Configure process model to send approval email */
+
+/* ❌ WRONG - Process activity misclassified */
+/* TODO-CONVERTER: Send notification email */  /* Use TODO! */
+```
+
+---
+
+### Mockup Boundaries
+
+**❌ NEVER in mockups:**
+- `ri!` (use `local!` with TODO-CONVERTER)
+- `recordtype!` references (use `a!map()`)
+- `a!recordData()`, `a!queryRecordType()` (use `local!` with sample data)
+- `'recordType!Case.fields.status'` (use simple property: `fv!row.status`)
+- Grid parameters: `showSearchBox`, `userFilters`, `recordActions` (use custom UX with TODO comments)
+
+**✅ ALWAYS in mockups:**
+- `local!` variables with `a!map()` sample data
+- Simple property names (`.status` not `['recordType!Case.fields.status']`)
+- Custom search/filter UX with TODO-CONVERTER comments
+- Control parameters: `local!isUpdate: false()`, `local!cancel: false()`
+- **Static hardcoded sample values** (no rand(), no runtime generation)
+
+```sail
+/* ✅ MOCKUP - Static sample data */
+local!caseNumber: "CASE-2024-5847",
+local!submittedDate: date(2025, 1, 15),
+local!priority: "High",
+local!cases: {
+  a!map(id: 1, title: "Case A", status: "Open"),
+  a!map(id: 2, title: "Case B", status: "Closed")
+}
+
+/* ❌ WRONG - Runtime generation in mockups */
+local!caseNumber: "CASE-" & text(rand(10000), "0000"),  /* Changes on every re-evaluation! */
+local!submittedDate: today(),  /* Use specific date instead */
+
+/* ❌ FUNCTIONAL CODE (not a mockup!) */
+local!cases: a!queryRecordType(
+  recordType: 'recordType!Case',
+  fields: {'recordType!Case.fields.id'}
+).data
+```
+
 ## STYLING
 ### Use this color scheme for generated SAIL UIs
 - #F5F6F8: page background color
@@ -411,121 +317,169 @@ Browse the `/ui-guidelines/patterns` folder for examples of how to compose commo
 - `ACCENT`: themed accent color (primary buttons, etc.)
 - `STANDARD`: text and heading color
 
-## ⚠️ NULL SAFETY RULES (CRITICAL)
+---
 
-SAIL cannot handle null values in most operations. **Check before using.**
+# PHASE 3: WRITE THE CODE
 
-### The Core Problem
-- Comparing null values crashes: `local!id = fv!item.id` fails if `local!id` is null
-- Accessing properties on null crashes: `local!data.type` fails if `local!data` is null
-- Most functions reject null parameters: `text(null, "format")` fails
+## 📚 DOCUMENTATION REQUIREMENT
 
-### Universal Pattern: Use if() for Short-Circuit Evaluation
+**ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
-✅ **RIGHT - if() short-circuits (safe):**
-```sail
-/* Pattern 1: Null-safe comparison */
-showWhen: if(a!isNotNullOrEmpty(local!selectedId),
-              local!selectedId = fv!item.id,
-              false())
+**Two-tier documentation structure:**
+1. **Schema Reference (SELECTIVE LOADING)** - Category-specific schema files for parameter validation
+2. **Detailed Instructions** - Dedicated instruction files for complex components
 
-/* Pattern 2: Null-safe property access */
-if(a!isNotNullOrEmpty(local!data),
-   local!data.type = "Contract",
-   false())
+---
+
+## 🎯 PARAMETER VALIDATION STRATEGY (Use Selective Loading)
+
+**CRITICAL:** Load ONLY the category schema files you need based on your task from `/ui-guidelines/reference/schemas/`.
+
+### Step 1: Detect Interface Type and Components Needed
+
+**For FORMS (create/update interfaces):**
+```
+ALWAYS load:
+  ✅ ui-guidelines/reference/schemas/layouts-schema.json
+  ✅ ui-guidelines/reference/schemas/input-components-schema.json
+  ✅ ui-guidelines/reference/schemas/button-components-schema.json
 ```
 
-❌ **WRONG - and() does NOT short-circuit (crashes):**
-```sail
-/* and() evaluates ALL parameters even if first is false */
-showWhen: and(a!isNotNullOrEmpty(local!data),
-              local!data.type = "Contract")  /* CRASHES if null! */
+**For DISPLAYS (dashboards/reports):**
+```
+ALWAYS load:
+  ✅ ui-guidelines/reference/schemas/layouts-schema.json
+  ✅ ui-guidelines/reference/schemas/display-components-schema.json
+
+CONDITIONALLY load:
+  - Using grids? → schemas/grid-components-schema.json
+  - Using charts? → schemas/chart-components-schema.json
+  - Has action buttons? → schemas/button-components-schema.json
 ```
 
-### Common Null Safety Patterns
+**For GRID-HEAVY INTERFACES:**
+```
+ALWAYS load:
+  ✅ ui-guidelines/reference/schemas/layouts-schema.json
+  ✅ ui-guidelines/reference/schemas/grid-components-schema.json
 
-**1. Choice Field Initialization**
-```sail
-/* ✅ Uninitialized = unchecked/unselected (null state) */
-local!agreeToTerms,  /* NOT false() */
-
-/* ✅ Only initialize if pre-selected AND value exists in choiceValues */
-local!agreeToTerms: true(),  /* Only if true() is in choiceValues */
-
-/* ❌ NEVER use null/empty in choiceValues */
-choiceValues: {true()}  /* NOT: {true(), null} or {true(), ""} */
+CONDITIONALLY load:
+  - Has action buttons? → schemas/button-components-schema.json
+  - Has filters? → schemas/input-components-schema.json
+  - Complex logic? → schemas/expression-functions-schema.json
 ```
 
-**2. Input Field Data Storage**
-```sail
-/* ❌ NEVER leave inputs orphaned */
-a!textField(value: null, saveInto: null)  /* User input goes nowhere! */
+### Step 2: Load Expression Functions IF Needed
 
-/* ✅ Always store to variables */
-a!textField(value: local!name, saveInto: local!name)
-```
+**Only load `schemas/expression-functions-schema.json` if you need:**
+- Complex loops (a!forEach)
+- Pattern matching (a!match)
+- Helper functions (richTextItem, richTextIcon, save, update)
+- Array manipulation (wherecontains, index, append)
 
-**3. Functions That Reject Null**
-```sail
-/* Common functions that crash on null: text(), concat(), user(), not(), etc. */
+**DO NOT load if you're only using basic components with simple parameters.**
 
-/* ✅ Use a!defaultValue() wrapper */
-text(a!defaultValue(fv!row.amount, 0), "$#,##0.00")
-concat(a!defaultValue(fv!row.firstName, ""), " ", a!defaultValue(fv!row.lastName, ""))
-not(a!defaultValue(ri!isActive, false()))
+---
 
-/* ✅ OR use if() to provide fallback */
-if(a!isNullOrEmpty(fv!row.status), "N/A", text(fv!row.status, "format"))
-```
+### Schema File Reference
 
-**4. Grid Selection (Always Returns List)**
-```sail
-/* Grid selectionValue is ALWAYS a list, even for single-select */
+| Category | File | Components | When to Use |
+|----------|------|------------|-------------|
+| **Layouts** | `schemas/layouts-schema.json` | 18 | Page structure (formLayout, headerContentLayout, wizardLayout, etc.) |
+| **Inputs** | `schemas/input-components-schema.json` | 18 | Form fields (textField, dateField, dropdownField, etc.) |
+| **Displays** | `schemas/display-components-schema.json` | 14 | Read-only displays (richText, stamps, tags, images) |
+| **Grids** | `schemas/grid-components-schema.json` | 12 | Grids and data queries (gridField, recordData, queryFilter) |
+| **Charts** | `schemas/chart-components-schema.json` | 12 | Charts (columnChart, pieChart, measure, grouping) |
+| **Buttons** | `schemas/button-components-schema.json` | 3 | Buttons and actions (buttonWidget, buttonArrayLayout) |
+| **Functions** | `schemas/expression-functions-schema.json` | 39+60 funcs | Expressions, loops, helpers, utilities |
 
-/* ✅ Use index() to access first item safely */
-local!selectedRow: index(local!selection, 1, null)  /* null if empty */
+---
 
-/* ✅ Check before using */
-showWhen: if(a!isNotNullOrEmpty(local!selectedRow),
-             local!selectedRow.id > 0,
-             false())
-```
+### Available Detailed Instruction Files:
 
-**5. Relationship Field Access**
-```sail
-/* Relationships can be null or empty arrays */
+**Expression Grammar & Variables:**
+- `logic-guidelines/functions-reference.md` - Essential functions reference (arrays, text, dates, queries)
 
-/* ✅ Check before accessing fields */
-if(a!isNotNullOrEmpty(fv!row['recordType!Case.relationships.assignedUser']),
-   fv!row['recordType!Case.relationships.assignedUser'].firstName,
-   "Unassigned")
+**Layout Components:**
+- `ui-guidelines/layouts/header-content-layout-instructions.md` - HeaderContentLayout guidelines
+- `ui-guidelines/layouts/columns-layout-instructions.md` - ColumnsLayout guidelines
+- `ui-guidelines/layouts/sidebyside-layout-instructions.md` - SideBySideLayout guidelines
+- `ui-guidelines/layouts/form-layout-instructions.md` - FormLayout guidelines
+- `ui-guidelines/layouts/pane-layout-instructions.md` - PaneLayout guidelines
+- `ui-guidelines/layouts/wizard-layout-instructions.md` - WizardLayout guidelines
+- `ui-guidelines/layouts/card-layout-instructions.md` - CardLayout guidelines
 
-/* ✅ Use a!defaultValue() for direct field access */
-a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
-```
+**Display Components:**
+- `ui-guidelines/components/button-instructions.md` - Button and ButtonArrayLayout guidelines
+- `ui-guidelines/components/grid-field-instructions.md` - GridField (read-only grid) guidelines
+- `ui-guidelines/components/grid-layout-instructions.md` - GridLayout (editable grid) guidelines
+- `ui-guidelines/components/rich-text-instructions.md` - Rich Text component guidelines
+- `ui-guidelines/components/stamp-field-instructions.md` - Stamp Field guidelines
+- `ui-guidelines/components/card-choice-field-instructions.md` - Card Choice Field guidelines
+- `ui-guidelines/components/chart-instructions.md` - Chart component guidelines
+- `ui-guidelines/components/image-field-instructions.md` - Image Field guidelines
+- `ui-guidelines/components/tabular-data-display-pattern.md` - Custom tabular display pattern
 
-### Quick Reference Table
+**Icons:**
+- `ui-guidelines/reference/rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
 
-| Scenario | Pattern | Example |
-|----------|---------|---------|
-| Comparison with nullable | `if(isNotNull(var), comparison, false)` | `if(a!isNotNullOrEmpty(local!id), local!id = 5, false())` |
-| Property access | `if(isNotNull(obj), obj.prop, default)` | `if(a!isNotNullOrEmpty(data), data.type, "")` |
-| Function parameter | `function(a!defaultValue(var, default))` | `text(a!defaultValue(amount, 0), "$#,##0")` |
-| String concatenation | `a!defaultValue(field, "")` | `concat(a!defaultValue(first, ""), " ", a!defaultValue(last, ""))` |
-| Boolean operations | `not(a!defaultValue(var, false()))` | `not(a!defaultValue(ri!isActive, false()))` |
-| Grid selection | `index(selection, 1, null)` then check | `if(a!isNotNullOrEmpty(index(sel, 1, null)), ...)` |
-| Date field display | `if(isNotNull(field), text(todate(field), "MMM d, yyyy"), "N/A")` | Use `todate()` wrapper |
-| DateTime field display | `if(isNotNull(field), text(field, "MMM d, yyyy h:mm a"), "N/A")` | NO `todate()` wrapper |
-| Time field display | `if(isNotNull(field), text(field, "h:mm a"), "N/A")` | Use `text()` directly |
+**All other components** (textField, dropdownField, etc.) are documented in category-specific schema files only.
 
-### Where to Learn More
-**Null Safety Topic Files (for detailed patterns):**
-- `/logic-guidelines/short-circuit-evaluation.md` - Why if() vs and()/or()
-- `/logic-guidelines/null-safety-quick-ref.md` - Complete quick reference table
-- `/logic-guidelines/functions-reference.md` - Functions by category including null-rejecting functions
+### Documentation Lookup Process:
 
-**Master guidelines (for comprehensive rules):**
-- `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` #null-safety-implementation
+1. **Check if a dedicated instruction file exists** for the component (see list above)
+   - If YES → Read the dedicated file for templates, patterns, and detailed rules
+   - If NO → Use the appropriate category schema file for parameters and values
+
+2. **For unfamiliar components** - Read the component entry in the appropriate schema file first to understand basic parameters
+   - Forms → `schemas/input-components-schema.json`
+   - Displays → `schemas/display-components-schema.json`
+   - Grids → `schemas/grid-components-schema.json`
+   - Charts → `schemas/chart-components-schema.json`
+   - Buttons → `schemas/button-components-schema.json`
+
+### ❌ NEVER:
+- Use parameters that aren't explicitly documented in either the reference or instruction files
+- Put components in layouts that don't accept them
+- Skip reading documentation because "it seems straightforward"
+
+### ✅ ALWAYS:
+- Start with appropriate schema files for parameter validation (see "PARAMETER VALIDATION STRATEGY" above)
+- Read dedicated instruction files when available for templates and patterns
+- Follow templates exactly from instruction files
+- Verify against validation checklists
+- **Read `/ui-guidelines/reference/rich-text-icon-aliases.md` in full before using ANY icons**
+
+**THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
+
+## 🔄 DYNAMIC SAIL EXPRESSIONS
+
+**When working with dynamic data (arrays, loops, conditionals), read the appropriate topic file FIRST.**
+
+### Topic Files by Need
+
+| Need | Read This File |
+|------|----------------|
+| **Navigation index** | `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` |
+| **Email validation (textField)** | `/logic-guidelines/functions-reference.md#email-validation-pattern` |
+| Arrays, loops, forEach | `/logic-guidelines/foreach-patterns.md` |
+| Array manipulation, wherecontains | `/logic-guidelines/array-manipulation-patterns.md` |
+| Null safety patterns | `/logic-guidelines/null-safety-quick-ref.md` |
+| Grid selections | `/logic-guidelines/grid-selection-patterns.md` |
+| Checkbox initialization | `/logic-guidelines/choice-field-patterns.md` |
+| Pattern matching (a!match) | `/logic-guidelines/pattern-matching.md` |
+| Date/time handling | `/logic-guidelines/datetime-handling.md` |
+| Chart configuration | `/logic-guidelines/chart-configuration.md` |
+| Non-existent constants | `/logic-guidelines/environment-placeholders.md` |
+
+## EXPRESSION STRUCTURE RULES
+- All expressions must begin with a!localVariables() as the parent element
+- Place the main interface as the last argument of a!localVariables()
+   - When the top-level layout is `a!paneLayout`, `a!formLayout`, `a!wizardLayout`, or `a!headerContentLayout`, DON'T put it in an array ({})
+- Define any local variables within the a!localVariables() function
+- All form inputs should save into a corresponding local variable
+- ButtonWidgets can't be on their own, they must be inside a ButtonArrayLayout
+- Use cardLayout for content blocks, EXCEPT when the content is already a collection of cards (cardGroupLayout, multiple cardLayouts arranged in a list) - in those cases, place the cards directly on the page background without an outer wrapper card
 
 ## SYNTAX REQUIREMENTS
 - Never use JavaScript syntax, operators (if, or, and), or keywords
@@ -544,14 +498,59 @@ a!defaultValue(fv!row['recordType!Case.fields.priority'], "Medium")
   - **WRONG:** `local!agreeToTerms: false()` with `choiceValues: {true()}`
   - **RIGHT:** `local!agreeToTerms,` (uninitialized = unchecked)
   - **RIGHT:** `local!agreeToTerms: true()` (pre-checked, if true() is in choiceValues)
-- **Always check for null/empty before comparing values or accessing properties** - See "NULL SAFETY RULES" section above for complete patterns
+- **Always check for null/empty before comparing values or accessing properties** - See "NULL SAFETY RULES" section below for complete patterns
+- **SAIL has NO regex support** - never use `regexmatch()`, `regex()`, or similar functions; for email validation use pattern from `/logic-guidelines/functions-reference.md#email-validation-pattern` ‼️
 
 ### Dynamic Form Generation
-- **Choose the right pattern** - See "Dynamic Form Field Validation" checklist above:
+- **Choose the right pattern** - See "Dynamic Form Field Validation" in the validation checklist:
   - **Array of Maps** (PREFERRED): For multi-instance data entry (work experiences, addresses, line items) → `saveInto: fv!item.propertyName`
   - **Parallel Arrays**: Only when iterating a fixed source list to collect separate data → `index()` + `a!update()` pattern
 - Read `/logic-guidelines/foreach-patterns.md` for complete pattern guidance before implementing
 - NEVER use `value: null, saveInto: null` in input fields - See "NULL SAFETY RULES" section for details
+
+## ⚠️ NULL SAFETY RULES (CRITICAL)
+
+> **📖 Complete Reference:** `/logic-guidelines/null-safety-quick-ref.md`
+> **📖 Why if() vs and():** `/logic-guidelines/short-circuit-evaluation.md`
+> **⚠️ saveInto Rules:** `save!value` ONLY valid inside `a!save()` value parameter - see `/logic-guidelines/choice-field-patterns.md`
+
+### Core Problem
+SAIL cannot handle null values in most operations - comparisons crash, property access fails, functions reject null.
+
+### saveInto Variable Restrictions
+- ✅ `save!value` can ONLY be used inside: `a!save(target, save!value)` or `a!save(target, if(..., save!value, ...))`
+- ❌ NEVER use `save!value` in if() conditions, and(), or(), or anywhere outside a!save()
+- ❌ NEVER use `save!value` in the target parameter of a!save()
+- ✅ To check state transitions, use helper variables (e.g., `local!previousState`) instead of checking save!value
+
+### Universal Pattern: Use if() for Short-Circuit Evaluation
+
+```sail
+/* ✅ RIGHT - if() short-circuits (safe) */
+showWhen: if(a!isNotNullOrEmpty(local!selectedId),
+              local!selectedId = fv!item.id,
+              false())
+
+/* ❌ WRONG - and() does NOT short-circuit (crashes) */
+showWhen: and(a!isNotNullOrEmpty(local!data),
+              local!data.type = "Contract")  /* CRASHES if null! */
+```
+
+### Essential Patterns (Quick Reference)
+
+| Scenario | Pattern |
+|----------|---------|
+| Comparison with nullable | `if(a!isNotNullOrEmpty(var), comparison, false)` |
+| Property access | `if(a!isNotNullOrEmpty(obj), obj.prop, default)` |
+| Function parameter | `function(a!defaultValue(var, default))` |
+| Grid selection | `index(selection, 1, null)` then check |
+| Boolean with not() | `not(a!defaultValue(var, false()))` |
+
+**See `/logic-guidelines/null-safety-quick-ref.md` for complete patterns including:**
+- Choice field initialization
+- Functions that reject null (text, concat, user, not)
+- Relationship field access
+- Date/DateTime display formatting
 
 ## ⚠️ FUNCTION VARIABLES (fv!) - CRITICAL RULES
 
@@ -568,54 +567,23 @@ Function variables (fv!) are context-specific and ONLY available in certain SAIL
 
 ## TYPE HANDLING FOR DATE/TIME CALCULATIONS
 
-### Always Cast Date Arithmetic with todate()
-When using date arithmetic in sample data, cast results to ensure consistent types:
+> **📖 Complete Reference:** `/logic-guidelines/datetime-handling.md`
 
-**WRONG:**
+### Essential Rules
+- **Cast date arithmetic**: Use `todate(today() + 1)` in sample data (prevents type mismatch)
+- **Interval comparisons**: Use `tointeger(now() - timestamp)` before comparing to numbers
+- **Type matching**: Date fields use `today()`, DateTime fields use `now()`
+
 ```sail
+/* ✅ RIGHT - Consistent Date types */
 local!data: {
-  a!map(dueDate: today()),        /* Type: Date */
-  a!map(dueDate: today() + 1)     /* Type: DateTime - causes grid sort errors! */
+  a!map(dueDate: todate(today())),
+  a!map(dueDate: todate(today() + 7))
 }
+
+/* ✅ RIGHT - Interval to Integer for comparison */
+if(tointeger(now() - fv!row.timestamp) < 1, ...)
 ```
-
-**RIGHT:**
-```sail
-local!data: {
-  a!map(dueDate: todate(today())),      /* Type: Date */
-  a!map(dueDate: todate(today() + 1)),  /* Type: Date */
-  a!map(dueDate: todate(today() + 7)),  /* Type: Date */
-  a!map(dueDate: todate("03/14/2023"))   /* Type: Date, use MM/DD/YYYY */
-}
-```
-
-### Date/DateTime Arithmetic Returns Intervals
-Subtracting dates or datetimes returns an **Interval** type, not a Number:
-- `now() - timestamp` → Interval (Day to Second)
-- `today() - dateValue` → Interval (Day to Day)
-
-**Cannot compare Intervals directly to Numbers:**
-```sail
-/* WRONG */
-if(now() - fv!row.timestamp < 1, ...)  /* Error: Cannot compare Interval to Number */
-
-/* RIGHT */
-if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer first */
-```
-
-### Key Functions
-- `todate()` - Cast to Date type (use for all date arithmetic in sample data)
-- `tointeger()` - Convert interval to whole days as integer
-- `text(value, format)` - Format numbers/dates/intervals as text
-
-## EXPRESSION STRUCTURE RULES
-- All expressions must begin with a!localVariables() as the parent element
-- Place the main interface as the last argument of a!localVariables()
-   - When the top-level layout is `a!paneLayout`, `a!formLayout`, `a!wizardLayout`, or `a!headerContentLayout`, DON'T put it in an array ({})
-- Define any local variables within the a!localVariables() function
-- All form inputs should save into a corresponding local variable
-- ButtonWidgets can't be on their own, they must be inside a ButtonArrayLayout
-- Use cardLayout for content blocks, EXCEPT when the content is already a collection of cards (cardGroupLayout, multiple cardLayouts arranged in a list) - in those cases, place the cards directly on the page background without an outer wrapper card
 
 ## PARAMETER RESTRICTIONS
 - Only use parameters explicitly defined in the documentation
@@ -628,9 +596,139 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 - Checkbox and radio button labels can only accept plain text, not rich text
 - choiceValues CANNOT be null or empty strings ("")
 
+---
+
+# PHASE 4: VALIDATE & DOCUMENT
+
+## CAPTURING USER REQUIREMENTS IN GENERATED CODE
+
+> **📖 Complete Patterns:** `/logic-guidelines/documentation-patterns.md`
+
+When generating mockups, capture user-specified requirements as comments using the three-tier structure:
+1. **Interface-level header** - Overall purpose and key requirements
+2. **Section-level comments** - Business purpose + field requirements
+3. **Inline comments** - Complex logic explanation
+
+**Critical Rules:**
+- ✅ ONLY capture requirements explicitly stated by the user
+- ❌ DO NOT add requirement comments for standard UI patterns (sorting, formatting, basic display)
+- ❌ DO NOT invent business rules or make assumptions about data logic
+
+**See `/logic-guidelines/documentation-patterns.md` for complete examples and comment format guidelines.**
+
+## 🚨 UNIVERSAL SAIL VALIDATION CHECKLIST
+
+### 🛑 STOP - Before Writing ANY Code:
+
+**READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` NOW if your code will use ANY of the following:**
+- [ ] Arrays or lists (any `{}` or `local!data: {...}`)
+- [ ] Index access (`index()`, array element access)
+- [ ] Property access on maps (`.fieldName` or `fv!row.fieldName`)
+- [ ] Null checking or comparisons with variables that could be null
+- [ ] Any looping (`a!forEach`)
+- [ ] Data aggregation (showing counts, grouping "by status", "by priority", etc.)
+- [ ] Multiple data items (lists of cases, users, products, etc.)
+
+**❌ IF YES TO ANY → STOP AND READ `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` FIRST**
+**✅ IF NO TO ALL → Proceed with static UI generation (single values, no data manipulation)**
+
+### Before Writing Dynamic Code:
+- [ ] Read `/logic-guidelines/local-variable-patterns.md` for data modeling philosophy (maps for entity data, separate variables for UI state)
+- [ ] Read `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` if using arrays, loops, null checking in mock data interfaces
+- [ ] SAIL doesn't support regex - for email validation, MUST use `/logic-guidelines/functions-reference.md#email-validation-pattern`
+
+### Dynamic Form Field Validation:
+- [ ] **Pattern Selection for Multi-Instance Forms** (see `/logic-guidelines/foreach-patterns.md`):
+  - [ ] **Array of Maps** (PREFERRED): When collecting multiple instances of related data (work experiences, addresses, contacts, line items) → Use `local!items: {a!map(...)}` with `saveInto: fv!item.propertyName` ‼️
+  - [ ] **Parallel Arrays** (ALTERNATIVE): Only when iterating over a FIXED source list to collect SEPARATE data → Use `index()` + `a!update()` pattern
+- [ ] Parallel arrays type-initialized based on data type (see logic-guidelines/array-type-initialization-guidelines.md) ‼️
+- [ ] NO `value: null, saveInto: null` in input fields (textField, dateField, fileUploadField, etc.) ‼️
+- [ ] Multi-select checkbox fields use single array variable, NOT separate boolean variables ‼️ (see `/logic-guidelines/choice-field-patterns.md`)
+- [ ] Single checkbox (choiceValues: {true()}) uses `a!isNotNullOrEmpty()` for showWhen, NOT `contains()` ‼️
+- [ ] DO NOT use `local!showValidation` flags - SAIL's `validations` parameter evaluates automatically when fields have values ‼️
+- [ ] Email fields: MUST use the email validation pattern from `/logic-guidelines/functions-reference.md#email-validation-pattern` - do NOT improvise ‼️
+- [ ] Single-field validations: Do NOT wrap in `a!isNotNullOrEmpty()` - SAIL only evaluates validations when field has a value ‼️
+- [ ] NO manual language toggles or `local!currentLanguage` variables - Appian handles i18n automatically (see `/logic-guidelines/internationalization.md`) ‼️
+- [ ] Control parameters (isUpdate, cancel) use `local!` NOT `ri!` - initialized to false(), converter transforms in Phase 2 ‼️
+
+### Syntax Validation:
+- [ ] Starts with a!localVariables()
+- [ ] All braces/parentheses matched
+- [ ] All strings in double quotes
+- [ ] Escape double quotes like "", not like \" ✅ CHECK EVERY STRING VALUE
+- [ ] Comments use /* */ not //
+- [ ] `or(a,b)` NOT `a or b` ‼️
+- [ ] Pattern matching (3+ cases on single value) use `a!match()` NOT `if()` ‼️
+  - Exact values (status/category/priority): `a!match(equals:)`
+  - Ranges/thresholds (>=100, >=75): `a!match(whenTrue:)`
+- [ ] Empty arrays type-initialized: `tointeger({})`, `touniformstring({})`, `toboolean({})`, `todate({})`, `todatetime({})`, `todecimal({})`, `totime({})`, `touser({})`, `togroup({})` ‼️
+- [ ] Text arrays use `touniformstring({})` NOT `tostring({})` (tostring merges to single string) ‼️
+- [ ] NO untyped `{}` used with contains(), wherecontains(), union(), intersection() ‼️
+- [ ] NO mixed-type appends that create List of Variant ‼️
+- [ ] All null-unsafe operations protected (see "NULL SAFETY RULES" section) ‼️
+  - Comparisons wrapped in if() short-circuit pattern
+  - Property access checked before use
+  - Function parameters use a!defaultValue() where needed
+  - Grid selections use index(..., 1, null) pattern
+- [ ] Date arithmetic wrapped in todate() in sample data - use `todate(today() + 1)` ‼️
+- [ ] No Interval-to-Number comparisons - use `tointeger()` to convert first ‼️
+- [ ] index() wrapped in type converters for arithmetic - use `todate(index(...))`, `tointeger(index(...))`, etc. ‼️
+- [ ] **NO inline function definitions or lambdas** - `local!helper: function(x)(...)` is invalid SAIL syntax ‼️
+- [ ] Repeated logic: Duplicate inline with TODO comment, don't extract to helper variable ‼️
+
+### Function Variable Validation:
+- [ ] ✅ In grid columns: ONLY use `fv!row` (NOT fv!index, NOT fv!item) ‼️
+- [ ] ❌ NEVER use `fv!index` in grid columns - use grid's selectionValue instead ‼️
+- [ ] ✅ Grid selectionValue is always a LIST - use `index(local!selected, 1, null)` to access
+- [ ] ✅ In a!forEach(): Use `fv!index`, `fv!item`, `fv!isFirst`, `fv!isLast`
+- [ ] ❌ NEVER use `fv!item` outside of a!forEach() ‼️
+- [ ] ✅ `save!value` can ONLY be used inside the `value` parameter of `a!save(target, value)` ‼️
+- [ ] ❌ NEVER use `save!value` in conditionals (if/and/or), target parameter, or outside a!save() (see `/logic-guidelines/choice-field-patterns.md`) ‼️
+
+### Parameter Validation:
+- [ ] Check to see that every parameter and value is listed in documentation before using!
+- [ ] **Grid columns: sortField must match the primary field displayed in value parameter AND be unique across all columns** ‼️
+- [ ] **Each field used as sortField only ONCE across all grid columns** ‼️
+- [ ] **Computed columns (if/a!match/concat) must NOT have sortField** ‼️
+
+### Layout Validation:
+- [ ] One top-level layout (HeaderContent/FormLayout/PaneLayout)
+- [ ] No nested sideBySideLayouts
+- [ ] No columns or card layouts inside sideBySideItems
+- [ ] Only richTextItems or richTextIcons in richTextDisplayField
+- [ ] At least one AUTO width column in each columnsLayout
+- [ ] ❌ DON'T USE `less` or `more` for `spacing`!
+
+### Unused Variable Check:
+- [ ] No unused local variables (declared but never referenced) ‼️
+  - Variables with count=1 (declaration only) should be removed
+  - If justified for future use, document with `/* UNUSED - [reason] */` comment
+
 ## 🛑 MANDATORY DELEGATION CHECKLIST
 
-### 🔄 Converting Mock to Functional Interface:
+### 🔄 Generating Functional Interfaces (Two-Step Workflow):
+
+**When user requests a "functional interface" or "dynamic interface" or "live data interface":**
+
+⚠️ **ALWAYS follow this two-step process:**
+
+```
+STEP 1: Create static mockup FIRST
+        └─► Write to /output/[name].sail
+        └─► Use local! variables with a!map() for sample data
+        └─► Capture requirements in /* REQUIREMENT: */ comments
+
+STEP 2: THEN invoke sail-dynamic-converter agent
+        └─► Agent reads /output/[name].sail
+        └─► Transforms to functional code
+        └─► Writes to /output/[name]-functional.sail
+```
+
+**The sail-dynamic-converter agent REQUIRES an existing mockup file to read.**
+
+---
+
+### 🔄 Converting Existing Mock to Functional Interface:
 
 **REQUIRED ACTION:**
 - [ ] **ALWAYS invoke sail-dynamic-converter agent** when user requests:
@@ -642,6 +740,7 @@ if(tointeger(now() - fv!row.timestamp) < 1, ...)  /* Convert Interval to Integer
 **❌ NEVER:**
 - Attempt conversion yourself without invoking the agent
 - Make up UUIDs or field references
+- Invoke sail-dynamic-converter without a mockup file existing first
 
 ### ✅ Validating SAIL Expressions:
 👉 Always use tools to validate new expressions:

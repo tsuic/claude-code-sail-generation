@@ -1,0 +1,1028 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Input Components - Form fields and user input components",
+  "version": "2.3.0",
+  "components": {
+    "a!textField": {
+      "category": "input",
+      "parameters": {
+        "refreshAfter": {
+          "type": "Text",
+          "validValues": [
+            "KEYPRESS",
+            "UNFOCUS"
+          ]
+        },
+        "align": {
+          "validValues": [
+            "LEFT",
+            "CENTER",
+            "RIGHT"
+          ]
+        },
+        "masked": {
+          "type": "Boolean"
+        },
+        "inputPurpose": {
+          "type": "Text",
+          "validValues": [
+            "NAME",
+            "EMAIL",
+            "PHONE_NUMBER",
+            "STREET_ADDRESS",
+            "POSTAL_CODE",
+            "CREDIT_CARD_NUMBER",
+            "OFF"
+          ]
+        },
+        "characterLimit": {
+          "type": "Integer"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Single line text input"
+    },
+    "a!paragraphField": {
+      "category": "input",
+      "parameters": {
+        "height": {
+          "validValues": [
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "characterLimit": {
+          "type": "Integer"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Multi-line text input"
+    },
+    "a!styledTextEditorField": {
+      "description": "Rich text input with formatting toolbar - stores text with HTML formatting",
+      "category": "input",
+      "parameters": {
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "height": {
+          "validValues": [
+            "EXTRA_SHORT",
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL"
+          ]
+        },
+        "sizeLimit": {
+          "type": "Integer"
+        },
+        "allowedFormats": {
+          "type": "List of Text",
+          "validValues": [
+            "BOLD",
+            "ITALIC",
+            "UNDERLINE",
+            "STRIKETHROUGH",
+            "SUBSCRIPT",
+            "SUPERSCRIPT",
+            "LINK",
+            "TEXT_ALIGNMENT",
+            "NUMBERED_LIST",
+            "BULLETED_LIST",
+            "TABLE"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "Stores HTML-formatted text. Default allowedFormats: BOLD, ITALIC, UNDERLINE, STRIKETHROUGH, LINK, NUMBERED_LIST, BULLETED_LIST (excludes SUBSCRIPT, SUPERSCRIPT, TEXT_ALIGNMENT, TABLE). To display styled text editor values in read-only mode, use a!styledTextEditorField with readOnly: true (NOT richTextDisplayField). For grid display, use stripHtml() on a separate database field."
+    },
+    "a!integerField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Integer"
+        },
+        "masked": {
+          "type": "Boolean"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Integer number input"
+    },
+    "a!floatingPointField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Decimal"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Decimal number input"
+    },
+    "a!dateField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Date"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Date input (year, month, day)"
+    },
+    "a!dropdownField": {
+      "category": "input",
+      "parameters": {
+        "choiceLabels": {
+          "type": "List of Text"
+        },
+        "choiceValues": {
+          "type": "List of Variant",
+          "validation": "cannot be null or empty strings"
+        },
+        "value": {
+          "type": "Any Type"
+        },
+        "searchDisplay": {
+          "type": "Text",
+          "validValues": [
+            "AUTO",
+            "ON",
+            "OFF"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Single selection dropdown"
+    },
+    "a!radioButtonField": {
+      "category": "input",
+      "parameters": {
+        "choiceLabels": {
+          "type": "List of Text"
+        },
+        "choiceValues": {
+          "type": "List of Variant",
+          "validation": "cannot be null or empty strings"
+        },
+        "value": {
+          "type": "Any Type"
+        },
+        "choiceLayout": {
+          "validValues": [
+            "STACKED",
+            "COMPACT"
+          ]
+        },
+        "choiceStyle": {
+          "type": "Text",
+          "validValues": [
+            "STANDARD",
+            "CARDS"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Single selection radio buttons"
+    },
+    "a!checkboxField": {
+      "category": "input",
+      "parameters": {
+        "choiceLabels": {
+          "type": "List of Text"
+        },
+        "choiceValues": {
+          "type": "List of Variant",
+          "validation": "cannot be null or empty strings"
+        },
+        "value": {
+          "type": "List of Variant"
+        },
+        "choiceLayout": {
+          "validValues": [
+            "STACKED",
+            "COMPACT"
+          ]
+        },
+        "choiceStyle": {
+          "type": "Text",
+          "validValues": [
+            "STANDARD",
+            "CARDS"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Multiple selection checkboxes"
+    },
+    "a!dateTimeField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Date and Time"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Date and time input (year, month, day, hour, minute, second)"
+    },
+    "a!timeField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Time"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Time input (hour, minute, second)"
+    },
+    "a!barcodeField": {
+      "category": "input",
+      "parameters": {
+        "refreshAfter": {
+          "type": "Text",
+          "validValues": [
+            "KEYPRESS",
+            "UNFOCUS"
+          ]
+        },
+        "align": {
+          "validValues": [
+            "LEFT",
+            "CENTER",
+            "RIGHT"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Displays and allows entry of a barcode value"
+    },
+    "a!pickerFieldUsers": {
+      "category": "input",
+      "parameters": {
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "groupFilter": {
+          "type": "Group"
+        },
+        "value": {
+          "type": "List of Username"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Selects one or more users"
+    },
+    "a!pickerFieldGroups": {
+      "category": "input",
+      "parameters": {
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "groupFilter": {
+          "type": "Group"
+        },
+        "value": {
+          "type": "List of Group"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Selects one or more groups"
+    },
+    "a!pickerFieldUsersAndGroups": {
+      "category": "input",
+      "parameters": {
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "groupFilter": {
+          "type": "Group"
+        },
+        "value": {
+          "type": "List of User or Group"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Selects one or more users or groups"
+    },
+    "a!cardChoiceField": {
+      "category": "input",
+      "parameters": {
+        "data": {
+          "type": "List of Variant"
+        },
+        "cardTemplate": {
+          "type": "Any Type"
+        },
+        "value": {
+          "type": "List of Variant"
+        },
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "NONE",
+            "DENSE",
+            "SPARSE"
+          ]
+        },
+        "align": {
+          "validValues": [
+            "START",
+            "CENTER",
+            "END"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Selection displayed as styled cards"
+    },
+    "a!fileUploadField": {
+      "category": "input",
+      "parameters": {
+        "target": {
+          "type": "Document/Folder"
+        },
+        "value": {
+          "type": "List of Document"
+        },
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "buttonStyle": {
+          "type": "Text",
+          "validValues": [
+            "NORMAL",
+            "PRIMARY",
+            "SECONDARY",
+            "LINK"
+          ]
+        },
+        "buttonDisplay": {
+          "type": "Text",
+          "validValues": [
+            "LABEL",
+            "ICON",
+            "LABEL_AND_ICON"
+          ]
+        },
+        "buttonSize": {
+          "type": "Text",
+          "validValues": [
+            "SMALL",
+            "STANDARD",
+            "LARGE"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "File upload with document management"
+    },
+    "a!encryptedTextField": {
+      "category": "input",
+      "parameters": {
+        "value": {
+          "type": "Encrypted Text"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "Returns Encrypted Text type which CANNOT be compared, concatenated, or used in expressions. NOT compatible with synced record types - use a!textField with warning banner instead",
+      "description": "Encrypted text input field"
+    }
+  }
+}

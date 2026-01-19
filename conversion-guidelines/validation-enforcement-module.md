@@ -1,5 +1,17 @@
 # Validation Enforcement Module {#validation-module}
 
+> **Parent guide:** `/conversion-guidelines/CONVERSION-PRIMARY-REFERENCE.md`
+>
+> **Related modules:**
+> - **Form modules:** `/conversion-guidelines/form-conversion-module.md` (navigation index)
+>   - Focused modules: `form-conversion-ri-patterns.md`, `form-conversion-relationships.md`, `form-conversion-buttons-actions.md`, `form-conversion-data-model.md`
+> - **Display modules:** `/conversion-guidelines/display-conversion-module.md` (navigation index)
+>   - Focused modules: `display-conversion-core.md`, `display-conversion-grids.md`, `display-conversion-charts.md`, `display-conversion-kpis.md`, `display-conversion-actions.md`
+> - **Common modules:** `/conversion-guidelines/common-conversion-patterns.md` (navigation index)
+>   - Focused modules: `conversion-queries.md`, `conversion-relationships.md`, `conversion-field-mapping.md`
+>
+> **Null safety details:** `/logic-guidelines/null-safety-quick-ref.md`
+
 Post-conversion validation and cleanup steps. **Always executed** regardless of interface type. These steps ensure code quality before output.
 
 ---
@@ -7,9 +19,18 @@ Post-conversion validation and cleanup steps. **Always executed** regardless of 
 ## 📑 Module Navigation {#validation.nav}
 
 - `{#validation.unused-variables}` - Detect and remove/document unused variables
+  - `{#validation.unused-variables.decision}` - Removal vs documentation decision tree
+  - `{#validation.unused-variables.template}` - UNUSED comment template
+  - `{#validation.unused-variables.categories}` - Categories with examples
+  - `{#validation.unused-variables.performance}` - Performance warning rules
 - `{#validation.null-safety}` - Enforce null safety patterns
 - `{#validation.type-matching}` - Verify query filter type compatibility
+- `{#validation.query-result-handling}` - Handle empty query results (DataSubset)
+  - `{#validation.query-result-handling.multiple}` - Multiple records pattern
+  - `{#validation.query-result-handling.single}` - Single record pattern
+  - `{#validation.query-result-handling.checklist}` - Query result checklist
 - `{#validation.pre-flight-checklist}` - Final validation before output
+- `{#validation.critical-errors}` - Critical errors quick reference table
 
 ---
 
@@ -40,22 +61,87 @@ grep -o 'local![a-zA-Z_]*' output/[filename].sail | sort | uniq -c | sort -rn
 
 ### Removal vs Documentation Decision {#validation.unused-variables.decision}
 
+**Decision Tree:**
+```
+Is the variable unused?
+├─ YES → Is there a clear future use?
+│   ├─ YES → Document with UNUSED comment (see template below)
+│   └─ NO → REMOVE IT
+└─ NO → No action needed
+```
+
 | Scenario | Action |
 |----------|--------|
 | No clear future use | **REMOVE** - Delete the variable declaration entirely |
 | Documented future use | **KEEP** - Add UNUSED comment template |
 
-**UNUSED Comment Template (if keeping variable):**
-```sail
-/* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
-local!variable: value,
-```
+**Quick Reference:**
+
+| Keep & Document | Remove Immediately |
+|-----------------|-------------------|
+| ✅ Planned features | ❌ Debug/test code |
+| ✅ Deferred work | ❌ Dead refactors |
+| ✅ Alternative logic (with reason) | ❌ No clear purpose |
+| ✅ Awaiting config system | ❌ Duplicate functionality |
 
 **Common Mockup Variables to REMOVE:**
 - Filter variables that weren't implemented (`local!dateRangeFilter`)
 - UI state variables not needed (`local!showAdvanced`)
 - Computed variables never referenced (`local!selectedSubmissions`)
 - Placeholder variables from templates
+
+### UNUSED Comment Template {#validation.unused-variables.template}
+
+**One-Line Format:**
+```sail
+/* UNUSED - [Name] ([Category]): [Why not used] | [Future use or decision] */
+local!variable: value,
+```
+
+### Categories & Examples {#validation.unused-variables.categories}
+
+**Future Enhancement** - Feature planned but not built yet
+```sail
+/* UNUSED - caseTypes (Future): Text field used; picker planned for Phase 2 case type management */
+local!caseTypes: a!queryRecordType('recordType!{...}Case Type', ...).data,
+```
+
+**Deferred** - Feature postponed
+```sail
+/* UNUSED - advancedFilters (Deferred): Phase 1 basic search only per ticket #1234 */
+local!showAdvancedFilters: false,
+local!filterDateRange,
+```
+
+**Alternative** - Different approach available
+```sail
+/* UNUSED - weightedSLA (Alternative): Client chose flat SLA over priority-weighted */
+local!weightedSLA: sum(a!forEach(local!cases, expression: fv!item.hours * fv!item.weight)),
+```
+
+**Config** - Waiting for configuration system
+```sail
+/* UNUSED - pageSize (Config): User preferences not implemented; using default 25 */
+local!userPageSize: 50,
+```
+
+**Requirements Changed** - Was needed, temporarily disabled
+```sail
+/* UNUSED - emailValidation (ReqChanged): Disabled for 60-day migration period */
+/* NOTE: Use pattern from /logic-guidelines/functions-reference.md#email-validation-pattern */
+local!isValidEmail: false(),
+```
+
+### Performance Warning {#validation.unused-variables.performance}
+
+Add performance note if query >0.5s or >500 records:
+
+```sail
+/* UNUSED - allCases (Future): Pre-load for export feature | 5000 records, 3s load */
+local!allCases: a!queryRecordType(..., batchSize: 5000).data,
+```
+
+**Rule**: If >1s and no near-term use → REMOVE
 
 ### Re-Verification {#validation.unused-variables.reverification}
 
@@ -364,6 +450,167 @@ For EACH `a!queryFilter()` in the generated file:
 
 ---
 
+## Query Result Handling {#validation.query-result-handling}
+
+### DataSubset Structure
+
+`a!queryRecordType()` returns a **DataSubset** type with these properties:
+
+| Property | Type | When No Results |
+|----------|------|-----------------|
+| `startIndex` | Integer | Value from pagingInfo |
+| `batchSize` | Integer | Value from pagingInfo |
+| `totalCount` | Integer | `0` (if `fetchTotalCount: true`) |
+| `data` | List of [Record Type] | **empty list** (e.g., empty `List of Case`) |
+| `identifiers` | List of Any Type | **empty list** |
+
+**Critical:** When no records match the query, the `data` property is an **empty list** of the queried record type. Always check before iterating or indexing.
+
+### Pattern A: Multiple Records (Lists, Grids, ForEach) {#validation.query-result-handling.multiple}
+
+When displaying multiple records, use the full `.data` list:
+
+```sail
+/* Query returns DataSubset */
+local!casesQuery: a!queryRecordType(
+  recordType: 'recordType!Case',
+  fields: {
+    'recordType!Case.fields.caseId',
+    'recordType!Case.fields.title',
+    'recordType!Case.fields.status'
+  },
+  filters: a!queryFilter(
+    field: 'recordType!Case.fields.status',
+    operator: "=",
+    value: local!selectedStatus,
+    applyWhen: a!isNotNullOrEmpty(local!selectedStatus)
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 100),
+  fetchTotalCount: true
+),
+
+/* Use .data directly - it's a List of Case (or empty list if no results) */
+local!cases: local!casesQuery.data,
+
+/* In UI: Check for empty list before rendering */
+if(
+  a!isNullOrEmpty(local!cases),
+  /* Empty state */
+  a!richTextDisplayField(
+    labelPosition: "COLLAPSED",
+    value: a!richTextItem(
+      text: "No cases found.",
+      color: "SECONDARY"
+    )
+  ),
+  /* Display all records */
+  a!forEach(
+    items: local!cases,
+    expression: a!cardLayout(
+      contents: {
+        a!richTextDisplayField(
+          labelPosition: "COLLAPSED",
+          value: a!richTextItem(
+            text: fv!item['recordType!Case.fields.title'],
+            style: "STRONG"
+          )
+        )
+      }
+    )
+  )
+)
+```
+
+### Pattern B: Single Record (Detail Views) {#validation.query-result-handling.single}
+
+When fetching a single record by ID, extract the first element:
+
+```sail
+/* Query for single record */
+local!caseQuery: a!queryRecordType(
+  recordType: 'recordType!Case',
+  fields: {
+    'recordType!Case.fields.caseId',
+    'recordType!Case.fields.title',
+    'recordType!Case.fields.status',
+    'recordType!Case.fields.description'
+  },
+  filters: a!queryFilter(
+    field: 'recordType!Case.fields.caseId',
+    operator: "=",
+    value: ri!caseId,
+    applyWhen: a!isNotNullOrEmpty(ri!caseId)
+  ),
+  pagingInfo: a!pagingInfo(startIndex: 1, batchSize: 1),
+  fetchTotalCount: true
+),
+
+/* Extract single record - MUST check .data before indexing */
+local!case: if(
+  a!isNotNullOrEmpty(local!caseQuery.data),
+  local!caseQuery.data[1],
+  null
+),
+
+/* In UI: Check extracted record before rendering */
+if(
+  a!isNullOrEmpty(local!case),
+  /* Empty state - record not found */
+  a!richTextDisplayField(
+    labelPosition: "COLLAPSED",
+    value: a!richTextItem(
+      text: "Case not found.",
+      color: "SECONDARY"
+    )
+  ),
+  /* Display record details */
+  a!sectionLayout(
+    label: local!case['recordType!Case.fields.title'],
+    contents: {
+      a!richTextDisplayField(
+        label: "Status",
+        value: local!case['recordType!Case.fields.status']
+      ),
+      a!richTextDisplayField(
+        label: "Description",
+        value: local!case['recordType!Case.fields.description']
+      )
+    }
+  )
+)
+```
+
+### Why Empty Check Matters
+
+```sail
+/* ❌ CRASHES - Cannot index into empty list */
+local!case: local!caseQuery.data[1]
+
+/* When query returns no results:
+ *   local!caseQuery.data = {} (empty List of Case)
+ *   {}[1] = ERROR - index out of bounds
+ */
+```
+
+### Two-Level Protection
+
+| Level | What It Protects | Pattern |
+|-------|------------------|---------|
+| **Query filter** | Prevents invalid query execution | `applyWhen: a!isNotNullOrEmpty(ri!caseId)` |
+| **Result handling** | Prevents indexing/iterating empty list | `if(a!isNotNullOrEmpty(query.data), ..., null)` |
+| **UI rendering** | Shows appropriate empty state | `if(a!isNullOrEmpty(local!case), emptyState, normalUI)` |
+
+### Query Result Handling Checklist {#validation.query-result-handling.checklist}
+
+For each `a!queryRecordType()`:
+
+- [ ] Filter on ri!/local! uses `applyWhen: a!isNotNullOrEmpty(...)`
+- [ ] **Single record:** Checks `a!isNotNullOrEmpty(query.data)` before `query.data[1]`
+- [ ] **Multiple records:** Checks `a!isNullOrEmpty(query.data)` before iterating
+- [ ] UI shows appropriate empty state when no records found
+
+---
+
 ## Pre-Flight Checklist {#validation.pre-flight-checklist}
 
 **🚨 MANDATORY** - Complete ALL items before writing output file.
@@ -402,8 +649,8 @@ For EACH `a!queryFilter()` in the generated file:
 - [ ] Used structured RULE INPUTS comment format with ALL 3 inputs documented
 - [ ] Each rule input has Name/Type/Description
 - [ ] Form fields bind to `ri!recordName[...]`, NOT local variables
-- [ ] Create button: `showWhen: not(ri!isUpdate)`, sets ALL 4 audit fields
-- [ ] Update button: `showWhen: ri!isUpdate`, sets only modifiedBy/modifiedOn
+- [ ] Create button: `showWhen: not(a!defaultValue(ri!isUpdate, false()))` with null safety, sets ALL 4 audit fields
+- [ ] Update button: `showWhen: a!defaultValue(ri!isUpdate, false())` with null safety, sets only modifiedBy/modifiedOn
 - [ ] Cancel button: `submit: true, validate: false, saveInto: a!save(ri!cancel, true)`
 - [ ] **RUN full form checklist:** `form-conversion-module.md {#form.checklist}`
 
@@ -415,6 +662,38 @@ For EACH `a!queryFilter()` in the generated file:
 - [ ] All null safety corrections applied
 - [ ] Re-verification confirms 100% compliance
 - [ ] Query filter type matching verified for ALL filters
+
+### Query Construction Validation {#validation.pre-flight.queries}
+
+- [ ] NO `a!recordData()` stored in local variables - only used directly in grid/chart data parameters ‼️
+- [ ] KPIs use `a!queryRecordType()` with `a!aggregationFields()`, NOT derived from grid data ‼️
+- [ ] Related KPIs (same grouping dimension) use single grouped query with dot notation extraction ‼️
+- [ ] Unrelated KPIs (different filters) use separate dedicated queries ‼️
+- [ ] All `a!queryRecordType()` calls include `pagingInfo` and `fetchTotalCount: true` ‼️
+- [ ] Aggregation result extraction includes null safety checks (`a!isNotNullOrEmpty()` on `.data`) ‼️
+- [ ] Grouped aggregation value extraction checks if value exists before indexing (`contains()` check) ‼️
+
+### Visual Design Preservation Validation {#validation.pre-flight.ux-preservation}
+
+- [ ] ALL layout structures preserved from mockup (sideBySideLayout, columnsLayout, cardLayout, sectionLayout, etc.) ‼️
+- [ ] ALL visual components preserved (stampField, gaugeField, progressBarField, tagField, richTextIcon, etc.) ‼️
+- [ ] ALL styling parameters preserved (colors, spacing, padding, margins, heights, widths, shape, showBorder, style) ‼️
+- [ ] ALL text content preserved (labels, descriptions, helper text with exact wording and formatting) ‼️
+- [ ] NO component type changes (richText → textField, card → section, stamp → icon) ‼️
+- [ ] NO layout simplifications (removing sideBySideLayout, nested cards, columns) ‼️
+- [ ] NO removal of decorative components (stamps, gauges, icons, tags) ‼️
+- [ ] ONLY data sources transformed (local! → queries, hardcoded → record fields, computed → aggregations) ‼️
+- [ ] Logic cleanup applied (unused variables, redundant if() statements, verbose expressions) ‼️
+- [ ] Layout/visual structures NOT cleaned up (these are UX, not logic) ‼️
+
+### Query Result Safety {#validation.pre-flight.query-results}
+
+- [ ] Single-record extractions check `.data` is not empty before indexing with `[1]`
+- [ ] Multi-record displays check `.data` for empty before iterating
+- [ ] UI shows appropriate empty state when no records found
+- [ ] Query filters with ri!/local! values have `applyWhen` protection
+
+**Reference:** See `{#validation.query-result-handling}` for complete patterns.
 
 ### Action Conversion Verification (if applicable) {#validation.pre-flight.actions}
 
@@ -432,7 +711,10 @@ For EACH `a!queryFilter()` in the generated file:
 - [ ] No nested sideBySideLayouts
 - [ ] At least one AUTO width column in each columnsLayout
 - [ ] Grid columns use `fv!row` (NOT fv!index, NOT fv!item)
+- [ ] Grid sortField: No sortField on computed columns (if/a!match/concat in value) ‼️
+- [ ] Grid sortField: Each field used as sortField only ONCE across all grid columns ‼️
 - [ ] Variables declared in dependency order (no forward references)
+- [ ] ALL `a!queryRecordType()` calls include `fetchTotalCount: true`
 
 ### Dropdown "All" Option Validation {#validation.pre-flight.dropdown-all}
 
@@ -484,5 +766,36 @@ After passing pre-flight checklist:
    - sail-code-reviewer (structure, best practices)
 
 4. **Review validation results:**
-   - Expected errors: Record type UUIDs, ri! variables, cons!/rule! references
-   - Critical errors: Invalid functions, syntax errors → FIX and re-validate
+   - Fix any errors reported and re-validate
+
+---
+
+## Critical Errors Quick Reference {#validation.critical-errors}
+
+Quick diagnostic table for common conversion errors. Each error links to its authoritative documentation.
+
+### Error Lookup Table {#validation.critical-errors.table}
+
+| Error | Problem | Solution | Details |
+|-------|---------|----------|---------|
+| **Dropdown init with record data** | `local!filter: "All"` when choiceValues come from records | `local!filter,` (uninitialized) + `placeholder: "All"` | `conversion-queries.md {#common.dropdown-all-option}` |
+| **Query in grid/chart data** | `data: local!queryResults` | `data: a!recordData(...)` | `conversion-queries.md {#common.query-construction}` |
+| **Type mismatch in filters** | DateTime field + Date value | Use matching type functions | `{#validation.type-matching}` |
+| **Chart pattern errors** | `categories` + `series` with record data | `data: a!recordData()` + `config: a!*ChartConfig()` | `display-conversion-charts.md {#display.chart-components}` |
+| **Invalid interval** | `interval: "MONTH"` or `"WEEK"` | Use `"MONTH_SHORT_TEXT"`, `"DATE_SHORT_TEXT"` | `display-conversion-charts.md {#display.chart-components.intervals}` |
+| **Stacking in config** | `stacking` inside chart config | Move `stacking` to chart field level | `display-conversion-charts.md {#display.chart-components.stacking}` |
+| **Non-existent functions** | `a!decimalField()`, `a!dateTimeValue()` | `a!floatingPointField()`, `datetime()` | `/ui-guidelines/reference/sail-api-schema.json` |
+| **Wizard validations param** | `validations` on `a!wizardLayout()` | Place on `a!buttonWidget()` or fields | `form-conversion-buttons-actions.md {#form.parameter-validation}` |
+| **JS/Python syntax** | `condition ? true : false` | `if(condition, true, false)` | `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` |
+| **Null in functions** | `text(nullField, "format")` | Wrap in `if(a!isNotNullOrEmpty(...))` | `{#validation.null-safety}` |
+| **totalCount for KPIs** | `.totalCount` for metrics | Use aggregation queries | `display-conversion-kpis.md {#display.kpi-aggregation}` |
+| **Array manipulation** | `append(map, array)` for insert | `a!update(data: array, index: 1, value: map)` | `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` |
+| **Query extraction pattern** | Wrong indexing for query type | Aggregations: `query.data.alias`; Fields: `query[1]['field']` | `conversion-queries.md {#common.query-result-structures}` |
+
+### Quick Diagnostic Questions {#validation.critical-errors.diagnostic}
+
+1. **Is dropdown empty on load?** → Check variable initialization (`local!var,` not `local!var: "value"`) - See `conversion-queries.md {#common.dropdown-all-option}`
+2. **Is chart blank?** → Check data pattern (`a!recordData` + config, not `categories` + `series`) - See `display-conversion-charts.md {#display.chart-refactoring}`
+3. **Is KPI showing null?** → Check extraction pattern and null wrapping - See `display-conversion-kpis.md {#display.kpi-aggregation}`
+4. **Is grid showing error?** → Check `fv!row` usage (not `fv!index` or `fv!item`) - See `display-conversion-grids.md {#display.grid-patterns}`
+5. **Is filter not working?** → Check `applyWhen` and type matching - See `{#validation.type-matching}`

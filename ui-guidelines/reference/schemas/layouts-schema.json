@@ -1,0 +1,815 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Layout Components - Page structure and container components",
+  "version": "2.3.0",
+  "components": {
+    "a!formLayout": {
+      "description": "Top-level form layout with optional header, contents, and buttons",
+      "category": "layout",
+      "parameters": {
+        "titleBar": {
+          "type": "Text|CardLayout|HeaderTemplate"
+        },
+        "contentsWidth": {
+          "validValues": [
+            "FULL",
+            "WIDE",
+            "MEDIUM",
+            "NARROW",
+            "EXTRA_NARROW"
+          ]
+        },
+        "contents": {
+          "type": "Any Type Array"
+        },
+        "buttons": {
+          "type": "Button Layout"
+        },
+        "backgroundColor": {
+          "validValues": [
+            "WHITE",
+            "TRANSPARENT"
+          ],
+          "acceptsHexColors": true
+        },
+        "validations": {
+          "type": "Text/Validation Message"
+        }
+      }
+    },
+    "a!headerContentLayout": {
+      "description": "General purpose page layout with header (optional) and content sections",
+      "category": "layout",
+      "parameters": {
+        "header": {
+          "type": "Any Type"
+        },
+        "contents": {
+          "type": "Any Type Array"
+        },
+        "backgroundColor": {
+          "validValues": [
+            "WHITE",
+            "TRANSPARENT"
+          ],
+          "acceptsHexColors": true
+        },
+        "contentsPadding": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      }
+    },
+    "a!paneLayout": {
+      "category": "layout",
+      "parameters": {
+        "panes": {
+          "type": "List of a!pane",
+          "required": true
+        }
+      },
+      "specialNote": "At least one pane must have width: \"AUTO\" for fluid layout",
+      "description": "2-3 full-height vertical panes with independent scrolling"
+    },
+    "a!pane": {
+      "category": "layout",
+      "parameters": {
+        "contents": {
+          "type": "Any Type"
+        },
+        "width": {
+          "validValues": [
+            "AUTO",
+            "EXTRA_NARROW",
+            "NARROW",
+            "NARROW_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "WIDE",
+            "WIDE_PLUS"
+          ]
+        },
+        "backgroundColor": {
+          "acceptsHexColors": true
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Individual pane within paneLayout"
+    },
+    "a!wizardLayout": {
+      "category": "layout",
+      "parameters": {
+        "titleBar": {
+          "type": "Text|CardLayout|HeaderTemplate"
+        },
+        "steps": {
+          "type": "List of a!wizardStep",
+          "required": true
+        },
+        "style": {
+          "validValues": [
+            "DOT_VERTICAL",
+            "DOT_HORIZONTAL",
+            "CHEVRON_VERTICAL",
+            "CHEVRON_HORIZONTAL",
+            "LINE_VERTICAL",
+            "LINE_HORIZONTAL",
+            "MINIMAL"
+          ]
+        },
+        "contentsWidth": {
+          "validValues": [
+            "FULL",
+            "WIDE",
+            "MEDIUM",
+            "NARROW",
+            "EXTRA_NARROW"
+          ]
+        },
+        "primaryButtons": {
+          "type": "List of ButtonWidget"
+        },
+        "secondaryButtons": {
+          "type": "List of ButtonWidget"
+        },
+        "showStepHeadings": {
+          "type": "Boolean"
+        },
+        "focusOnFirstInput": {
+          "type": "Boolean"
+        },
+        "isTitleBarFixed": {
+          "type": "Boolean"
+        },
+        "showButtonDivider": {
+          "type": "Boolean"
+        },
+        "showTitleBarDivider": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Multi-step form layout with automatic navigation and progress indicators"
+    },
+    "a!wizardStep": {
+      "category": "layout",
+      "parameters": {
+        "label": {
+          "required": true
+        },
+        "contents": {
+          "type": "Any Type",
+          "required": true
+        },
+        "disableNextButton": {
+          "type": "Boolean"
+        },
+        "validations": {
+          "type": "List of Text"
+        }
+      },
+      "description": "Individual step within wizardLayout"
+    },
+    "a!boxLayout": {
+      "category": "layout",
+      "parameters": {
+        "contents": {
+          "type": "Any Type Array"
+        },
+        "style": {
+          "validValues": [
+            "STANDARD",
+            "ACCENT",
+            "SUCCESS",
+            "INFO",
+            "WARN",
+            "ERROR"
+          ],
+          "acceptsHexColors": true
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Content within a box outline with a title bar"
+    },
+    "a!columnsLayout": {
+      "category": "layout",
+      "parameters": {
+        "columns": {
+          "type": "List of columnLayout",
+          "required": true
+        },
+        "alignVertical": {
+          "validValues": [
+            "TOP",
+            "MIDDLE",
+            "BOTTOM"
+          ]
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "NONE",
+            "DENSE",
+            "SPARSE"
+          ]
+        },
+        "showDividers": {
+          "type": "Boolean"
+        },
+        "stackWhen": {
+          "type": "List of Text",
+          "validValues": [
+            "PHONE",
+            "TABLET_PORTRAIT",
+            "TABLET_LANDSCAPE",
+            "DESKTOP",
+            "DESKTOP_WIDE"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "At least one column must have width: \"AUTO\" for proper layout distribution",
+      "description": "Horizontal column arrangement"
+    },
+    "a!columnLayout": {
+      "category": "layout",
+      "parameters": {
+        "contents": {
+          "type": "Any Type"
+        },
+        "width": {
+          "validValues": [
+            "AUTO",
+            "EXTRA_NARROW",
+            "NARROW",
+            "NARROW_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "WIDE",
+            "WIDE_PLUS",
+            "1X",
+            "2X",
+            "3X",
+            "4X",
+            "5X",
+            "6X",
+            "7X",
+            "8X",
+            "9X",
+            "10X"
+          ]
+        }
+      },
+      "description": "Single column within columns layout"
+    },
+    "a!sideBySideLayout": {
+      "category": "layout",
+      "parameters": {
+        "items": {
+          "type": "List of sideBySideItem",
+          "required": true
+        },
+        "alignVertical": {
+          "validValues": [
+            "TOP",
+            "MIDDLE",
+            "BOTTOM"
+          ]
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "NONE",
+            "DENSE",
+            "SPARSE"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "NEVER nest sideBySideLayouts inside sideBySideItems. NEVER put arrays of components or layout components in sideBySideItems - only single components allowed",
+      "description": "Side-by-side component arrangement (like flex)"
+    },
+    "a!sideBySideItem": {
+      "category": "layout",
+      "parameters": {
+        "item": {
+          "type": "Single component",
+          "required": true
+        },
+        "width": {
+          "validValues": [
+            "AUTO",
+            "MINIMIZE",
+            "1X",
+            "2X",
+            "3X",
+            "4X",
+            "5X",
+            "6X",
+            "7X",
+            "8X",
+            "9X",
+            "10X"
+          ]
+        }
+      },
+      "specialNote": "Can ONLY contain single components - NEVER arrays of components or layout components (columnsLayout, cardLayout, sideBySideLayout, etc.)",
+      "description": "Item within side-by-side layout"
+    },
+    "a!cardLayout": {
+      "category": "layout",
+      "parameters": {
+        "contents": {
+          "type": "Any Type"
+        },
+        "style": {
+          "validValues": [
+            "NONE",
+            "TRANSPARENT",
+            "STANDARD",
+            "ACCENT",
+            "SUCCESS",
+            "INFO",
+            "WARN",
+            "ERROR",
+            "CHARCOAL_SCHEME",
+            "NAVY_SCHEME",
+            "PLUM_SCHEME"
+          ],
+          "acceptsHexColors": true
+        },
+        "shape": {
+          "validValues": [
+            "SQUARED",
+            "SEMI_ROUNDED",
+            "ROUNDED"
+          ]
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "height": {
+          "validValues": [
+            "EXTRA_SHORT",
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL",
+            "AUTO"
+          ]
+        },
+        "link": {
+          "type": "a!dynamicLink"
+        },
+        "decorativeBarPosition": {
+          "validValues": [
+            "NONE",
+            "TOP",
+            "BOTTOM",
+            "START",
+            "END"
+          ]
+        },
+        "decorativeBarColor": {
+          "validValues": [
+            "ACCENT",
+            "POSITIVE",
+            "WARN",
+            "NEGATIVE"
+          ],
+          "acceptsHexColors": true
+        },
+        "borderColor": {
+          "validValues": [
+            "ACCENT",
+            "POSITIVE",
+            "WARN",
+            "NEGATIVE"
+          ],
+          "acceptsHexColors": true
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Content within a styled card with optional border, shadow, and background color"
+    },
+    "a!cardGroupLayout": {
+      "category": "layout",
+      "parameters": {
+        "cards": {
+          "type": "Any Type"
+        },
+        "cardWidth": {
+          "type": "Text",
+          "validValues": [
+            "EXTRA_NARROW",
+            "NARROW",
+            "NARROW_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "WIDE",
+            "WIDE_PLUS",
+            "EXTRA_WIDE"
+          ]
+        },
+        "cardHeight": {
+          "type": "Text",
+          "validValues": [
+            "AUTO",
+            "EXTRA_SHORT",
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL"
+          ]
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "NONE",
+            "DENSE",
+            "SPARSE"
+          ]
+        },
+        "fillContainer": {
+          "type": "Boolean"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Group of cards with automatic responsive flow"
+    },
+    "a!sectionLayout": {
+      "category": "layout",
+      "parameters": {
+        "contents": {
+          "type": "Any Type"
+        },
+        "labelColor": {
+          "type": "Text",
+          "validValues": [
+            "ACCENT",
+            "STANDARD",
+            "POSITIVE",
+            "NEGATIVE",
+            "SECONDARY"
+          ],
+          "acceptsHexColors": true
+        },
+        "labelSize": {
+          "type": "Text",
+          "validValues": [
+            "LARGE_PLUS",
+            "LARGE",
+            "MEDIUM_PLUS",
+            "MEDIUM",
+            "SMALL",
+            "EXTRA_SMALL"
+          ]
+        },
+        "divider": {
+          "validValues": [
+            "NONE",
+            "ABOVE",
+            "BELOW"
+          ]
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Section with title and optionally collapsible content"
+    },
+    "a!billboardLayout": {
+      "category": "layout",
+      "parameters": {
+        "backgroundMedia": {
+          "type": "Any Type"
+        },
+        "backgroundColor": {
+          "acceptsHexColors": true
+        },
+        "height": {
+          "validValues": [
+            "EXTRA_SHORT",
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL",
+            "AUTO"
+          ]
+        },
+        "overlay": {
+          "type": "a!fullOverlay | a!barOverlay | a!columnOverlay",
+          "specialNote": "Must use a!fullOverlay(), a!barOverlay(), or a!columnOverlay() - cannot accept components directly"
+        },
+        "marginAbove": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Background image or video with optional overlay content"
+    },
+    "a!fullOverlay": {
+      "category": "layout",
+      "parameters": {
+        "alignVertical": {
+          "validValues": [
+            "TOP",
+            "MIDDLE",
+            "BOTTOM"
+          ]
+        },
+        "contents": {
+          "type": "Any Type"
+        },
+        "style": {
+          "validValues": [
+            "DARK",
+            "SEMI_DARK",
+            "NONE",
+            "SEMI_LIGHT",
+            "LIGHT"
+          ]
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Full overlay completely covering entire billboard"
+    },
+    "a!barOverlay": {
+      "category": "layout",
+      "parameters": {
+        "position": {
+          "type": "Text",
+          "validValues": [
+            "TOP",
+            "MIDDLE",
+            "BOTTOM"
+          ]
+        },
+        "contents": {
+          "type": "Any Type"
+        },
+        "style": {
+          "validValues": [
+            "DARK",
+            "SEMI_DARK",
+            "NONE",
+            "SEMI_LIGHT",
+            "LIGHT"
+          ]
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Horizontal bar overlay positioned at top, middle, or bottom of billboard"
+    },
+    "a!columnOverlay": {
+      "category": "layout",
+      "parameters": {
+        "alignVertical": {
+          "validValues": [
+            "TOP",
+            "MIDDLE",
+            "BOTTOM"
+          ]
+        },
+        "position": {
+          "type": "Text",
+          "validValues": [
+            "START",
+            "CENTER",
+            "END"
+          ]
+        },
+        "width": {
+          "validValues": [
+            "NARROW",
+            "MEDIUM",
+            "WIDE"
+          ]
+        },
+        "contents": {
+          "type": "Any Type"
+        },
+        "style": {
+          "validValues": [
+            "DARK",
+            "SEMI_DARK",
+            "NONE",
+            "SEMI_LIGHT",
+            "LIGHT"
+          ]
+        },
+        "padding": {
+          "type": "Text",
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "description": "Vertical column overlay positioned at left, middle, or right of billboard"
+    }
+  }
+}

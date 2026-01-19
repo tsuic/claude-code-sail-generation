@@ -51,6 +51,13 @@ Container for multiple cards with automatic flow and height matching.
 - When the number of cards is known or unknown
 - *DEFAULT* to using cardGroupLayout (not columnsLayout) to arrange sets of cards
 
+### ✅ ALWAYS Use cardGroupLayout When:
+- Displaying 2+ cards side-by-side that should have **equal heights**
+- Cards contain variable-length content (descriptions, lists, text blocks)
+- You want automatic height matching without manual height settings
+
+**Key benefit:** `cardHeight: "AUTO"` automatically matches all cards to the tallest card's content height, creating a polished grid appearance.
+
 **Example:**
 ```sail
 a!cardGroupLayout(
@@ -60,7 +67,8 @@ a!cardGroupLayout(
     a!cardLayout(contents: {/* content */}, shape: "ROUNDED")
   },
   cardWidth: "NARROW_PLUS",
-  spacing: "SPARSE"
+  spacing: "SPARSE",
+  cardHeight: "AUTO"
 )
 ```
 

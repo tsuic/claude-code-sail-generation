@@ -1,8 +1,8 @@
 # Date/Time Handling Rules {#datetime-critical-rules}
 
-> **Parent guides:**
+> **Related documentation:**
 > - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
-> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
+> - `conversion-guidelines/validation-enforcement-module.md` (type matching enforcement)
 >
 > **Quick Reference:** `logic-guidelines/null-safety-quick-ref.md` (Date/Time section)
 
@@ -257,4 +257,4 @@ if(
 
 ## Valid Operators by Data Type
 
-See `record-query-guidelines/query-filters-operators.md` for the complete operator reference table and examples.
+See `/conversion-guidelines/common-conversion-patterns.md#common.query-parameters` for the complete operator reference table and examples.

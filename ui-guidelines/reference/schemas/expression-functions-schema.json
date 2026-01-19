@@ -1,0 +1,954 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Expression Functions and Helper Components - Core functions, helpers, utilities, and looping",
+  "version": "2.3.0",
+  "components": {
+    "a!richTextItem": {
+      "category": "helper",
+      "parameters": {
+        "text": {
+          "type": "Text"
+        },
+        "style": {
+          "type": "Text Array",
+          "validValues": [
+            "PLAIN",
+            "EMPHASIS",
+            "STRONG",
+            "UNDERLINE",
+            "STRIKETHROUGH"
+          ]
+        },
+        "size": {
+          "validValues": [
+            "SMALL",
+            "STANDARD",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "LARGE",
+            "LARGE_PLUS",
+            "EXTRA_LARGE"
+          ]
+        },
+        "color": {
+          "validValues": [
+            "STANDARD",
+            "ACCENT",
+            "POSITIVE",
+            "NEGATIVE",
+            "SECONDARY"
+          ],
+          "acceptsHexColors": true
+        },
+        "link": {
+          "type": "Link"
+        },
+        "linkStyle": {
+          "validValues": [
+            "INLINE",
+            "STANDALONE"
+          ]
+        }
+      },
+      "description": "Styled text for rich text display"
+    },
+    "a!richTextIcon": {
+      "category": "helper",
+      "parameters": {
+        "color": {
+          "validValues": [
+            "STANDARD",
+            "ACCENT",
+            "POSITIVE",
+            "NEGATIVE",
+            "SECONDARY"
+          ],
+          "acceptsHexColors": true
+        },
+        "size": {
+          "validValues": [
+            "SMALL",
+            "STANDARD",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "LARGE",
+            "LARGE_PLUS",
+            "EXTRA_LARGE"
+          ]
+        },
+        "altText": {
+          "type": "Text"
+        }
+      },
+      "description": "Icon for rich text display"
+    },
+    "a!chartSeries": {
+      "category": "helper",
+      "parameters": {
+        "data": {
+          "type": "Decimal Array"
+        },
+        "color": {
+          "validValues": [
+            "ACCENT",
+            "BLUEGRAY",
+            "GREEN",
+            "GOLD",
+            "ORANGE",
+            "PURPLE",
+            "RED",
+            "SKYBLUE",
+            "LIMEGREEN",
+            "YELLOW",
+            "AMBER",
+            "PINK",
+            "VIOLETRED"
+          ],
+          "acceptsHexColors": true
+        }
+      },
+      "description": "Data series for charts"
+    },
+    "a!dynamicLink": {
+      "category": "helper",
+      "parameters": {
+        "value": {
+          "type": "Any Type"
+        },
+        "saveInto": {
+          "type": "Save Array"
+        }
+      },
+      "description": "Link that updates variables"
+    },
+    "a!safeLink": {
+      "category": "helper",
+      "parameters": {
+        "uri": {
+          "type": "Text"
+        }
+      },
+      "description": "Creates a link to an external URL that opens in a new tab/window"
+    },
+    "a!recordLink": {
+      "category": "helper",
+      "parameters": {
+        "record": {
+          "type": "Record",
+          "required": true
+        }
+      },
+      "description": "Creates a link to an Appian record"
+    },
+    "a!tagItem": {
+      "category": "helper",
+      "parameters": {
+        "text": {
+          "type": "Text"
+        },
+        "backgroundColor": {
+          "validValues": [
+            "ACCENT",
+            "POSITIVE",
+            "NEGATIVE",
+            "SECONDARY"
+          ],
+          "acceptsHexColors": true
+        },
+        "textColor": {
+          "type": "Text",
+          "validValues": [
+            "STANDARD"
+          ],
+          "acceptsHexColors": true
+        },
+        "link": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Individual tag for tag field"
+    },
+    "a!richTextBulletedList": {
+      "category": "helper",
+      "parameters": {
+        "items": {
+          "type": "List of Text/RichTextItem"
+        }
+      },
+      "description": "Creates a bulleted list within rich text display"
+    },
+    "a!richTextNumberedList": {
+      "category": "helper",
+      "parameters": {
+        "items": {
+          "type": "List of Text/RichTextItem"
+        }
+      },
+      "description": "Creates a numbered list within rich text display"
+    },
+    "a!headerTemplateFull": {
+      "category": "helper",
+      "parameters": {
+        "secondaryText": {
+          "type": "Text"
+        },
+        "backgroundColor": {
+          "acceptsHexColors": true
+        },
+        "titleColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        },
+        "secondaryTextColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        },
+        "stampIcon": {
+          "type": "Text"
+        },
+        "stampColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        }
+      },
+      "description": "Full-width header template for formLayout with background color"
+    },
+    "a!headerTemplateSimple": {
+      "category": "helper",
+      "parameters": {
+        "secondaryText": {
+          "type": "Text"
+        },
+        "titleColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        },
+        "secondaryTextColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        },
+        "stampIcon": {
+          "type": "Text"
+        },
+        "stampColor": {
+          "type": "Text",
+          "acceptsHexColors": true
+        }
+      },
+      "description": "Simple header template for formLayout aligned with content width"
+    },
+    "a!sidebarTemplate": {
+      "category": "helper",
+      "parameters": {
+        "secondaryText": {
+          "type": "Text"
+        },
+        "image": {
+          "type": "Any Type"
+        },
+        "additionalContents": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Sidebar header template (desktop) that becomes header on mobile"
+    },
+    "a!validationMessage": {
+      "category": "utility",
+      "parameters": {
+        "message": {
+          "type": "Text"
+        },
+        "color": {
+          "validValues": [
+            "ERROR",
+            "WARN",
+            "INFO",
+            "SUCCESS"
+          ]
+        }
+      },
+      "description": "Configures a standalone validation message for layouts or custom error handling"
+    },
+    "a!webImage": {
+      "category": "helper",
+      "parameters": {
+        "source": {
+          "type": "Text",
+          "required": true
+        },
+        "altText": {
+          "type": "Text"
+        }
+      },
+      "description": "References an image from a web URL for use in imageField or billboardLayout"
+    },
+    "a!documentImage": {
+      "category": "helper",
+      "parameters": {
+        "document": {
+          "type": "Document",
+          "required": true
+        },
+        "altText": {
+          "type": "Text"
+        }
+      },
+      "description": "References an Appian document as an image source"
+    },
+    "a!userImage": {
+      "category": "helper",
+      "parameters": {
+        "user": {
+          "type": "User",
+          "required": true
+        },
+        "altText": {
+          "type": "Text"
+        }
+      },
+      "description": "References a user's profile image"
+    },
+    "a!save": {
+      "category": "helper",
+      "parameters": {
+        "target": {
+          "type": "Variable",
+          "required": true
+        },
+        "value": {
+          "type": "Any Type",
+          "required": true
+        }
+      },
+      "description": "Save operation for updating variables"
+    },
+    "a!sortInfo": {
+      "category": "helper",
+      "parameters": {
+        "field": {
+          "type": "Text",
+          "required": true
+        },
+        "ascending": {
+          "type": "Boolean",
+          "required": true
+        }
+      },
+      "description": "Defines initial or secondary sorting for grid fields"
+    },
+    "a!map": {
+      "category": "helper",
+      "parameters": {},
+      "description": "Creates a map data structure with key-value pairs"
+    },
+    "a!forEach": {
+      "category": "looping",
+      "parameters": {
+        "items": {
+          "type": "Any Type",
+          "required": true
+        },
+        "expression": {
+          "type": "Any Type",
+          "required": true
+        }
+      },
+      "functionVariables": [
+        "fv!item",
+        "fv!index",
+        "fv!isFirst",
+        "fv!isLast",
+        "fv!itemCount"
+      ],
+      "description": "Iterate over array with access to item, index, and position"
+    },
+    "a!localVariables": {
+      "category": "core",
+      "parameters": {},
+      "description": "Define local variables for the expression scope"
+    },
+    "a!recordActionItem": {
+      "category": "helper",
+      "parameters": {
+        "action": {
+          "type": "Record Action Reference",
+          "required": true,
+          "description": "Reference to a record action (e.g., 'recordType!Type.actions.actionName')"
+        },
+        "identifier": {
+          "type": "Any Type",
+          "description": "Record identifier for related actions. Use fv!identifier in grids with a!recordData(). Omit for record actions (Create)."
+        }
+      },
+      "specialNote": "For related actions (Edit, Delete), identifier is REQUIRED. For record actions (Create), omit identifier. View/Open actions should use a!recordLink() instead.",
+      "description": "Defines a record action for display in recordActionField"
+    },
+    "a!gridLayoutHeaderCell": {
+      "category": "helper",
+      "parameters": {
+        "align": {
+          "validValues": [
+            "LEFT",
+            "CENTER",
+            "RIGHT"
+          ]
+        }
+      },
+      "description": "Header cell definition for editable grid layout"
+    },
+    "a!gridLayoutColumnConfig": {
+      "category": "helper",
+      "parameters": {
+        "width": {
+          "validValues": [
+            "DISTRIBUTE",
+            "AUTO",
+            "ICON",
+            "ICON_PLUS",
+            "NARROW",
+            "NARROW_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "WIDE",
+            "1X",
+            "2X",
+            "3X",
+            "4X",
+            "5X",
+            "6X",
+            "7X",
+            "8X",
+            "9X",
+            "10X"
+          ]
+        },
+        "weight": {
+          "type": "Integer"
+        }
+      },
+      "description": "Column configuration for editable grid layout"
+    },
+    "a!gridRowLayout": {
+      "category": "helper",
+      "parameters": {
+        "contents": {
+          "type": "List of Any Type",
+          "required": true
+        },
+        "id": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Row definition for editable grid layout"
+    },
+    "a!gridRowDeletion": {
+      "category": "helper",
+      "parameters": {},
+      "description": "Row deletion configuration for editable grid"
+    },
+    "a!webVideo": {
+      "category": "helper",
+      "parameters": {
+        "source": {
+          "type": "Text",
+          "required": true
+        },
+        "altText": {
+          "type": "Text"
+        }
+      },
+      "description": "References a video from a web URL for use in billboardLayout"
+    },
+    "a!isPageWidth": {
+      "category": "utility",
+      "parameters": {
+        "widths": {
+          "type": "List of Text",
+          "required": true,
+          "validValues": [
+            "PHONE",
+            "TABLET_PORTRAIT",
+            "TABLET_LANDSCAPE",
+            "DESKTOP",
+            "DESKTOP_WIDE"
+          ]
+        }
+      },
+      "specialNote": "Returns true if current viewport matches any of the specified widths - use for responsive design",
+      "description": "Returns true if current viewport matches any of the specified widths"
+    },
+    "a!authorizationLink": {
+      "category": "helper",
+      "parameters": {
+        "task": {
+          "type": "Task",
+          "required": true
+        }
+      },
+      "description": "Creates a link to authorize a task"
+    },
+    "a!documentDownloadLink": {
+      "category": "helper",
+      "parameters": {
+        "document": {
+          "type": "Document",
+          "required": true
+        }
+      },
+      "description": "Creates a link to download a document"
+    },
+    "a!processTaskLink": {
+      "category": "helper",
+      "parameters": {
+        "task": {
+          "type": "Task",
+          "required": true
+        }
+      },
+      "description": "Creates a link to a process task"
+    },
+    "a!startProcessLink": {
+      "category": "helper",
+      "parameters": {
+        "processModel": {
+          "type": "Process Model",
+          "required": true
+        },
+        "processParameters": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Creates a link to start a process"
+    },
+    "a!submitLink": {
+      "category": "helper",
+      "parameters": {
+        "value": {
+          "type": "Any Type"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "confirm": {
+          "type": "Boolean"
+        },
+        "confirmHeader": {
+          "type": "Text"
+        },
+        "confirmMessage": {
+          "type": "Text"
+        },
+        "validate": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Creates a link that submits form data"
+    },
+    "a!userRecordLink": {
+      "category": "helper",
+      "parameters": {
+        "user": {
+          "type": "User",
+          "required": true
+        }
+      },
+      "description": "Creates a link to a user's record"
+    },
+    "a!cardTemplateBarTextStacked": {
+      "category": "helper",
+      "parameters": {
+        "id": {
+          "type": "Any Type"
+        },
+        "primaryText": {
+          "type": "Text"
+        },
+        "secondaryText": {
+          "type": "Text"
+        },
+        "tertiaryText": {
+          "type": "Text"
+        },
+        "emphasize": {
+          "validValues": [
+            "PRIMARY",
+            "SECONDARY",
+            "TERTIARY"
+          ]
+        }
+      },
+      "description": "Card template with stacked text layout"
+    },
+    "a!cardTemplateBarTextJustified": {
+      "category": "helper",
+      "parameters": {
+        "id": {
+          "type": "Any Type"
+        },
+        "primaryText": {
+          "type": "Text"
+        },
+        "secondaryText": {
+          "type": "Text"
+        },
+        "tertiaryText": {
+          "type": "Text"
+        }
+      },
+      "description": "Card template with justified text layout"
+    },
+    "a!cardTemplateTile": {
+      "category": "helper",
+      "parameters": {
+        "id": {
+          "type": "Any Type"
+        },
+        "primaryText": {
+          "type": "Text"
+        },
+        "secondaryText": {
+          "type": "Text"
+        }
+      },
+      "description": "Card template for tile-style display"
+    },
+    "a!chartCustomColorScheme": {
+      "category": "helper",
+      "parameters": {
+        "colors": {
+          "type": "List of Text",
+          "required": true
+        }
+      },
+      "specialNote": "Use hex color codes in the colors array",
+      "description": "Defines a custom color scheme for charts"
+    },
+    "a!chartReferenceLine": {
+      "category": "helper",
+      "parameters": {
+        "value": {
+          "type": "Decimal",
+          "required": true
+        },
+        "color": {
+          "acceptsHexColors": true
+        },
+        "style": {
+          "validValues": [
+            "SOLID",
+            "DASHED"
+          ]
+        }
+      },
+      "description": "Defines a reference line for charts"
+    }
+  },
+  "expressionFunctions": {
+    "if": {
+      "syntax": "if(condition, valueIfTrue, valueIfFalse)",
+      "parameterCount": 3,
+      "description": "Conditional logic with short-circuit evaluation"
+    },
+    "and": {
+      "syntax": "and(value1, value2, ...)",
+      "parameterCount": "variadic",
+      "description": "Logical AND operation"
+    },
+    "or": {
+      "syntax": "or(value1, value2, ...)",
+      "parameterCount": "variadic",
+      "description": "Logical OR operation"
+    },
+    "not": {
+      "syntax": "not(booleanValue)",
+      "parameterCount": 1,
+      "description": "Logical NOT operation"
+    },
+    "isnull": {
+      "syntax": "isnull(value)",
+      "parameterCount": 1,
+      "description": "Check if value is null"
+    },
+    "index": {
+      "syntax": "index(array, index, default)",
+      "parameterCount": 3,
+      "description": "Get array element at index or default"
+    },
+    "length": {
+      "syntax": "length(array)",
+      "parameterCount": 1,
+      "description": "Get array length"
+    },
+    "append": {
+      "syntax": "append(array, value)",
+      "parameterCount": 2,
+      "description": "Append value to array"
+    },
+    "concat": {
+      "syntax": "concat(text1, text2, ...)",
+      "parameterCount": "variadic",
+      "description": "Concatenate text strings"
+    },
+    "text": {
+      "syntax": "text(value, format)",
+      "parameterCount": 2,
+      "description": "Format value as text with pattern",
+      "specialNote": "Cannot accept null values - use if() or a!defaultValue() to check first"
+    },
+    "today": {
+      "syntax": "today()",
+      "parameterCount": 0,
+      "description": "Current date"
+    },
+    "now": {
+      "syntax": "now()",
+      "parameterCount": 0,
+      "description": "Current date and time"
+    },
+    "todate": {
+      "syntax": "todate(value)",
+      "parameterCount": 1,
+      "description": "Convert to date type"
+    },
+    "todatetime": {
+      "syntax": "todatetime(value)",
+      "parameterCount": 1,
+      "description": "Convert to datetime type"
+    },
+    "tointeger": {
+      "syntax": "tointeger(value)",
+      "parameterCount": 1,
+      "description": "Convert to integer"
+    },
+    "todecimal": {
+      "syntax": "todecimal(value)",
+      "parameterCount": 1,
+      "description": "Convert to decimal"
+    },
+    "tostring": {
+      "syntax": "tostring(value)",
+      "parameterCount": 1,
+      "description": "Convert to text"
+    },
+    "upper": {
+      "syntax": "upper(text)",
+      "parameterCount": 1,
+      "description": "Convert to uppercase"
+    },
+    "lower": {
+      "syntax": "lower(text)",
+      "parameterCount": 1,
+      "description": "Convert to lowercase"
+    },
+    "trim": {
+      "syntax": "trim(text)",
+      "parameterCount": 1,
+      "description": "Remove extra whitespace"
+    },
+    "a!defaultValue": {
+      "syntax": "a!defaultValue(value, default)",
+      "parameterCount": 2,
+      "description": "Return first non-null/empty value"
+    },
+    "a!isNullOrEmpty": {
+      "syntax": "a!isNullOrEmpty(value)",
+      "parameterCount": 1,
+      "description": "Check if null or empty"
+    },
+    "a!isNotNullOrEmpty": {
+      "syntax": "a!isNotNullOrEmpty(value)",
+      "parameterCount": 1,
+      "description": "Check if not null and not empty"
+    },
+    "contains": {
+      "syntax": "contains(arrayToFindWithin, valueToFind)",
+      "parameterCount": 2,
+      "description": "Check if array contains value"
+    },
+    "where": {
+      "syntax": "where(booleanArray)",
+      "parameterCount": 1,
+      "description": "Return indices where true"
+    },
+    "union": {
+      "syntax": "union(array1, array2)",
+      "parameterCount": 2,
+      "description": "All unique items from both arrays"
+    },
+    "difference": {
+      "syntax": "difference(array1, array2)",
+      "parameterCount": 2,
+      "description": "Items in array1 not in array2"
+    },
+    "intersection": {
+      "syntax": "intersection(array1, array2)",
+      "parameterCount": 2,
+      "description": "Items in both arrays"
+    },
+    "sum": {
+      "syntax": "sum(numberArray)",
+      "parameterCount": 1,
+      "description": "Sum of array"
+    },
+    "average": {
+      "syntax": "average(numberArray)",
+      "parameterCount": 1,
+      "description": "Average of array"
+    },
+    "min": {
+      "syntax": "min(numberArray)",
+      "parameterCount": 1,
+      "description": "Minimum value"
+    },
+    "max": {
+      "syntax": "max(numberArray)",
+      "parameterCount": 1,
+      "description": "Maximum value"
+    },
+    "round": {
+      "syntax": "round(number, digits)",
+      "parameterCount": 2,
+      "description": "Round to digits"
+    },
+    "mod": {
+      "syntax": "mod(dividend, divisor)",
+      "parameterCount": 2,
+      "description": "Modulo/remainder operation"
+    },
+    "todatasubset": {
+      "syntax": "todatasubset(array, pagingInfo)",
+      "parameterCount": 2,
+      "description": "Sort and paginate data using a!pagingInfo",
+      "specialNote": "Returns DataSubset with data, startIndex, batchSize, sort, totalCount, and identifiers"
+    },
+    "wherecontains": {
+      "syntax": "wherecontains(valueToFind, arrayToSearch)",
+      "parameterCount": 2,
+      "description": "Find indices where array contains value"
+    },
+    "filter": {
+      "syntax": "filter(predicate, array)",
+      "parameterCount": 2,
+      "description": "Filter array by boolean predicate"
+    },
+    "reduce": {
+      "syntax": "reduce(rule, initialValue, array)",
+      "parameterCount": 3,
+      "description": "Reduce array to single value"
+    },
+    "merge": {
+      "syntax": "merge(array1, array2, ...)",
+      "parameterCount": "variadic",
+      "description": "Merge multiple arrays preserving duplicates"
+    },
+    "a!flatten": {
+      "syntax": "a!flatten(array)",
+      "parameterCount": 1,
+      "description": "Flatten nested arrays into single array"
+    },
+    "a!update": {
+      "syntax": "a!update(array, index, value)",
+      "parameterCount": 3,
+      "description": "Immutably update array element at index"
+    },
+    "a!match": {
+      "syntax": "a!match(value, equals|whenTrue, then, default)",
+      "description": "Pattern matching. Use 'equals' for exact matches, 'whenTrue' for ranges/thresholds. Access value via fv!value in conditions. Keywords required.",
+      "specialNote": "Short-circuits on first match. Can mix equals and whenTrue. PREFER over nested if() for 3+ conditions."
+    },
+    "datetime": {
+      "syntax": "datetime(year, month, day, hour, minute, second)",
+      "parameterCount": 6,
+      "description": "Create datetime value from components"
+    },
+    "date": {
+      "syntax": "date(year, month, day)",
+      "parameterCount": 3,
+      "description": "Create date value from components"
+    },
+    "a!addDateTime": {
+      "syntax": "a!addDateTime(dateTime, years, months, days, hours, minutes, seconds)",
+      "parameterCount": 7,
+      "description": "Add time intervals to datetime"
+    },
+    "a!subtractDateTime": {
+      "syntax": "a!subtractDateTime(dateTime, years, months, days, hours, minutes, seconds)",
+      "parameterCount": 7,
+      "description": "Subtract time intervals from datetime"
+    },
+    "user": {
+      "syntax": "user(username, property)",
+      "parameterCount": 2,
+      "description": "Get user information by username",
+      "specialNote": "Common properties: firstName, lastName, email, displayName"
+    },
+    "loggedInUser": {
+      "syntax": "loggedInUser()",
+      "parameterCount": 0,
+      "description": "Get current logged-in user"
+    },
+    "touser": {
+      "syntax": "touser(value)",
+      "parameterCount": 1,
+      "description": "Convert value to User type. Accepts User, Text, Binary, People, or Array.",
+      "specialNote": "Use to ensure User type when filtering User fields with text usernames"
+    },
+    "group": {
+      "syntax": "group(groupId, property)",
+      "parameterCount": 2,
+      "description": "Get group information",
+      "specialNote": "Common properties: name, description, members"
+    },
+    "togroup": {
+      "syntax": "togroup(value)",
+      "parameterCount": 1,
+      "description": "Convert value to Group type. Accepts Group ID (Integer), Text, or Array.",
+      "specialNote": "Use to ensure Group type when filtering Group fields"
+    },
+    "a!toJson": {
+      "syntax": "a!toJson(value)",
+      "parameterCount": 1,
+      "description": "Convert SAIL value to JSON text"
+    },
+    "a!fromJson": {
+      "syntax": "a!fromJson(jsonText)",
+      "parameterCount": 1,
+      "description": "Parse JSON text to SAIL value"
+    },
+    "a!jsonPath": {
+      "syntax": "a!jsonPath(jsonText, path, default)",
+      "parameterCount": 3,
+      "description": "Extract value from JSON using JSONPath expression"
+    },
+    "find": {
+      "syntax": "find(searchText, withinText, startPosition)",
+      "parameterCount": 3,
+      "description": "Find position of substring"
+    },
+    "left": {
+      "syntax": "left(text, numChars)",
+      "parameterCount": 2,
+      "description": "Extract leftmost characters"
+    },
+    "substitute": {
+      "syntax": "substitute(text, oldText, newText)",
+      "parameterCount": 3,
+      "description": "Replace substring occurrences"
+    },
+    "len": {
+      "syntax": "len(text)",
+      "parameterCount": 1,
+      "description": "Get text length"
+    },
+    "fixed": {
+      "syntax": "fixed(number, decimals, noCommas)",
+      "parameterCount": 3,
+      "description": "Format number with fixed decimal places"
+    },
+    "dollar": {
+      "syntax": "dollar(number, decimals)",
+      "parameterCount": 2,
+      "description": "Format number as currency"
+    }
+  }
+}

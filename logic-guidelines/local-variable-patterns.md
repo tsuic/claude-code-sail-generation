@@ -1,9 +1,11 @@
 # Local Variable Patterns and Data Modeling
 
-> **Related guides:**
-> - `foreach-patterns.md` - Pattern A vs B for forEach
-> - `array-type-initialization-guidelines.md` - Type-casting empty arrays
-> - `checkbox-patterns.md` - Checkbox initialization rules
+> **Parent guide:** `/logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
+>
+> **Related:**
+> - `/logic-guidelines/foreach-patterns.md` - Pattern A vs B for forEach
+> - `/logic-guidelines/array-type-initialization-guidelines.md` - Type-casting empty arrays
+> - `/logic-guidelines/choice-field-patterns.md` - Checkbox initialization rules
 
 ---
 
@@ -294,7 +296,7 @@ a!localVariables(
 )
 ```
 
-See `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` for complete functional interface patterns.
+See `/conversion-guidelines/CONVERSION-PRIMARY-REFERENCE.md` for complete functional interface patterns.
 
 ---
 

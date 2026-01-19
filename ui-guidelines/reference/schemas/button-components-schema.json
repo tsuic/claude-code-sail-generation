@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Button and Action Components - Buttons, links, and interactive elements",
+  "version": "2.3.0",
+  "components": {
+    "a!buttonWidget": {
+      "category": "interactive",
+      "parameters": {
+        "style": {
+          "validValues": [
+            "OUTLINE",
+            "GHOST",
+            "LINK",
+            "SOLID"
+          ]
+        },
+        "size": {
+          "validValues": [
+            "SMALL",
+            "STANDARD",
+            "LARGE"
+          ]
+        },
+        "submit": {
+          "type": "Boolean"
+        },
+        "color": {
+          "validValues": [
+            "ACCENT",
+            "NEGATIVE",
+            "SECONDARY"
+          ],
+          "acceptsHexColors": true
+        },
+        "confirmMessage": {
+          "type": "Text",
+          "description": "If provided, a confirmation dialog will appear when the button is clicked"
+        },
+        "confirmHeader": {
+          "type": "Text",
+          "description": "Header text for the confirmation dialog"
+        },
+        "confirmButtonLabel": {
+          "type": "Text",
+          "description": "Label for the confirmation button in the confirmation dialog"
+        },
+        "cancelButtonLabel": {
+          "type": "Text",
+          "description": "Label for the cancel button in the confirmation dialog"
+        },
+        "width": {
+          "validValues": [
+            "MINIMIZE",
+            "FILL"
+          ]
+        },
+        "loadingIndicator": {
+          "type": "Boolean"
+        },
+        "validate": {
+          "type": "Boolean"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "value": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Interactive button with conditional form submission"
+    },
+    "a!buttonArrayLayout": {
+      "category": "interactive",
+      "parameters": {
+        "buttons": {
+          "type": "List of ButtonWidget"
+        },
+        "align": {
+          "validValues": [
+            "START",
+            "CENTER",
+            "END"
+          ]
+        },
+        "marginBelow": {
+          "validValues": [
+            "NONE",
+            "EVEN_LESS",
+            "LESS",
+            "STANDARD",
+            "MORE",
+            "EVEN_MORE"
+          ]
+        }
+      },
+      "specialNote": "Best practice: explicitly set marginBelow: \"NONE\" to improve vertical alignment by removing extra space below buttons",
+      "description": "Button list for interfaces (not form submission)"
+    },
+    "a!buttonLayout": {
+      "category": "interactive",
+      "parameters": {
+        "primaryButtons": {
+          "type": "List of ButtonWidget"
+        },
+        "secondaryButtons": {
+          "type": "List of ButtonWidget"
+        }
+      },
+      "description": "Grouped buttons by prominence"
+    }
+  }
+}

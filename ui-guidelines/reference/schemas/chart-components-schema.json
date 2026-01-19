@@ -1,0 +1,453 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Chart Components - Chart types and chart configuration components",
+  "version": "2.3.0",
+  "components": {
+    "a!columnChartField": {
+      "category": "chart",
+      "parameters": {
+        "data": {
+          "type": "Any Type"
+        },
+        "categories": {
+          "type": "List of Variant"
+        },
+        "series": {
+          "type": "List of ChartSeries"
+        },
+        "height": {
+          "validValues": [
+            "MICRO",
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "stacking": {
+          "validValues": [
+            "NONE",
+            "NORMAL",
+            "PERCENT_TO_TOTAL"
+          ]
+        },
+        "referenceLines": {
+          "type": "List of ReferenceLine"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Vertical bars for data changes over time"
+    },
+    "a!pieChartField": {
+      "category": "chart",
+      "parameters": {
+        "series": {
+          "type": "List of PieChartSeries"
+        },
+        "height": {
+          "validValues": [
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "showAsPercentage": {
+          "type": "Boolean"
+        },
+        "style": {
+          "validValues": [
+            "PIE",
+            "DONUT"
+          ]
+        },
+        "seriesLabelStyle": {
+          "type": "Text",
+          "validValues": [
+            "ON_CHART",
+            "LEGEND",
+            "NONE"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Circular slices for parts of a whole"
+    },
+    "a!lineChartField": {
+      "category": "chart",
+      "parameters": {
+        "data": {
+          "type": "Any Type"
+        },
+        "categories": {
+          "type": "List of Variant"
+        },
+        "series": {
+          "type": "List of ChartSeries"
+        },
+        "height": {
+          "validValues": [
+            "MICRO",
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "referenceLines": {
+          "type": "List of ReferenceLine"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Connected points for trends over time"
+    },
+    "a!barChartField": {
+      "category": "chart",
+      "parameters": {
+        "data": {
+          "type": "Any Type"
+        },
+        "categories": {
+          "type": "List of Variant"
+        },
+        "series": {
+          "type": "List of ChartSeries"
+        },
+        "height": {
+          "validValues": [
+            "MICRO",
+            "SHORT",
+            "MEDIUM",
+            "TALL",
+            "AUTO"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "stacking": {
+          "validValues": [
+            "NONE",
+            "NORMAL",
+            "PERCENT_TO_TOTAL"
+          ]
+        },
+        "referenceLines": {
+          "type": "List of ReferenceLine"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Horizontal bars for values at same time point"
+    },
+    "a!areaChartField": {
+      "category": "chart",
+      "parameters": {
+        "data": {
+          "type": "Any Type"
+        },
+        "categories": {
+          "type": "List of Variant"
+        },
+        "series": {
+          "type": "List of ChartSeries"
+        },
+        "height": {
+          "validValues": [
+            "MICRO",
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "stacking": {
+          "validValues": [
+            "NORMAL",
+            "PERCENT_TO_TOTAL",
+            "NONE"
+          ]
+        },
+        "referenceLines": {
+          "type": "List of ReferenceLine"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Area chart with shaded regions"
+    },
+    "a!scatterChartField": {
+      "category": "chart",
+      "parameters": {
+        "data": {
+          "type": "Any Type"
+        },
+        "height": {
+          "validValues": [
+            "MICRO",
+            "SHORT",
+            "MEDIUM",
+            "TALL"
+          ]
+        },
+        "colorScheme": {
+          "validValues": [
+            "CLASSIC",
+            "MIDNIGHT",
+            "OCEAN",
+            "MOSS",
+            "BERRY",
+            "PARACHUTE",
+            "RAINFOREST",
+            "SUNSET"
+          ]
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        }
+      },
+      "description": "Points showing relationship between values"
+    },
+    "a!columnChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": {
+          "type": "a!grouping"
+        },
+        "secondaryGrouping": {
+          "type": "a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        },
+        "sort": {
+          "type": "a!sortInfo"
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        },
+        "showIntervalsWithNoData": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Configuration for column chart with record data"
+    },
+    "a!barChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": {
+          "type": "a!grouping"
+        },
+        "secondaryGrouping": {
+          "type": "a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        },
+        "sort": {
+          "type": "a!sortInfo"
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        },
+        "showIntervalsWithNoData": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Configuration for bar chart with record data"
+    },
+    "a!lineChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": {
+          "type": "a!grouping"
+        },
+        "secondaryGrouping": {
+          "type": "a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        },
+        "sort": {
+          "type": "a!sortInfo"
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        },
+        "showIntervalsWithNoData": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Configuration for line chart with record data"
+    },
+    "a!areaChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": {
+          "type": "a!grouping"
+        },
+        "secondaryGrouping": {
+          "type": "a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        },
+        "sort": {
+          "type": "a!sortInfo"
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        },
+        "showIntervalsWithNoData": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Configuration for area chart with record data"
+    },
+    "a!pieChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "primaryGrouping": {
+          "type": "a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        },
+        "sort": {
+          "type": "a!sortInfo"
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        }
+      },
+      "description": "Configuration for pie chart with record data"
+    },
+    "a!scatterChartConfig": {
+      "category": "chart-config",
+      "parameters": {
+        "xAxisField": {
+          "type": "Field Reference",
+          "required": true
+        },
+        "yAxisField": {
+          "type": "Field Reference",
+          "required": true
+        },
+        "dataLimit": {
+          "type": "Integer"
+        },
+        "link": {
+          "type": "Any Type"
+        }
+      },
+      "specialNote": "Scatter charts ONLY work with a!recordData - cannot use categories + series",
+      "description": "Configuration for scatter chart with record data"
+    }
+  }
+}

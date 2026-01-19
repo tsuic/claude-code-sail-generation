@@ -1,8 +1,6 @@
 # Null Safety Implementation Patterns {#null-safety-implementation}
 
-> **Parent guides:**
-> - `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md` (mock data interfaces)
-> - `record-query-guidelines/RECORD-QUERY-PRIMARY-REFERENCE.md` (record types & queries)
+> **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
 > **Quick Reference:** `logic-guidelines/null-safety-quick-ref.md`
 > **Related:** `logic-guidelines/short-circuit-evaluation.md` for nested if() patterns

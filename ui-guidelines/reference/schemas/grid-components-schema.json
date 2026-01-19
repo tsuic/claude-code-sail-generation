@@ -1,0 +1,534 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "SAIL Grid Components - Grid, column, and data presentation components",
+  "version": "2.3.0",
+  "components": {
+    "a!gridField": {
+      "category": "data",
+      "parameters": {
+        "data": {
+          "type": "RecordType/List/DataSubset"
+        },
+        "columns": {
+          "type": "List of a!gridColumn"
+        },
+        "emptyGridMessage": {
+          "type": "Text"
+        },
+        "pageSize": {
+          "type": "Integer"
+        },
+        "pagingSaveInto": {
+          "type": "Save Array"
+        },
+        "initialSorts": {
+          "type": "List of SortInfo"
+        },
+        "secondarySorts": {
+          "type": "List of SortInfo"
+        },
+        "selectable": {
+          "type": "Boolean",
+          "description": "Determines if grid rows are selectable. Required to enable selection functionality."
+        },
+        "selectionStyle": {
+          "type": "Text",
+          "validValues": [
+            "CHECKBOX",
+            "ROW_HIGHLIGHT"
+          ]
+        },
+        "selectionValue": {
+          "type": "List of Variant"
+        },
+        "selectionSaveInto": {
+          "type": "Save Array"
+        },
+        "selectionRequired": {
+          "type": "Boolean"
+        },
+        "selectionRequiredMessage": {
+          "type": "Text"
+        },
+        "maxSelections": {
+          "type": "Integer"
+        },
+        "showSelectionCount": {
+          "type": "Text",
+          "validValues": [
+            "AUTO",
+            "ON",
+            "OFF"
+          ]
+        },
+        "disableRowSelectionWhen": {
+          "type": "Boolean"
+        },
+        "height": {
+          "validValues": [
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL",
+            "AUTO"
+          ]
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "DENSE"
+          ]
+        },
+        "borderStyle": {
+          "validValues": [
+            "STANDARD",
+            "LIGHT"
+          ]
+        },
+        "rowHeader": {
+          "type": "Integer"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "requiredMessage": {
+          "type": "Text"
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        },
+        "showSearchBox": {
+          "type": "Boolean",
+          "recordDataOnly": true,
+          "description": "Shows built-in record search box above grid. Only works when data parameter uses recordType! or a!recordData(). Default: true. NEVER use with local! data."
+        },
+        "showRefreshButton": {
+          "type": "Boolean",
+          "recordDataOnly": true,
+          "description": "Shows refresh button to manually refresh data. Only works when data parameter uses recordType! or a!recordData(). Default: true. NEVER use with local! data."
+        },
+        "showExportButton": {
+          "type": "Boolean",
+          "recordDataOnly": true,
+          "description": "Shows export button to download grid data. Only works when data parameter uses recordType! or a!recordData(). Default: false."
+        },
+        "userFilters": {
+          "type": "List of Record Filter Reference",
+          "recordDataOnly": true,
+          "description": "User filter references from the record type (e.g., recordType!Case.filters.status). Displayed above grid next to search box. Supports list filters (dropdown selection) and date range filters. Only works with record data source."
+        },
+        "recordActions": {
+          "type": "List of a!recordActionItem",
+          "recordDataOnly": true,
+          "description": "Record actions to display above grid. Only works when data parameter uses recordType! or a!recordData()."
+        },
+        "loadDataAsync": {
+          "type": "Boolean",
+          "recordDataOnly": true,
+          "description": "Load grid data independently from rest of interface. Only works with record data source. Default: false."
+        },
+        "refreshAfter": {
+          "type": "List of Text",
+          "recordDataOnly": true,
+          "validValues": [
+            "RECORD_ACTION"
+          ],
+          "description": "Refresh grid after specified events complete. Only works with record data source."
+        },
+        "openActionsIn": {
+          "type": "Text",
+          "validValues": [
+            "DIALOG",
+            "NEW_TAB",
+            "SAME_TAB"
+          ],
+          "description": "Determines how record actions open. Default: DIALOG."
+        },
+        "actionsDisplay": {
+          "type": "Text",
+          "validValues": [
+            "LABEL_AND_ICON",
+            "LABEL",
+            "ICON"
+          ],
+          "description": "Determines which details show for record actions. Default: LABEL_AND_ICON."
+        },
+        "actionsStyle": {
+          "type": "Text",
+          "validValues": [
+            "TOOLBAR",
+            "TOOLBAR_PRIMARY"
+          ],
+          "description": "Determines how actions display above the grid. Default: TOOLBAR."
+        }
+      },
+      "description": "Read-only data grid with sorting, paging, selection, search, and record actions"
+    },
+    "a!gridColumn": {
+      "category": "data",
+      "parameters": {
+        "value": {
+          "type": "Any Type"
+        },
+        "sortField": {
+          "type": "Any Type"
+        },
+        "width": {
+          "validValues": [
+            "AUTO",
+            "ICON",
+            "ICON_PLUS",
+            "NARROW",
+            "NARROW_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "WIDE",
+            "1X",
+            "2X",
+            "3X",
+            "4X",
+            "5X",
+            "6X",
+            "7X",
+            "8X",
+            "9X",
+            "10X"
+          ]
+        },
+        "align": {
+          "validValues": [
+            "START",
+            "CENTER",
+            "END"
+          ]
+        },
+        "backgroundColor": {
+          "validValues": [
+            "NONE",
+            "ACCENT",
+            "SUCCESS",
+            "INFO",
+            "WARN",
+            "ERROR"
+          ],
+          "acceptsHexColors": true
+        }
+      },
+      "description": "Column definition for read-only grid with advanced display and export options"
+    },
+    "a!pagingInfo": {
+      "category": "data",
+      "parameters": {
+        "startIndex": {
+          "type": "Integer",
+          "required": true
+        },
+        "batchSize": {
+          "type": "Integer",
+          "required": true
+        },
+        "sort": {
+          "type": "List of a!sortInfo"
+        }
+      },
+      "description": "Defines paging information for data queries"
+    },
+    "a!queryRecordType": {
+      "category": "data",
+      "parameters": {
+        "recordType": {
+          "type": "RecordType",
+          "required": true
+        },
+        "fields": {
+          "type": "List of Field References or a!aggregationFields"
+        },
+        "filters": {
+          "type": "List of a!queryFilter or a!queryLogicalExpression"
+        },
+        "pagingInfo": {
+          "type": "a!pagingInfo",
+          "required": true
+        },
+        "fetchTotalCount": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Query record type data with filtering and sorting"
+    },
+    "a!recordData": {
+      "category": "data",
+      "parameters": {
+        "recordType": {
+          "type": "RecordType",
+          "required": true
+        },
+        "filters": {
+          "type": "List of a!queryFilter or a!queryLogicalExpression"
+        },
+        "relatedRecordData": {
+          "type": "List of a!relatedRecordData"
+        }
+      },
+      "specialNote": "ONLY use directly in a!gridField data parameter or chart data parameter - NEVER in local variables",
+      "description": "Defines record data source for grids and charts"
+    },
+    "a!relatedRecordData": {
+      "category": "data",
+      "parameters": {
+        "relationship": {
+          "type": "Record Type Relationship",
+          "required": true,
+          "description": "A one-to-many record type relationship reference using recordType! domain notation"
+        },
+        "filters": {
+          "type": "Any Type (queryFilter or list of queryFilters)",
+          "description": "Filters applied to related records, combined with AND logic. Field references must use related record type fields."
+        },
+        "sort": {
+          "type": "List of a!sortInfo",
+          "description": "Sort order for related records using fields from the related record type"
+        },
+        "limit": {
+          "type": "Number (Integer)",
+          "description": "Maximum related records to return. Default: 10. Max: 100 for a!queryRecordType/a!recordData, 250 for a!queryRecordByIdentifier"
+        }
+      },
+      "specialNote": "ONLY works with ONE-TO-MANY relationships. Cannot be used in aggregations or records-powered charts. Requires data sync enabled.",
+      "description": "References a one-to-many relationship and allows filtering, sorting, and limiting of the related record set"
+    },
+    "a!aggregationFields": {
+      "category": "data",
+      "parameters": {
+        "groupings": {
+          "type": "List of a!grouping"
+        },
+        "measures": {
+          "type": "List of a!measure"
+        }
+      },
+      "description": "Defines grouping and measure fields for data aggregation"
+    },
+    "a!measure": {
+      "category": "data",
+      "parameters": {
+        "function": {
+          "type": "Text",
+          "required": true,
+          "validValues": [
+            "COUNT",
+            "SUM",
+            "AVG",
+            "MIN",
+            "MAX",
+            "DISTINCT_COUNT"
+          ]
+        },
+        "field": {
+          "type": "Field Reference",
+          "required": true
+        },
+        "alias": {
+          "type": "Text",
+          "required": true
+        },
+        "filters": {
+          "type": "List of a!queryFilter"
+        }
+      },
+      "description": "Defines a measure calculation for aggregated data"
+    },
+    "a!grouping": {
+      "category": "data",
+      "parameters": {
+        "field": {
+          "type": "Field Reference",
+          "required": true
+        },
+        "alias": {
+          "type": "Text",
+          "required": true
+        },
+        "interval": {
+          "type": "Text",
+          "validValues": [
+            "AUTO",
+            "YEAR",
+            "MONTH_OF_YEAR",
+            "MONTH_OF_YEAR_SHORT_TEXT",
+            "MONTH_OF_YEAR_TEXT",
+            "MONTH_TEXT",
+            "MONTH_SHORT_TEXT",
+            "MONTH_DATE",
+            "DATE",
+            "DATE_SHORT_TEXT",
+            "DATE_TEXT",
+            "DAY_OF_MONTH",
+            "HOUR_OF_DAY",
+            "HOUR",
+            "MINUTE_OF_HOUR",
+            "MINUTE"
+          ]
+        }
+      },
+      "description": "Defines a grouping field for data aggregation"
+    },
+    "a!queryFilter": {
+      "category": "data",
+      "parameters": {
+        "field": {
+          "type": "Field Reference",
+          "required": true
+        },
+        "operator": {
+          "type": "Text",
+          "required": true,
+          "validValues": [
+            "=",
+            "<>",
+            ">",
+            "<",
+            ">=",
+            "<=",
+            "in",
+            "not in",
+            "is null",
+            "not null",
+            "between",
+            "starts with",
+            "not starts with",
+            "ends with",
+            "not ends with",
+            "includes",
+            "not includes",
+            "like"
+          ]
+        },
+        "value": {
+          "type": "Any Type"
+        },
+        "applyWhen": {
+          "type": "Boolean"
+        }
+      },
+      "description": "Defines a filter condition for record queries"
+    },
+    "a!queryLogicalExpression": {
+      "category": "data",
+      "parameters": {
+        "operator": {
+          "type": "Text",
+          "required": true,
+          "validValues": [
+            "AND",
+            "OR"
+          ]
+        },
+        "filters": {
+          "type": "List of a!queryFilter or a!queryLogicalExpression",
+          "required": true
+        }
+      },
+      "description": "Combines multiple query filters with AND/OR logic"
+    },
+    "a!gridLayout": {
+      "category": "data",
+      "parameters": {
+        "headerCells": {
+          "type": "List of a!gridLayoutHeaderCell"
+        },
+        "columnConfigs": {
+          "type": "List of a!gridLayoutColumnConfig"
+        },
+        "rows": {
+          "type": "List of a!gridRowLayout"
+        },
+        "emptyGridMessage": {
+          "type": "Text"
+        },
+        "height": {
+          "validValues": [
+            "SHORT",
+            "SHORT_PLUS",
+            "MEDIUM",
+            "MEDIUM_PLUS",
+            "TALL",
+            "TALL_PLUS",
+            "EXTRA_TALL",
+            "AUTO"
+          ]
+        },
+        "spacing": {
+          "validValues": [
+            "STANDARD",
+            "DENSE"
+          ]
+        },
+        "borderStyle": {
+          "validValues": [
+            "STANDARD",
+            "LIGHT"
+          ]
+        },
+        "selectionValue": {
+          "type": "List of Variant"
+        },
+        "selectionSaveInto": {
+          "type": "List of Save"
+        },
+        "selectionStyle": {
+          "type": "Text",
+          "validValues": [
+            "CHECKBOX",
+            "ROW_HIGHLIGHT"
+          ]
+        },
+        "selectionDisabled": {
+          "type": "Boolean"
+        },
+        "selectionRequired": {
+          "type": "Boolean"
+        },
+        "addRowLink": {
+          "type": "Link"
+        },
+        "rowDeletions": {
+          "type": "List of a!gridRowDeletion"
+        },
+        "totalCount": {
+          "type": "Integer"
+        },
+        "rowHeader": {
+          "type": "Integer"
+        },
+        "labelPosition": {
+          "validValues": [
+            "ABOVE",
+            "ADJACENT",
+            "JUSTIFIED",
+            "COLLAPSED"
+          ]
+        },
+        "validations": {
+          "type": "List of Text"
+        },
+        "saveInto": {
+          "type": "List of Save"
+        }
+      },
+      "specialNote": "For inline editing - use a!gridField for read-only display",
+      "description": "Editable grid with inline editing"
+    }
+  }
+}

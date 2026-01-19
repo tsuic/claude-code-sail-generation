@@ -44,6 +44,293 @@ a!gridField(
 
 **Key Takeaway:** If your grid uses `data: local!variableName` with a!map arrays, **NEVER** include `showSearchBox`, `showRefreshButton`, or `recordActions` parameters.
 
+## Record-Powered Grid Features (Search, Filters, Export, Actions)
+
+When a grid is backed by record data (`recordType!` or `a!recordData()`), it gains powerful built-in features that replace the need for custom search/filter UX. Understanding when to use custom UX vs built-in features is critical to avoid duplicate or conflicting interfaces.
+
+### The Two Grid Modes
+
+| Mode | Data Source | Search/Filter Approach |
+|------|-------------|------------------------|
+| **Mockup** | `local!` variables with `a!map()` | Custom UX (textField, dropdowns) with TODO comments |
+| **Functional** | `recordType!` or `a!recordData()` | Built-in `showSearchBox`, `userFilters` |
+
+**⚠️ CRITICAL:** Never mix custom search/filter UX with built-in grid features on the same grid. This creates duplicate, confusing interfaces.
+
+### Built-in Features (Record Data Only)
+
+When grid uses record data, these features are available:
+
+| Feature | Parameter | Default | Description |
+|---------|-----------|---------|-------------|
+| Search box | `showSearchBox` | `true` | Full-text search across searchable record fields |
+| Refresh button | `showRefreshButton` | `true` | Manual data refresh |
+| Export button | `showExportButton` | `false` | Download grid data to Excel |
+| User filters | `userFilters` | none | Dropdown and date range filters defined on record type |
+| Record actions | `recordActions` | none | Action buttons above grid |
+
+### Mockup Pattern: Custom Search for Local Data
+
+When creating mockups with local data, implement a custom search field with a TODO comment:
+
+```sail
+/* =========================================================================
+ * SEARCH AND FILTERS SECTION
+ * TODO: When converting to record data, REMOVE this section and use:
+ *   - showSearchBox: true (built-in search)
+ *   - userFilters: { recordType!Record.filters.filterName, ... }
+ * ========================================================================= */
+local!searchText,
+local!filterStatus,
+
+/* Custom search field for mockup */
+a!textField(
+  label: "Search",
+  labelPosition: "ABOVE",
+  placeholder: "Search by name...",
+  value: local!searchText,
+  saveInto: local!searchText
+),
+
+/* Custom filter dropdown for mockup */
+a!dropdownField(
+  label: "Status",
+  placeholder: "All Statuses",
+  choiceLabels: {"Active", "Inactive", "Pending"},
+  choiceValues: {"ACTIVE", "INACTIVE", "PENDING"},
+  value: local!filterStatus,
+  saveInto: local!filterStatus
+),
+
+/* Grid with manual filtering */
+a!gridField(
+  data: index(
+    local!employees,
+    wherecontains(
+      true,
+      a!forEach(
+        items: local!employees,
+        expression: and(
+          or(
+            a!isNullOrEmpty(local!searchText),
+            search(lower(local!searchText), lower(fv!item.name)) > 0
+          ),
+          or(
+            a!isNullOrEmpty(local!filterStatus),
+            fv!item.status = local!filterStatus
+          )
+        )
+      )
+    ),
+    {}
+  ),
+  columns: {...}
+  /* ❌ NO showSearchBox - causes error with local data */
+)
+```
+
+### Functional Pattern: Built-in Search and Filters
+
+When grid uses record data, use built-in features:
+
+```sail
+/* ✅ NO custom search/filter section needed for this grid */
+
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Employee',
+    filters: {
+      /* Server-side filters for security/permissions */
+      a!queryFilter(
+        field: 'recordType!Employee.fields.department',
+        operator: "=",
+        value: local!userDepartment,
+        applyWhen: not(local!isAdmin)
+      )
+    }
+  ),
+  columns: {...},
+
+  /* Built-in search - replaces custom textField */
+  showSearchBox: true,
+
+  /* Built-in user filters - replaces custom dropdowns */
+  userFilters: {
+    'recordType!Employee.filters.status',
+    'recordType!Employee.filters.department',
+    'recordType!Employee.filters.hireDate'  /* Date range filter */
+  },
+
+  showRefreshButton: true,
+  showExportButton: true
+)
+```
+
+### User Filter Types
+
+User filters are defined on the record type and come in two types:
+
+**List User Filters** (dropdown selection):
+- Allow users to filter by selecting one or more options
+- Options come from field values or related record values
+- Example: Status filter with options "Active", "Inactive", "Pending"
+
+**Date Range User Filters**:
+- Allow users to specify a date range or open-ended range
+- Example: "Hire Date" filter for filtering employees by when they were hired
+
+### When Custom Search/Filter UX is Appropriate
+
+Keep custom search/filter sections when they serve **multiple components**, not just one grid:
+
+```sail
+/* ✅ APPROPRIATE: Dashboard filters affecting multiple grids AND charts */
+a!cardLayout(
+  contents: {
+    /* These filters apply to the entire dashboard */
+    a!dropdownField(label: "Region", ...),
+    a!dateField(label: "Date Range Start", ...),
+    a!dateField(label: "Date Range End", ...)
+  }
+),
+
+/* Grid 1 - filtered by dashboard filters */
+a!gridField(
+  data: a!recordData(
+    recordType: 'recordType!Sales',
+    filters: {
+      a!queryFilter(field: ..., value: local!filterRegion, applyWhen: ...),
+      a!queryFilter(field: ..., value: local!filterDateStart, applyWhen: ...)
+    }
+  ),
+  showSearchBox: true,  /* Grid-specific search still works */
+  ...
+),
+
+/* Chart - also filtered by dashboard filters */
+a!columnChartField(
+  data: a!recordData(
+    recordType: 'recordType!Sales',
+    filters: {...same filters...}
+  ),
+  ...
+)
+```
+
+### Conversion Checklist: Custom UX → Built-in Features
+
+When converting a mockup to functional:
+
+- [ ] Identify custom search/filter sections that ONLY apply to one grid
+- [ ] Remove custom search `a!textField` → Add `showSearchBox: true`
+- [ ] Check `data-model-context.md` for available user filters on the record type
+- [ ] Replace custom filter dropdowns with `userFilters` where available
+- [ ] For filters without matching user filters, add TODO comment for filter creation
+- [ ] Keep custom filters ONLY if they apply to multiple grids/charts
+- [ ] Verify no duplicate search/filter UX remains
+
+### Record Actions (Toolbar and Row-Level)
+
+When a grid is backed by record data, you can use the `recordActions` parameter to display action buttons in the grid's toolbar area.
+
+#### Mockup Pattern: Action Button Placeholder
+
+When creating mockups, include action buttons with TODO comments indicating intended placement:
+
+```sail
+/* =========================================================================
+ * HEADER WITH ACTION BUTTON
+ * TODO: When converting to record data:
+ *   - If action should stay in header: Convert to a!recordActionField()
+ *   - If action can move to grid: Use recordActions parameter on a!gridField
+ * ========================================================================= */
+a!headerContentLayout(
+  header: {
+    a!sideBySideLayout(
+      items: {
+        a!sideBySideItem(
+          item: a!richTextDisplayField(
+            labelPosition: "COLLAPSED",
+            value: a!richTextItem(text: "Memberships", size: "LARGE", style: "STRONG")
+          )
+        ),
+        a!sideBySideItem(
+          /* TODO: Convert to recordActions or a!recordActionField() */
+          item: a!buttonArrayLayout(
+            buttons: a!buttonWidget(
+              label: "New Membership",
+              icon: "plus",
+              style: "SOLID",
+              color: "ACCENT",
+              saveInto: {}
+            )
+          ),
+          width: "MINIMIZE"
+        )
+      }
+    )
+  },
+  contents: {
+    a!gridField(
+      data: local!memberships,
+      columns: {...}
+      /* ❌ NO recordActions - causes error with local data */
+    )
+  }
+)
+```
+
+#### Functional Pattern: Built-in Record Actions
+
+When grid uses record data, use the `recordActions` parameter:
+
+```sail
+a!gridField(
+  data: a!recordData(recordType: 'recordType!Membership'),
+  columns: {...},
+
+  /* Built-in toolbar action - replaces custom button */
+  recordActions: {
+    a!recordActionItem(
+      action: 'recordType!Membership.actions.createMembership'
+      /* NO identifier - creates new record */
+    )
+  },
+
+  /* Auto-refresh after any record action completes */
+  refreshAfter: "RECORD_ACTION",
+
+  showSearchBox: true,
+  showRefreshButton: true
+)
+```
+
+#### refreshAfter Parameter
+
+Add `refreshAfter: "RECORD_ACTION"` when the grid has **any** record actions that modify data:
+
+- ✅ Grid has `recordActions` parameter with Create action → Add refreshAfter
+- ✅ Grid has `a!recordActionField()` in a column (Edit, Delete) → Add refreshAfter
+- ✅ Grid has both toolbar and column actions → Add refreshAfter
+- ❌ Grid only has `a!recordLink()` (view only) → No refreshAfter needed
+
+#### Toolbar vs Header Placement
+
+By default, move Create/New actions to the grid's `recordActions` parameter. However, keep actions in the header if:
+- The mockup explicitly specifies header placement
+- The action applies to multiple components (not just the grid)
+- Design requirements call for prominent header-level actions
+
+#### Record Action Parameters Reference
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `recordActions` | none | List of `a!recordActionItem()` for toolbar |
+| `refreshAfter` | none | `["RECORD_ACTION"]` to auto-refresh after actions |
+| `openActionsIn` | `"DIALOG"` | Where actions open: `"DIALOG"`, `"NEW_TAB"`, `"SAME_TAB"` |
+| `actionsDisplay` | `"LABEL_AND_ICON"` | Show: `"LABEL_AND_ICON"`, `"LABEL"`, `"ICON"` |
+| `actionsStyle` | `"TOOLBAR"` | Style: `"TOOLBAR"`, `"TOOLBAR_PRIMARY"` |
+
 ## ⚠️ CRITICAL: Function Variables in Grid Columns
 
 **ONLY `fv!row` is available in grid columns!**
@@ -304,6 +591,75 @@ a!gridColumn(
   sortField: "fieldName",           /* Enables sorting */
   align: "START",                   /* Cell alignment */
   backgroundColor: "#FEF2F2".     /* Optional cell background color for highlighting */
+)
+```
+
+### ⚠️ CRITICAL: sortField Rules
+
+**Each sortField value must be UNIQUE across all columns in a grid.**
+
+#### The Fundamental Rule:
+**sortField should match the primary field displayed in the column's value parameter.**
+
+```sail
+/* ✅ CORRECT - sortField matches the field being displayed */
+a!gridColumn(
+  label: "Partner Name",
+  value: fv!row['recordType!SUBMISSION.relationships.partner.fields.name'],
+  sortField: 'recordType!SUBMISSION.relationships.partner.fields.name'
+)
+
+/* ❌ WRONG - sortField doesn't match displayed field */
+a!gridColumn(
+  label: "Partner Name",
+  value: fv!row['recordType!SUBMISSION.relationships.partner.fields.name'],
+  sortField: 'recordType!SUBMISSION.fields.partnerUsername'  /* Different field! */
+)
+```
+
+#### Common Mistake: Duplicate sortField Values
+**Runtime Error:** If two columns use the same sortField, the interface will fail with:
+```
+Expression evaluation error: Each column must have a unique value for "sortField"
+```
+
+**Example of the problem:**
+```sail
+/* ❌ WRONG - Both columns use the same sortField */
+a!gridColumn(
+  label: "Partner Name",
+  value: fv!row['...partner.fields.name'],
+  sortField: 'recordType!SUBMISSION.fields.partnerUsername'  /* Duplicate! */
+),
+a!gridColumn(
+  label: "Submitted By",
+  value: fv!row['...partnerUsername'],
+  sortField: 'recordType!SUBMISSION.fields.partnerUsername'  /* Duplicate! */
+)
+```
+
+**✅ CORRECT Solution:**
+```sail
+/* ✅ Each column sorts by the field it displays */
+a!gridColumn(
+  label: "Partner Name",
+  value: fv!row['...partner.fields.name'],
+  sortField: 'recordType!SUBMISSION.relationships.partner.fields.name'  /* Unique */
+),
+a!gridColumn(
+  label: "Submitted By",
+  value: fv!row['...partnerUsername'],
+  sortField: 'recordType!SUBMISSION.fields.partnerUsername'  /* Unique */
+)
+```
+
+#### When to Omit sortField
+If a column truly cannot have a unique sortField (rare edge case), omit the parameter entirely:
+```sail
+a!gridColumn(
+  label: "Column Without Sorting",
+  value: fv!row.complexCalculation
+  /* No sortField - sorting disabled for this column */
 )
 ```
 
@@ -719,7 +1075,7 @@ a!gridField(
 - Use appropriate column widths based on content type
 - Provide meaningful `emptyGridMessage` text
 - Use consistent text styling across similar columns
-- Set `sortField` on columns that should be sortable
+- **Set `sortField` to match the primary field displayed in the column's value parameter**
 - Use `align: "END"` for numeric columns
 - Choose appropriate `pageSize` for your use case (10-25 typical)
 - Use `a!richTextDisplayField` for formatted content instead of sideBySideLayout
@@ -731,6 +1087,8 @@ a!gridField(
 - **Set height parameter unless you specifically need fixed height with scrolling**
 - Use very wide grids with too many columns (consider stacking content)
 - Forget to set column widths (can cause layout issues)
+- **Use the same sortField value in multiple columns** - Each must be unique AND match the displayed field ‼️
+- **Add sortField to computed columns (if/a!match/concat)** - Only raw field displays are sortable ‼️
 
 ### Column Content Guidelines:
 - **IDs/References**: Use linked rich text with `linkStyle: "STANDALONE"`

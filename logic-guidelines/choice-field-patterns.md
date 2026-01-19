@@ -1,4 +1,4 @@
-# Checkbox Field Patterns {#checkbox-patterns}
+# Choice Field Patterns {#choice-field-patterns}
 
 > **Parent guide:** `logic-guidelines/LOGIC-PRIMARY-REFERENCE.md`
 >
@@ -162,6 +162,7 @@ a!localVariables(
   local!caseUrgent,        /* null by default */
   local!assignedTo,
   local!escalationReason,
+  local!previousCheckState: local!caseUrgent,  /* Track previous state for clearing logic */
 
   {
     a!checkboxField(
@@ -170,9 +171,24 @@ a!localVariables(
       choiceValues: {true},
       value: if(a!defaultValue(local!caseUrgent, false), {true}, {}),
       saveInto: {
+        /* Save the new checkbox state */
         a!save(local!caseUrgent, if(a!isNotNullOrEmpty(save!value), true, null)),
+        /* Set assignedTo when checked, preserve when unchecked */
         a!save(local!assignedTo, if(a!isNotNullOrEmpty(save!value), "urgent-team@example.com", local!assignedTo)),
-        a!save(local!escalationReason, if(a!isNullOrEmpty(save!value), null, local!escalationReason))
+        /* Clear escalationReason only when transitioning from checked to unchecked */
+        a!save(
+          local!escalationReason,
+          if(
+            and(
+              a!isNotNullOrEmpty(local!previousCheckState),  /* Was previously checked */
+              a!isNullOrEmpty(save!value)                     /* Now unchecked */
+            ),
+            null,                      /* Clear the field */
+            local!escalationReason     /* Otherwise preserve current value */
+          )
+        ),
+        /* Update the state tracker for next interaction */
+        a!save(local!previousCheckState, if(a!isNotNullOrEmpty(save!value), true, null))
       }
     ),
     /* Dependent fields check null state */
@@ -187,10 +203,22 @@ a!localVariables(
 )
 ```
 
+**Pattern Explanation:**
+- **local!previousCheckState**: Tracks the checkbox state from before the current interaction
+- **First a!save**: Updates the checkbox variable itself
+- **Second a!save**: Sets a value when checking, preserves when unchecking
+- **Third a!save**: Clears the dependent field ONLY when transitioning from checked→unchecked (not when already unchecked)
+- **Fourth a!save**: Updates the state tracker for the next interaction
+
+**Why This Pattern Works:**
+- `save!value` is ONLY used inside `a!save()` value parameters (complies with SAIL rules)
+- Uses `local!previousCheckState` to detect state transitions without referencing `save!value` in conditionals
+- Prevents unnecessary clearing when checkbox is already unchecked
+
 ### Key Differences
 
 - **Pattern 1**: Use when binding to a boolean variable with no side effects
-- **Pattern 2**: Use when the checkbox state affects other fields or starts as null
+- **Pattern 2**: Use when the checkbox state affects other fields, requires clearing dependent fields on uncheck, or needs complex side effects
 
 ---
 
@@ -246,6 +274,95 @@ a!localVariables(
     )
   }
 )
+```
+
+---
+
+## Initialization Patterns Quick Reference
+
+### Pre-Checked Checkbox
+```sail
+/* Use when checkbox should be checked by default (opt-out scenarios) */
+local!agreeToTerms: true(),  /* Pre-checked */
+
+a!checkboxField(
+  label: "Terms and Conditions",
+  choiceLabels: {"I agree to the terms and conditions"},
+  choiceValues: {true},
+  value: local!agreeToTerms,
+  saveInto: local!agreeToTerms
+)
+```
+
+### Pre-Selected Multi-Checkbox
+```sail
+/* Use when some options should be selected by default (default filters, saved preferences) */
+local!selectedPriorities: {"HIGH", "MEDIUM"},  /* Pre-select specific options */
+
+a!checkboxField(
+  label: "Case Priorities",
+  choiceLabels: {"High", "Medium", "Low", "Critical"},
+  choiceValues: {"HIGH", "MEDIUM", "LOW", "CRITICAL"},
+  value: local!selectedPriorities,
+  saveInto: local!selectedPriorities
+)
+```
+
+---
+
+## Radio Button Patterns
+
+Radio buttons allow selecting **one value** from multiple options (unlike checkboxes which allow multiple selections or toggle behavior).
+
+### Unselected Radio Button
+```sail
+local!priority,  /* null = no selection */
+
+a!radioButtonField(
+  label: "Priority Level",
+  choiceLabels: {"High", "Medium", "Low"},
+  choiceValues: {"HIGH", "MEDIUM", "LOW"},
+  value: local!priority,
+  saveInto: local!priority
+)
+```
+
+### Pre-Selected Radio Button
+```sail
+local!priority: "MEDIUM",  /* Pre-select Medium */
+
+a!radioButtonField(
+  label: "Priority Level",
+  choiceLabels: {"High", "Medium", "Low"},
+  choiceValues: {"HIGH", "MEDIUM", "LOW"},
+  value: local!priority,
+  saveInto: local!priority
+)
+```
+
+**Key Differences from Checkboxes:**
+- Radio buttons store a **single value** (not an array)
+- Checkboxes with multiple choiceValues store an **array of values**
+- Single checkbox with `choiceValues: {true}` stores a **boolean value**
+
+---
+
+## Single Checkbox showWhen Pattern
+
+**Single-value checkbox** (`choiceValues: {true()}`):
+
+```sail
+/* ❌ WRONG - contains() crashes on null */
+showWhen: contains(local!hasConflict, true())
+
+/* ✅ CORRECT - Safe for null */
+showWhen: a!isNotNullOrEmpty(local!hasConflict)
+```
+
+**Multi-value checkbox** (`choiceValues: {"a", "b", "c"}`):
+```sail
+/* ✅ CORRECT - Use contains() */
+showWhen: contains(local!preferences, "email")
 ```
 
 ---
