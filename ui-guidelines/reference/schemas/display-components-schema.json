@@ -1,737 +1,546 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "description": "SAIL Display Components - Read-only display and visualization components",
-  "version": "2.3.0",
+  "version": "3.0.0",
+
+  "sharedParameters": {
+    "allDisplayFields": {
+      "description": "Parameters common to most display field components (excludes headingField, horizontalLine, messageBanner which have specialized parameter sets)",
+      "label": {
+        "type": "Text",
+        "description": "Text to display as the field label"
+      },
+      "labelPosition": {
+        "type": "Text",
+        "validValues": ["ABOVE", "ADJACENT", "JUSTIFIED", "COLLAPSED"],
+        "default": "ABOVE",
+        "description": "Determines where the label appears. When set to COLLAPSED, the label is hidden and space is not reserved."
+      },
+      "instructions": {
+        "type": "Text",
+        "description": "Supplemental text about this field (displayed below the component)"
+      },
+      "helpTooltip": {
+        "type": "Text",
+        "description": "Displays a help icon with the specified text as a tooltip (max 500 characters). Hidden when labelPosition is COLLAPSED."
+      },
+      "showWhen": {
+        "type": "Boolean",
+        "default": true,
+        "description": "Determines whether the component is displayed on the interface. When false, the component is not evaluated."
+      },
+      "accessibilityText": {
+        "type": "Text",
+        "description": "Additional text to be announced by screen readers. Used to provide context for users using assistive technology. Not displayed visually."
+      },
+      "marginAbove": {
+        "type": "Text",
+        "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+        "default": "NONE"
+      },
+      "marginBelow": {
+        "type": "Text",
+        "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+        "default": "STANDARD"
+      }
+    },
+
+    "leftCenterRightAlignment": {
+      "description": "Alignment parameter using LEFT/CENTER/RIGHT values (used by richTextDisplayField, linkField)",
+      "align": {
+        "type": "Text",
+        "validValues": ["LEFT", "CENTER", "RIGHT"],
+        "description": "Horizontal alignment of content within the component"
+      }
+    },
+
+    "startCenterEndAlignment": {
+      "description": "Alignment parameter using START/CENTER/END values (used by stampField, tagField, recordActionField, imageField, gaugeField)",
+      "align": {
+        "type": "Text",
+        "validValues": ["START", "CENTER", "END"],
+        "description": "Horizontal alignment of content within the component"
+      }
+    },
+
+    "colorWithTransparency": {
+      "description": "Color parameter that accepts enumerated values or hex colors with optional transparency",
+      "color": {
+        "type": "Text",
+        "acceptsHexColors": true,
+        "supportsTransparency": true,
+        "description": "Color of the component. Accepts enumerated values or 6-digit hex (#RRGGBB) or 8-digit hex with transparency (#RRGGBBAA where AA is 00-FF)"
+      }
+    }
+  },
+
   "components": {
     "a!richTextDisplayField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "leftCenterRightAlignment"],
       "parameters": {
         "value": {
           "type": "Any Type",
           "validation": "Can only contain a!richTextItem, a!richTextIcon, a!richTextBulletedList, a!richTextNumberedList, or plain text"
         },
-        "align": {
-          "validValues": [
-            "LEFT",
-            "CENTER",
-            "RIGHT"
-          ]
-        },
         "preventWrapping": {
-          "type": "Boolean"
+          "type": "Boolean",
+          "default": false
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "tooltip": {
+          "type": "Text",
+          "description": "Text displayed on mouseover/tap of the rich text content"
         }
       },
       "description": "Formatted text display with styles, links, lists"
     },
+
     "a!stampField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "startCenterEndAlignment"],
       "parameters": {
         "text": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display in the stamp (typically 1-2 characters for initials)"
+        },
+        "icon": {
+          "type": "Text",
+          "description": "Icon to display in the stamp (valid icon identifiers)"
         },
         "backgroundColor": {
-          "validValues": [
-            "ACCENT",
-            "POSITIVE",
-            "NEGATIVE",
-            "SECONDARY",
-            "TRANSPARENT"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "SECONDARY", "TRANSPARENT"],
+          "acceptsHexColors": true,
+          "default": "ACCENT"
         },
         "contentColor": {
           "type": "Text",
-          "validValues": [
-            "STANDARD",
-            "ACCENT",
-            "POSITIVE",
-            "NEGATIVE"
-          ],
-          "acceptsHexColors": true
+          "validValues": ["STANDARD", "ACCENT", "POSITIVE", "NEGATIVE"],
+          "acceptsHexColors": true,
+          "default": "STANDARD"
         },
         "size": {
-          "validValues": [
-            "TINY",
-            "SMALL",
-            "MEDIUM",
-            "LARGE"
-          ]
+          "type": "Text",
+          "validValues": ["TINY", "SMALL", "MEDIUM", "LARGE"],
+          "default": "MEDIUM"
         },
         "shape": {
-          "validValues": [
-            "ROUNDED",
-            "SEMI_ROUNDED",
-            "SQUARED"
-          ]
+          "type": "Text",
+          "validValues": ["ROUNDED", "SEMI_ROUNDED", "SQUARED"],
+          "default": "ROUNDED"
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
+        "link": {
+          "type": "Any Type",
+          "description": "Link component to make the stamp clickable (accepts various link functions)"
         },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "tooltip": {
+          "type": "Text",
+          "description": "Text displayed on mouseover/tap of the stamp"
         }
       },
       "description": "Icon and/or text on colored background"
     },
+
     "a!headingField": {
       "category": "display",
+      "note": "Does NOT inherit allDisplayFields - headings do not have label, instructions, helpTooltip, or accessibilityText",
       "parameters": {
         "text": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display in the heading"
         },
         "size": {
-          "validValues": [
-            "LARGE_PLUS",
-            "LARGE",
-            "MEDIUM_PLUS",
-            "MEDIUM",
-            "SMALL",
-            "EXTRA_SMALL"
-          ]
+          "type": "Text",
+          "validValues": ["LARGE_PLUS", "LARGE", "MEDIUM_PLUS", "MEDIUM", "SMALL", "EXTRA_SMALL"],
+          "default": "MEDIUM_PLUS"
         },
         "headingTag": {
           "type": "Text",
-          "validValues": [
-            "H1",
-            "H2",
-            "H3",
-            "H4",
-            "H5",
-            "H6"
-          ]
+          "validValues": ["H1", "H2", "H3", "H4", "H5", "H6"],
+          "description": "Accessibility heading tag for screen readers (produces no visible change)"
         },
         "color": {
-          "validValues": [
-            "ACCENT",
-            "STANDARD",
-            "SECONDARY"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["ACCENT", "STANDARD", "SECONDARY"],
+          "acceptsHexColors": true,
+          "default": "STANDARD"
         },
         "fontWeight": {
           "type": "Text",
-          "validValues": [
-            "LIGHT",
-            "NORMAL",
-            "SEMI_BOLD",
-            "BOLD",
-            "EXTRA_BOLD"
-          ]
+          "validValues": ["LIGHT", "REGULAR", "SEMI_BOLD", "BOLD"],
+          "default": "REGULAR"
+        },
+        "link": {
+          "type": "Any Type",
+          "description": "Link component to make the heading clickable (if more than one link is provided, only the first will be used)"
+        },
+        "align": {
+          "type": "Text",
+          "validValues": ["START", "CENTER", "END"],
+          "default": "START"
+        },
+        "preventWrapping": {
+          "type": "Boolean",
+          "default": false,
+          "description": "When true, the heading will truncate to a single line"
+        },
+        "showWhen": {
+          "type": "Boolean",
+          "default": true
         },
         "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "NONE"
         },
         "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "MORE"
         }
       },
       "description": "Styled heading text with accessibility support"
     },
+
     "a!progressBarField": {
       "category": "display",
+      "inherits": ["allDisplayFields"],
       "parameters": {
         "percentage": {
-          "type": "Integer"
+          "type": "Integer",
+          "description": "Percentage value to display (0-100)"
         },
         "color": {
-          "validValues": [
-            "ACCENT",
-            "POSITIVE",
-            "NEGATIVE",
-            "WARN"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"],
+          "acceptsHexColors": true,
+          "supportsTransparency": true,
+          "default": "ACCENT"
         },
         "style": {
-          "validValues": [
-            "THIN",
-            "THICK"
-          ]
+          "type": "Text",
+          "validValues": ["THIN", "THICK"],
+          "default": "THIN"
         },
         "showPercentage": {
-          "type": "Boolean"
-        },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Boolean",
+          "default": true
         }
       },
       "description": "Progress bar showing completion percentage"
     },
+
     "a!tagField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "startCenterEndAlignment"],
       "parameters": {
         "tags": {
-          "type": "List of Variant"
+          "type": "List of Variant",
+          "description": "Array of tag items created with a!tagItem()"
         },
         "size": {
-          "validValues": [
-            "SMALL",
-            "STANDARD"
-          ]
-        },
-        "align": {
-          "validValues": [
-            "START",
-            "CENTER",
-            "END"
-          ]
-        },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["SMALL", "STANDARD"],
+          "default": "STANDARD"
         }
       },
       "description": "Colored text labels for highlighting attributes"
     },
+
     "a!linkField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "leftCenterRightAlignment"],
       "parameters": {
         "links": {
-          "type": "Any Type"
-        },
-        "align": {
-          "validValues": [
-            "LEFT",
-            "CENTER",
-            "RIGHT"
-          ]
-        },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
+          "type": "Any Type",
+          "description": "Array of link components to display"
         }
       },
       "description": "Displays a list of clickable links"
     },
+
     "a!recordActionField": {
       "category": "display",
+      "inherits": ["startCenterEndAlignment"],
+      "note": "Does NOT inherit allDisplayFields - specialized component without label/instructions/helpTooltip",
       "parameters": {
         "actions": {
           "type": "List of a!recordActionItem",
           "description": "Record action items to display"
         },
         "style": {
-          "validValues": [
-            "TOOLBAR",
-            "LINKS",
-            "CARDS",
-            "SIDEBAR",
-            "CALL_TO_ACTION",
-            "MENU",
-            "MENU_ICON",
-            "TOOLBAR_PRIMARY",
-            "SIDEBAR_PRIMARY"
-          ]
+          "type": "Text",
+          "validValues": ["TOOLBAR", "LINKS", "CARDS", "SIDEBAR", "CALL_TO_ACTION", "MENU", "MENU_ICON", "TOOLBAR_PRIMARY", "SIDEBAR_PRIMARY"]
         },
         "display": {
-          "validValues": [
-            "LABEL",
-            "ICON",
-            "LABEL_AND_ICON"
-          ]
+          "type": "Text",
+          "validValues": ["LABEL", "ICON", "LABEL_AND_ICON"]
         },
         "openActionsIn": {
-          "validValues": [
-            "DIALOG",
-            "NEW_TAB",
-            "SAME_TAB"
-          ]
-        },
-        "align": {
-          "validValues": [
-            "START",
-            "CENTER",
-            "END"
-          ]
+          "type": "Text",
+          "validValues": ["DIALOG", "NEW_TAB", "SAME_TAB"]
         },
         "securityOnDemand": {
-          "type": "Boolean"
+          "type": "Boolean",
+          "default": false
+        },
+        "showWhen": {
+          "type": "Boolean",
+          "default": true
+        },
+        "accessibilityText": {
+          "type": "Text"
         }
       },
       "description": "Displays record actions in various configurable styles"
     },
+
     "a!imageField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "startCenterEndAlignment"],
       "parameters": {
         "images": {
-          "type": "Any Type"
+          "type": "Any Type",
+          "description": "Array of document images or web images created with a!documentImage() or a!webImage()"
         },
         "size": {
-          "validValues": [
-            "ICON",
-            "ICON_PLUS",
-            "TINY",
-            "EXTRA_SMALL",
-            "SMALL",
-            "SMALL_PLUS",
-            "MEDIUM",
-            "MEDIUM_PLUS",
-            "LARGE",
-            "LARGE_PLUS",
-            "EXTRA_LARGE",
-            "FIT",
-            "GALLERY"
-          ]
+          "type": "Text",
+          "validValues": ["ICON", "ICON_PLUS", "TINY", "EXTRA_SMALL", "SMALL", "SMALL_PLUS", "MEDIUM", "MEDIUM_PLUS", "LARGE", "LARGE_PLUS", "EXTRA_LARGE", "FIT", "GALLERY"],
+          "default": "MEDIUM"
         },
         "style": {
-          "validValues": [
-            "STANDARD",
-            "AVATAR"
-          ]
+          "type": "Text",
+          "validValues": ["STANDARD", "AVATAR"],
+          "default": "STANDARD"
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "isThumbnail": {
+          "type": "Boolean",
+          "default": false,
+          "description": "When true, clicking the image opens an enlarged view"
         }
       },
       "description": "Image display from documents or web"
     },
+
     "a!gaugeField": {
       "category": "display",
+      "inherits": ["allDisplayFields", "startCenterEndAlignment"],
       "parameters": {
         "percentage": {
-          "type": "Decimal"
+          "type": "Decimal",
+          "description": "Percentage value to display (0-100)"
         },
         "primaryText": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display in the center of the gauge"
         },
         "secondaryText": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display below the primaryText"
         },
         "color": {
-          "validValues": [
-            "ACCENT",
-            "POSITIVE",
-            "NEGATIVE",
-            "WARN"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"],
+          "acceptsHexColors": true,
+          "supportsTransparency": true,
+          "default": "ACCENT"
         },
         "size": {
-          "validValues": [
-            "SMALL",
-            "MEDIUM",
-            "LARGE"
-          ]
+          "type": "Text",
+          "validValues": ["SMALL", "MEDIUM", "LARGE"],
+          "default": "MEDIUM"
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "tooltip": {
+          "type": "Text",
+          "description": "Text displayed on mouseover/tap of the gauge"
         }
       },
       "description": "Circular progress indicator"
     },
+
     "a!milestoneField": {
       "category": "display",
+      "inherits": ["allDisplayFields"],
       "parameters": {
         "steps": {
-          "type": "List of Text"
+          "type": "List of Text",
+          "description": "Array of text labels for each milestone step"
         },
         "active": {
-          "type": "Integer"
+          "type": "Integer",
+          "description": "Index of the currently active step (1-based)"
         },
         "orientation": {
           "type": "Text",
-          "validValues": [
-            "HORIZONTAL",
-            "VERTICAL"
-          ]
+          "validValues": ["HORIZONTAL", "VERTICAL"],
+          "default": "HORIZONTAL"
         },
         "stepStyle": {
           "type": "Text",
-          "validValues": [
-            "LINE",
-            "CHEVRON",
-            "DOT"
-          ]
+          "validValues": ["LINE", "CHEVRON", "DOT"],
+          "default": "LINE"
         },
         "color": {
-          "validValues": [
-            "ACCENT",
-            "POSITIVE",
-            "NEGATIVE",
-            "WARN"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["ACCENT", "POSITIVE", "NEGATIVE", "WARN"],
+          "acceptsHexColors": true,
+          "supportsTransparency": true,
+          "default": "ACCENT"
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "links": {
+          "type": "List of Variant",
+          "description": "Array of link components for each milestone step"
         }
       },
       "description": "Process step indicator"
     },
+
     "a!horizontalLine": {
       "category": "display",
+      "note": "Does NOT inherit allDisplayFields - specialized component without label/instructions/helpTooltip/accessibilityText/showWhen",
       "parameters": {
         "color": {
-          "validValues": [
-            "SECONDARY",
-            "STANDARD",
-            "ACCENT"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["SECONDARY", "STANDARD", "ACCENT"],
+          "acceptsHexColors": true,
+          "supportsTransparency": true,
+          "default": "SECONDARY"
         },
         "weight": {
           "type": "Text",
-          "validValues": [
-            "THIN",
-            "MEDIUM",
-            "THICK"
-          ]
+          "validValues": ["THIN", "MEDIUM", "THICK"],
+          "default": "THIN"
         },
         "style": {
-          "validValues": [
-            "SOLID",
-            "DOT",
-            "DASH"
-          ]
+          "type": "Text",
+          "validValues": ["SOLID", "DOT", "DASH"],
+          "default": "SOLID"
         },
         "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "NONE"
         },
         "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "STANDARD"
         }
       },
       "description": "Horizontal divider line"
     },
+
     "a!documentViewerField": {
       "category": "display",
+      "inherits": ["allDisplayFields"],
       "parameters": {
         "document": {
-          "type": "Document"
-        },
-        "showName": {
-          "type": "Boolean"
-        },
-        "showDescription": {
-          "type": "Boolean"
+          "type": "Document",
+          "description": "Document to display"
         },
         "height": {
-          "validValues": [
-            "SHORT",
-            "MEDIUM",
-            "TALL"
-          ]
+          "type": "Text",
+          "validValues": ["SHORT", "MEDIUM", "TALL"],
+          "default": "MEDIUM"
         },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
+        "altText": {
+          "type": "Text",
+          "description": "Alternate text for screen readers; used as download link label on mobile"
         },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "disabled": {
+          "type": "Boolean",
+          "default": false,
+          "description": "Prevents user interaction when true"
         },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+        "initialPageDisplay": {
+          "type": "Integer",
+          "description": "Page number to display when the document opens (defaults to page 1)"
+        },
+        "highlightedText": {
+          "type": "Text",
+          "description": "Text to highlight in the document (first occurrence, case-insensitive; Chrome/Firefox only)"
         }
       },
       "description": "Displays a document using the web browser's built-in document viewer"
     },
+
     "a!timeDisplay": {
       "category": "display",
+      "inherits": ["allDisplayFields"],
       "parameters": {
         "value": {
-          "type": "Time"
-        },
-        "format": {
-          "type": "Text",
-          "validValues": [
-            "SHORT",
-            "MEDIUM",
-            "LONG"
-          ]
-        },
-        "labelPosition": {
-          "validValues": [
-            "ABOVE",
-            "ADJACENT",
-            "JUSTIFIED",
-            "COLLAPSED"
-          ]
-        },
-        "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
-        },
-        "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Time",
+          "description": "Time value to display (displays in user's timezone)"
         }
       },
       "description": "Displays a single time (hour, minute, second) in read-only format"
     },
+
     "a!messageBanner": {
       "category": "display",
+      "note": "Does NOT inherit allDisplayFields - specialized component without label/instructions/helpTooltip",
       "parameters": {
         "primaryText": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display on the first line inside the banner"
         },
         "secondaryText": {
-          "type": "Text"
+          "type": "Text",
+          "description": "Text to display beneath the primary text inside the banner"
         },
         "backgroundColor": {
-          "validValues": [
-            "ACCENT",
-            "SUCCESS",
-            "INFO",
-            "WARN",
-            "ERROR"
-          ],
-          "acceptsHexColors": true
+          "type": "Text",
+          "validValues": ["INFO", "SUCCESS", "WARN", "ERROR"],
+          "acceptsHexColors": true,
+          "supportsTransparency": true,
+          "default": "INFO",
+          "description": "Background color of the banner"
+        },
+        "highlightColor": {
+          "type": "Text",
+          "validValues": ["INFO", "POSITIVE", "WARN", "NEGATIVE"],
+          "acceptsHexColors": true,
+          "default": "INFO",
+          "description": "Color of the decorative bar and icon"
+        },
+        "icon": {
+          "type": "Text",
+          "description": "Valid Appian icon name (e.g., 'info-circle', 'check-circle'). Decorative only, not announced by screen readers."
+        },
+        "showDecorativeBar": {
+          "type": "Boolean",
+          "default": true,
+          "description": "Controls visibility of the decorative bar"
+        },
+        "shape": {
+          "type": "Text",
+          "validValues": ["SQUARED", "SEMI_ROUNDED", "ROUNDED"],
+          "default": "SQUARED"
+        },
+        "showWhen": {
+          "type": "Boolean",
+          "default": true,
+          "description": "When false, banner is not displayed or announced"
+        },
+        "announceBehavior": {
+          "type": "Text",
+          "validValues": ["DISPLAY_ONLY", "DISPLAY_AND_ANNOUNCE", "ANNOUNCE_ONLY"],
+          "default": "DISPLAY_ONLY",
+          "description": "Controls screen reader announcement behavior. Note: Appian Mobile always uses DISPLAY_ONLY."
+        },
+        "accessibilityText": {
+          "type": "Text",
+          "description": "Additional text announced by screen readers (not displayed visually)"
         },
         "marginAbove": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "NONE"
         },
         "marginBelow": {
-          "validValues": [
-            "NONE",
-            "EVEN_LESS",
-            "LESS",
-            "STANDARD",
-            "MORE",
-            "EVEN_MORE"
-          ]
+          "type": "Text",
+          "validValues": ["NONE", "EVEN_LESS", "LESS", "STANDARD", "MORE", "EVEN_MORE"],
+          "default": "STANDARD"
         }
       },
       "description": "Displays a message banner with configurable styling"
