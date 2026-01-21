@@ -325,63 +325,77 @@ local!cases: a!queryRecordType(
 
 **ALWAYS read component docs from `/ui-guidelines/` BEFORE writing code.** Never assume you know how a component works—read the documentation first, code second.
 
-**Two-tier documentation structure:**
-1. **Schema Reference (SELECTIVE LOADING)** - Category-specific schema files for parameter validation
-2. **Detailed Instructions** - Dedicated instruction files for complex components
+---
+
+## 🎯 PARAMETER VALIDATION WORKFLOW
+
+### Step 1: Load Required Schema Files (Category-Level Validation)
+
+**Schema files validate parameters and allowed values.** Load only what you need:
+
+**For ALL interfaces:**
+```
+✅ ui-guidelines/reference/schemas/layouts-schema.json (always needed)
+```
+
+**Additional schemas based on components:**
+```
+Forms with inputs? → schemas/input-components-schema.json
+Action buttons? → schemas/button-components-schema.json
+Read-only displays (tags, stamps, richText)? → schemas/display-components-schema.json
+Grids? → schemas/grid-components-schema.json
+Charts? → schemas/chart-components-schema.json
+Complex logic (loops, pattern matching, array manipulation)? → schemas/expression-functions-schema.json
+```
+
+**Quick decision guide:**
+- Create/update form → layouts + input-components + button-components
+- Dashboard/report → layouts + display-components + (grid-components if grids) + (chart-components if charts)
+- Grid-heavy interface → layouts + grid-components + (input-components if filters) + (button-components if actions)
+
+### Step 2: Read Component-Specific Instructions (When Available)
+
+**Some components have detailed instruction files with templates, patterns, and validation checklists.** Check for these AFTER loading schemas:
+
+**Layouts:**
+- [header-content-layout-instructions.md](ui-guidelines/layouts/header-content-layout-instructions.md)
+- [columns-layout-instructions.md](ui-guidelines/layouts/columns-layout-instructions.md)
+- [sidebyside-layout-instructions.md](ui-guidelines/layouts/sidebyside-layout-instructions.md)
+- [form-layout-instructions.md](ui-guidelines/layouts/form-layout-instructions.md)
+- [pane-layout-instructions.md](ui-guidelines/layouts/pane-layout-instructions.md)
+- [wizard-layout-instructions.md](ui-guidelines/layouts/wizard-layout-instructions.md)
+- [card-layout-instructions.md](ui-guidelines/layouts/card-layout-instructions.md)
+
+**Components:**
+- [button-instructions.md](ui-guidelines/components/button-instructions.md)
+- [grid-field-instructions.md](ui-guidelines/components/grid-field-instructions.md)
+- [grid-layout-instructions.md](ui-guidelines/components/grid-layout-instructions.md)
+- [rich-text-instructions.md](ui-guidelines/components/rich-text-instructions.md)
+- [stamp-field-instructions.md](ui-guidelines/components/stamp-field-instructions.md)
+- [card-choice-field-instructions.md](ui-guidelines/components/card-choice-field-instructions.md)
+- [chart-instructions.md](ui-guidelines/components/chart-instructions.md)
+- [image-field-instructions.md](ui-guidelines/components/image-field-instructions.md)
+- [tabular-data-display-pattern.md](ui-guidelines/components/tabular-data-display-pattern.md)
+
+**Icons:**
+- ⚠️ **MUST READ before using ANY icons:** [rich-text-icon-aliases.md](ui-guidelines/reference/rich-text-icon-aliases.md)
+
+**If no instruction file exists, the schema file is your complete reference.**
+
+### Step 3: Follow the Pattern
+
+```
+1. Load schema files → Understand allowed parameters and values
+2. Read instruction file (if exists) → Get templates, patterns, checklists
+3. Write code → Follow templates exactly
+4. Validate → Check against schema + instruction checklist
+```
 
 ---
 
-## 🎯 PARAMETER VALIDATION STRATEGY (Use Selective Loading)
+**Key principle:** Schemas tell you WHAT parameters exist. Instructions tell you HOW to use them correctly. Use both.
 
-**CRITICAL:** Load ONLY the category schema files you need based on your task from `/ui-guidelines/reference/schemas/`.
-
-### Step 1: Detect Interface Type and Components Needed
-
-**For FORMS (create/update interfaces):**
-```
-ALWAYS load:
-  ✅ ui-guidelines/reference/schemas/layouts-schema.json
-  ✅ ui-guidelines/reference/schemas/input-components-schema.json
-  ✅ ui-guidelines/reference/schemas/button-components-schema.json
-```
-
-**For DISPLAYS (dashboards/reports):**
-```
-ALWAYS load:
-  ✅ ui-guidelines/reference/schemas/layouts-schema.json
-  ✅ ui-guidelines/reference/schemas/display-components-schema.json
-
-CONDITIONALLY load:
-  - Using grids? → schemas/grid-components-schema.json
-  - Using charts? → schemas/chart-components-schema.json
-  - Has action buttons? → schemas/button-components-schema.json
-```
-
-**For GRID-HEAVY INTERFACES:**
-```
-ALWAYS load:
-  ✅ ui-guidelines/reference/schemas/layouts-schema.json
-  ✅ ui-guidelines/reference/schemas/grid-components-schema.json
-
-CONDITIONALLY load:
-  - Has action buttons? → schemas/button-components-schema.json
-  - Has filters? → schemas/input-components-schema.json
-  - Complex logic? → schemas/expression-functions-schema.json
-```
-
-### Step 2: Load Expression Functions IF Needed
-
-**Only load `schemas/expression-functions-schema.json` if you need:**
-- Complex loops (a!forEach)
-- Pattern matching (a!match)
-- Helper functions (richTextItem, richTextIcon, save, update)
-- Array manipulation (wherecontains, index, append)
-
-**DO NOT load if you're only using basic components with simple parameters.**
-
----
-
-### Schema File Reference
+### Schema File Reference Table
 
 | Category | File | Components | When to Use |
 |----------|------|------------|-------------|
@@ -392,65 +406,6 @@ CONDITIONALLY load:
 | **Charts** | `schemas/chart-components-schema.json` | 12 | Charts (columnChart, pieChart, measure, grouping) |
 | **Buttons** | `schemas/button-components-schema.json` | 3 | Buttons and actions (buttonWidget, buttonArrayLayout) |
 | **Functions** | `schemas/expression-functions-schema.json` | 39+60 funcs | Expressions, loops, helpers, utilities |
-
----
-
-### Available Detailed Instruction Files:
-
-**Expression Grammar & Variables:**
-- `logic-guidelines/functions-reference.md` - Essential functions reference (arrays, text, dates, queries)
-
-**Layout Components:**
-- `ui-guidelines/layouts/header-content-layout-instructions.md` - HeaderContentLayout guidelines
-- `ui-guidelines/layouts/columns-layout-instructions.md` - ColumnsLayout guidelines
-- `ui-guidelines/layouts/sidebyside-layout-instructions.md` - SideBySideLayout guidelines
-- `ui-guidelines/layouts/form-layout-instructions.md` - FormLayout guidelines
-- `ui-guidelines/layouts/pane-layout-instructions.md` - PaneLayout guidelines
-- `ui-guidelines/layouts/wizard-layout-instructions.md` - WizardLayout guidelines
-- `ui-guidelines/layouts/card-layout-instructions.md` - CardLayout guidelines
-
-**Display Components:**
-- `ui-guidelines/components/button-instructions.md` - Button and ButtonArrayLayout guidelines
-- `ui-guidelines/components/grid-field-instructions.md` - GridField (read-only grid) guidelines
-- `ui-guidelines/components/grid-layout-instructions.md` - GridLayout (editable grid) guidelines
-- `ui-guidelines/components/rich-text-instructions.md` - Rich Text component guidelines
-- `ui-guidelines/components/stamp-field-instructions.md` - Stamp Field guidelines
-- `ui-guidelines/components/card-choice-field-instructions.md` - Card Choice Field guidelines
-- `ui-guidelines/components/chart-instructions.md` - Chart component guidelines
-- `ui-guidelines/components/image-field-instructions.md` - Image Field guidelines
-- `ui-guidelines/components/tabular-data-display-pattern.md` - Custom tabular display pattern
-
-**Icons:**
-- `ui-guidelines/reference/rich-text-icon-aliases.md` - Valid icon aliases for richTextIcon (**MUST READ before using any icons**)
-
-**All other components** (textField, dropdownField, etc.) are documented in category-specific schema files only.
-
-### Documentation Lookup Process:
-
-1. **Check if a dedicated instruction file exists** for the component (see list above)
-   - If YES → Read the dedicated file for templates, patterns, and detailed rules
-   - If NO → Use the appropriate category schema file for parameters and values
-
-2. **For unfamiliar components** - Read the component entry in the appropriate schema file first to understand basic parameters
-   - Forms → `schemas/input-components-schema.json`
-   - Displays → `schemas/display-components-schema.json`
-   - Grids → `schemas/grid-components-schema.json`
-   - Charts → `schemas/chart-components-schema.json`
-   - Buttons → `schemas/button-components-schema.json`
-
-### ❌ NEVER:
-- Use parameters that aren't explicitly documented in either the reference or instruction files
-- Put components in layouts that don't accept them
-- Skip reading documentation because "it seems straightforward"
-
-### ✅ ALWAYS:
-- Start with appropriate schema files for parameter validation (see "PARAMETER VALIDATION STRATEGY" above)
-- Read dedicated instruction files when available for templates and patterns
-- Follow templates exactly from instruction files
-- Verify against validation checklists
-- **Read `/ui-guidelines/reference/rich-text-icon-aliases.md` in full before using ANY icons**
-
-**THIS IS NOT OPTIONAL. Skipping documentation causes critical errors.**
 
 ## 🔄 DYNAMIC SAIL EXPRESSIONS
 
