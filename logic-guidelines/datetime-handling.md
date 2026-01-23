@@ -186,6 +186,54 @@ local!filterUser: loggedInUser(),    /* Type: User */
 
 ---
 
+## Function Return Type Detection for Type Validation {#datetime.type-detection}
+
+### Date-Returning Functions (Incompatible with DateTime fields)
+
+When these functions appear in `a!queryFilter()` value parameter with a **DateTime field**, wrap the entire expression in `todatetime()`:
+
+| Function Pattern | Returns | Wrap Pattern |
+|------------------|---------|--------------|
+| `today()` | Date | `todatetime(today())` |
+| `today() + N` | Date | `todatetime(today() + N)` |
+| `today() - N` | Date | `todatetime(today() - N)` |
+| `todate(...)` | Date | `todatetime(todate(...))` |
+| `date(y, m, d)` | Date | `todatetime(date(y, m, d))` |
+| `datevalue(...)` | Date | `todatetime(datevalue(...))` |
+| `eomonth(...)` | Date | `todatetime(eomonth(...))` |
+| `eomonth(...) + N` | Date | `todatetime(eomonth(...) + N)` |
+| `edate(...)` | Date | `todatetime(edate(...))` |
+| `edate(...) + N` | Date | `todatetime(edate(...) + N)` |
+
+### DateTime-Returning Functions (Incompatible with Date fields)
+
+When these functions appear in `a!queryFilter()` value parameter with a **Date field**, wrap the entire expression in `todate()`:
+
+| Function Pattern | Returns | Wrap Pattern |
+|------------------|---------|--------------|
+| `now()` | DateTime | `todate(now())` |
+| `todatetime(...)` | DateTime | `todate(todatetime(...))` |
+| `datetime(...)` | DateTime | `todate(datetime(...))` |
+| `a!subtractDateTime(...)` | DateTime | `todate(a!subtractDateTime(...))` |
+| `a!addDateTime(...)` | DateTime | `todate(a!addDateTime(...))` |
+| `userdatetime(...)` | DateTime | `todate(userdatetime(...))` |
+
+### Detection Regex Patterns {#datetime.type-detection.regex}
+
+**For automated detection during validation:**
+
+```bash
+# Pattern 1: Date functions (return Date type)
+DATE_FUNCTIONS="(today|todate|date\(|datevalue|eomonth|edate)"
+
+# Pattern 2: DateTime functions (return DateTime type)
+DATETIME_FUNCTIONS="(now|todatetime|datetime\(|a!subtractDateTime|a!addDateTime|userdatetime)"
+```
+
+**Reference:** See `/conversion-guidelines/validation-enforcement-module.md#validation.type-matching` for complete automated detection workflow.
+
+---
+
 ## Date Function Corrections
 
 ```sail

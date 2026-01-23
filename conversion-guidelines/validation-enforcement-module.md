@@ -222,6 +222,10 @@ For each user() call in `/tmp/null_check_user.txt`:
 - [ ] **SKIP** if showing current user (auto-populated fields using `loggedInUser()`)
 - [ ] For display contexts: Verify wrapped in `if(a!isNotNullOrEmpty(...), user(...), "N/A")`
 - [ ] If NOT wrapped → Mark for correction
+- [ ] **Verify property parameter uses firstName + lastName pattern:**
+  - [ ] ❌ WRONG: `user(userId, "displayName")` - displayName is a nickname field and often empty
+  - [ ] ✅ RIGHT: `trim(user(userId, "firstName") & " " & user(userId, "lastName"))`
+  - [ ] If using displayName → Mark for correction to firstName + lastName pattern
 
 ### Review Concatenations {#validation.null-safety.review-concat}
 
@@ -248,6 +252,66 @@ For each a!queryFilter() in `/tmp/null_check_filters.txt`:
 - [ ] For filters with **variable values**: Verify has `applyWhen: a!isNotNullOrEmpty(variable)`
 - [ ] For filters with **constants/functions**: No applyWhen needed
 - [ ] **NO SKIPPING** - all queryFilters with variables need applyWhen
+
+#### Common applyWhen Missing Patterns {#validation.null-safety.common-applywhen}
+
+**These are the most frequent sources of runtime errors. Check EVERY queryFilter for these patterns:**
+
+**Pattern 1: Missing applyWhen on ri! variable (Record ID filtering)**
+```sail
+/* ❌ WRONG - Missing applyWhen with ri! variable */
+a!queryFilter(
+  field: 'recordType!Case.fields.id',
+  operator: "=",
+  value: ri!recordId  /* Variable without applyWhen causes runtime error if null! */
+)
+
+/* ✅ CORRECT - Has applyWhen */
+a!queryFilter(
+  field: 'recordType!Case.fields.id',
+  operator: "=",
+  value: ri!recordId,
+  applyWhen: a!isNotNullOrEmpty(ri!recordId)
+)
+```
+
+**Pattern 2: Missing applyWhen on local! filter variable**
+```sail
+/* ❌ WRONG - Missing applyWhen with local! variable */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus  /* Variable without applyWhen causes runtime error if null! */
+)
+
+/* ✅ CORRECT - Has applyWhen */
+a!queryFilter(
+  field: 'recordType!Case.fields.status',
+  operator: "=",
+  value: local!selectedStatus,
+  applyWhen: a!isNotNullOrEmpty(local!selectedStatus)
+)
+```
+
+**Pattern 3: Missing applyWhen on record field reference**
+```sail
+/* ❌ WRONG - Missing applyWhen with record field */
+a!queryFilter(
+  field: 'recordType!Document.fields.caseId',
+  operator: "=",
+  value: ri!case['recordType!Case.fields.caseId']  /* Field reference without applyWhen! */
+)
+
+/* ✅ CORRECT - Has applyWhen */
+a!queryFilter(
+  field: 'recordType!Document.fields.caseId',
+  operator: "=",
+  value: ri!case['recordType!Case.fields.caseId'],
+  applyWhen: a!isNotNullOrEmpty(ri!case['recordType!Case.fields.caseId'])
+)
+```
+
+**Rule**: ANY filter where `value` parameter uses `ri!` or `local!` MUST have `applyWhen: a!isNotNullOrEmpty()`. No exceptions.
 
 ### Review Dropdown Fields {#validation.null-safety.review-dropdown}
 
@@ -398,55 +462,141 @@ Null Safety Enforcement Summary:
 
 Field type in `a!queryFilter()` MUST match value type. Mismatches cause runtime errors.
 
-### Type Compatibility Table {#validation.type-matching.table}
+### Automated Detection System {#validation.type-matching.detection}
 
-| Field Type | Valid Value Expressions | Invalid (Will Fail) |
-|------------|------------------------|---------------------|
-| **Date** | `today()`, `todate()`, `date()`, `datevalue()`, `eomonth()`, `edate()`, date arithmetic | `now()`, `a!subtractDateTime()`, `userdatetime()` |
-| **DateTime** | `now()`, `todatetime()`, `datetime()`, `a!subtractDateTime()`, `a!addDateTime()`, `userdatetime()` | `today()`, `todate()`, `eomonth()`, `edate()` |
-| **Text** | `"literal"`, `tostring()`, `concat()`, Text variable | Integer, Boolean, Date |
-| **Number (Integer)** | `123`, `tointeger()`, Integer variable | `"123"` (text), dates |
-| **Number (Decimal)** | `123.45`, `todecimal()`, Decimal variable | `"123.45"` (text), dates |
-| **Boolean** | `true()`, `false()`, Boolean variable | `"true"` (text), `1` (integer) |
-| **User** | `loggedInUser()`, `touser()`, User variable | `"username"` (text without touser) |
+**Step 1: Extract all queryFilter instances**
 
-**Note:** Integer and Decimal are interchangeable. All other types require exact match.
+```bash
+# Extract filters with line numbers and context
+grep -n -A 3 "a!queryFilter(" output/[filename].sail > /tmp/all_filters.txt
+echo "Found $(grep -c "a!queryFilter(" output/[filename].sail) filters to validate"
+```
 
-### Local Variable Tracing {#validation.type-matching.tracing}
+**Step 2: Detect Date function usage in filters**
 
-When filter value is a local variable, trace back to declaration:
+```bash
+# Find filters using Date-returning functions
+grep -n "a!queryFilter(" output/[filename].sail | \
+  grep -E "(today|todate|date\(|datevalue|eomonth|edate)" \
+  > /tmp/date_function_filters.txt
+
+echo "Found $(wc -l < /tmp/date_function_filters.txt) filters using Date functions"
+cat /tmp/date_function_filters.txt
+```
+
+**Step 3: Detect DateTime function usage in filters**
+
+```bash
+# Find filters using DateTime-returning functions
+grep -n "a!queryFilter(" output/[filename].sail | \
+  grep -E "(now\(\)|todatetime|datetime\(|subtractDateTime|addDateTime|userdatetime)" \
+  > /tmp/datetime_function_filters.txt
+
+echo "Found $(wc -l < /tmp/datetime_function_filters.txt) filters using DateTime functions"
+cat /tmp/datetime_function_filters.txt
+```
+
+**Step 4: Manual field type verification**
+
+For each filter found in Steps 2-3:
+
+1. **Extract field UUID** from the filter
+2. **Look up field type** in `data-model-context.md`:
+   - Search for field UUID
+   - Find "Data Type" column value
+3. **Apply correction if mismatched:**
+
+| Filter Uses | Field Type in data-model-context.md | Action |
+|-------------|-------------------------------------|--------|
+| Date function (today, eomonth, edate, etc.) | **Date and Time** (DateTime) | ❌ MISMATCH - Wrap value in `todatetime()` |
+| Date function | **Date** | ✅ OK - No change |
+| DateTime function (now, a!addDateTime, etc.) | **Date** | ❌ MISMATCH - Wrap value in `todate()` |
+| DateTime function | **Date and Time** (DateTime) | ✅ OK - No change |
+
+### Correction Patterns {#validation.type-matching.corrections}
+
+**Pattern A: Date function → DateTime field (Most Common)**
 
 ```sail
-/* Variable declaration */
-local!filterDate: today(),           /* ← Initialized with today() → Type: Date */
-
-/* Later in a!queryFilter */
+/* ❌ BEFORE - Runtime error */
 a!queryFilter(
-  field: '...membershipEndDate',     /* ← Field type: Date (from data-model-context.md) */
+  field: 'recordType!X.fields.submissionDate',  /* DateTime field */
   operator: ">=",
-  value: local!filterDate            /* ← Variable type: Date ✅ MATCH */
+  value: eomonth(today(), -1) + 1  /* Returns Date */
+)
+
+/* ✅ AFTER - Wrap entire expression in todatetime() */
+a!queryFilter(
+  field: 'recordType!X.fields.submissionDate',  /* DateTime field */
+  operator: ">=",
+  value: todatetime(eomonth(today(), -1) + 1)  /* Now returns DateTime */
 )
 ```
 
-### Common Mistakes and Fixes {#validation.type-matching.fixes}
+**Pattern B: DateTime function → Date field (Less Common)**
 
-| Mismatch | Fix |
-|----------|-----|
-| DateTime field + Date value | Change `today()` → `now()`, `todate()` → `todatetime()` |
-| Date field + DateTime value | Change `now()` → `today()`, `a!subtractDateTime()` → `todate(today() - N)` |
-| Integer field + Text value | Change `"123"` → `123`, or wrap in `tointeger()` |
-| Text field + Integer value | Change `123` → `"123"`, or wrap in `tostring()` |
+```sail
+/* ❌ BEFORE - Runtime error */
+a!queryFilter(
+  field: 'recordType!X.fields.dueDate',  /* Date field */
+  operator: ">=",
+  value: a!subtractDateTime(startDateTime: now(), days: 30)  /* Returns DateTime */
+)
 
-### Verification Checklist {#validation.type-matching.checklist}
+/* ✅ AFTER - Wrap entire expression in todate() */
+a!queryFilter(
+  field: 'recordType!X.fields.dueDate',  /* Date field */
+  operator: ">=",
+  value: todate(a!subtractDateTime(startDateTime: now(), days: 30))  /* Now returns Date */
+)
+```
 
-For EACH `a!queryFilter()` in the generated file:
+**Pattern C: Local variable type tracing**
 
-- [ ] Identify field type from `data-model-context.md`
-- [ ] Check value expression type
-- [ ] If mismatch → Apply fix from table above
-- [ ] If local variable → Trace to declaration, confirm type
+```sail
+/* Variable declaration */
+local!filterDate: eomonth(today(), -1),  /* ← Type: Date (from eomonth return type) */
 
-**Reference:** See `/logic-guidelines/datetime-handling.md` for complete type compatibility.
+/* Later in filter */
+a!queryFilter(
+  field: '...createdOn',  /* DateTime field from data-model-context.md */
+  operator: ">=",
+  value: local!filterDate  /* ← Type: Date (traced from declaration) - MISMATCH! */
+)
+
+/* FIX: Wrap variable reference in todatetime() */
+a!queryFilter(
+  field: '...createdOn',  /* DateTime field */
+  operator: ">=",
+  value: todatetime(local!filterDate)  /* ✅ Now returns DateTime */
+)
+```
+
+### Type Compatibility Reference {#validation.type-matching.reference}
+
+**Quick lookup - Full matrix in `/logic-guidelines/datetime-handling.md#datetime.type-detection`**
+
+| Field Type | Compatible Functions | Incompatible Functions |
+|------------|---------------------|------------------------|
+| **Date** | today(), todate(), date(), eomonth(), edate() | now(), todatetime(), a!subtractDateTime(), a!addDateTime() |
+| **DateTime** | now(), todatetime(), datetime(), a!subtractDateTime(), a!addDateTime() | today(), todate(), eomonth(), edate() |
+| **Text** | Text literals, concat(), tostring() | Numbers, Dates, Booleans |
+| **Integer/Decimal** | Numeric literals, tointeger(), todecimal() | Text, Dates, Booleans |
+| **Boolean** | true(), false() | "true" (text), 1 (integer) |
+| **User** | loggedInUser(), touser() | "username" (plain text) |
+
+### Validation Checklist {#validation.type-matching.checklist}
+
+- [ ] **Step 1:** Run automated detection commands (Steps 1-3 above)
+- [ ] **Step 2:** For each detected filter:
+  - [ ] Extract field UUID
+  - [ ] Look up field type in data-model-context.md
+  - [ ] Determine function return type (use tables above)
+  - [ ] If mismatch → Apply correction pattern
+- [ ] **Step 3:** Document corrections in conversion summary
+- [ ] **Step 4:** Re-run detection to confirm all mismatches resolved
+
+**🛑 BLOCKING:** Cannot proceed until ALL detected filters verified and corrected.
 
 ---
 
@@ -661,7 +811,12 @@ For each `a!queryRecordType()`:
 - [ ] Null safety detection run (all 5+ commands)
 - [ ] All null safety corrections applied
 - [ ] Re-verification confirms 100% compliance
-- [ ] Query filter type matching verified for ALL filters
+- [ ] Query filter type matching (AUTOMATED DETECTION REQUIRED):
+  - [ ] Ran Date function detection: `grep -n "a!queryFilter(" ... | grep -E "(today|eomonth|edate|todate|date\(|datevalue)"`
+  - [ ] Ran DateTime function detection: `grep -n "a!queryFilter(" ... | grep -E "(now|todatetime|datetime\(|subtractDateTime|addDateTime)"`
+  - [ ] Verified ALL detected filters against field types in data-model-context.md
+  - [ ] Applied corrections using patterns from {#validation.type-matching.corrections}
+  - [ ] Re-verified: ZERO mismatches remain
 
 ### Query Construction Validation {#validation.pre-flight.queries}
 

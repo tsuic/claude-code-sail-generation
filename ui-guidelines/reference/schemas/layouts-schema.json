@@ -819,7 +819,7 @@
       "parameters": {
         "label": {
           "type": "Text",
-          "description": "Section title"
+          "description": "Section heading"
         },
         "contents": {
           "type": "Any Type"
@@ -833,7 +833,8 @@
         },
         "isCollapsible": {
           "type": "Boolean",
-          "default": false
+          "default": false,
+          "description": "When true, users can click a caret to expand/collapse section contents"
         },
         "isInitiallyCollapsed": {
           "type": "Boolean",
@@ -871,7 +872,7 @@
             "H5",
             "H6"
           ],
-          "description": "Depends on label size"
+          "description": "Semantic/accessibility heading level"
         },
         "labelColor": {
           "type": "Text",

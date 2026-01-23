@@ -129,55 +129,12 @@ a!gridField(
 )
 ```
 
-### Functional Pattern: Built-in Search and Filters
-
-When grid uses record data, use built-in features:
-
-```sail
-/* ✅ NO custom search/filter section needed for this grid */
-
-a!gridField(
-  data: a!recordData(
-    recordType: 'recordType!Employee',
-    filters: {
-      /* Server-side filters for security/permissions */
-      a!queryFilter(
-        field: 'recordType!Employee.fields.department',
-        operator: "=",
-        value: local!userDepartment,
-        applyWhen: not(local!isAdmin)
-      )
-    }
-  ),
-  columns: {...},
-
-  /* Built-in search - replaces custom textField */
-  showSearchBox: true,
-
-  /* Built-in user filters - replaces custom dropdowns */
-  userFilters: {
-    'recordType!Employee.filters.status',
-    'recordType!Employee.filters.department',
-    'recordType!Employee.filters.hireDate'  /* Date range filter */
-  },
-
-  showRefreshButton: true,
-  showExportButton: true
-)
-```
-
-### User Filter Types
-
-User filters are defined on the record type and come in two types:
-
-**List User Filters** (dropdown selection):
-- Allow users to filter by selecting one or more options
-- Options come from field values or related record values
-- Example: Status filter with options "Active", "Inactive", "Pending"
-
-**Date Range User Filters**:
-- Allow users to specify a date range or open-ended range
-- Example: "Hire Date" filter for filtering employees by when they were hired
+**Conversion Details:** The converter will transform custom search/filter UX to built-in grid features. See `/conversion-guidelines/display-conversion-grids.md` `{#display-grids.search-filter}` for:
+- 4-step conversion process (inventory, match, apply decision matrix)
+- Decision tree: when to convert vs keep custom UX
+- User filter types (list filters, date range filters)
+- TODO comment format for missing user filters
+- Complete conversion examples
 
 ### When Custom Search/Filter UX is Appropriate
 
@@ -217,25 +174,17 @@ a!columnChartField(
 )
 ```
 
-### Conversion Checklist: Custom UX → Built-in Features
-
-When converting a mockup to functional:
-
-- [ ] Identify custom search/filter sections that ONLY apply to one grid
-- [ ] Remove custom search `a!textField` → Add `showSearchBox: true`
-- [ ] Check `data-model-context.md` for available user filters on the record type
-- [ ] Replace custom filter dropdowns with `userFilters` where available
-- [ ] For filters without matching user filters, add TODO comment for filter creation
-- [ ] Keep custom filters ONLY if they apply to multiple grids/charts
-- [ ] Verify no duplicate search/filter UX remains
+**Important:** Dashboard-level filters remain as custom UX since they affect multiple components. Only single-grid filters are converted to built-in features.
 
 ### Record Actions (Toolbar and Row-Level)
 
-When a grid is backed by record data, you can use the `recordActions` parameter to display action buttons in the grid's toolbar area.
+**⚠️ NEVER use `recordActions` parameter with local data - causes runtime errors.**
 
-#### Mockup Pattern: Action Button Placeholder
+When creating mockups with action buttons, use placeholder buttons with TODO comments for the converter to transform.
 
-When creating mockups, include action buttons with TODO comments indicating intended placement:
+#### Mockup Pattern: Header/Toolbar Action Buttons
+
+For Create or New actions, place buttons in the header or near the grid:
 
 ```sail
 /* =========================================================================
@@ -280,56 +229,12 @@ a!headerContentLayout(
 )
 ```
 
-#### Functional Pattern: Built-in Record Actions
-
-When grid uses record data, use the `recordActions` parameter:
-
-```sail
-a!gridField(
-  data: a!recordData(recordType: 'recordType!Membership'),
-  columns: {...},
-
-  /* Built-in toolbar action - replaces custom button */
-  recordActions: {
-    a!recordActionItem(
-      action: 'recordType!Membership.actions.createMembership'
-      /* NO identifier - creates new record */
-    )
-  },
-
-  /* Auto-refresh after any record action completes */
-  refreshAfter: "RECORD_ACTION",
-
-  showSearchBox: true,
-  showRefreshButton: true
-)
-```
-
-#### refreshAfter Parameter
-
-Add `refreshAfter: "RECORD_ACTION"` when the grid has **any** record actions that modify data:
-
-- ✅ Grid has `recordActions` parameter with Create action → Add refreshAfter
-- ✅ Grid has `a!recordActionField()` in a column (Edit, Delete) → Add refreshAfter
-- ✅ Grid has both toolbar and column actions → Add refreshAfter
-- ❌ Grid only has `a!recordLink()` (view only) → No refreshAfter needed
-
-#### Toolbar vs Header Placement
-
-By default, move Create/New actions to the grid's `recordActions` parameter. However, keep actions in the header if:
-- The mockup explicitly specifies header placement
-- The action applies to multiple components (not just the grid)
-- Design requirements call for prominent header-level actions
-
-#### Record Action Parameters Reference
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `recordActions` | none | List of `a!recordActionItem()` for toolbar |
-| `refreshAfter` | none | `["RECORD_ACTION"]` to auto-refresh after actions |
-| `openActionsIn` | `"DIALOG"` | Where actions open: `"DIALOG"`, `"NEW_TAB"`, `"SAME_TAB"` |
-| `actionsDisplay` | `"LABEL_AND_ICON"` | Show: `"LABEL_AND_ICON"`, `"LABEL"`, `"ICON"` |
-| `actionsStyle` | `"TOOLBAR"` | Style: `"TOOLBAR"`, `"TOOLBAR_PRIMARY"` |
+**Conversion Details:** The converter will transform mockup action buttons to functional record actions. See `/conversion-guidelines/display-conversion-actions.md` for:
+- Action type rules (Record List vs Related)
+- Primary key identification
+- Placement rules and validation
+- refreshAfter parameter usage
+- Style mapping and configuration
 
 ## ⚠️ CRITICAL: Function Variables in Grid Columns
 
@@ -825,24 +730,31 @@ a!gridColumn(
 ```
 
 ### 7. Action Buttons
+
+**⚠️ Important:** Only use action buttons in grid columns for **secondary actions** (like Delete, Duplicate, Share). For the primary action of viewing a record, use a link on the row identifier/display name instead.
+
+**Mockup Pattern:**
 ```sail
 a!gridColumn(
   label: "Actions",
   value: a!buttonArrayLayout(
     buttons: {
+      /* TODO-CONVERTER: Convert to a!recordActionField() with identifier */
       a!buttonWidget(
         label: "Delete",
         icon: "trash",
         style: "OUTLINE",
         size: "SMALL",
-        color: "SECONDARY"
+        color: "SECONDARY",
+        saveInto: {}
       ),
       a!buttonWidget(
         label: "Share",
         icon: "share",
         style: "OUTLINE",
         size: "SMALL",
-        color: "SECONDARY"
+        color: "SECONDARY",
+        saveInto: {}
       )
     },
     align: "START"
@@ -851,6 +763,12 @@ a!gridColumn(
   align: "CENTER"
 )
 ```
+
+**Notes:**
+- Use `a!buttonArrayLayout` to wrap multiple buttons in grid columns
+- Empty `saveInto: {}` indicates this is a mockup placeholder
+- Converter will transform to `a!recordActionField()` with proper action references
+- See `/conversion-guidelines/display-conversion-actions.md` for conversion patterns
 
 ### 8. Conditional Background Color Highlighting
 
@@ -981,21 +899,6 @@ a!gridField(
       ),
       width: "NARROW_PLUS",
       sortField: "status"
-    ),
-    a!gridColumn(
-      label: "Actions",
-      value: a!buttonArrayLayout(
-        buttons: {
-          a!buttonWidget(
-            label: "Review",
-            style: "OUTLINE",
-            size: "SMALL",
-            color: "ACCENT"
-          )
-        }
-      ),
-      width: "NARROW",
-      align: "CENTER"
     )
   },
   pageSize: 15,
